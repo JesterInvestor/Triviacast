@@ -8,8 +8,6 @@
     "start": "next start"
   },
   "dependencies": {
-    "@thirdweb-dev/react": "^4.9.4",
-    "@thirdweb-dev/sdk": "^4.0.99",
     "next": "15.5.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
