@@ -5,6 +5,7 @@ import { Question, QuizState } from '@/types/quiz';
 import QuizQuestion from './QuizQuestion';
 import QuizResults from './QuizResults';
 import Timer from './Timer';
+import { calculateTPoints } from '@/lib/tpoints';
 
 const QUIZ_TIME_LIMIT = 300; // 5 minutes in seconds
 const TIME_PER_QUESTION = 30; // 30 seconds per question
@@ -18,6 +19,8 @@ export default function Quiz() {
     timeRemaining: QUIZ_TIME_LIMIT,
     quizStarted: false,
     quizCompleted: false,
+    consecutiveCorrect: 0,
+    tPoints: 0,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +45,8 @@ export default function Quiz() {
         timeRemaining: QUIZ_TIME_LIMIT,
         quizStarted: true,
         quizCompleted: false,
+        consecutiveCorrect: 0,
+        tPoints: 0,
       });
     } catch (err) {
       setError('Failed to load quiz questions. Please try again.');
@@ -74,11 +79,18 @@ export default function Quiz() {
     const newAnswers = [...quizState.answers];
     newAnswers[quizState.currentQuestionIndex] = answer;
     
-    setQuizState(prev => ({
-      ...prev,
-      answers: newAnswers,
-      score: isCorrect ? prev.score + 1 : prev.score,
-    }));
+    setQuizState(prev => {
+      const newConsecutive = isCorrect ? prev.consecutiveCorrect + 1 : 0;
+      const earnedPoints = calculateTPoints(newConsecutive, isCorrect, prev.consecutiveCorrect);
+      
+      return {
+        ...prev,
+        answers: newAnswers,
+        score: isCorrect ? prev.score + 1 : prev.score,
+        consecutiveCorrect: newConsecutive,
+        tPoints: prev.tPoints + earnedPoints,
+      };
+    });
 
     // Move to next question or complete quiz
     setTimeout(() => {
@@ -102,6 +114,8 @@ export default function Quiz() {
       timeRemaining: QUIZ_TIME_LIMIT,
       quizStarted: false,
       quizCompleted: false,
+      consecutiveCorrect: 0,
+      tPoints: 0,
     });
     setError(null);
   };
@@ -138,6 +152,7 @@ export default function Quiz() {
         totalQuestions={quizState.questions.length}
         questions={quizState.questions}
         answers={quizState.answers}
+        tPoints={quizState.tPoints}
         onRestart={restartQuiz}
       />
     );

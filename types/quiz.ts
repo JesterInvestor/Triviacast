@@ -15,9 +15,17 @@ export interface QuizState {
   timeRemaining: number;
   quizStarted: boolean;
   quizCompleted: boolean;
+  consecutiveCorrect: number;
+  tPoints: number;
 }
 
 export interface ApiResponse {
   response_code: number;
   results: Question[];
+}
+
+export interface LeaderboardEntry {
+  userName: string;
+  tPoints: number;
+  timestamp: number;
 }

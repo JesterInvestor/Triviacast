@@ -1,12 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { Question } from '@/types/quiz';
+import { addToLeaderboard, addUserTPoints } from '@/lib/tpoints';
+import Link from 'next/link';
 
 interface QuizResultsProps {
   score: number;
   totalQuestions: number;
   questions: Question[];
   answers: (string | null)[];
+  tPoints: number;
   onRestart: () => void;
 }
 
@@ -21,8 +25,11 @@ export default function QuizResults({
   totalQuestions, 
   questions, 
   answers, 
+  tPoints,
   onRestart 
 }: QuizResultsProps) {
+  const [userName, setUserName] = useState('');
+  const [saved, setSaved] = useState(false);
   const percentage = Math.round((score / totalQuestions) * 100);
   
   const getResultMessage = () => {
@@ -37,6 +44,17 @@ export default function QuizResults({
     if (percentage >= 60) return "text-blue-600";
     if (percentage >= 40) return "text-yellow-600";
     return "text-red-600";
+  };
+
+  const handleSaveScore = () => {
+    if (!userName.trim()) {
+      alert('Please enter your name');
+      return;
+    }
+    
+    addToLeaderboard(userName.trim(), tPoints);
+    addUserTPoints(tPoints);
+    setSaved(true);
   };
 
   return (
@@ -56,6 +74,46 @@ export default function QuizResults({
           <div className="text-xl font-semibold text-gray-700">
             {getResultMessage()}
           </div>
+          
+          <div className="mt-6 p-6 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-lg border-2 border-yellow-300">
+            <div className="text-3xl font-bold text-amber-600 mb-2">
+              🏆 {tPoints.toLocaleString()} T Points Earned!
+            </div>
+            <div className="text-sm text-gray-600">
+              • 1000 T points per correct answer<br/>
+              • 500 bonus for 3 in a row<br/>
+              • 1000 bonus for 5 in a row<br/>
+              • 2000 bonus for perfect 10!
+            </div>
+          </div>
+
+          {!saved && (
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 className="text-lg font-semibold mb-3 text-gray-800">Save to Leaderboard</h4>
+              <div className="flex gap-2 justify-center items-center">
+                <input
+                  type="text"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  placeholder="Enter your name"
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  maxLength={20}
+                />
+                <button
+                  onClick={handleSaveScore}
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition"
+                >
+                  Save Score
+                </button>
+              </div>
+            </div>
+          )}
+
+          {saved && (
+            <div className="mt-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+              ✓ Score saved to leaderboard!
+            </div>
+          )}
         </div>
 
         <div className="mb-6">
@@ -111,13 +169,19 @@ export default function QuizResults({
           </div>
         </div>
 
-        <div className="text-center">
+        <div className="text-center flex gap-4 justify-center">
           <button
             onClick={onRestart}
             className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition"
           >
             Try Again
           </button>
+          <Link
+            href="/leaderboard"
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition inline-block"
+          >
+            View Leaderboard
+          </Link>
         </div>
       </div>
     </div>
