@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjEsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIn0",
+    "payload": "eyJkb21haW4iOiJxdWl6LmV4YW1wbGUuY29tIn0",
+    "signature": "MHg..."
+  },
+  "frame": {
+    "version": "1",
+    "name": "Quiz Challenge",
+    "iconUrl": "https://your-domain.vercel.app/icon.png",
+    "homeUrl": "https://your-domain.vercel.app/",
+    "imageUrl": "https://your-domain.vercel.app/og-image.png",
+    "buttonTitle": "Start Quiz",
+    "splashImageUrl": "https://your-domain.vercel.app/splash.png",
+    "splashBackgroundColor": "#3b82f6",
+    "webhookUrl": "https://your-domain.vercel.app/api/webhook"
+  }
+}
