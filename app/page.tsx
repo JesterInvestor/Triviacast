@@ -18,11 +18,11 @@ import Link from 'next/link';
 
 export default function Home() {
   useEffect(() => {
-    window.onload = async () => {
+    (async () => {
       try {
         await sdk.actions.ready();
       } catch {}
-    };
+    })();
   }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1]">
