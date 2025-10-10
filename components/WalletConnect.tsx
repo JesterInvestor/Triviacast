@@ -2,16 +2,11 @@
 
 import { ConnectButton } from 'thirdweb/react';
 import { base } from 'thirdweb/chains';
-import { inAppWallet, createWallet } from 'thirdweb/wallets';
+import { createWallet } from 'thirdweb/wallets';
 import { client } from '@/lib/thirdweb';
 
-// Configure wallets: Farcaster auth + popular external wallets
+// Configure wallets: External wallets only (no social/email/phone login)
 const wallets = client ? [
-  inAppWallet({
-    auth: {
-      options: ['farcaster'],
-    },
-  }),
   createWallet('io.metamask'),
   createWallet('com.coinbase.wallet'),
   createWallet('me.rainbow'),
