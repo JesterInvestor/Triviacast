@@ -2,7 +2,23 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ThirdwebProvider from "@/components/ThirdwebProvider";
 import WagmiProvider from "@/components/WagmiProvider";
+import FarcasterMiniAppReady from "@/components/FarcasterMiniAppReady";
 import AddMiniAppPrompt from "@/components/AddMiniAppPrompt";
+
+const frame = {
+  version: "1",
+  imageUrl: "https://triviacast.xyz/og-image.png",
+  button: {
+    title: "Play Triviacast",
+    action: {
+      type: "launch_frame",
+      name: "Triviacast",
+      url: "https://triviacast.xyz",
+      splashImageUrl: "https://triviacast.xyz/icon.png",
+      splashBackgroundColor: "#F4A6B7"
+    }
+  }
+};
 
 export const metadata: Metadata = {
   title: {
@@ -20,6 +36,10 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
   },
+  other: {
+    "fc:miniapp": JSON.stringify(frame),
+    "fc:frame": JSON.stringify(frame)
+  }
 };
 
 export const viewport: Viewport = {
@@ -47,10 +67,6 @@ export default function RootLayout({
                     (registration) => {
                       console.log('SW registered:', registration);
                     },
-        <meta
-          name="fc:miniapp"
-          content='{"version":"1","imageUrl":"https://triviacast.xyz/image.png","button":{"title":"Open Triviacast","action":{"type":"launch_frame","name":"Triviacast","url":"https://triviacast.xyz","splashImageUrl":"https://triviacast.xyz/icon.png","splashBackgroundColor":"#FFE4EC"}}}'
-        />
                     (error) => {
                       console.log('SW registration failed:', error);
                     }
@@ -81,7 +97,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-      
+        <FarcasterMiniAppReady />
         <WagmiProvider>
           <ThirdwebProvider>
             {children}
