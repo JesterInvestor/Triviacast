@@ -268,6 +268,14 @@ For questions or issues:
 
 ## Contract Details
 
+- ## $TRIV Token & Airdrop
+
+- **Native coin**: $TRIV
+- **Token contract address**: `0x73385Ee7392C105d5898048F96a1bDF551B2D936`
+- **Airdrop**: At launch, $TRIV will be airdropped to top users (top leaderboard wallets). Specific snapshot timing, eligibility thresholds, and distribution amounts will be announced separately.
+
+- ## Contract Details
+
 - **Solidity Version**: 0.8.27
 - **License**: MIT
 - **Network**: Base Sepolia (testnet)

@@ -52,6 +52,8 @@ and used within Farcaster clients. You can use an SDK to access native
 Farcaster features, like authentication, sending notifications, and interacting
 with the user's wallet.
 
+Note: The Triviacast platform's native coin is $TRIV (contract: `0x73385Ee7392C105d5898048F96a1bDF551B2D936`). At launch, $TRIV will be airdropped to top users on the leaderboard; detailed eligibility and snapshot timing will be announced separately.
+
 ### Requirements
 
 Before getting started, make sure you have:

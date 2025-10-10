@@ -14,6 +14,8 @@ A Next.js-based trivia quiz mini-game that encourages users to answer questions 
 - **Farcaster Integration**: Ready for Farcaster miniapp deployment
 - **Vercel Deployment**: Optimized for deployment on Vercel
 
+Note: The platform's native coin is $TRIV (contract: `0x73385Ee7392C105d5898048F96a1bDF551B2D936`). At launch, $TRIV will be airdropped to top users on the leaderboard; eligibility details will be announced separately.
+
 ## Getting Started
 
 ### Prerequisites
