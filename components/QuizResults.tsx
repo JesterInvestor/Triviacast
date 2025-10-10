@@ -6,7 +6,7 @@ import { useActiveAccount } from 'thirdweb/react';
 import { useEffect, useState } from 'react';
 import { addPointsOnChain, isContractConfigured } from '@/lib/contract';
 import { addWalletTPoints } from '@/lib/tpoints';
-import { shareResultsUrl } from '@/lib/farcaster';
+import { shareResultsUrl, openShareUrl } from '@/lib/farcaster';
 
 interface QuizResultsProps {
   score: number;
@@ -204,16 +204,14 @@ export default function QuizResults({
           >
             View Leaderboard
           </Link>
-          <a
-            href={shareResultsUrl(score, totalQuestions, percentage, tPoints)}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => openShareUrl(shareResultsUrl(score, totalQuestions, percentage, tPoints))}
             className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-4 px-8 rounded-lg text-base sm:text-lg transition inline-flex items-center justify-center shadow-lg min-h-[52px] w-full sm:w-auto gap-2"
             aria-label="Share results on Farcaster"
           >
             <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
             Share Results
-          </a>
+          </button>
         </div>
       </div>
     </div>

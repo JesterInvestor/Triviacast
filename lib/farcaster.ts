@@ -9,6 +9,25 @@ function getBaseUrl(): string {
   return 'https://triviacast.xyz';
 }
 
+// Helper to open share URL properly within mini app or externally
+export async function openShareUrl(url: string): Promise<void> {
+  if (typeof window === 'undefined') return;
+  
+  try {
+    // Try to use Farcaster SDK if available (running in mini app)
+    const { sdk } = await import('@farcaster/miniapp-sdk');
+    // Use SDK's openUrl to handle the URL within the Farcaster client
+    await sdk.actions.openUrl(url);
+    return;
+  } catch (error) {
+    // SDK not available or failed to load - fall through to normal handling
+    console.log('Farcaster SDK not available, using normal link');
+  }
+  
+  // Fallback to normal window.open for non-mini-app contexts
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
 function buildEmbedsParams(embeds: string[] = []): string {
   if (!embeds.length) return '';
   // Warpcast supports multiple embeds[] params: embeds[]=url1&embeds[]=url2
