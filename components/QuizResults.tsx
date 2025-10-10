@@ -1,8 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
 import { Question } from '@/types/quiz';
-import { addWalletTPoints } from '@/lib/tpoints';
 import Link from 'next/link';
 import { useActiveAccount } from 'thirdweb/react';
 
@@ -31,13 +29,6 @@ export default function QuizResults({
 }: QuizResultsProps) {
   const percentage = Math.round((score / totalQuestions) * 100);
   const account = useActiveAccount();
-
-  // Automatically save points for connected wallet
-  useEffect(() => {
-    if (account?.address && tPoints > 0) {
-      addWalletTPoints(account.address, tPoints);
-    }
-  }, [account?.address, tPoints]);
   
   const getResultMessage = () => {
     if (percentage >= 80) return "Excellent! 🎉";
@@ -84,11 +75,6 @@ export default function QuizResults({
               • 1000 bonus for 5 in a row<br/>
               • 2000 bonus for perfect 10!
             </div>
-            {account?.address && (
-              <div className="mt-3 text-xs sm:text-sm text-[#5a3d5c] font-medium">
-                ✓ Points saved to wallet: {account.address.slice(0, 6)}...{account.address.slice(-4)}
-              </div>
-            )}
           </div>
         </div>
 

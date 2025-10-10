@@ -79,9 +79,6 @@ export default function Leaderboard() {
                     >
                       <td className="py-2 sm:py-3 px-2 sm:px-4">
                         <div className="flex items-center">
-                          {index === 0 && <span className="text-lg sm:text-2xl mr-1 sm:mr-2">🥇</span>}
-                          {index === 1 && <span className="text-lg sm:text-2xl mr-1 sm:mr-2">🥈</span>}
-                          {index === 2 && <span className="text-lg sm:text-2xl mr-1 sm:mr-2">🥉</span>}
                           <span className="font-semibold text-[#2d1b2e] text-xs sm:text-base">#{index + 1}</span>
                         </div>
                       </td>
