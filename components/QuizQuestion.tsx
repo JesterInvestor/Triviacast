@@ -35,10 +35,10 @@ export default function QuizQuestion({ question, onAnswer, answered }: QuizQuest
   };
 
   const getAnswerClassName = (answer: string) => {
-    const baseClass = "w-full p-4 mb-3 rounded-lg border-2 text-left transition-all cursor-pointer font-medium ";
+    const baseClass = "w-full p-4 sm:p-4 mb-3 rounded-lg border-2 text-left transition-all cursor-pointer font-medium min-h-[56px] flex items-center ";
     
     if (!selectedAnswer) {
-      return baseClass + "border-[#F4A6B7] hover:border-[#E8949C] hover:bg-[#FFE4EC] text-[#2d1b2e] bg-white shadow-md hover:shadow-lg";
+      return baseClass + "border-[#F4A6B7] hover:border-[#E8949C] active:bg-[#FFE4EC] hover:bg-[#FFE4EC] text-[#2d1b2e] bg-white shadow-md hover:shadow-lg active:shadow-xl";
     }
     
     if (answer === question.correct_answer) {
@@ -53,16 +53,16 @@ export default function QuizQuestion({ question, onAnswer, answered }: QuizQuest
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-xl p-6 border-4 border-[#F4A6B7]">
-      <div className="mb-2 text-sm text-[#8b6b8d] font-semibold uppercase tracking-wide">
+    <div className="bg-white rounded-lg shadow-xl p-4 sm:p-6 border-4 border-[#F4A6B7]">
+      <div className="mb-2 text-xs sm:text-sm text-[#8b6b8d] font-semibold uppercase tracking-wide">
         {question.category} - {question.difficulty}
       </div>
       
-      <h2 className="text-2xl font-semibold mb-6 text-[#2d1b2e] leading-relaxed">
+      <h2 className="text-lg sm:text-2xl font-semibold mb-4 sm:mb-6 text-[#2d1b2e] leading-relaxed">
         {decodeHtml(question.question)}
       </h2>
       
-      <div className="space-y-2">
+      <div className="space-y-3">
         {shuffledAnswers.map((answer, index) => (
           <button
             key={index}
@@ -70,8 +70,8 @@ export default function QuizQuestion({ question, onAnswer, answered }: QuizQuest
             disabled={answered}
             className={getAnswerClassName(answer)}
           >
-            <span className="font-bold text-[#F4A6B7]">{String.fromCharCode(65 + index)}.</span>{' '}
-            {decodeHtml(answer)}
+            <span className="font-bold text-[#F4A6B7] mr-2">{String.fromCharCode(65 + index)}.</span>
+            <span className="flex-1 text-left">{decodeHtml(answer)}</span>
           </button>
         ))}
       </div>

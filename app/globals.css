@@ -18,6 +18,10 @@
   --text-medium: #5a3d5c;
   --text-light: #8b6b8d;
   --text-on-brain: #ffffff;
+  
+  /* Touch target sizes (mobile-first) */
+  --touch-target-min: 44px;
+  --touch-spacing: 12px;
 }
 
 @theme inline {
@@ -48,4 +52,33 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  /* Improve text rendering on mobile */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent text size adjustment on mobile */
+  -webkit-text-size-adjust: 100%;
+  /* Improve tap highlight */
+  -webkit-tap-highlight-color: rgba(244, 166, 183, 0.2);
+}
+
+/* Mobile-first: Ensure touch targets meet minimum size */
+button, a, input, select, textarea {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+/* Improve focus states for accessibility */
+button:focus-visible, a:focus-visible, input:focus-visible {
+  outline: 2px solid var(--brain-primary);
+  outline-offset: 2px;
+}
+
+/* Optimize for performance - will-change for animated elements */
+.quiz-progress-bar {
+  will-change: width;
+}
+
+/* Prevent horizontal scroll on mobile */
+html, body {
+  overflow-x: hidden;
 }

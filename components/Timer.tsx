@@ -15,7 +15,7 @@ export default function Timer({ timeRemaining }: TimerProps) {
   };
 
   return (
-    <div className={`text-2xl font-bold ${getTimerColor()} bg-white px-4 py-2 rounded-lg shadow-md border-2 border-[#F4A6B7]`}>
+    <div className={`text-lg sm:text-2xl font-bold ${getTimerColor()} bg-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg shadow-md border-2 border-[#F4A6B7]`}>
       ⏱️ {minutes}:{seconds.toString().padStart(2, '0')}
     </div>
   );
