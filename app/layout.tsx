@@ -23,6 +23,10 @@ export const metadata: Metadata = {
   },
 };
 
+        <meta
+          name="fc:miniapp"
+          content='{"version":"1","imageUrl":"https://triviacast.xyz/image.png","button":{"title":"Open Triviacast","action":{"type":"launch_frame","name":"Triviacast","url":"https://triviacast.xyz","splashImageUrl":"https://triviacast.xyz/icon.png","splashBackgroundColor":"#FFE4EC"}}}'
+        />
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
