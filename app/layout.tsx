@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ThirdwebProvider from "@/components/ThirdwebProvider";
 import FarcasterMiniAppReady from "@/components/FarcasterMiniAppReady";
+import AddMiniAppPrompt from "@/components/AddMiniAppPrompt";
 
 export const metadata: Metadata = {
   title: "Triviacast - Test Your Brain Power",
@@ -75,6 +76,8 @@ export default function RootLayout({
         <ThirdwebProvider>
           {children}
         </ThirdwebProvider>
+        {/* Gentle prompt to add the app to user's Mini Apps list */}
+        <AddMiniAppPrompt />
       </body>
     </html>
   );
