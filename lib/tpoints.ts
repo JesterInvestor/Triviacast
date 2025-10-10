@@ -5,9 +5,6 @@ import {
   isContractConfigured 
 } from './contract';
 
-const WALLET_POINTS_KEY_PREFIX = 'triviacast_wallet_points_';
-const WALLET_LEADERBOARD_KEY = 'triviacast_wallet_leaderboard';
-
 export function calculateTPoints(
   consecutiveCorrect: number,
   isCorrect: boolean,
@@ -29,115 +26,61 @@ export function calculateTPoints(
   return points;
 }
 
+/**
+ * Get leaderboard from blockchain
+ * @returns Array of leaderboard entries sorted by T points (descending)
+ */
 export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
-  // Try to get from blockchain first if contract is configured
-  if (isContractConfigured()) {
-    try {
-      // Get total number of wallets to fetch all entries
-      const { getTotalWalletsFromChain } = await import('./contract');
-      const totalWallets = await getTotalWalletsFromChain();
-      
-      // Fetch all wallets with points (use a large limit or the total count)
-      const limit = Math.max(totalWallets, 1000); // At least 1000 to be safe
-      const chainLeaderboard = await getLeaderboardFromChain(limit);
-      
-      if (chainLeaderboard.length > 0) {
-        return chainLeaderboard;
-      }
-    } catch (error) {
-      console.warn('Failed to fetch leaderboard from chain, falling back to localStorage:', error);
-    }
+  if (!isContractConfigured()) {
+    console.warn('Contract not configured - cannot fetch leaderboard');
+    return [];
   }
 
-  // Fallback to localStorage
-  if (typeof window === 'undefined') return [];
-  
-  const stored = localStorage.getItem(WALLET_LEADERBOARD_KEY);
-  if (!stored) return [];
-  
   try {
-    const leaderboard = JSON.parse(stored);
-    // Return all entries, not just top 100
-    return leaderboard;
-  } catch {
+    // Get total number of wallets to fetch all entries
+    const { getTotalWalletsFromChain } = await import('./contract');
+    const totalWallets = await getTotalWalletsFromChain();
+    
+    // Fetch all wallets with points (use a large limit or the total count)
+    const limit = Math.max(totalWallets, 1000); // At least 1000 to be safe
+    const chainLeaderboard = await getLeaderboardFromChain(limit);
+    
+    return chainLeaderboard;
+  } catch (error) {
+    console.error('Failed to fetch leaderboard from chain:', error);
     return [];
   }
 }
 
-function updateLeaderboard(walletAddress: string, totalPoints: number): void {
-  if (typeof window === 'undefined') return;
-  
-  // Get leaderboard from localStorage only for updating
-  const stored = localStorage.getItem(WALLET_LEADERBOARD_KEY);
-  let leaderboard: LeaderboardEntry[] = [];
-  
-  if (stored) {
-    try {
-      leaderboard = JSON.parse(stored);
-    } catch {
-      leaderboard = [];
-    }
-  }
-  
-  // Check if wallet already exists
-  const existingIndex = leaderboard.findIndex(
-    entry => entry.walletAddress.toLowerCase() === walletAddress.toLowerCase()
-  );
-  
-  if (existingIndex >= 0) {
-    // Update existing entry
-    leaderboard[existingIndex].tPoints = totalPoints;
-  } else {
-    // Add new entry
-    leaderboard.push({
-      walletAddress,
-      tPoints: totalPoints,
-    });
-  }
-  
-  // Sort by points descending
-  leaderboard.sort((a, b) => b.tPoints - a.tPoints);
-  
-  // Store all entries (no limit)
-  localStorage.setItem(WALLET_LEADERBOARD_KEY, JSON.stringify(leaderboard));
-}
-
-// --- Wallet-based point storage ---
-
+/**
+ * Get wallet's total T points from blockchain
+ * @param walletAddress The wallet address to query
+ * @returns Total T points for the wallet
+ */
 export async function getWalletTotalPoints(walletAddress: string): Promise<number> {
-  // Try to get from blockchain first if contract is configured
-  if (isContractConfigured()) {
-    try {
-      const chainPoints = await getPointsFromChain(walletAddress);
-      if (chainPoints > 0) {
-        return chainPoints;
-      }
-    } catch (error) {
-      console.warn('Failed to fetch points from chain, falling back to localStorage:', error);
-    }
+  if (!isContractConfigured()) {
+    console.warn('Contract not configured - cannot fetch points');
+    return 0;
   }
 
-  // Fallback to localStorage
-  if (typeof window === 'undefined') return 0;
-  
-  const key = WALLET_POINTS_KEY_PREFIX + walletAddress.toLowerCase();
-  const stored = localStorage.getItem(key);
-  return stored ? parseInt(stored, 10) : 0;
+  try {
+    const chainPoints = await getPointsFromChain(walletAddress);
+    return chainPoints;
+  } catch (error) {
+    console.error('Failed to fetch points from chain:', error);
+    return 0;
+  }
 }
 
+/**
+ * Calculate new total points (does not store - blockchain write happens in QuizResults)
+ * This function is kept for compatibility but doesn't write to localStorage anymore
+ * @param walletAddress The wallet address
+ * @param points Points to add
+ * @returns New total (current + added points)
+ */
 export async function addWalletTPoints(walletAddress: string, points: number): Promise<number> {
-  if (typeof window === 'undefined') return 0;
-  
-  // For now, we only update localStorage
-  // The actual blockchain transaction will be done in QuizResults component
-  // where we have access to the user's account
-  const key = WALLET_POINTS_KEY_PREFIX + walletAddress.toLowerCase();
   const currentTotal = await getWalletTotalPoints(walletAddress);
   const newTotal = currentTotal + points;
-  localStorage.setItem(key, newTotal.toString());
-  
-  // Update leaderboard with new total
-  updateLeaderboard(walletAddress, newTotal);
-  
   return newTotal;
 }
