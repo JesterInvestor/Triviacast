@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ThirdwebProvider from "@/components/ThirdwebProvider";
 import WagmiProvider from "@/components/WagmiProvider";
-import FarcasterMiniAppReady from "@/components/FarcasterMiniAppReady";
 import AddMiniAppPrompt from "@/components/AddMiniAppPrompt";
 
 export const metadata: Metadata = {
@@ -23,10 +22,6 @@ export const metadata: Metadata = {
   },
 };
 
-        <meta
-          name="fc:miniapp"
-          content='{"version":"1","imageUrl":"https://triviacast.xyz/image.png","button":{"title":"Open Triviacast","action":{"type":"launch_frame","name":"Triviacast","url":"https://triviacast.xyz","splashImageUrl":"https://triviacast.xyz/icon.png","splashBackgroundColor":"#FFE4EC"}}}'
-        />
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -52,6 +47,10 @@ export default function RootLayout({
                     (registration) => {
                       console.log('SW registered:', registration);
                     },
+        <meta
+          name="fc:miniapp"
+          content='{"version":"1","imageUrl":"https://triviacast.xyz/image.png","button":{"title":"Open Triviacast","action":{"type":"launch_frame","name":"Triviacast","url":"https://triviacast.xyz","splashImageUrl":"https://triviacast.xyz/icon.png","splashBackgroundColor":"#FFE4EC"}}}'
+        />
                     (error) => {
                       console.log('SW registration failed:', error);
                     }
@@ -82,8 +81,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        {/* Notify Farcaster Mini App host that UI is ready once mounted (mount early) */}
-        <FarcasterMiniAppReady />
+      
         <WagmiProvider>
           <ThirdwebProvider>
             {children}
