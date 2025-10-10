@@ -1,16 +1,34 @@
 {
-  "accountAssociation": {
-    "header": "",
-    "payload": "",
-    "signature": ""
-  },
-  "miniapp": {
-    "version": "1",
+  "frame": {
     "name": "Triviacast",
-    "homeUrl": "https://triviacast.xyz/",
-    "iconUrl": "https://triviacast.xyz/brain-small.svg",
-    "description": "Play timed trivia, earn T points, and claim daily $TRIV on Base.",
-    "splashImageUrl": "https://triviacast.xyz/brain-small.svg",
-    "splashBackgroundColor": "#F4A6B7"
+    "version": "1",
+    "iconUrl": "https://triviacast.xyz/icon.png",
+    "homeUrl": "https://triviacast.xyz",
+    "imageUrl": "https://triviacast.xyz/image.png",
+    "buttonTitle": "Open Triviacast",
+    "splashImageUrl": "https://triviacast.xyz/splash.png",
+    "splashBackgroundColor": "#FFE4EC",
+    "webhookUrl": "https://triviacast.xyz/api/webhook",
+    "subtitle": "Test Your Brain Power",
+    "description": "A Next.js-based trivia quiz mini-game. Built for Farcaster",
+    "screenshotUrls": [
+      "https://triviacast.xyz/screenshot.png"
+    ],
+    "primaryCategory": "education",
+    "tags": [
+      "social",
+      "messaging",
+      "community",
+      "trivia"
+    ],
+    "heroImageUrl": "https://triviacast.xyz/screenshot.png",
+    "ogTitle": "Triviacast - Test your brain",
+    "ogDescription": "Next.js-based trivia quiz mini-game",
+    "ogImageUrl": "https://triviacast.xyz/screenshot.png"
+  },
+  "accountAssociation": {
+    "header": "eyJmaWQiOjExNzU1MDYsInR5cGUiOiJhdXRoIiwia2V5IjoiMHhmRWZiMTRCOTkyNjQwZDUwZWJiMDBmYTlkOTY3NGFlMzlDNjA3ZDhiIn0",
+    "payload": "eyJkb21haW4iOiJ0cml2aWFjYXN0Lnh5eiJ9",
+    "signature": "wkPmTxxyx4zxJnCbm8/YGke9NwdhxTtBsmpZawM1WFk/ozoUjbIZT5BcVQ+9Eudx9mpR+U4Y/gvGMtOOA8E+kxw="
   }
 }
