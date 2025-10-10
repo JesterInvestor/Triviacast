@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ThirdwebProvider from "@/components/ThirdwebProvider";
 import FarcasterMiniAppReady from "@/components/FarcasterMiniAppReady";
+// import ClientReady from '@/components/ClientReady'
+// Update the path below to the correct location of ClientReady, for example:
+import ClientReady from '@/components/ClientReady'
 
 export const metadata: Metadata = {
   title: "Triviacast - Test Your Brain Power",
@@ -72,6 +75,7 @@ export default function RootLayout({
       <body className="antialiased">
         {/* Notify Farcaster Mini App host that UI is ready once mounted (mount early) */}
         <FarcasterMiniAppReady />
+        <ClientReady />
         <ThirdwebProvider>
           {children}
         </ThirdwebProvider>
