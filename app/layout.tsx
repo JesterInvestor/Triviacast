@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ThirdwebProvider from "@/components/ThirdwebProvider";
+import FarcasterMiniAppReady from "@/components/FarcasterMiniAppReady";
 
 export const metadata: Metadata = {
   title: "Triviacast - Test Your Brain Power",
@@ -52,6 +53,8 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <ThirdwebProvider>
+          {/* Notify Farcaster Mini App host that UI is ready once mounted */}
+          <FarcasterMiniAppReady />
           {children}
         </ThirdwebProvider>
       </body>
