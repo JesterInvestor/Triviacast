@@ -6,8 +6,11 @@ import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
 import Link from 'next/link';
 import { useActiveAccount } from 'thirdweb/react';
 import { callDailyClaim, getDistributorOwner, isDistributorConfigured } from '@/lib/distributor';
-import { shareLeaderboardUrl } from '@/lib/farcaster';
+
 import { batchResolveDisplayNames } from '@/lib/addressResolver';
+
+import { shareLeaderboardUrl, openShareUrl } from '@/lib/farcaster';
+
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -73,15 +76,13 @@ export default function Leaderboard() {
                 {account.address.slice(0, 6)}...{account.address.slice(-4)}
               </div>
               <div className="mt-3 flex items-center gap-2 justify-center flex-wrap">
-                <a
-                  href={shareLeaderboardUrl(myRank, walletTotal)}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => openShareUrl(shareLeaderboardUrl(myRank, walletTotal))}
                   className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-4 rounded-lg text-sm transition inline-flex items-center justify-center shadow gap-2"
                 >
                   <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
                   Share on Farcaster
-                </a>
+                </button>
               {isDistributorConfigured() && (
                 <div className="mt-3">
                   <button
