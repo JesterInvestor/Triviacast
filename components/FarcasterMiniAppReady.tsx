@@ -6,23 +6,47 @@ import { useEffect } from "react";
 export default function FarcasterMiniAppReady() {
   useEffect(() => {
     let cancelled = false;
+    let attempts = 0;
 
-    async function run() {
+    const callReady = async () => {
       try {
-        // Only run in Farcaster host or when embedded; safe to call regardless
         const mod = await import("@farcaster/miniapp-sdk");
         if (cancelled) return;
-        // Signal that the app is ready to display
-        await mod.sdk.actions.ready();
+  await mod.sdk.actions.ready();
+  try { (window as any).__TRIVIACAST_READY_CALLED = true; } catch {}
+        // Once successful, we can stop listening
+        document.removeEventListener("visibilitychange", onVisible);
       } catch (err) {
-        // Non-fatal outside of Farcaster; ignore in normal web context
-        console.debug("Farcaster ready() skipped:", err);
+        // Retry a few times in case host isn't ready yet
+        attempts += 1;
+        if (attempts <= 3) {
+          setTimeout(callReady, 300 * attempts);
+        } else {
+          console.debug("Farcaster ready() not acknowledged; will retry on visibilitychange.");
+        }
       }
+    };
+
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        callReady();
+      }
+    };
+
+    // Ensure DOM is ready before calling
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      callReady();
+    } else {
+      window.addEventListener("DOMContentLoaded", callReady, { once: true });
     }
 
-    run();
+    // Also listen for visibility changes (some hosts delay until visible)
+    document.addEventListener("visibilitychange", onVisible);
+
     return () => {
       cancelled = true;
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("DOMContentLoaded", callReady as any);
     };
   }, []);
 

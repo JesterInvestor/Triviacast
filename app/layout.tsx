@@ -52,9 +52,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        {/* Notify Farcaster Mini App host that UI is ready once mounted (mount early) */}
+        <FarcasterMiniAppReady />
         <ThirdwebProvider>
-          {/* Notify Farcaster Mini App host that UI is ready once mounted */}
-          <FarcasterMiniAppReady />
           {children}
         </ThirdwebProvider>
       </body>
