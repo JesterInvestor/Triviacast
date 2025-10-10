@@ -32,12 +32,15 @@ export default function Leaderboard() {
       setLoading(true);
       try {
         const board = await getLeaderboard();
+        console.log('Leaderboard data:', board);
         setLeaderboard(board);
         
         // Resolve display names for all addresses
         if (board.length > 0) {
           const addresses = board.map(entry => entry.walletAddress);
+          console.log('Resolving names for addresses:', addresses);
           const names = await batchResolveDisplayNames(addresses);
+          console.log('Resolved display names:', names);
           setDisplayNames(names);
         }
         

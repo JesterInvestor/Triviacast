@@ -11,9 +11,15 @@ export async function resolveENS(address: string): Promise<string | null> {
   try {
     // Use a public ENS resolver
     const response = await fetch(`https://api.ensideas.com/ens/resolve/${address}`);
-    if (!response.ok) return null;
+    console.log(`ENS API response for ${address}:`, response.status);
+    
+    if (!response.ok) {
+      console.log(`ENS API not OK for ${address}`);
+      return null;
+    }
     
     const data = await response.json();
+    console.log(`ENS data for ${address}:`, data);
     return data.name || null;
   } catch (error) {
     console.error('Error resolving ENS:', error);
@@ -40,15 +46,24 @@ export async function resolveFarcasterUsername(address: string): Promise<string 
       }
     );
     
-    if (!response.ok) return null;
+    console.log(`Farcaster API response for ${address}:`, response.status);
+    
+    if (!response.ok) {
+      console.log(`Farcaster API not OK for ${address}`);
+      return null;
+    }
     
     const data = await response.json();
+    console.log(`Farcaster data for ${address}:`, data);
+    
     const users = data[address.toLowerCase()];
     
     if (users && users.length > 0) {
+      console.log(`Found Farcaster username for ${address}:`, users[0].username);
       return users[0].username || null;
     }
     
+    console.log(`No Farcaster users found for ${address}`);
     return null;
   } catch (error) {
     console.error('Error resolving Farcaster username:', error);
