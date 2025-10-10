@@ -15,7 +15,7 @@ export default function FarcasterMiniAppReady() {
       } catch {}
       try {
         console.log("[Triviacast] FarcasterMiniAppReady: calling sdk.actions.ready()");
-        await sdk.actions.ready();
+        await sdk.actions.ready({ disableNativeGestures: false });
         console.log("[Triviacast] FarcasterMiniAppReady: ready() resolved");
       } catch {
         console.log("[Triviacast] FarcasterMiniAppReady: ready() error (ignored)");
