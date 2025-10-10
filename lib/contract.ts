@@ -1,5 +1,5 @@
 import { getContract, prepareContractCall, readContract, sendTransaction } from "thirdweb";
-import { baseSepolia } from "thirdweb/chains";
+import { base, baseSepolia } from "thirdweb/chains";
 import { client } from "./thirdweb";
 import type { Account } from "thirdweb/wallets";
 
@@ -52,6 +52,7 @@ const CONTRACT_ABI = [
 // Get contract address from environment
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "84532");
+const activeChain = CHAIN_ID === 8453 ? base : baseSepolia;
 
 // Check if contract is configured
 export function isContractConfigured(): boolean {
@@ -70,7 +71,7 @@ function getContractInstance() {
   return getContract({
     client,
     address: CONTRACT_ADDRESS,
-    chain: baseSepolia,
+    chain: activeChain,
     abi: CONTRACT_ABI,
   });
 }

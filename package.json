@@ -5,7 +5,11 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
-    "start": "next start"
+    "start": "next start",
+    "deploy:dist:base": "npm --prefix hardhat run deploy:dist:base",
+    "airdrop:top5:base": "npm --prefix hardhat run airdrop:top5:base",
+    "deploy:dist:sepolia": "npm --prefix hardhat run deploy:dist:sepolia",
+    "airdrop:top5:sepolia": "npm --prefix hardhat run airdrop:top5:sepolia"
   },
   "dependencies": {
     "next": "15.5.4",

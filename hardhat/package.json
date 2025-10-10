@@ -10,7 +10,9 @@
     "deploy:base": "hardhat run scripts/deploy.ts --network base",
     "verify:base": "hardhat verify --network base",
     "deploy:dist:base": "hardhat run scripts/deploy_distributor.ts --network base",
-    "deploy:dist:sepolia": "hardhat run scripts/deploy_distributor.ts --network baseSepolia"
+    "deploy:dist:sepolia": "hardhat run scripts/deploy_distributor.ts --network baseSepolia",
+    "airdrop:top5:base": "hardhat run scripts/airdrop_top5.ts --network base",
+    "airdrop:top5:sepolia": "hardhat run scripts/airdrop_top5.ts --network baseSepolia"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",

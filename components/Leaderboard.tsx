@@ -1,15 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { LeaderboardEntry } from '@/types/quiz';
 import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
 import Link from 'next/link';
 import { useActiveAccount } from 'thirdweb/react';
+import { callDailyClaim, getDistributorOwner, isDistributorConfigured } from '@/lib/distributor';
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [walletTotal, setWalletTotal] = useState(0);
+  const [claiming, setClaiming] = useState(false);
+  const [claimMsg, setClaimMsg] = useState<string | null>(null);
   const account = useActiveAccount();
+  const canClaim = useMemo(() => !!account?.address && walletTotal > 0 && isDistributorConfigured(), [account?.address, walletTotal]);
 
   useEffect(() => {
     async function fetchData() {
@@ -46,6 +50,35 @@ export default function Leaderboard() {
               <div className="text-xs text-[#5a3d5c] mt-1 truncate">
                 {account.address.slice(0, 6)}...{account.address.slice(-4)}
               </div>
+              {isDistributorConfigured() && (
+                <div className="mt-3">
+                  <button
+                    onClick={async () => {
+                      if (!account) return;
+                      setClaimMsg(null);
+                      setClaiming(true);
+                      try {
+                        const tx = await callDailyClaim(account);
+                        setClaimMsg('Daily claim submitted! It may take a few seconds to confirm.');
+                        console.log('dailyClaim tx:', tx);
+                      } catch (e: any) {
+                        console.error('dailyClaim error', e);
+                        setClaimMsg(e?.message || 'Failed to claim.');
+                      } finally {
+                        setClaiming(false);
+                      }
+                    }}
+                    disabled={!canClaim || claiming}
+                    className={`mt-2 bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-2 px-4 rounded-lg text-sm transition inline-flex items-center justify-center shadow ${(!canClaim || claiming) ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    aria-disabled={!canClaim || claiming}
+                  >
+                    {claiming ? 'Claiming…' : 'Claim Daily $TRIV'}
+                  </button>
+                  {claimMsg && (
+                    <div className="mt-2 text-xs text-[#5a3d5c]">{claimMsg}</div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
