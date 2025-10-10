@@ -5,8 +5,62 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { shareAppUrl } from '@/lib/farcaster';
 import { sdk } from '@farcaster/miniapp-sdk'
+import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Triviacast - Test Your Brain Power',
+  description: 'Test your knowledge with timed trivia questions. Challenge your brain with Triviacast on Farcaster!',
+  openGraph: {
+    title: 'Triviacast - Test Your Brain',
+    description: 'Play daily trivia, climb the leaderboard, and earn T Points. $TRIV airdrops for top players.',
+    images: [
+      {
+        url: 'https://triviacast.xyz/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Triviacast',
+      },
+    ],
+    url: 'https://triviacast.xyz/',
+  },
+  twitter: {
+    title: 'Triviacast - Test Your Brain',
+    description: 'Play daily trivia, climb the leaderboard, and earn T Points. $TRIV airdrops for top players.',
+    images: ['https://triviacast.xyz/og-image.png'],
+  },
+  other: {
+    'fc:miniapp': JSON.stringify({
+      version: '1',
+      imageUrl: 'https://triviacast.xyz/og-image.png',
+      button: {
+        title: 'Play Triviacast',
+        action: {
+          type: 'launch_frame',
+          name: 'Triviacast',
+          url: 'https://triviacast.xyz/',
+          splashImageUrl: 'https://triviacast.xyz/icon.png',
+          splashBackgroundColor: '#F4A6B7',
+        },
+      },
+    }),
+    'fc:frame': JSON.stringify({
+      version: '1',
+      imageUrl: 'https://triviacast.xyz/og-image.png',
+      button: {
+        title: 'Play Triviacast',
+        action: {
+          type: 'launch_frame',
+          name: 'Triviacast',
+          url: 'https://triviacast.xyz/',
+          splashImageUrl: 'https://triviacast.xyz/icon.png',
+          splashBackgroundColor: '#F4A6B7',
+        },
+      },
+    }),
+  },
+};
 
 export default function Home() {
   return (
