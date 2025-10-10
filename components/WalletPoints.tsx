@@ -9,11 +9,15 @@ export default function WalletPoints() {
   const account = useActiveAccount();
 
   useEffect(() => {
-    if (account?.address) {
-      setWalletTotal(getWalletTotalPoints(account.address));
-    } else {
-      setWalletTotal(0);
+    async function fetchPoints() {
+      if (account?.address) {
+        const points = await getWalletTotalPoints(account.address);
+        setWalletTotal(points);
+      } else {
+        setWalletTotal(0);
+      }
     }
+    fetchPoints();
   }, [account?.address]);
 
   if (!account?.address || walletTotal === 0) {

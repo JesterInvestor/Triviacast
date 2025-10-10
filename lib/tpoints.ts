@@ -1,4 +1,9 @@
 import { LeaderboardEntry } from '@/types/quiz';
+import { 
+  getPointsFromChain, 
+  getLeaderboardFromChain, 
+  isContractConfigured 
+} from './contract';
 
 const WALLET_POINTS_KEY_PREFIX = 'triviacast_wallet_points_';
 const WALLET_LEADERBOARD_KEY = 'triviacast_wallet_leaderboard';
@@ -24,7 +29,20 @@ export function calculateTPoints(
   return points;
 }
 
-export function getLeaderboard(): LeaderboardEntry[] {
+export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
+  // Try to get from blockchain first if contract is configured
+  if (isContractConfigured()) {
+    try {
+      const chainLeaderboard = await getLeaderboardFromChain(100);
+      if (chainLeaderboard.length > 0) {
+        return chainLeaderboard;
+      }
+    } catch (error) {
+      console.warn('Failed to fetch leaderboard from chain, falling back to localStorage:', error);
+    }
+  }
+
+  // Fallback to localStorage
   if (typeof window === 'undefined') return [];
   
   const stored = localStorage.getItem(WALLET_LEADERBOARD_KEY);
@@ -40,7 +58,17 @@ export function getLeaderboard(): LeaderboardEntry[] {
 function updateLeaderboard(walletAddress: string, totalPoints: number): void {
   if (typeof window === 'undefined') return;
   
-  const leaderboard = getLeaderboard();
+  // Get leaderboard from localStorage only for updating
+  const stored = localStorage.getItem(WALLET_LEADERBOARD_KEY);
+  let leaderboard: LeaderboardEntry[] = [];
+  
+  if (stored) {
+    try {
+      leaderboard = JSON.parse(stored);
+    } catch {
+      leaderboard = [];
+    }
+  }
   
   // Check if wallet already exists
   const existingIndex = leaderboard.findIndex(
@@ -69,7 +97,20 @@ function updateLeaderboard(walletAddress: string, totalPoints: number): void {
 
 // --- Wallet-based point storage ---
 
-export function getWalletTotalPoints(walletAddress: string): number {
+export async function getWalletTotalPoints(walletAddress: string): Promise<number> {
+  // Try to get from blockchain first if contract is configured
+  if (isContractConfigured()) {
+    try {
+      const chainPoints = await getPointsFromChain(walletAddress);
+      if (chainPoints > 0) {
+        return chainPoints;
+      }
+    } catch (error) {
+      console.warn('Failed to fetch points from chain, falling back to localStorage:', error);
+    }
+  }
+
+  // Fallback to localStorage
   if (typeof window === 'undefined') return 0;
   
   const key = WALLET_POINTS_KEY_PREFIX + walletAddress.toLowerCase();
@@ -77,11 +118,14 @@ export function getWalletTotalPoints(walletAddress: string): number {
   return stored ? parseInt(stored, 10) : 0;
 }
 
-export function addWalletTPoints(walletAddress: string, points: number): number {
+export async function addWalletTPoints(walletAddress: string, points: number): Promise<number> {
   if (typeof window === 'undefined') return 0;
   
+  // For now, we only update localStorage
+  // The actual blockchain transaction will be done in QuizResults component
+  // where we have access to the user's account
   const key = WALLET_POINTS_KEY_PREFIX + walletAddress.toLowerCase();
-  const currentTotal = getWalletTotalPoints(walletAddress);
+  const currentTotal = await getWalletTotalPoints(walletAddress);
   const newTotal = currentTotal + points;
   localStorage.setItem(key, newTotal.toString());
   

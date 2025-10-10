@@ -12,10 +12,15 @@ export default function Leaderboard() {
   const account = useActiveAccount();
 
   useEffect(() => {
-    setLeaderboard(getLeaderboard());
-    if (account?.address) {
-      setWalletTotal(getWalletTotalPoints(account.address));
+    async function fetchData() {
+      const board = await getLeaderboard();
+      setLeaderboard(board);
+      if (account?.address) {
+        const points = await getWalletTotalPoints(account.address);
+        setWalletTotal(points);
+      }
     }
+    fetchData();
   }, [account?.address]);
 
   return (
