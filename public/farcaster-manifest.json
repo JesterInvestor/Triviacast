@@ -5,14 +5,30 @@
     "signature": "MHg..."
   },
   "frame": {
+    "name": "Triviacast",
     "version": "1",
-    "name": "Quiz Challenge",
-    "iconUrl": "https://your-domain.vercel.app/icon.png",
-    "homeUrl": "https://your-domain.vercel.app/",
-    "imageUrl": "https://your-domain.vercel.app/og-image.png",
-    "buttonTitle": "Start Quiz",
-    "splashImageUrl": "https://your-domain.vercel.app/splash.png",
-    "splashBackgroundColor": "#3b82f6",
-    "webhookUrl": "https://your-domain.vercel.app/api/webhook"
+    "iconUrl": "https://triviacast.xyz/icon.png",
+    "homeUrl": "https://triviacast.xyz",
+    "imageUrl": "https://triviacast.xyz/image.png",
+    "buttonTitle": "Open Triviacast",
+    "splashImageUrl": "https://triviacast.xyz/splash.png",
+    "splashBackgroundColor": "#FFE4EC",
+    "webhookUrl": "https://triviacast.xyz/api/webhook",
+    "subtitle": "Test Your Brain Power",
+    "description": "A Next.js-based trivia quiz mini-game that encourages users to answer questions in a timed format. Built for Farcaster",
+    "primaryCategory": "education",
+    "screenshotUrls": [
+      "https://triviacast.xyz/screenshot.png"
+    ],
+    "heroImageUrl": "https://triviacast.xyz/screenshot.png",
+    "tags": [
+      "social",
+      "messaging",
+      "community",
+      "trivia"
+    ],
+    "ogTitle": "Triviacast - Test your brain",
+    "ogDescription": "Next.js-based trivia quiz mini-game",
+    "ogImageUrl": "https://triviacast.xyz/screenshot.png"
   }
 }

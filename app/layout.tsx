@@ -44,6 +44,11 @@ export default function RootLayout({
             `,
           }}
         />
+        {/* Farcaster Mini App embed for homepage */}
+        <meta
+          name="fc:miniapp"
+          content='{"version":"1","imageUrl":"https://triviacast.xyz/og-image.png","button":{"title":"Play Triviacast","action":{"type":"launch_frame","name":"Triviacast","url":"https://triviacast.xyz/","splashImageUrl":"https://triviacast.xyz/brain-small.svg","splashBackgroundColor":"#F4A6B7"}}}'
+        />
       </head>
       <body className="antialiased">
         <ThirdwebProvider>

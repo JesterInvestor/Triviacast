@@ -1,0 +1,16 @@
+{
+  "accountAssociation": {
+    "header": "",
+    "payload": "",
+    "signature": ""
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Triviacast",
+    "homeUrl": "https://triviacast.xyz/",
+    "iconUrl": "https://triviacast.xyz/brain-small.svg",
+    "description": "Play timed trivia, earn T points, and claim daily $TRIV on Base.",
+    "splashImageUrl": "https://triviacast.xyz/brain-small.svg",
+    "splashBackgroundColor": "#F4A6B7"
+  }
+}
