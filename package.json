@@ -20,6 +20,7 @@
     "react-dom": "19.1.0",
     "thirdweb": "^5.108.12",
     "viem": "^2.38.0",
+    "pino-pretty": "^10.0.0",
     "wagmi": "^2.18.0"
   },
   "devDependencies": {
