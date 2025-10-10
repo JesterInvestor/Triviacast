@@ -82,14 +82,8 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                console.log('[Triviacast] Inline fallback: starting import', Date.now());
                 import('https://esm.sh/@farcaster/miniapp-sdk').then(({ sdk }) => {
-                  console.log('[Triviacast] Inline fallback: calling ready()', Date.now());
-                  sdk.actions.ready().then(() => {
-                    console.log('[Triviacast] Inline fallback: ready() resolved', Date.now());
-                  }).catch(() => {
-                    console.log('[Triviacast] Inline fallback: ready() error (ignored)', Date.now());
-                  });
+                  sdk.actions.ready().catch(() => {});
                 }).catch(() => {});
               } catch {}
             `,
