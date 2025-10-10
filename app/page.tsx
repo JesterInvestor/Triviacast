@@ -3,6 +3,7 @@ import WalletConnect from '@/components/WalletConnect';
 import WalletPoints from '@/components/WalletPoints';
 import Link from 'next/link';
 import Image from 'next/image';
+import { shareAppUrl } from '@/lib/farcaster';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,6 +36,16 @@ export default function Home() {
               >
                 🏆 <span className="hidden xs:inline">Leaderboard</span>
               </Link>
+              <a
+                href={shareAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-4 sm:py-2 sm:px-6 rounded-lg transition shadow-lg flex items-center gap-2 justify-center flex-1 sm:flex-initial min-h-[44px]"
+                aria-label="Share on Farcaster"
+              >
+                <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
+                <span className="hidden xs:inline">Share</span>
+              </a>
             </div>
           </div>
         </div>

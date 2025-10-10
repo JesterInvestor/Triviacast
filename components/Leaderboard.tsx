@@ -6,6 +6,7 @@ import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
 import Link from 'next/link';
 import { useActiveAccount } from 'thirdweb/react';
 import { callDailyClaim, getDistributorOwner, isDistributorConfigured } from '@/lib/distributor';
+import { shareLeaderboardUrl } from '@/lib/farcaster';
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -14,6 +15,11 @@ export default function Leaderboard() {
   const [claimMsg, setClaimMsg] = useState<string | null>(null);
   const account = useActiveAccount();
   const canClaim = useMemo(() => !!account?.address && walletTotal > 0 && isDistributorConfigured(), [account?.address, walletTotal]);
+  const myRank = useMemo(() => {
+    if (!account?.address) return null;
+    const idx = leaderboard.findIndex(l => l.walletAddress.toLowerCase() === account.address!.toLowerCase());
+    return idx >= 0 ? idx + 1 : null;
+  }, [account?.address, leaderboard]);
 
   useEffect(() => {
     async function fetchData() {
@@ -50,6 +56,16 @@ export default function Leaderboard() {
               <div className="text-xs text-[#5a3d5c] mt-1 truncate">
                 {account.address.slice(0, 6)}...{account.address.slice(-4)}
               </div>
+              <div className="mt-3 flex items-center gap-2 justify-center flex-wrap">
+                <a
+                  href={shareLeaderboardUrl(myRank, walletTotal)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-4 rounded-lg text-sm transition inline-flex items-center justify-center shadow gap-2"
+                >
+                  <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
+                  Share on Farcaster
+                </a>
               {isDistributorConfigured() && (
                 <div className="mt-3">
                   <button
@@ -79,6 +95,7 @@ export default function Leaderboard() {
                   )}
                 </div>
               )}
+              </div>
             </div>
           </div>
         )}
