@@ -1,7 +1,10 @@
 import Quiz from '@/components/Quiz';
 import WalletConnect from '@/components/WalletConnect';
+import WalletPoints from '@/components/WalletPoints';
 import Link from 'next/link';
 import Image from 'next/image';
+
+export const dynamic = 'force-dynamic';
 
 export default function Home() {
   return (
@@ -22,14 +25,17 @@ export default function Home() {
               <p className="text-xs sm:text-sm text-[#5a3d5c]">Test Your Brain Power</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
-            <WalletConnect />
-            <Link
-              href="/leaderboard"
-              className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-3 px-4 sm:py-2 sm:px-6 rounded-lg transition shadow-lg flex items-center gap-2 justify-center flex-1 sm:flex-initial min-h-[44px]"
-            >
-              🏆 <span className="hidden xs:inline">Leaderboard</span>
-            </Link>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+            <WalletPoints />
+            <div className="flex items-center gap-2 sm:gap-4">
+              <WalletConnect />
+              <Link
+                href="/leaderboard"
+                className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-3 px-4 sm:py-2 sm:px-6 rounded-lg transition shadow-lg flex items-center gap-2 justify-center flex-1 sm:flex-initial min-h-[44px]"
+              >
+                🏆 <span className="hidden xs:inline">Leaderboard</span>
+              </Link>
+            </div>
           </div>
         </div>
         <Quiz />

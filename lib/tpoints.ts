@@ -2,6 +2,7 @@ import { LeaderboardEntry } from '@/types/quiz';
 
 const LEADERBOARD_KEY = 'triviacast_leaderboard';
 const USER_TOTAL_POINTS_KEY = 'triviacast_user_total_points';
+const WALLET_POINTS_KEY_PREFIX = 'triviacast_wallet_points_';
 
 export function calculateTPoints(
   consecutiveCorrect: number,
@@ -81,4 +82,24 @@ export function addToLeaderboard(userName: string, tPoints: number): void {
   const trimmed = leaderboard.slice(0, 100);
   
   localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(trimmed));
+}
+
+// --- Wallet-based point storage ---
+
+export function getWalletTotalPoints(walletAddress: string): number {
+  if (typeof window === 'undefined') return 0;
+  
+  const key = WALLET_POINTS_KEY_PREFIX + walletAddress.toLowerCase();
+  const stored = localStorage.getItem(key);
+  return stored ? parseInt(stored, 10) : 0;
+}
+
+export function addWalletTPoints(walletAddress: string, points: number): number {
+  if (typeof window === 'undefined') return 0;
+  
+  const key = WALLET_POINTS_KEY_PREFIX + walletAddress.toLowerCase();
+  const currentTotal = getWalletTotalPoints(walletAddress);
+  const newTotal = currentTotal + points;
+  localStorage.setItem(key, newTotal.toString());
+  return newTotal;
 }

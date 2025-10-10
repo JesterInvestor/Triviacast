@@ -3,6 +3,8 @@ import WalletConnect from '@/components/WalletConnect';
 import Link from 'next/link';
 import Image from 'next/image';
 
+export const dynamic = 'force-dynamic';
+
 export default function LeaderboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1]">
