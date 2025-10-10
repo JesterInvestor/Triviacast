@@ -1,8 +1,7 @@
 import { LeaderboardEntry } from '@/types/quiz';
 
-const LEADERBOARD_KEY = 'triviacast_leaderboard';
-const USER_TOTAL_POINTS_KEY = 'triviacast_user_total_points';
 const WALLET_POINTS_KEY_PREFIX = 'triviacast_wallet_points_';
+const WALLET_LEADERBOARD_KEY = 'triviacast_wallet_leaderboard';
 
 export function calculateTPoints(
   consecutiveCorrect: number,
@@ -25,26 +24,10 @@ export function calculateTPoints(
   return points;
 }
 
-export function getUserTotalPoints(): number {
-  if (typeof window === 'undefined') return 0;
-  
-  const stored = localStorage.getItem(USER_TOTAL_POINTS_KEY);
-  return stored ? parseInt(stored, 10) : 0;
-}
-
-export function addUserTPoints(points: number): number {
-  if (typeof window === 'undefined') return 0;
-  
-  const currentTotal = getUserTotalPoints();
-  const newTotal = currentTotal + points;
-  localStorage.setItem(USER_TOTAL_POINTS_KEY, newTotal.toString());
-  return newTotal;
-}
-
 export function getLeaderboard(): LeaderboardEntry[] {
   if (typeof window === 'undefined') return [];
   
-  const stored = localStorage.getItem(LEADERBOARD_KEY);
+  const stored = localStorage.getItem(WALLET_LEADERBOARD_KEY);
   if (!stored) return [];
   
   try {
@@ -54,24 +37,24 @@ export function getLeaderboard(): LeaderboardEntry[] {
   }
 }
 
-export function addToLeaderboard(userName: string, tPoints: number): void {
+function updateLeaderboard(walletAddress: string, totalPoints: number): void {
   if (typeof window === 'undefined') return;
   
   const leaderboard = getLeaderboard();
   
-  // Check if user already exists
-  const existingIndex = leaderboard.findIndex(entry => entry.userName === userName);
+  // Check if wallet already exists
+  const existingIndex = leaderboard.findIndex(
+    entry => entry.walletAddress.toLowerCase() === walletAddress.toLowerCase()
+  );
   
   if (existingIndex >= 0) {
     // Update existing entry
-    leaderboard[existingIndex].tPoints += tPoints;
-    leaderboard[existingIndex].timestamp = Date.now();
+    leaderboard[existingIndex].tPoints = totalPoints;
   } else {
     // Add new entry
     leaderboard.push({
-      userName,
-      tPoints,
-      timestamp: Date.now(),
+      walletAddress,
+      tPoints: totalPoints,
     });
   }
   
@@ -81,7 +64,7 @@ export function addToLeaderboard(userName: string, tPoints: number): void {
   // Keep top 100
   const trimmed = leaderboard.slice(0, 100);
   
-  localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(trimmed));
+  localStorage.setItem(WALLET_LEADERBOARD_KEY, JSON.stringify(trimmed));
 }
 
 // --- Wallet-based point storage ---
@@ -101,5 +84,9 @@ export function addWalletTPoints(walletAddress: string, points: number): number 
   const currentTotal = getWalletTotalPoints(walletAddress);
   const newTotal = currentTotal + points;
   localStorage.setItem(key, newTotal.toString());
+  
+  // Update leaderboard with new total
+  updateLeaderboard(walletAddress, newTotal);
+  
   return newTotal;
 }

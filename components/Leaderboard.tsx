@@ -2,31 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import { LeaderboardEntry } from '@/types/quiz';
-import { getLeaderboard, getUserTotalPoints, getWalletTotalPoints } from '@/lib/tpoints';
+import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
 import Link from 'next/link';
 import { useActiveAccount } from 'thirdweb/react';
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [userTotal, setUserTotal] = useState(0);
   const [walletTotal, setWalletTotal] = useState(0);
   const account = useActiveAccount();
 
   useEffect(() => {
     setLeaderboard(getLeaderboard());
-    setUserTotal(getUserTotalPoints());
     if (account?.address) {
       setWalletTotal(getWalletTotalPoints(account.address));
     }
   }, [account?.address]);
-
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
 
   return (
     <div className="max-w-4xl mx-auto px-2 sm:px-6">
@@ -38,31 +28,19 @@ export default function Leaderboard() {
           </h1>
         </div>
         <p className="text-center text-[#5a3d5c] mb-4 sm:mb-6 text-sm sm:text-lg">
-          Top players ranked by T points
+          Top wallets ranked by T points
         </p>
 
-        {(userTotal > 0 || walletTotal > 0) && (
+        {walletTotal > 0 && account?.address && (
           <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gradient-to-r from-[#FFE4EC] to-[#FFC4D1] rounded-lg border-2 border-[#F4A6B7] shadow-md">
             <div className="text-center">
-              {walletTotal > 0 && account?.address && (
-                <>
-                  <div className="text-xs sm:text-sm text-[#5a3d5c] mb-1 font-semibold">Your Wallet T Points</div>
-                  <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">
-                    {walletTotal.toLocaleString()}
-                  </div>
-                  <div className="text-xs text-[#5a3d5c] mt-1 truncate">
-                    {account.address.slice(0, 6)}...{account.address.slice(-4)}
-                  </div>
-                </>
-              )}
-              {userTotal > 0 && !account?.address && (
-                <>
-                  <div className="text-xs sm:text-sm text-[#5a3d5c] mb-1 font-semibold">Your Total T Points</div>
-                  <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">
-                    {userTotal.toLocaleString()}
-                  </div>
-                </>
-              )}
+              <div className="text-xs sm:text-sm text-[#5a3d5c] mb-1 font-semibold">Your Wallet T Points</div>
+              <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">
+                {walletTotal.toLocaleString()}
+              </div>
+              <div className="text-xs text-[#5a3d5c] mt-1 truncate">
+                {account.address.slice(0, 6)}...{account.address.slice(-4)}
+              </div>
             </div>
           </div>
         )}
@@ -83,13 +61,12 @@ export default function Leaderboard() {
         ) : (
           <>
             <div className="overflow-x-auto -mx-2 sm:mx-0">
-              <table className="w-full min-w-[500px]">
+              <table className="w-full min-w-[400px]">
                 <thead>
                   <tr className="border-b-2 border-[#F4A6B7]">
                     <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-[#2d1b2e] font-semibold text-xs sm:text-base">Rank</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-[#2d1b2e] font-semibold text-xs sm:text-base">Player</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-[#2d1b2e] font-semibold text-xs sm:text-base">Wallet Address</th>
                     <th className="text-right py-2 sm:py-3 px-2 sm:px-4 text-[#2d1b2e] font-semibold text-xs sm:text-base">T Points</th>
-                    <th className="text-right py-2 sm:py-3 px-2 sm:px-4 text-[#2d1b2e] font-semibold text-xs sm:text-base hidden sm:table-cell">Last Played</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -109,15 +86,14 @@ export default function Leaderboard() {
                         </div>
                       </td>
                       <td className="py-2 sm:py-3 px-2 sm:px-4">
-                        <span className="font-medium text-[#2d1b2e] text-xs sm:text-base truncate block max-w-[120px] sm:max-w-none">{entry.userName}</span>
+                        <span className="font-mono text-[#2d1b2e] text-xs sm:text-sm">
+                          {entry.walletAddress.slice(0, 6)}...{entry.walletAddress.slice(-4)}
+                        </span>
                       </td>
                       <td className="py-2 sm:py-3 px-2 sm:px-4 text-right">
                         <span className="font-bold text-[#DC8291] text-xs sm:text-base">
                           {entry.tPoints.toLocaleString()}
                         </span>
-                      </td>
-                      <td className="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs sm:text-sm text-[#5a3d5c] hidden sm:table-cell">
-                        {formatDate(entry.timestamp)}
                       </td>
                     </tr>
                   ))}
