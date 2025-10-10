@@ -1,3 +1,4 @@
+"use client";
 import Leaderboard from '@/components/Leaderboard';
 import WalletConnect from '@/components/WalletConnect';
 import ShareButton from '@/components/ShareButton';
@@ -5,34 +6,20 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { shareLeaderboardUrl } from '@/lib/farcaster';
 import { Metadata } from 'next';
+import React, { useEffect } from 'react';
+import { sdk } from '@farcaster/miniapp-sdk';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: 'Leaderboard',
-  description: 'Top Brain Power Rankings - See the best Triviacast players',
-  openGraph: {
-    title: 'Leaderboard - Triviacast',
-    description: 'Top Brain Power Rankings - See the best Triviacast players',
-    images: [
-      {
-        url: 'https://triviacast.xyz/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Triviacast Leaderboard',
-      },
-    ],
-    url: 'https://triviacast.xyz/leaderboard',
-  },
-  twitter: {
-    title: 'Leaderboard - Triviacast',
-    description: 'Top Brain Power Rankings - See the best Triviacast players',
-    images: ['https://triviacast.xyz/og-image.png'],
-  },
-
-};
 
 export default function LeaderboardPage() {
+  useEffect(() => {
+    (async () => {
+      try {
+        await sdk.actions.ready();
+      } catch {}
+    })();
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1]">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
