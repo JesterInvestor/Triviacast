@@ -2,7 +2,22 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #2d1b2e;
+  
+  /* Brain-themed pink/coral palette */
+  --brain-primary: #F4A6B7;
+  --brain-secondary: #E8949C;
+  --brain-tertiary: #DC8291;
+  --brain-dark: #C86D7D;
+  --brain-light: #FFC4D1;
+  --brain-pale: #FFE4EC;
+  --brain-accent: #FF8FA3;
+  
+  /* Text colors for readability */
+  --text-dark: #2d1b2e;
+  --text-medium: #5a3d5c;
+  --text-light: #8b6b8d;
+  --text-on-brain: #ffffff;
 }
 
 @theme inline {
@@ -10,12 +25,22 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Brain theme colors */
+  --color-brain-primary: var(--brain-primary);
+  --color-brain-secondary: var(--brain-secondary);
+  --color-brain-tertiary: var(--brain-tertiary);
+  --color-brain-dark: var(--brain-dark);
+  --color-brain-light: var(--brain-light);
+  --color-brain-pale: var(--brain-pale);
+  --color-brain-accent: var(--brain-accent);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1a0e1b;
+    --foreground: #f5e6f0;
+    --brain-pale: #3d2a3e;
   }
 }
 

@@ -35,30 +35,30 @@ export default function QuizQuestion({ question, onAnswer, answered }: QuizQuest
   };
 
   const getAnswerClassName = (answer: string) => {
-    const baseClass = "w-full p-4 mb-3 rounded-lg border-2 text-left transition-all cursor-pointer ";
+    const baseClass = "w-full p-4 mb-3 rounded-lg border-2 text-left transition-all cursor-pointer font-medium ";
     
     if (!selectedAnswer) {
-      return baseClass + "border-gray-300 hover:border-blue-500 hover:bg-blue-50";
+      return baseClass + "border-[#F4A6B7] hover:border-[#E8949C] hover:bg-[#FFE4EC] text-[#2d1b2e] bg-white shadow-md hover:shadow-lg";
     }
     
     if (answer === question.correct_answer) {
-      return baseClass + "border-green-500 bg-green-100";
+      return baseClass + "border-green-500 bg-green-100 text-green-900 shadow-lg";
     }
     
     if (answer === selectedAnswer) {
-      return baseClass + "border-red-500 bg-red-100";
+      return baseClass + "border-red-500 bg-red-100 text-red-900 shadow-lg";
     }
     
-    return baseClass + "border-gray-300 bg-gray-100";
+    return baseClass + "border-[#FFC4D1] bg-[#FFE4EC] text-[#5a3d5c] shadow";
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <div className="mb-2 text-sm text-gray-500">
+    <div className="bg-white rounded-lg shadow-xl p-6 border-4 border-[#F4A6B7]">
+      <div className="mb-2 text-sm text-[#8b6b8d] font-semibold uppercase tracking-wide">
         {question.category} - {question.difficulty}
       </div>
       
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+      <h2 className="text-2xl font-semibold mb-6 text-[#2d1b2e] leading-relaxed">
         {decodeHtml(question.question)}
       </h2>
       
@@ -70,7 +70,7 @@ export default function QuizQuestion({ question, onAnswer, answered }: QuizQuest
             disabled={answered}
             className={getAnswerClassName(answer)}
           >
-            <span className="font-medium">{String.fromCharCode(65 + index)}.</span>{' '}
+            <span className="font-bold text-[#F4A6B7]">{String.fromCharCode(65 + index)}.</span>{' '}
             {decodeHtml(answer)}
           </button>
         ))}

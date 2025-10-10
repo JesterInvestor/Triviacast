@@ -123,20 +123,23 @@ export default function Quiz() {
   if (!quizState.quizStarted) {
     return (
       <div className="max-w-2xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-          <h1 className="text-4xl font-bold mb-4 text-gray-800">Quiz Challenge</h1>
-          <p className="text-gray-600 mb-8">
+        <div className="bg-white rounded-lg shadow-xl p-8 text-center border-4 border-[#F4A6B7]">
+          <div className="mb-6 flex justify-center">
+            <img src="/brain-large.svg" alt="Brain" className="w-32 h-32" />
+          </div>
+          <h1 className="text-4xl font-bold mb-4 text-[#2d1b2e]">Quiz Challenge</h1>
+          <p className="text-[#5a3d5c] mb-8 text-lg">
             Test your knowledge with 10 trivia questions. You have 5 minutes to complete the quiz!
           </p>
           {error && (
-            <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#DC8291] text-[#C86D7D] rounded-lg">
               {error}
             </div>
           )}
           <button
             onClick={startQuiz}
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition disabled:opacity-50"
+            className="bg-[#F4A6B7] hover:bg-[#E8949C] text-white font-bold py-3 px-8 rounded-lg text-lg transition disabled:opacity-50 shadow-lg"
           >
             {loading ? 'Loading...' : 'Start Quiz'}
           </button>
@@ -161,16 +164,17 @@ export default function Quiz() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="mb-4 flex justify-between items-center">
-        <div className="text-gray-700">
+        <div className="text-[#2d1b2e] font-semibold flex items-center gap-2">
+          <img src="/brain-small.svg" alt="Brain" className="w-8 h-8" />
           Question {quizState.currentQuestionIndex + 1} of {quizState.questions.length}
         </div>
         <Timer timeRemaining={quizState.timeRemaining} />
       </div>
       
       <div className="mb-4">
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full bg-[#FFE4EC] rounded-full h-3 shadow-inner">
           <div
-            className="bg-blue-600 h-2 rounded-full transition-all"
+            className="bg-gradient-to-r from-[#F4A6B7] to-[#E8949C] h-3 rounded-full transition-all shadow-md"
             style={{
               width: `${((quizState.currentQuestionIndex + 1) / quizState.questions.length) * 100}%`,
             }}
@@ -184,7 +188,7 @@ export default function Quiz() {
         answered={quizState.answers[quizState.currentQuestionIndex] !== null}
       />
       
-      <div className="mt-4 text-center text-gray-600">
+      <div className="mt-4 text-center text-[#2d1b2e] font-semibold text-lg">
         Score: {quizState.score} / {quizState.currentQuestionIndex + (quizState.answers[quizState.currentQuestionIndex] !== null ? 1 : 0)}
       </div>
     </div>
