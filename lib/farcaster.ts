@@ -67,11 +67,10 @@ export function shareResultsUrl(score: number, total: number, percent: number, t
 
 export function shareLeaderboardText(rank: number | null, points: number): string {
   const site = getBaseUrl();
-  const pts = points.toLocaleString();
   if (rank !== null) {
-    return `I'm #${rank} on the Triviacast leaderboard with ${pts} T Points! 🏆\nSee the leaderboard: ${site}/leaderboard\n#Triviacast #Trivia #Farcaster`;
+    return `I'm #${rank} on the Triviacast leaderboard! 🏆\nCheck it out: ${site}/leaderboard\n#Triviacast #Trivia #Farcaster`;
   }
-  return `I'm climbing the Triviacast leaderboard with ${pts} T Points! 🧠\nSee the leaderboard: ${site}/leaderboard\n#Triviacast #Trivia #Farcaster`;
+  return `Check out the Triviacast leaderboard! 🧠\n${site}/leaderboard\n#Triviacast #Trivia #Farcaster`;
 }
 
 export function shareLeaderboardUrl(rank: number | null, points: number): string {
