@@ -2,17 +2,23 @@
 
 import { useEffect, useState } from 'react';
 import { LeaderboardEntry } from '@/types/quiz';
-import { getLeaderboard, getUserTotalPoints } from '@/lib/tpoints';
+import { getLeaderboard, getUserTotalPoints, getWalletTotalPoints } from '@/lib/tpoints';
 import Link from 'next/link';
+import { useActiveAccount } from 'thirdweb/react';
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [userTotal, setUserTotal] = useState(0);
+  const [walletTotal, setWalletTotal] = useState(0);
+  const account = useActiveAccount();
 
   useEffect(() => {
     setLeaderboard(getLeaderboard());
     setUserTotal(getUserTotalPoints());
-  }, []);
+    if (account?.address) {
+      setWalletTotal(getWalletTotalPoints(account.address));
+    }
+  }, [account?.address]);
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
@@ -35,13 +41,28 @@ export default function Leaderboard() {
           Top players ranked by T points
         </p>
 
-        {userTotal > 0 && (
+        {(userTotal > 0 || walletTotal > 0) && (
           <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gradient-to-r from-[#FFE4EC] to-[#FFC4D1] rounded-lg border-2 border-[#F4A6B7] shadow-md">
             <div className="text-center">
-              <div className="text-xs sm:text-sm text-[#5a3d5c] mb-1 font-semibold">Your Total T Points</div>
-              <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">
-                {userTotal.toLocaleString()}
-              </div>
+              {walletTotal > 0 && account?.address && (
+                <>
+                  <div className="text-xs sm:text-sm text-[#5a3d5c] mb-1 font-semibold">Your Wallet T Points</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">
+                    {walletTotal.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-[#5a3d5c] mt-1 truncate">
+                    {account.address.slice(0, 6)}...{account.address.slice(-4)}
+                  </div>
+                </>
+              )}
+              {userTotal > 0 && !account?.address && (
+                <>
+                  <div className="text-xs sm:text-sm text-[#5a3d5c] mb-1 font-semibold">Your Total T Points</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">
+                    {userTotal.toLocaleString()}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
