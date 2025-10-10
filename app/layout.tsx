@@ -46,6 +46,19 @@ export default function RootLayout({
             `,
           }}
         />
+        {/* Inline fallback: call Farcaster ready() ASAP before React hydrates */}
+        <script
+          type="module"
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                import('https://esm.sh/@farcaster/miniapp-sdk').then(({ sdk }) => {
+                  sdk.actions.ready().catch(() => {});
+                }).catch(() => {});
+              } catch {}
+            `,
+          }}
+        />
         {/* Farcaster Mini App embed for homepage */}
         <meta
           name="fc:miniapp"
