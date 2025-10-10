@@ -62,7 +62,17 @@ export const metadata: Metadata = {
   },
 };
 
+import { useEffect } from 'react';
+import { sdk } from '@farcaster/miniapp-sdk';
+
 export default function Home() {
+  useEffect(() => {
+    (async () => {
+      try {
+        await sdk.actions.ready();
+      } catch {}
+    })();
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1]">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
