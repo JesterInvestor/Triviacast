@@ -1,15 +1,8 @@
 'use client';
 
 import { ConnectButton } from 'thirdweb/react';
-import { createThirdwebClient, type ThirdwebClient } from 'thirdweb';
 import { base } from 'thirdweb/chains';
-
-const clientId = process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID;
-
-let client: ThirdwebClient | undefined;
-if (clientId) {
-  client = createThirdwebClient({ clientId });
-}
+import { client } from '@/lib/thirdweb';
 
 export default function WalletConnect() {
   if (!client) {

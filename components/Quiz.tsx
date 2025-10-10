@@ -6,11 +6,13 @@ import QuizQuestion from './QuizQuestion';
 import QuizResults from './QuizResults';
 import Timer from './Timer';
 import { calculateTPoints } from '@/lib/tpoints';
+import { useActiveAccount } from 'thirdweb/react';
 
 const QUIZ_TIME_LIMIT = 300; // 5 minutes in seconds
 const TIME_PER_QUESTION = 30; // 30 seconds per question
 
 export default function Quiz() {
+  const account = useActiveAccount();
   const [quizState, setQuizState] = useState<QuizState>({
     questions: [],
     currentQuestionIndex: 0,
@@ -131,6 +133,11 @@ export default function Quiz() {
           <p className="text-[#5a3d5c] mb-8 text-base sm:text-lg">
             Test your knowledge with 10 trivia questions. You have 5 minutes to complete the quiz!
           </p>
+          {!account?.address && (
+            <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#F4A6B7] text-[#5a3d5c] rounded-lg text-sm sm:text-base">
+              🔒 Please connect your wallet to start the quiz
+            </div>
+          )}
           {error && (
             <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#DC8291] text-[#C86D7D] rounded-lg text-sm sm:text-base">
               {error}
@@ -138,7 +145,7 @@ export default function Quiz() {
           )}
           <button
             onClick={startQuiz}
-            disabled={loading}
+            disabled={loading || !account?.address}
             className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-lg transition disabled:opacity-50 shadow-lg w-full sm:w-auto min-h-[56px]"
           >
             {loading ? 'Loading...' : 'Start Quiz'}
