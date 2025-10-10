@@ -7,12 +7,15 @@ import Link from 'next/link';
 import { useActiveAccount } from 'thirdweb/react';
 import { callDailyClaim, getDistributorOwner, isDistributorConfigured } from '@/lib/distributor';
 import { shareLeaderboardUrl } from '@/lib/farcaster';
+import { batchResolveDisplayNames } from '@/lib/addressResolver';
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [displayNames, setDisplayNames] = useState<Map<string, string>>(new Map());
   const [walletTotal, setWalletTotal] = useState(0);
   const [claiming, setClaiming] = useState(false);
   const [claimMsg, setClaimMsg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const account = useActiveAccount();
   const canClaim = useMemo(() => !!account?.address && walletTotal > 0 && isDistributorConfigured(), [account?.address, walletTotal]);
   const myRank = useMemo(() => {
@@ -23,11 +26,24 @@ export default function Leaderboard() {
 
   useEffect(() => {
     async function fetchData() {
-      const board = await getLeaderboard();
-      setLeaderboard(board);
-      if (account?.address) {
-        const points = await getWalletTotalPoints(account.address);
-        setWalletTotal(points);
+      setLoading(true);
+      try {
+        const board = await getLeaderboard();
+        setLeaderboard(board);
+        
+        // Resolve display names for all addresses
+        if (board.length > 0) {
+          const addresses = board.map(entry => entry.walletAddress);
+          const names = await batchResolveDisplayNames(addresses);
+          setDisplayNames(names);
+        }
+        
+        if (account?.address) {
+          const points = await getWalletTotalPoints(account.address);
+          setWalletTotal(points);
+        }
+      } finally {
+        setLoading(false);
       }
     }
     fetchData();
@@ -100,7 +116,14 @@ export default function Leaderboard() {
           </div>
         )}
 
-        {leaderboard.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-8 sm:py-12">
+            <img src="/brain-large.svg" alt="Brain" className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 opacity-50 animate-pulse" loading="eager" />
+            <p className="text-[#5a3d5c] text-base sm:text-lg">
+              Loading leaderboard...
+            </p>
+          </div>
+        ) : leaderboard.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
             <img src="/brain-large.svg" alt="Brain" className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 opacity-50" loading="eager" />
             <p className="text-[#5a3d5c] text-base sm:text-lg mb-4">
@@ -115,40 +138,59 @@ export default function Leaderboard() {
           </div>
         ) : (
           <>
+            <div className="mb-4 text-center text-[#5a3d5c] text-sm">
+              Showing all {leaderboard.length} {leaderboard.length === 1 ? 'player' : 'players'} with T points
+            </div>
             <div className="overflow-x-auto -mx-2 sm:mx-0">
               <table className="w-full min-w-[400px]">
                 <thead>
                   <tr className="border-b-2 border-[#F4A6B7]">
                     <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-[#2d1b2e] font-semibold text-xs sm:text-base">Rank</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-[#2d1b2e] font-semibold text-xs sm:text-base">Wallet Address</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-[#2d1b2e] font-semibold text-xs sm:text-base">Player</th>
                     <th className="text-right py-2 sm:py-3 px-2 sm:px-4 text-[#2d1b2e] font-semibold text-xs sm:text-base">T Points</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {leaderboard.map((entry, index) => (
-                    <tr
-                      key={index}
-                      className={`border-b border-[#FFC4D1] active:bg-[#FFE4EC] transition ${
-                        index < 3 ? 'bg-[#FFF0F5]' : ''
-                      }`}
-                    >
-                      <td className="py-2 sm:py-3 px-2 sm:px-4">
-                        <div className="flex items-center">
-                          <span className="font-semibold text-[#2d1b2e] text-xs sm:text-base">#{index + 1}</span>
-                        </div>
-                      </td>
-                      <td className="py-2 sm:py-3 px-2 sm:px-4">
-                        <span className="font-mono text-[#2d1b2e] text-xs sm:text-sm">
-                          {entry.walletAddress.slice(0, 6)}...{entry.walletAddress.slice(-4)}
-                        </span>
-                      </td>
-                      <td className="py-2 sm:py-3 px-2 sm:px-4 text-right">
-                        <span className="font-bold text-[#DC8291] text-xs sm:text-base">
-                          {entry.tPoints.toLocaleString()}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {leaderboard.map((entry, index) => {
+                    const displayName = displayNames.get(entry.walletAddress.toLowerCase()) || 
+                      `${entry.walletAddress.slice(0, 6)}...${entry.walletAddress.slice(-4)}`;
+                    const isTopThree = index < 3;
+                    
+                    return (
+                      <tr
+                        key={entry.walletAddress}
+                        className={`border-b border-[#FFC4D1] active:bg-[#FFE4EC] transition ${
+                          isTopThree ? 'bg-[#FFF0F5]' : ''
+                        }`}
+                      >
+                        <td className="py-2 sm:py-3 px-2 sm:px-4">
+                          <div className="flex items-center gap-2">
+                            {isTopThree && index === 0 && <span>🥇</span>}
+                            {isTopThree && index === 1 && <span>🥈</span>}
+                            {isTopThree && index === 2 && <span>🥉</span>}
+                            <span className="font-semibold text-[#2d1b2e] text-xs sm:text-base">#{index + 1}</span>
+                          </div>
+                        </td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4">
+                          <div className="flex flex-col">
+                            <span className={`text-[#2d1b2e] text-xs sm:text-sm ${displayName.startsWith('@') || displayName.includes('.eth') ? 'font-semibold' : 'font-mono'}`}>
+                              {displayName}
+                            </span>
+                            {(displayName.startsWith('@') || displayName.includes('.eth')) && (
+                              <span className="font-mono text-[#5a3d5c] text-xs opacity-70">
+                                {entry.walletAddress.slice(0, 6)}...{entry.walletAddress.slice(-4)}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-right">
+                          <span className="font-bold text-[#DC8291] text-xs sm:text-base">
+                            {entry.tPoints.toLocaleString()}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

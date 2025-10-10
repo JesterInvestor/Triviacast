@@ -28,36 +28,7 @@ export const metadata: Metadata = {
     description: 'Top Brain Power Rankings - See the best Triviacast players',
     images: ['https://triviacast.xyz/og-image.png'],
   },
-  other: {
-    'fc:miniapp': JSON.stringify({
-      version: '1',
-      imageUrl: 'https://triviacast.xyz/og-image.png',
-      button: {
-        title: 'View Leaderboard',
-        action: {
-          type: 'launch_frame',
-          name: 'Triviacast',
-          url: 'https://triviacast.xyz/leaderboard',
-          splashImageUrl: 'https://triviacast.xyz/icon.png',
-          splashBackgroundColor: '#F4A6B7',
-        },
-      },
-    }),
-    'fc:frame': JSON.stringify({
-      version: '1',
-      imageUrl: 'https://triviacast.xyz/og-image.png',
-      button: {
-        title: 'View Leaderboard',
-        action: {
-          type: 'launch_frame',
-          name: 'Triviacast',
-          url: 'https://triviacast.xyz/leaderboard',
-          splashImageUrl: 'https://triviacast.xyz/icon.png',
-          splashBackgroundColor: '#F4A6B7',
-        },
-      },
-    }),
-  },
+
 };
 
 export default function LeaderboardPage() {

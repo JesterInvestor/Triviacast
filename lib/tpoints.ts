@@ -33,7 +33,14 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
   // Try to get from blockchain first if contract is configured
   if (isContractConfigured()) {
     try {
-      const chainLeaderboard = await getLeaderboardFromChain(100);
+      // Get total number of wallets to fetch all entries
+      const { getTotalWalletsFromChain } = await import('./contract');
+      const totalWallets = await getTotalWalletsFromChain();
+      
+      // Fetch all wallets with points (use a large limit or the total count)
+      const limit = Math.max(totalWallets, 1000); // At least 1000 to be safe
+      const chainLeaderboard = await getLeaderboardFromChain(limit);
+      
       if (chainLeaderboard.length > 0) {
         return chainLeaderboard;
       }
@@ -49,7 +56,9 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
   if (!stored) return [];
   
   try {
-    return JSON.parse(stored);
+    const leaderboard = JSON.parse(stored);
+    // Return all entries, not just top 100
+    return leaderboard;
   } catch {
     return [];
   }
@@ -89,10 +98,8 @@ function updateLeaderboard(walletAddress: string, totalPoints: number): void {
   // Sort by points descending
   leaderboard.sort((a, b) => b.tPoints - a.tPoints);
   
-  // Keep top 100
-  const trimmed = leaderboard.slice(0, 100);
-  
-  localStorage.setItem(WALLET_LEADERBOARD_KEY, JSON.stringify(trimmed));
+  // Store all entries (no limit)
+  localStorage.setItem(WALLET_LEADERBOARD_KEY, JSON.stringify(leaderboard));
 }
 
 // --- Wallet-based point storage ---
