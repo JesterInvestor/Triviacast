@@ -8,14 +8,19 @@
     "deploy:base-sepolia": "hardhat run scripts/deploy.ts --network baseSepolia",
     "verify:base-sepolia": "hardhat verify --network baseSepolia",
     "deploy:base": "hardhat run scripts/deploy.ts --network base",
-    "verify:base": "hardhat verify --network base"
+    "verify:base": "hardhat verify --network base",
+    "deploy:dist:base": "hardhat run scripts/deploy_distributor.ts --network base",
+    "deploy:dist:sepolia": "hardhat run scripts/deploy_distributor.ts --network baseSepolia"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/node": "^20.14.12",
     "dotenv": "^16.4.5",
     "hardhat": "^2.22.12",
-    "@types/node": "^20.14.12",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0"
   }
 }
