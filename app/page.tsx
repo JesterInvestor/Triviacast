@@ -62,6 +62,9 @@ export const metadata: Metadata = {
   },
 };
 
+
+"use client";
+
 import { useEffect } from 'react';
 import { sdk } from '@farcaster/miniapp-sdk';
 
