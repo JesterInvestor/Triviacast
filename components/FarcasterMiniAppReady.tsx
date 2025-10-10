@@ -12,8 +12,25 @@ export default function FarcasterMiniAppReady() {
       try {
         const mod = await import("@farcaster/miniapp-sdk");
         if (cancelled) return;
-  await mod.sdk.actions.ready();
-  try { (window as any).__TRIVIACAST_READY_CALLED = true; } catch {}
+
+        // Avoid calling outside Mini App hosts (e.g., normal browser) and prevent double calls
+        const { sdk } = mod as typeof import("@farcaster/miniapp-sdk");
+        if (!(await sdk.isInMiniApp())) {
+          // Not in a Mini App environment; do nothing
+          return;
+        }
+
+        if ((window as any).__TRIVIACAST_READY_CALLED) {
+          return; // already signaled ready
+        }
+
+        // Use rAF to avoid calling before first paint to reduce jitter/reflow
+        await new Promise((res) => requestAnimationFrame(() => res(undefined)));
+
+        await sdk.actions.ready();
+        try {
+          (window as any).__TRIVIACAST_READY_CALLED = true;
+        } catch {}
         // Once successful, we can stop listening
         document.removeEventListener("visibilitychange", onVisible);
       } catch (err) {
