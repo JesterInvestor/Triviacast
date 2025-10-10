@@ -25,7 +25,6 @@ export interface ApiResponse {
 }
 
 export interface LeaderboardEntry {
-  userName: string;
+  walletAddress: string;
   tPoints: number;
-  timestamp: number;
 }

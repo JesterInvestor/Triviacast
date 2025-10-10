@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Question } from '@/types/quiz';
-import { addToLeaderboard, addUserTPoints, addWalletTPoints, getWalletTotalPoints } from '@/lib/tpoints';
+import { addWalletTPoints } from '@/lib/tpoints';
 import Link from 'next/link';
 import { useActiveAccount } from 'thirdweb/react';
 
@@ -29,8 +29,6 @@ export default function QuizResults({
   tPoints,
   onRestart 
 }: QuizResultsProps) {
-  const [userName, setUserName] = useState('');
-  const [saved, setSaved] = useState(false);
   const percentage = Math.round((score / totalQuestions) * 100);
   const account = useActiveAccount();
 
@@ -53,17 +51,6 @@ export default function QuizResults({
     if (percentage >= 60) return "text-[#F4A6B7]";
     if (percentage >= 40) return "text-[#DC8291]";
     return "text-red-600";
-  };
-
-  const handleSaveScore = () => {
-    if (!userName.trim()) {
-      alert('Please enter your name');
-      return;
-    }
-    
-    addToLeaderboard(userName.trim(), tPoints);
-    addUserTPoints(tPoints);
-    setSaved(true);
   };
 
   return (
@@ -97,35 +84,12 @@ export default function QuizResults({
               • 1000 bonus for 5 in a row<br/>
               • 2000 bonus for perfect 10!
             </div>
-          </div>
-
-          {!saved && (
-            <div className="mt-4 sm:mt-6 p-4 bg-[#FFE4EC] rounded-lg border-2 border-[#F4A6B7]">
-              <h4 className="text-base sm:text-lg font-semibold mb-3 text-[#2d1b2e]">Save to Leaderboard</h4>
-              <div className="flex flex-col sm:flex-row gap-2 justify-center items-stretch sm:items-center">
-                <input
-                  type="text"
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
-                  placeholder="Enter your name"
-                  className="px-4 py-3 border-2 border-[#F4A6B7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E8949C] text-[#2d1b2e] min-h-[48px] text-base"
-                  maxLength={20}
-                />
-                <button
-                  onClick={handleSaveScore}
-                  className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-3 px-6 rounded-lg transition shadow-md min-h-[48px]"
-                >
-                  Save Score
-                </button>
+            {account?.address && (
+              <div className="mt-3 text-xs sm:text-sm text-[#5a3d5c] font-medium">
+                ✓ Points saved to wallet: {account.address.slice(0, 6)}...{account.address.slice(-4)}
               </div>
-            </div>
-          )}
-
-          {saved && (
-            <div className="mt-4 p-4 bg-green-100 border-2 border-green-400 text-green-700 rounded-lg">
-              ✓ Score saved to leaderboard!
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <div className="mb-4 sm:mb-6">
