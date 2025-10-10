@@ -2,7 +2,22 @@
 
 import { ConnectButton } from 'thirdweb/react';
 import { base } from 'thirdweb/chains';
+import { inAppWallet, createWallet } from 'thirdweb/wallets';
 import { client } from '@/lib/thirdweb';
+
+// Configure wallets: Farcaster auth + popular external wallets
+const wallets = client ? [
+  inAppWallet({
+    auth: {
+      options: ['farcaster'],
+    },
+  }),
+  createWallet('io.metamask'),
+  createWallet('com.coinbase.wallet'),
+  createWallet('me.rainbow'),
+  createWallet('io.rabby'),
+  createWallet('io.zerion.wallet'),
+] : [];
 
 export default function WalletConnect() {
   if (!client) {
@@ -21,6 +36,7 @@ export default function WalletConnect() {
       <ConnectButton
         client={client}
         chain={base}
+        wallets={wallets}
         connectButton={{
           label: 'Connect Wallet',
         }}
