@@ -9,9 +9,9 @@ A Next.js-based trivia quiz mini-game that encourages users to answer questions 
 - **Real-time Scoring**: Instant feedback on answers with score tracking
 - **T Points & Leaderboard**: Earn points for correct answers with streak bonuses
 - **Smart Contract Integration**: Optional blockchain storage for T points (Base Sepolia)
-- **Thirdweb Wallet Connect**: Seamless wallet connection for Web3 users
+- **Dual Wallet Integration**: Supports both wagmi (with Farcaster Mini App connector) and Thirdweb
 - **Responsive Design**: Beautiful UI with Tailwind CSS
-- **Farcaster Integration**: Ready for Farcaster miniapp deployment
+- **Farcaster Mini App**: Full Mini App SDK integration with ready() call
 - **Vercel Deployment**: Optimized for deployment on Vercel
 
 Note: The platform's native coin is $TRIV (contract: `0x73385Ee7392C105d5898048F96a1bDF551B2D936`). At launch, $TRIV will be airdropped to top users on the leaderboard; eligibility details will be announced separately.
@@ -86,9 +86,10 @@ npm run dev
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **Wallet Integration**: Thirdweb SDK v5
+- **Wallet Integration**: wagmi v2 with Farcaster Mini App connector + Thirdweb SDK v5
 - **Blockchain**: Solidity 0.8.27 (Base Sepolia)
 - **API**: Open Trivia Database
+- **Farcaster SDK**: @farcaster/miniapp-sdk
 - **Deployment**: Vercel
 
 ## Smart Contract Integration
@@ -116,14 +117,19 @@ See [SMART_CONTRACT_INTEGRATION.md](./SMART_CONTRACT_INTEGRATION.md) for detaile
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/JesterInvestor/Quiz)
 
-## Farcaster Integration
+## Farcaster Mini App Integration
 
-The app includes Farcaster miniapp configuration in `public/farcaster-manifest.json`. 
+The app is fully configured as a Farcaster Mini App with:
+- **Mini App SDK**: Properly calls `sdk.actions.ready()` to hide the splash screen
+- **Wallet Provider**: Uses wagmi with `@farcaster/miniapp-wagmi-connector` for seamless wallet access
+- **Manifest**: Configured in `public/farcaster-manifest.json`
 
 To integrate with Farcaster:
 1. Deploy your app to a public URL (e.g., Vercel)
 2. Update the URLs in `farcaster-manifest.json` with your actual domain
 3. Register your miniapp with Farcaster
+
+See [WAGMI_INTEGRATION.md](./WAGMI_INTEGRATION.md) for detailed wagmi setup and usage.
 
 ## API Routes
 
@@ -162,20 +168,26 @@ Triviacast/
 │   ├── Leaderboard.tsx           # Leaderboard display
 │   ├── WalletPoints.tsx          # Wallet points display
 │   ├── ThirdwebProvider.tsx      # Thirdweb provider wrapper
-│   └── WalletConnect.tsx         # Wallet connection button
+│   ├── WagmiProvider.tsx         # wagmi provider wrapper
+│   ├── WalletConnect.tsx         # Thirdweb wallet connection button
+│   ├── WagmiWalletConnect.tsx    # wagmi wallet connection component
+│   └── FarcasterMiniAppReady.tsx # Mini App SDK ready() caller
 ├── contracts/
 │   ├── TriviaPoints.sol          # Smart contract for T points
 │   └── README.md                 # Contract deployment guide
 ├── lib/
 │   ├── contract.ts               # Blockchain interaction functions
 │   ├── tpoints.ts                # T points calculation and storage
-│   └── thirdweb.ts               # Thirdweb client configuration
+│   ├── thirdweb.ts               # Thirdweb client configuration
+│   └── wagmi.ts                  # wagmi configuration with Farcaster connector
 ├── types/
 │   └── quiz.ts                   # TypeScript type definitions
 ├── public/
 │   └── farcaster-manifest.json   # Farcaster configuration
 ├── .env.example                  # Environment variables template
-└── SMART_CONTRACT_INTEGRATION.md # Smart contract setup guide
+├── SMART_CONTRACT_INTEGRATION.md # Smart contract setup guide
+├── WAGMI_INTEGRATION.md          # wagmi setup and usage guide
+└── FARCASTER.md                  # Farcaster Mini App documentation
 ```
 
 ## Contributing
