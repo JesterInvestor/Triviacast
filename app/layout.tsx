@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ThirdwebProvider from "@/components/ThirdwebProvider";
 import WagmiProvider from "@/components/WagmiProvider";
-import FarcasterMiniAppReady from "@/components/FarcasterMiniAppReady";
 import AddMiniAppPrompt from "@/components/AddMiniAppPrompt";
 
 const frame = {
@@ -11,7 +10,7 @@ const frame = {
   button: {
     title: "Play Triviacast",
     action: {
-      type: "launch_frame",
+      type: "launch_miniapp",
       name: "Triviacast",
       url: "https://triviacast.xyz",
       splashImageUrl: "https://triviacast.xyz/icon.png",
@@ -91,7 +90,6 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <FarcasterMiniAppReady />
         <WagmiProvider>
           <ThirdwebProvider>
             {children}
