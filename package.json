@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start",
     "check:farcaster": "node -e \"fetch('http://localhost:3000/api/health/farcaster').then(r=>r.json()).then(j=>{console.log(JSON.stringify(j,null,2)); process.exit(j.ok?0:1);}).catch(e=>{console.error(e); process.exit(1);});\"",
-    "check:embeds": "cross-env BASE_URL=https://triviacast.xyz ts-node scripts/check-embeds.ts",
+  "check:embeds": "cross-env BASE_URL=https://triviacast.xyz node scripts/check-embeds.cjs",
     "deploy:dist:base": "npm --prefix hardhat run deploy:dist:base",
     "airdrop:top5:base": "npm --prefix hardhat run airdrop:top5:base",
     "deploy:dist:sepolia": "npm --prefix hardhat run deploy:dist:sepolia",
