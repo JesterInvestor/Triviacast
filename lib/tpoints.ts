@@ -40,9 +40,11 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
     // Get total number of wallets to fetch all entries
     const { getTotalWalletsFromChain } = await import('./contract');
     const totalWallets = await getTotalWalletsFromChain();
+    console.info('[Triviacast] getLeaderboard totalWallets', totalWallets);
     
     // Fetch all wallets with points (use a large limit or the total count)
     const limit = Math.max(totalWallets, 1000); // At least 1000 to be safe
+    console.info('[Triviacast] getLeaderboard using limit', limit);
     const chainLeaderboard = await getLeaderboardFromChain(limit);
     
     return chainLeaderboard;

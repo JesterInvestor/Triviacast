@@ -19,6 +19,7 @@ export default function Leaderboard() {
   const [claiming, setClaiming] = useState(false);
   const [claimMsg, setClaimMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dataSource, setDataSource] = useState<'chain' | 'none'>('none');
   const account = useActiveAccount();
   const canClaim = useMemo(() => !!account?.address && walletTotal > 0 && isDistributorConfigured(), [account?.address, walletTotal]);
   const myRank = useMemo(() => {
@@ -31,9 +32,10 @@ export default function Leaderboard() {
     async function fetchData() {
       setLoading(true);
       try {
-        const board = await getLeaderboard();
+  const board = await getLeaderboard();
         console.log('Leaderboard data:', board);
         setLeaderboard(board);
+  setDataSource(board.length > 0 ? 'chain' : 'none');
         
         // Resolve display names for all addresses
         if (board.length > 0) {
@@ -144,6 +146,9 @@ export default function Leaderboard() {
           <>
             <div className="mb-4 text-center text-[#5a3d5c] text-sm">
               Showing all {leaderboard.length} {leaderboard.length === 1 ? 'player' : 'players'} with T points
+              {process.env.NODE_ENV !== 'production' && (
+                <span className="ml-2 text-[10px] text-gray-400">[{dataSource}]</span>
+              )}
             </div>
             <div className="overflow-x-auto -mx-2 sm:mx-0">
               <table className="w-full min-w-[400px]">

@@ -93,6 +93,12 @@ export async function addPointsOnChain(
   }
 
   const contract = getContractInstance();
+  console.info('[Triviacast] addPointsOnChain', {
+    contract: CONTRACT_ADDRESS,
+    chainId: CHAIN_ID,
+    walletAddress,
+    points
+  });
   
   const transaction = prepareContractCall({
     contract,
@@ -146,7 +152,11 @@ export async function getLeaderboardFromChain(limit: number = 100): Promise<Arra
 
   try {
     const contract = getContractInstance();
-    
+    console.info('[Triviacast] getLeaderboardFromChain calling', {
+      contract: CONTRACT_ADDRESS,
+      chainId: CHAIN_ID,
+      limit
+    });
     const result = await readContract({
       contract,
       method: "getLeaderboard",
@@ -154,7 +164,10 @@ export async function getLeaderboardFromChain(limit: number = 100): Promise<Arra
     });
 
     const [addresses, points] = result as [string[], bigint[]];
-    
+    console.info('[Triviacast] getLeaderboardFromChain result', {
+      count: addresses.length,
+      sample: addresses.slice(0, 5)
+    });
     return addresses.map((address, index) => ({
       walletAddress: address,
       tPoints: Number(points[index]),
@@ -176,14 +189,18 @@ export async function getTotalWalletsFromChain(): Promise<number> {
 
   try {
     const contract = getContractInstance();
-    
+    console.info('[Triviacast] getTotalWalletsFromChain calling', {
+      contract: CONTRACT_ADDRESS,
+      chainId: CHAIN_ID,
+    });
     const result = await readContract({
       contract,
       method: "getTotalWallets",
       params: [],
     });
-
-    return Number(result);
+    const total = Number(result);
+    console.info('[Triviacast] getTotalWalletsFromChain result', { total });
+    return total;
   } catch (error) {
     console.error("Error fetching total wallets from chain:", error);
     return 0;

@@ -35,13 +35,15 @@ export async function resolveENS(address: string): Promise<string | null> {
  */
 export async function resolveFarcasterUsername(address: string): Promise<string | null> {
   try {
+    const apiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
     // Use Neynar's free API endpoint
     const response = await fetch(
       `https://api.neynar.com/v2/farcaster/user/bulk-by-address?addresses=${address}`,
       {
         headers: {
           'accept': 'application/json',
-          // Using a public endpoint - in production, you'd want your own API key
+          ...(apiKey ? { 'api_key': apiKey, 'X-API-KEY': apiKey } : {}),
+          // Prefer providing an API key via NEXT_PUBLIC_NEYNAR_API_KEY for higher limits
         }
       }
     );
@@ -53,10 +55,10 @@ export async function resolveFarcasterUsername(address: string): Promise<string 
       return null;
     }
     
-    const data = await response.json();
-    console.log(`Farcaster data for ${address}:`, data);
-    
-    const users = data[address.toLowerCase()];
+  const data = await response.json();
+  console.log(`Farcaster data for ${address}:`, data);
+  const key = address.toLowerCase();
+  const users = data[key] || data[address] || data[key as any];
     
     if (users && users.length > 0) {
       console.log(`Found Farcaster username for ${address}:`, users[0].username);
