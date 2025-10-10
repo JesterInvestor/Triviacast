@@ -15,7 +15,7 @@ export default function WalletConnect() {
   if (!client) {
     return (
       <div className="flex justify-end">
-        <div className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg text-sm">
+        <div className="px-4 py-2 bg-[#FFE4EC] text-[#5a3d5c] rounded-lg text-sm border-2 border-[#F4A6B7] font-medium">
           Wallet connection requires Thirdweb Client ID
         </div>
       </div>

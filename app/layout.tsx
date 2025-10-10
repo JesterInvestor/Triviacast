@@ -3,8 +3,11 @@ import "./globals.css";
 import ThirdwebProvider from "@/components/ThirdwebProvider";
 
 export const metadata: Metadata = {
-  title: "Quiz App - Farcaster Trivia Challenge",
-  description: "Test your knowledge with timed trivia questions on Farcaster",
+  title: "Triviacast - Test Your Brain Power",
+  description: "Test your knowledge with timed trivia questions. Challenge your brain with Triviacast on Farcaster!",
+  icons: {
+    icon: '/brain-small.svg',
+  },
 };
 
 export default function RootLayout({
