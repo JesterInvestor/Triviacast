@@ -4,10 +4,7 @@ import WalletPoints from '@/components/WalletPoints';
 import Link from 'next/link';
 import Image from 'next/image';
 import { shareAppUrl } from '@/lib/farcaster';
-import { sdk } from '@farcaster/miniapp-sdk'
 import { Metadata } from 'next';
-
-await sdk.actions.ready()
 
 export const dynamic = 'force-dynamic';
 

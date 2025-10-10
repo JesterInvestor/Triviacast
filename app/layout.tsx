@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ThirdwebProvider from "@/components/ThirdwebProvider";
+import WagmiProvider from "@/components/WagmiProvider";
 import FarcasterMiniAppReady from "@/components/FarcasterMiniAppReady";
 import AddMiniAppPrompt from "@/components/AddMiniAppPrompt";
 
@@ -73,9 +74,11 @@ export default function RootLayout({
       <body className="antialiased">
         {/* Notify Farcaster Mini App host that UI is ready once mounted (mount early) */}
         <FarcasterMiniAppReady />
-        <ThirdwebProvider>
-          {children}
-        </ThirdwebProvider>
+        <WagmiProvider>
+          <ThirdwebProvider>
+            {children}
+          </ThirdwebProvider>
+        </WagmiProvider>
         {/* Gentle prompt to add the app to user's Mini Apps list */}
         <AddMiniAppPrompt />
       </body>
