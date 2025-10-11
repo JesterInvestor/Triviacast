@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useActiveAccount } from 'thirdweb/react';
 import { callDailyClaim, isDistributorConfigured } from '@/lib/distributor';
-import { callStake, isStakingConfigured, parseTokenAmount } from '@/lib/staking';
 import { getDailyClaimLabel } from '@/lib/config';
 
 const DISMISS_KEY = "triviacast:claim_prompt:dismissedAt";
@@ -75,43 +74,6 @@ export default function StakingDailyClaimPrompt() {
 
   const DAILY_CLAIM_AMOUNT = getDailyClaimLabel();
 
-  const [stakeAmount, setStakeAmount] = useState<string>('');
-  const [confirmOpen, setConfirmOpen] = useState(false);
-
-  // Open confirmation dialog before staking (includes approval step)
-  const onStake = () => {
-    setError(null);
-    try {
-      if (!account) throw new Error('Please connect your wallet');
-      if (!isStakingConfigured()) throw new Error('Staking not configured');
-      const amtAtomic = parseTokenAmount(stakeAmount || '0');
-      if (amtAtomic <= BigInt(0)) throw new Error('Enter a positive stake amount');
-      setConfirmOpen(true);
-    } catch (e: any) {
-      const msg = e?.message || 'Unable to stake. Try again later.';
-      setError(msg);
-    }
-  };
-
-  const onStakeConfirm = async () => {
-    setBusy(true);
-    setConfirmOpen(false);
-    setError(null);
-    try {
-      if (!account) throw new Error('Please connect your wallet');
-      const amtAtomic = parseTokenAmount(stakeAmount || '0');
-      await callStake(account as any, amtAtomic);
-      // Emit event so WalletPoints can refresh
-      try { window.dispatchEvent(new CustomEvent('triviacast:pointsUpdated')); } catch {}
-      try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: 'Stake successful' } })); } catch {}
-      dismiss();
-    } catch (e: any) {
-      const msg = e?.message || 'Unable to stake. Try again later.';
-      setError(msg);
-      try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'error', message: msg } })); } catch {}
-      setBusy(false);
-    }
-  };
 
   if (!open) return null;
 
@@ -134,22 +96,9 @@ export default function StakingDailyClaimPrompt() {
             <p className="mt-3 text-sm text-neutral-600">Daily claim amount: <strong>{DAILY_CLAIM_AMOUNT}</strong></p>
           )}
           <div className="mt-4">
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                min="0"
-                value={stakeAmount}
-                onChange={(e) => setStakeAmount(e.target.value)}
-                placeholder="Amount to stake"
-                className="w-full rounded-lg border px-3 py-2 text-sm"
-              />
-            </div>
             <div className="mt-3 flex items-center gap-3">
               <button onClick={onDailyClaim} disabled={busy} className="inline-flex items-center justify-center rounded-lg bg-[#6C47FF] px-4 py-2 text-white text-sm font-medium disabled:opacity-60">
                 {busy ? 'Processing…' : 'Claim Daily'}
-              </button>
-              <button onClick={onStake} disabled={busy} className="inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-medium">
-                Stake
               </button>
               <button onClick={dismiss} disabled={busy} className="text-sm text-neutral-600 hover:text-neutral-900">
                 Not now
@@ -159,21 +108,7 @@ export default function StakingDailyClaimPrompt() {
           <p className="mt-3 text-[11px] text-neutral-500">Daily claims are limited to once per 24 hours. Staking is available on the web staking page.</p>
         </div>
       </div>
-      {confirmOpen && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white text-neutral-900 shadow-xl ring-1 ring-black/5">
-            <div className="p-5">
-              <h4 className="font-semibold">Confirm Stake</h4>
-              <p className="mt-2 text-sm text-neutral-600">You're about to stake <strong>{stakeAmount || '0'} TRIV</strong>.</p>
-              <p className="mt-1 text-xs text-neutral-500">This will request token approval if needed and submit the stake transaction.</p>
-              <div className="mt-4 flex gap-3">
-                <button onClick={onStakeConfirm} disabled={busy} className="inline-flex items-center justify-center rounded-lg bg-[#6C47FF] px-4 py-2 text-white text-sm font-medium disabled:opacity-60">{busy ? 'Processing…' : 'Confirm'}</button>
-                <button onClick={() => setConfirmOpen(false)} disabled={busy} className="inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-medium">Cancel</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 }
