@@ -94,10 +94,10 @@ export default function RootLayout({
         <WagmiProvider>
           <ThirdwebProvider>
             {children}
+            {/* Client-only widgets (miniapp prompt, staking prompt, toaster) */}
+            <ClientOnlyWidgets />
           </ThirdwebProvider>
         </WagmiProvider>
-  {/* Client-only widgets (miniapp prompt, staking prompt, toaster) */}
-  <ClientOnlyWidgets />
       </body>
     </html>
   );
