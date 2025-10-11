@@ -35,6 +35,10 @@ export function isDistributorConfigured(): boolean {
   return !!(DISTRIBUTOR_ADDRESS && client);
 }
 
+export function hasDistributorAddress(): boolean {
+  return !!DISTRIBUTOR_ADDRESS;
+}
+
 function getDistributorContract() {
   if (!DISTRIBUTOR_ADDRESS) throw new Error("Distributor address not configured");
   if (!client) throw new Error("Thirdweb client not initialized");

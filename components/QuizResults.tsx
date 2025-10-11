@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { addPointsOnChain, isContractConfigured } from '@/lib/contract';
 import { addWalletTPoints } from '@/lib/tpoints';
 import { shareResultsUrl, openShareUrl } from '@/lib/farcaster';
-import { callDailyClaim, isDistributorConfigured } from '@/lib/distributor';
+import { callDailyClaim, isDistributorConfigured, hasDistributorAddress } from '@/lib/distributor';
 
 interface QuizResultsProps {
   score: number;
@@ -213,7 +213,7 @@ export default function QuizResults({
             <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
             Share Results
           </button>
-          {isDistributorConfigured() && (
+          {hasDistributorAddress() && (
             <ClaimButton account={account} tPoints={tPoints} />
           )}
         </div>
