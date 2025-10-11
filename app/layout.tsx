@@ -2,11 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ThirdwebProvider from "@/components/ThirdwebProvider";
 import WagmiProvider from "@/components/WagmiProvider";
-import dynamic from 'next/dynamic';
-
-const AddMiniAppPrompt = dynamic(() => import('@/components/AddMiniAppPrompt'), { ssr: false });
-const StakingDailyClaimPrompt = dynamic(() => import('@/components/StakingDailyClaimPrompt'), { ssr: false });
-const Toaster = dynamic(() => import('@/components/Toaster'), { ssr: false });
+import ClientOnlyWidgets from '@/components/ClientOnlyWidgets';
 
 const frame = {
   version: "1",
@@ -99,12 +95,8 @@ export default function RootLayout({
             {children}
           </ThirdwebProvider>
         </WagmiProvider>
-        {/* Gentle prompt to add the app to user's Mini Apps list */}
-        <AddMiniAppPrompt />
-  {/* Prompt for staking and daily claim inside Farcaster miniapp */}
-  <StakingDailyClaimPrompt />
-  {/* Global toaster for notifications */}
-  <Toaster />
+  {/* Client-only widgets (miniapp prompt, staking prompt, toaster) */}
+  <ClientOnlyWidgets />
       </body>
     </html>
   );
