@@ -58,10 +58,10 @@ export default function StakingDailyClaimPrompt() {
     setError(null);
     try {
       if (!account) throw new Error('Please connect your wallet');
-      await callDailyClaim(account);
+      await callDailyClaim(account as any);
       // notify points updated and show success toast
       try { window.dispatchEvent(new CustomEvent('triviacast:pointsUpdated')); } catch {}
-      try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: 'Daily claim successful' } })); } catch {}
+  try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: `You claimed ${DAILY_CLAIM_AMOUNT}` } })); } catch {}
       // hide for 24 hours on success
       dismiss();
     } catch (e: any) {
@@ -76,16 +76,31 @@ export default function StakingDailyClaimPrompt() {
   const DAILY_CLAIM_AMOUNT = process.env.NEXT_PUBLIC_DAILY_CLAIM_AMOUNT || '1000 $TRIV';
 
   const [stakeAmount, setStakeAmount] = useState<string>('');
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const onStake = async () => {
-    setBusy(true);
+  // Open confirmation dialog before staking (includes approval step)
+  const onStake = () => {
     setError(null);
     try {
       if (!account) throw new Error('Please connect your wallet');
       if (!isStakingConfigured()) throw new Error('Staking not configured');
       const amtAtomic = parseTokenAmount(stakeAmount || '0');
       if (amtAtomic <= BigInt(0)) throw new Error('Enter a positive stake amount');
-      await callStake(account, amtAtomic);
+      setConfirmOpen(true);
+    } catch (e: any) {
+      const msg = e?.message || 'Unable to stake. Try again later.';
+      setError(msg);
+    }
+  };
+
+  const onStakeConfirm = async () => {
+    setBusy(true);
+    setConfirmOpen(false);
+    setError(null);
+    try {
+      if (!account) throw new Error('Please connect your wallet');
+      const amtAtomic = parseTokenAmount(stakeAmount || '0');
+      await callStake(account as any, amtAtomic);
       // Emit event so WalletPoints can refresh
       try { window.dispatchEvent(new CustomEvent('triviacast:pointsUpdated')); } catch {}
       try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: 'Stake successful' } })); } catch {}
@@ -144,6 +159,21 @@ export default function StakingDailyClaimPrompt() {
           <p className="mt-3 text-[11px] text-neutral-500">Daily claims are limited to once per 24 hours. Staking is available on the web staking page.</p>
         </div>
       </div>
+      {confirmOpen && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white text-neutral-900 shadow-xl ring-1 ring-black/5">
+            <div className="p-5">
+              <h4 className="font-semibold">Confirm Stake</h4>
+              <p className="mt-2 text-sm text-neutral-600">You're about to stake <strong>{stakeAmount || '0'} TRIV</strong>.</p>
+              <p className="mt-1 text-xs text-neutral-500">This will request token approval if needed and submit the stake transaction.</p>
+              <div className="mt-4 flex gap-3">
+                <button onClick={onStakeConfirm} disabled={busy} className="inline-flex items-center justify-center rounded-lg bg-[#6C47FF] px-4 py-2 text-white text-sm font-medium disabled:opacity-60">{busy ? 'Processing…' : 'Confirm'}</button>
+                <button onClick={() => setConfirmOpen(false)} disabled={busy} className="inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-medium">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

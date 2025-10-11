@@ -89,8 +89,9 @@ export async function callStake(account: Account, amount: bigint | number): Prom
       const needed = typeof amount === 'bigint' ? amount : BigInt(amount);
       const allowance = await getAllowance(owner, spender, TRIV_TOKEN_ADDRESS);
       if (allowance < needed) {
-        // request approval
-        await approveToken(account, spender, needed, TRIV_TOKEN_ADDRESS);
+        // request approval for max uint256 to reduce future approvals
+        const MAX_UINT256 = (BigInt(2) ** BigInt(256)) - BigInt(1);
+        await approveToken(account, spender, MAX_UINT256, TRIV_TOKEN_ADDRESS);
       }
     } catch (e) {
       // Let the stake call proceed; if approval failed, contract call may still fail.
