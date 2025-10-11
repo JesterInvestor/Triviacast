@@ -20,6 +20,19 @@ export default function WalletPoints() {
     fetchPoints();
   }, [account?.address]);
 
+  useEffect(() => {
+    const handler = () => {
+      (async () => {
+        if (account?.address) {
+          const points = await getWalletTotalPoints(account.address);
+          setWalletTotal(points);
+        }
+      })();
+    };
+    window.addEventListener('triviacast:pointsUpdated', handler);
+    return () => { window.removeEventListener('triviacast:pointsUpdated', handler); };
+  }, [account?.address]);
+
   if (!account?.address || walletTotal === 0) {
     return null;
   }

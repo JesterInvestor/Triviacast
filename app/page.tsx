@@ -60,6 +60,14 @@ export default function Home() {
                 <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
                 <span className="hidden xs:inline">Share</span>
               </ShareButton>
+              <a
+                href={process.env.NEXT_PUBLIC_BUY_TRIV_URL || 'https://farcaster.xyz/miniapps/Ow9w157pag34/matcha?token=0x73385ee7392c105d5898048f96a1bdf551b2d936'}
+                target="_blank"
+                rel="noreferrer"
+                className="bg-[#3CB371] hover:bg-[#2fa960] active:bg-[#2b9f56] text-white font-bold py-3 px-4 sm:py-2 sm:px-6 rounded-lg transition shadow-lg flex items-center gap-2 justify-center flex-1 sm:flex-initial min-h-[44px]"
+              >
+                💱 <span className="hidden xs:inline">BUY $TRIV</span>
+              </a>
             </div>
           </div>
         </div>

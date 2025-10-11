@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
+export const dynamic = 'force-dynamic';
 import "./globals.css";
 import ThirdwebProvider from "@/components/ThirdwebProvider";
 import WagmiProvider from "@/components/WagmiProvider";
-import AddMiniAppPrompt from "@/components/AddMiniAppPrompt";
+import ClientOnlyWidgets from '@/components/ClientOnlyWidgets';
 
 const frame = {
   version: "1",
@@ -93,10 +94,10 @@ export default function RootLayout({
         <WagmiProvider>
           <ThirdwebProvider>
             {children}
+            {/* Client-only widgets (miniapp prompt, staking prompt, toaster) */}
+            <ClientOnlyWidgets />
           </ThirdwebProvider>
         </WagmiProvider>
-        {/* Gentle prompt to add the app to user's Mini Apps list */}
-        <AddMiniAppPrompt />
       </body>
     </html>
   );
