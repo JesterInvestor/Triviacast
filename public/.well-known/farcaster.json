@@ -27,9 +27,11 @@
     "ogImageUrl": "https://triviacast.xyz/screenshot.png",
     "castShareUrl": "https://triviacast.xyz/leaderboard"
   },
-  "accountAssociation": {
-    "header": "eyJmaWQiOjExNzU1MDYsInR5cGUiOiJhdXRoIiwia2V5IjoiMHhmRWZiMTRCOTkyNjQwZDUwZWJiMDBmYTlkOTY3NGFlMzlDNjA3ZDhiIn0",
-    "payload": "eyJkb21haW4iOiJ0cml2aWFjYXN0Lnh5ei9sZWFkZXJib2FyZCJ9",
-    "signature": "4lz931kkN7fUljWN3SJoQrUnUgjs+0uJh/e44DA+xb58eb/ZMSx/eVMvk3cGx0hzmz1pSkJa+YbyJQG3WYSEExs="
-  }
+  "accountAssociation": [
+    {
+      "header": "eyJmaWQiOjExNzU1MDYsInR5cGUiOiJhdXRoIiwia2V5IjoiMHhmRWZiMTRCOTkyNjQwZDUwZWJiMDBmYTlkOTY3NGFlMzlDNjA3ZDhiIn0",
+      "payload": "eyJkb21haW4iOiJ0cml2aWFjYXN0Lnh5eiJ9",
+      "signature": "wkPmTxxyx4zxJnCbm8/YGke9NwdhxTtBsmpZawM1WFk/ozoUjbIZT5BcVQ+9Eudx9mpR+U4Y/gvGMtOOA8E+kxw="
+    }
+  ]
 }
