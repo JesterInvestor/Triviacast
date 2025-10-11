@@ -227,8 +227,8 @@ export default function Leaderboard() {
             <li>• Perfect 10 in a row for +2000 bonus points!</li>
             <li>• T points will be used in this app</li>
             <li>• $ TRIV is the native token (coming soon)</li>
-            <li className="font-bold text-[#DC8291]">• Top T point holders will receive HUGE Airdrops of $TRIV tokens!</li>
-            <li className="text-xs italic">More details coming soon...</li>
+            <li className="font-bold text-[#DC8291]">• Top T point holders can claim HUGE Airdrops of $TRIV tokens daily!</li>
+            <li className="text-xs italic">BUY $TRIV with 💱</li>
           </ul>
         </div>
       </div>
