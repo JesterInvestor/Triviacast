@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useActiveAccount } from 'thirdweb/react';
 import { callDailyClaim, isDistributorConfigured } from '@/lib/distributor';
 import { callStake, isStakingConfigured, parseTokenAmount } from '@/lib/staking';
+import { getDailyClaimLabel } from '@/lib/config';
 
 const DISMISS_KEY = "triviacast:claim_prompt:dismissedAt";
 const DISMISS_TTL_MS = 1000 * 60 * 60 * 24; // 24 hours
@@ -72,8 +73,7 @@ export default function StakingDailyClaimPrompt() {
     }
   };
 
-  // Default to 1000 $TRIV for now if not configured
-  const DAILY_CLAIM_AMOUNT = process.env.NEXT_PUBLIC_DAILY_CLAIM_AMOUNT || '1000 $TRIV';
+  const DAILY_CLAIM_AMOUNT = getDailyClaimLabel();
 
   const [stakeAmount, setStakeAmount] = useState<string>('');
   const [confirmOpen, setConfirmOpen] = useState(false);

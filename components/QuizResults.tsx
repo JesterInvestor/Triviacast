@@ -8,6 +8,7 @@ import { addPointsOnChain, isContractConfigured } from '@/lib/contract';
 import { addWalletTPoints } from '@/lib/tpoints';
 import { shareResultsUrl, openShareUrl } from '@/lib/farcaster';
 import { callDailyClaim, isDistributorConfigured, hasDistributorAddress } from '@/lib/distributor';
+import { getDailyClaimLabel } from '@/lib/config';
 
 interface QuizResultsProps {
   score: number;
@@ -233,7 +234,7 @@ function ClaimButton({ account, tPoints }: { account: any; tPoints: number }) {
       if (!account) throw new Error('Please connect your wallet');
       await callDailyClaim(account as any);
       try { window.dispatchEvent(new CustomEvent('triviacast:pointsUpdated')); } catch {}
-      try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: `You claimed ${process.env.NEXT_PUBLIC_DAILY_CLAIM_AMOUNT || '1000 $TRIV'}` } })); } catch {}
+  try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: `You claimed ${getDailyClaimLabel()}` } })); } catch {}
     } catch (e: any) {
       const msg = e?.message || 'Unable to claim. Try again later.';
       setErr(msg);
