@@ -18,8 +18,19 @@ dotenv.config({ path: distEnvExamplePath });
 async function main() {
   const TRIV_TOKEN = process.env.TRIV_TOKEN || "";
   const TRIVIA_POINTS = process.env.TRIVIA_POINTS || "";
-  const DAILY_AMOUNT = process.env.DAILY_AMOUNT || "0";
-  const TOP_AMOUNT = process.env.TOP_AMOUNT || "0";
+  // Accept human amounts (e.g. DAILY_AMOUNT_HUMAN=1000) or raw wei in DAILY_AMOUNT
+  const DAILY_AMOUNT_RAW = process.env.DAILY_AMOUNT || "0";
+  const DAILY_AMOUNT_HUMAN = process.env.DAILY_AMOUNT_HUMAN || process.env.DAILY_AMOUNT_HUMAN || "";
+  const TOP_AMOUNT_RAW = process.env.TOP_AMOUNT || "0";
+  const TOP_AMOUNT_HUMAN = process.env.TOP_AMOUNT_HUMAN || "";
+
+  const DAILY_AMOUNT = DAILY_AMOUNT_HUMAN && DAILY_AMOUNT_HUMAN.trim().length > 0
+    ? ethers.parseUnits(DAILY_AMOUNT_HUMAN, 18).toString()
+    : DAILY_AMOUNT_RAW;
+
+  const TOP_AMOUNT = TOP_AMOUNT_HUMAN && TOP_AMOUNT_HUMAN.trim().length > 0
+    ? ethers.parseUnits(TOP_AMOUNT_HUMAN, 18).toString()
+    : TOP_AMOUNT_RAW;
 
   if (!TRIV_TOKEN || !TRIVIA_POINTS) {
     throw new Error("Missing TRIV_TOKEN or TRIVIA_POINTS env var");
