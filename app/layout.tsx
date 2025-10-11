@@ -57,6 +57,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Move Farcaster ready() script to the absolute top for reliability */}
+        <script
+          type="module"
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                import('https://esm.sh/@farcaster/miniapp-sdk').then(({ sdk }) => {
+                  sdk.actions.ready().catch(() => {});
+                }).catch(() => {});
+              } catch {}
+            `,
+          }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -72,19 +85,6 @@ export default function RootLayout({
                   );
                 });
               }
-            `,
-          }}
-        />
-        {/* Inline fallback: call Farcaster ready() ASAP before React hydrates */}
-        <script
-          type="module"
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                import('https://esm.sh/@farcaster/miniapp-sdk').then(({ sdk }) => {
-                  sdk.actions.ready().catch(() => {});
-                }).catch(() => {});
-              } catch {}
             `,
           }}
         />
