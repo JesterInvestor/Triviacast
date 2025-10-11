@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+export const dynamic = 'force-dynamic';
 import "./globals.css";
 import ThirdwebProvider from "@/components/ThirdwebProvider";
 import WagmiProvider from "@/components/WagmiProvider";
