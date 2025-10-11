@@ -9,7 +9,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest"
   },
   "dependencies": {
     "@farcaster/miniapp-sdk": "^0.2.0",
@@ -32,6 +33,10 @@
     "ethers": "^6.15.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^1.2.2",
+    "@testing-library/react": "^14.1.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "jsdom": "^22.1.0"
   }
 }
