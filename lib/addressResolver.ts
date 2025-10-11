@@ -1,4 +1,33 @@
 /**
+ * Resolve Farcaster username by FID using Neynar v1 API
+ * @param fid Farcaster ID
+ * @returns Username if found, null otherwise
+ */
+export async function resolveFarcasterUsernameByFid(fid: number): Promise<string | null> {
+  try {
+    const apiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
+    if (!apiKey) throw new Error('Neynar API key missing');
+    const response = await fetch(
+      `https://hub-api.neynar.com/v1/userDataByFid?fid=${fid}&user_data_type=USER_DATA_TYPE_USERNAME`,
+      {
+        headers: {
+          'accept': 'application/json',
+          'x-api-key': apiKey,
+        },
+      }
+    );
+    if (!response.ok) return null;
+    const data = await response.json();
+    if (data?.data?.userDataBody?.value) {
+      return data.data.userDataBody.value;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error resolving Farcaster username by FID:', error);
+    return null;
+  }
+}
+/**
  * Utilities for resolving wallet addresses to human-readable names
  */
 
