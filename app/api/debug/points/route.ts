@@ -14,7 +14,8 @@ export async function GET(request: Request) {
     }
     const points = await getPointsFromChain(address);
     return NextResponse.json({ configured, address, points });
-  } catch (error: any) {
-    return NextResponse.json({ error: error?.message || 'unknown-error' }, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    return NextResponse.json({ error: err?.message || 'unknown-error' }, { status: 500 });
   }
 }

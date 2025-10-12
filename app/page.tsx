@@ -4,7 +4,6 @@ import { sdk } from '@farcaster/miniapp-sdk';
 import Image from 'next/image';
 import Quiz from '@/components/Quiz';
 import { shareAppUrl } from '@/lib/farcaster';
-import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,10 +35,10 @@ export default function Home() {
       const sdkLocal = mod?.sdk;
       if (sdkLocal && (await sdkLocal.isInMiniApp())) {
         if (sdkLocal.actions?.swapToken) {
-          await (sdkLocal.actions.swapToken as any)({ sellToken });
+          await (sdkLocal.actions.swapToken as unknown as (params: { sellToken: string }) => Promise<void>)({ sellToken });
         }
       }
-    } catch (err) {
+    } catch {
       // SDK not available or import failed — do nothing
     }
     // No fallback: do nothing if not in miniapp or swapToken unavailable

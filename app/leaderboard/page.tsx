@@ -5,7 +5,6 @@ import ShareButton from '@/components/ShareButton';
 import Link from 'next/link';
 import Image from 'next/image';
 import { shareLeaderboardUrl } from '@/lib/farcaster';
-import { Metadata } from 'next';
 import React, { useEffect } from 'react';
 import { sdk } from '@farcaster/miniapp-sdk';
 

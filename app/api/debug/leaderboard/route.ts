@@ -15,7 +15,8 @@ export async function GET() {
     const entries = await getLeaderboardFromChain(limit);
 
     return NextResponse.json({ configured, contract, chainId, total, limit, count: entries.length, entries });
-  } catch (error: any) {
-    return NextResponse.json({ error: error?.message || 'unknown-error' }, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    return NextResponse.json({ error: err?.message || 'unknown-error' }, { status: 500 });
   }
 }

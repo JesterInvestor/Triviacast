@@ -20,15 +20,27 @@ export async function GET(req: Request) {
   const base = `${proto}://${host}`;
   const manifestUrl = `${base}/.well-known/farcaster.json`;
 
-  const result: any = {
+  const result: {
+    ok: boolean;
+    manifestUrl: string;
+    requestHost: string;
+    payloadDomain: string | null;
+    httpStatus: number | null;
+    errors: string[];
+    warnings: string[];
+    signatureStatus: "unknown" | "present" | "missing";
+    manifest?: unknown;
+    accountAssociation?: unknown;
+    miniapp?: unknown;
+  } = {
     ok: false,
     manifestUrl,
     requestHost: host,
-    payloadDomain: null as string | null,
-    httpStatus: null as number | null,
-    errors: [] as string[],
-    warnings: [] as string[],
-    signatureStatus: "unknown" as "unknown" | "present" | "missing",
+    payloadDomain: null,
+    httpStatus: null,
+    errors: [],
+    warnings: [],
+    signatureStatus: "unknown",
   };
 
   try {

@@ -3,11 +3,75 @@ import { getContract, prepareContractCall, sendTransaction } from "thirdweb";
 import { base, baseSepolia } from "thirdweb/chains";
 import { privateKeyToAccount } from "thirdweb/wallets";
 import { client } from "@/lib/thirdweb";
+import crypto from "crypto";
+
+// Rate limiting store (in production, use Redis or similar)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(identifier: string, maxRequests: number = 5, windowMs: number = 15 * 60 * 1000): boolean {
+  const now = Date.now();
+  const record = rateLimitStore.get(identifier);
+
+  if (!record || now > record.resetTime) {
+    rateLimitStore.set(identifier, { count: 1, resetTime: now + windowMs });
+    return true;
+  }
+
+  if (record.count >= maxRequests) {
+    return false;
+  }
+
+  record.count++;
+  return true;
+}
+
+function verifyAdminAuth(req: Request): boolean {
+  const authHeader = req.headers.get("authorization");
+  const timestamp = req.headers.get("x-timestamp");
+
+  if (!authHeader || !timestamp) {
+    return false;
+  }
+
+  // Check timestamp is within 5 minutes
+  const now = Date.now();
+  const requestTime = parseInt(timestamp);
+  if (Math.abs(now - requestTime) > 5 * 60 * 1000) {
+    return false;
+  }
+
+  const secret = process.env.ADMIN_API_SECRET;
+  if (!secret) {
+    console.error("ADMIN_API_SECRET not configured");
+    return false;
+  }
+
+  // Create HMAC signature
+  const hmac = crypto.createHmac('sha256', secret);
+  hmac.update(timestamp);
+  const expectedSignature = hmac.digest('hex');
+
+  // Check if auth header matches expected signature
+  return crypto.timingSafeEqual(
+    Buffer.from(authHeader),
+    Buffer.from(expectedSignature)
+  );
+}
 
 export async function POST(req: Request) {
   try {
-    const token = req.headers.get("x-admin-token");
-    if (!token || token !== process.env.ADMIN_API_TOKEN) {
+    // Get client IP for rate limiting
+    const clientIP = req.headers.get("x-forwarded-for") ||
+                     req.headers.get("x-real-ip") ||
+                     "unknown";
+
+    // Rate limiting: 5 requests per 15 minutes per IP
+    if (!checkRateLimit(clientIP)) {
+      return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+    }
+
+    // Verify HMAC authentication
+    if (!verifyAdminAuth(req)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -44,8 +108,9 @@ export async function POST(req: Request) {
     const receipt = await sendTransaction({ transaction: tx, account });
 
     return NextResponse.json({ ok: true, tx: receipt.transactionHash || receipt }, { status: 200 });
-  } catch (e: any) {
-    console.error("/api/admin/airdrop error", e);
-    return NextResponse.json({ error: e?.message || "Airdrop failed" }, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    console.error("/api/admin/airdrop error", err?.message || "Unknown error");
+    return NextResponse.json({ error: err?.message || "Airdrop failed" }, { status: 500 });
   }
 }

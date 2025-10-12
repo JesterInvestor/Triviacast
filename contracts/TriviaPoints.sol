@@ -33,13 +33,14 @@ contract TriviaPoints {
     }
     
     /**
-     * @dev Add points to a wallet address
+     * @dev Add points to a wallet address (only the wallet owner can add points to themselves)
      * @param wallet The wallet address to add points to
      * @param amount The amount of points to add
      */
     function addPoints(address wallet, uint256 amount) external {
         require(wallet != address(0), "Invalid wallet address");
         require(amount > 0, "Amount must be greater than zero");
+        require(wallet == msg.sender, "Can only add points to your own wallet");
         
         // Track wallet if not already tracked
         if (!isWalletTracked[wallet]) {
@@ -103,18 +104,8 @@ contract TriviaPoints {
             tempPoints[i] = tPoints[wallets[i]];
         }
         
-        // Simple bubble sort (descending order by points)
-        // Note: For production with many users, consider off-chain sorting
-        for (uint256 i = 0; i < walletsCount - 1; i++) {
-            for (uint256 j = 0; j < walletsCount - i - 1; j++) {
-                if (tempPoints[j] < tempPoints[j + 1]) {
-                    // Swap points
-                    (tempPoints[j], tempPoints[j + 1]) = (tempPoints[j + 1], tempPoints[j]);
-                    // Swap addresses
-                    (tempAddresses[j], tempAddresses[j + 1]) = (tempAddresses[j + 1], tempAddresses[j]);
-                }
-            }
-        }
+        // Quick sort (descending order by points) - more efficient than bubble sort
+        quickSort(tempAddresses, tempPoints, 0, int256(walletsCount - 1));
         
         // Create result arrays with the limit
         addresses = new address[](actualLimit);
@@ -126,6 +117,45 @@ contract TriviaPoints {
         }
         
         return (addresses, points);
+    }
+
+    /**
+     * @dev Quick sort helper function for sorting leaderboard
+     * @param addresses Array of addresses to sort
+     * @param points Array of points to sort
+     * @param left Left index
+     * @param right Right index
+     */
+    function quickSort(address[] memory addresses, uint256[] memory points, int256 left, int256 right) internal pure {
+        if (left >= right) return;
+
+        int256 pivotIndex = partition(addresses, points, left, right);
+        quickSort(addresses, points, left, pivotIndex - 1);
+        quickSort(addresses, points, pivotIndex + 1, right);
+    }
+
+    /**
+     * @dev Partition helper for quicksort
+     */
+    function partition(address[] memory addresses, uint256[] memory points, int256 left, int256 right) internal pure returns (int256) {
+        uint256 pivot = points[uint256(right)];
+        int256 i = left - 1;
+
+        for (int256 j = left; j < right; j++) {
+            if (points[uint256(j)] >= pivot) { // Descending order
+                i++;
+                // Swap addresses
+                (addresses[uint256(i)], addresses[uint256(j)]) = (addresses[uint256(j)], addresses[uint256(i)]);
+                // Swap points
+                (points[uint256(i)], points[uint256(j)]) = (points[uint256(j)], points[uint256(i)]);
+            }
+        }
+
+        // Swap with pivot
+        (addresses[uint256(i + 1)], addresses[uint256(right)]) = (addresses[uint256(right)], addresses[uint256(i + 1)]);
+        (points[uint256(i + 1)], points[uint256(right)]) = (points[uint256(right)], points[uint256(i + 1)]);
+
+        return i + 1;
     }
     
     /**
