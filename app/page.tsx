@@ -27,13 +27,16 @@ export default function Home() {
   
   const handleBuyClick = async (e: React.MouseEvent) => {
     e.preventDefault();
-    const token = process.env.NEXT_PUBLIC_TRIV_ADDRESS || '0x73385Ee7392C105d5898048F96a1bDF551B2D936';
+  // Use Farcaster swapToken format: eip155:8453/erc20:<address>
+  // USDC on Base mainnet: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
+  const usdcAddress = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
+  const sellToken = `eip155:8453/erc20:${usdcAddress}`;
     try {
       const mod = await import('@farcaster/miniapp-sdk');
       const sdkLocal = mod?.sdk;
       if (sdkLocal && (await sdkLocal.isInMiniApp())) {
         if (sdkLocal.actions?.swapToken) {
-          await (sdkLocal.actions.swapToken as any)({ token });
+          await (sdkLocal.actions.swapToken as any)({ sellToken });
         }
       }
     } catch (err) {
