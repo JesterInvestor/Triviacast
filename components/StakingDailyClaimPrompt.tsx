@@ -66,11 +66,14 @@ export default function StakingDailyClaimPrompt() {
       await callDailyClaim(account as any);
       // notify points updated and show success toast
       try { window.dispatchEvent(new CustomEvent('triviacast:pointsUpdated')); } catch {}
-  try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: `You claimed ${DAILY_CLAIM_AMOUNT}` } })); } catch {}
+      try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: `You claimed ${DAILY_CLAIM_AMOUNT}` } })); } catch {}
       // hide for 24 hours on success
       dismiss();
     } catch (e: any) {
-      const msg = e?.message || 'Unable to claim. Try again later.';
+      let msg = e?.message || 'Unable to claim. Try again later.';
+      if (msg?.toLowerCase().includes('cooldown')) {
+        msg = 'Try again tomorrow.............';
+      }
       setError(msg);
       try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'error', message: msg } })); } catch {}
       setBusy(false);
