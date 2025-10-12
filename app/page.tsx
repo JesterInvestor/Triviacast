@@ -27,7 +27,7 @@ export default function Home() {
   
   const handleBuyClick = async (e: React.MouseEvent) => {
     e.preventDefault();
-    const token = '0x73385ee7392c105d5898048f96a1bdf551b2d936';
+    const token = process.env.NEXT_PUBLIC_TRIV_ADDRESS || '0x73385Ee7392C105d5898048F96a1bDF551B2D936';
     try {
       const mod = await import('@farcaster/miniapp-sdk');
       const sdkLocal = mod?.sdk;
