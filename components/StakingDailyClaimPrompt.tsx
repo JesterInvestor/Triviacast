@@ -17,6 +17,11 @@ export default function StakingDailyClaimPrompt() {
   useEffect(() => {
     let cancelled = false;
 
+    if (!account) {
+      setOpen(false);
+      return;
+    }
+
     const shouldShow = () => {
       try {
         const raw = localStorage.getItem(DISMISS_KEY);
@@ -46,7 +51,7 @@ export default function StakingDailyClaimPrompt() {
 
     setup();
     return () => { cancelled = true; };
-  }, []);
+  }, [account]);
 
   const dismiss = () => {
     try { localStorage.setItem(DISMISS_KEY, String(Date.now())); } catch {}
