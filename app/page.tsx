@@ -27,41 +27,19 @@ export default function Home() {
   
   const handleBuyClick = async (e: React.MouseEvent) => {
     e.preventDefault();
-    const buyUrl = process.env.NEXT_PUBLIC_BUY_TRIV_URL || 'https://matcha.xyz/tokens/base/0x73385ee7392c105d5898048f96a1bdf551b2d936';
     const token = '0x73385ee7392c105d5898048f96a1bdf551b2d936';
     try {
       const mod = await import('@farcaster/miniapp-sdk');
       const sdkLocal = mod?.sdk;
       if (sdkLocal && (await sdkLocal.isInMiniApp())) {
-        // Prefer the SDK swapToken action when available in the host
-        try {
-          // swapToken action may accept different shapes depending on SDK version; prefer token arg
-          if (sdkLocal.actions?.swapToken) {
-            // Cast to any because SDK types may vary between versions; runtime expects token/address
-            await (sdkLocal.actions.swapToken as any)({ token });
-            return;
-          }
-          // fallback to openUrl if swapToken isn't available
-          if (sdkLocal.actions?.openUrl) {
-            await sdkLocal.actions.openUrl({ url: buyUrl });
-            return;
-          }
-        } catch (err) {
-          // If SDK action fails, fall through to opening the URL
-          console.warn('Farcaster swap/openUrl failed, falling back to Matcha URL', err);
+        if (sdkLocal.actions?.swapToken) {
+          await (sdkLocal.actions.swapToken as any)({ token });
         }
       }
     } catch (err) {
-      // SDK not available or import failed — fall back to Matcha
+      // SDK not available or import failed — do nothing
     }
-
-    // Fallback for non-miniapp environments: open Matcha in a new tab
-    try {
-      window.open(buyUrl, '_blank', 'noreferrer');
-    } catch (err) {
-      // as a last resort, navigate
-      window.location.href = buyUrl;
-    }
+    // No fallback: do nothing if not in miniapp or swapToken unavailable
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1]">
