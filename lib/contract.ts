@@ -56,7 +56,14 @@ const activeChain = CHAIN_ID === 8453 ? base : baseSepolia;
 
 // Check if contract is configured
 export function isContractConfigured(): boolean {
-  return !!(CONTRACT_ADDRESS && client);
+  const configured = !!(CONTRACT_ADDRESS && client);
+  // Helpful debug for runtime checks
+  if (!configured) {
+    try {
+      console.info('[Triviacast] contract not configured', { CONTRACT_ADDRESS, clientPresent: !!client });
+    } catch (_e) {}
+  }
+  return configured;
 }
 
 // Get contract instance

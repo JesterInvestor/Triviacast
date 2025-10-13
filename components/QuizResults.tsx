@@ -38,17 +38,22 @@ export default function QuizResults({
   const [savingPoints, setSavingPoints] = useState(false);
   const [pointsSaved, setPointsSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [thirdwebUnauthorized, setThirdwebUnauthorized] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
 
   // Save points when component mounts
   useEffect(() => {
     async function savePoints() {
+      // Debug: log key state so we can see why on-chain save might be skipped
+      console.info('[Triviacast] savePoints called', {
+        activeAccount: account?.address,
+        tPoints,
+        pointsSaved,
+        contractConfigured: isContractConfigured(),
+      });
+
       if (!account?.address || tPoints === 0 || pointsSaved) return;
 
-  setSavingPoints(true);
-  setSaveError(null);
-  setThirdwebUnauthorized(false);
+      setSavingPoints(true);
+      setSaveError(null);
 
       try {
         // Always save to localStorage first
@@ -57,29 +62,11 @@ export default function QuizResults({
         // If contract is configured, also save to blockchain
         if (isContractConfigured()) {
           try {
-            // Debug: log the account and params so we can see what will be sent
-            try {
-              console.info('[Triviacast] saving points to chain', {
-                activeAccount: account?.address,
-                walletParam: account?.address,
-                points: tPoints,
-              });
-            } catch {}
-
             await addPointsOnChain(account, account.address, tPoints);
             console.log('Points saved to blockchain successfully');
-            // Reset retry state on success
-            setRetryCount(0);
-            setThirdwebUnauthorized(false);
           } catch (error) {
             console.warn('Failed to save points to blockchain:', error);
-            const unauthorized = !!(error as any)?.thirdwebUnauthorized || String((error as any)?.message || '').toLowerCase().includes('not been authorized') || String((error as any)?.message || '').includes('401') || String((error as any)?.message || '').includes('403');
-            if (unauthorized) {
-              setThirdwebUnauthorized(true);
-              setSaveError('Points saved locally — thirdweb is still authorizing your app. We will retry automatically.');
-            } else {
-              setSaveError('Points saved locally but failed to save to blockchain. Please try again later.');
-            }
+            setSaveError('Points saved locally but failed to save to blockchain. Please try again later.');
           }
         }
 
@@ -94,28 +81,6 @@ export default function QuizResults({
 
     savePoints();
   }, [account, tPoints, pointsSaved]);
-
-  // Auto-retry when thirdweb reports unauthorized — exponential backoff
-  useEffect(() => {
-    if (!thirdwebUnauthorized) return;
-    if (retryCount >= 5) return; // cap retries
-
-    const wait = Math.min(30, Math.pow(2, retryCount)) * 1000; // backoff
-    const id = window.setTimeout(() => {
-      setRetryCount((c) => c + 1);
-      // Trigger a retry by resetting pointsSaved to false so useEffect will run savePoints again
-      setPointsSaved(false);
-    }, wait);
-
-    return () => window.clearTimeout(id);
-  }, [thirdwebUnauthorized, retryCount]);
-
-  const onRetryNow = () => {
-    setRetryCount(0);
-    setPointsSaved(false);
-    setThirdwebUnauthorized(false);
-    setSaveError(null);
-  };
   
   const getResultMessage = () => {
     if (percentage >= 80) return "Excellent! 🎉";
@@ -175,15 +140,6 @@ export default function QuizResults({
             {saveError && (
               <div className="text-xs text-orange-600 mt-2">
                 ⚠️ {saveError}
-                {thirdwebUnauthorized && (
-                  <div className="mt-2">
-                    <div className="text-xs text-[#5a3d5c] mb-2">We're waiting for Thirdweb to authorize your app. This can take a few moments after you import the contract. We'll retry automatically — or you can retry now.</div>
-                    <div className="flex gap-2">
-                      <button onClick={onRetryNow} className="bg-[#F4A6B7] hover:bg-[#E8949C] text-white font-semibold py-2 px-3 rounded">Retry now</button>
-                      <div className="text-xs text-[#5a3d5c] self-center">Attempts: {retryCount}</div>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
