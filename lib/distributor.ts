@@ -2,6 +2,7 @@ import { getContract, prepareContractCall, readContract, sendTransaction } from 
 import { base, baseSepolia } from "thirdweb/chains";
 import { client } from "./thirdweb";
 import type { Account } from "thirdweb/wallets";
+import { extendAbiWithErrors } from './contract';
 
 const DISTRIBUTOR_ABI = [
   {
@@ -42,7 +43,9 @@ export function hasDistributorAddress(): boolean {
 function getDistributorContract() {
   if (!DISTRIBUTOR_ADDRESS) throw new Error("Distributor address not configured");
   if (!client) throw new Error("Thirdweb client not initialized");
-  return getContract({ client, address: DISTRIBUTOR_ADDRESS, chain: activeChain, abi: DISTRIBUTOR_ABI });
+  // Merge in standard error ABI entries so viem/thirdweb can decode revert reasons
+  const abiWithErrors = extendAbiWithErrors(DISTRIBUTOR_ABI as any);
+  return getContract({ client, address: DISTRIBUTOR_ADDRESS, chain: activeChain, abi: abiWithErrors });
 }
 
 export async function getDistributorOwner(): Promise<string | null> {

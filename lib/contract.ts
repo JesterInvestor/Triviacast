@@ -4,6 +4,16 @@ import { client } from "./thirdweb";
 import type { Account } from "thirdweb/wallets";
 
 // Contract ABI - only the functions we need
+// We include the standard Solidity error types so libraries like viem can
+// decode revert reasons when they are returned from the node/provider.
+const STANDARD_ERROR_ABI = [
+  // The generic Error(string) encoded as: Error(string)
+  { "type": "error", "name": "Error", "inputs": [{ "name": "", "type": "string" }] },
+  // Solidity Panic(uint256) for built-in assertions (0x4e487b71)
+  { "type": "error", "name": "Panic", "inputs": [{ "name": "", "type": "uint256" }] }
+] as const;
+
+// Application ABI (functions required by the frontend)
 const CONTRACT_ABI = [
   {
     "inputs": [
@@ -49,6 +59,17 @@ const CONTRACT_ABI = [
   }
 ] as const;
 
+// Helper to merge contract ABI with error ABI entries so callers can pass
+// an ABI that includes errors. This is a lightweight, non-destructive
+// merge used when instantiating contracts with libraries that decode
+// error signatures (like viem).
+export function extendAbiWithErrors<T extends readonly any[]>(abi: T) {
+  // We return a new array combining the provided abi and the standard error types.
+  // Keep the original types intact; this is a simple runtime helper.
+  // Cast to unknown to avoid excessive TypeScript inference complexity here.
+  return ([...abi, ...(STANDARD_ERROR_ABI as any)] as unknown) as T & typeof STANDARD_ERROR_ABI;
+}
+
 // Get contract address from environment
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "84532");
@@ -75,11 +96,12 @@ function getContractInstance() {
     throw new Error("Thirdweb client not initialized");
   }
 
+  const abiWithErrors = extendAbiWithErrors(CONTRACT_ABI as any);
   return getContract({
     client,
     address: CONTRACT_ADDRESS,
     chain: activeChain,
-    abi: CONTRACT_ABI,
+    abi: abiWithErrors,
   });
 }
 
