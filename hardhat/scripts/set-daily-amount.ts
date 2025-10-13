@@ -11,7 +11,7 @@ dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 
 async function main() {
   const DISTRIBUTOR_ADDRESS = process.env.DISTRIBUTOR_ADDRESS || process.env.TRIVIA_DISTRIBUTOR || process.env.DISTRIBUTOR || "";
-  const RAW_AMOUNT = process.env.DAILY_AMOUNT || "1000"; // default to 1000 TRIV
+  const RAW_AMOUNT = process.env.DAILY_AMOUNT || "100000"; // default to 100000 TRIV
 
   if (!DISTRIBUTOR_ADDRESS) {
     throw new Error("DISTRIBUTOR_ADDRESS env var is required (set in hardhat/.env or .env)");

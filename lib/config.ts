@@ -11,5 +11,5 @@ export function getDailyClaimLabel(): string {
   }
 
   // Default fallback
-  return '1000 $TRIV';
+  return '100,000 $TRIV';
 }
