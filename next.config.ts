@@ -14,7 +14,7 @@ export default withSentryConfig(nextConfig, {
 
   org: "gifmix",
 
-  project: "javascript-nextjs",
+  project: "triviacast",
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
