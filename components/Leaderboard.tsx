@@ -195,7 +195,7 @@ export default function Leaderboard() {
             <li>• Get 5 in a row for +1000 bonus points</li>
             <li>• Perfect 10 in a row for +2000 bonus points!</li>
             <li>• T points will be used in this app</li>
-            <li>• $ TRIV is the native token • $ TRIV is the native token CA 0x73385Ee7392C105d5898048F96a1bDF551B2D936</li>
+            <li>• $ TRIV is the native token $ TRIV is the native token CA 0xa889A10126024F39A0ccae31D09C18095CB461B8</li>
             <li>• CLAIM $ TRIV daily after quiz and when prompted</li>
             <li className="font-bold text-[#DC8291]">• Top T point holders can claim HUGE Airdrops of $TRIV tokens daily!</li>
             <li className="text-xs italic">BUY $TRIV with 💱</li>
