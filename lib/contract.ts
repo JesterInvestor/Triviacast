@@ -131,6 +131,14 @@ export async function addPointsOnChain(
       error: error?.message || error,
       details: error
     });
+    // Detect Thirdweb cloud authorization errors (401/403 / "not authorized")
+    try {
+      const msg = String(error?.message || JSON.stringify(error || '')).toLowerCase();
+      if (msg.includes('not been authorized') || msg.includes('not authorized') || msg.includes('401') || msg.includes('403') || msg.includes('has not been authorized')) {
+        (error as any).thirdwebUnauthorized = true;
+      }
+    } catch (_) {}
+
     throw error;
   }
 }
