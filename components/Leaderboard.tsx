@@ -198,7 +198,7 @@ export default function Leaderboard() {
             <li>• $ TRIV is the native token $ TRIV is the native token CA 0xa889A10126024F39A0ccae31D09C18095CB461B8</li>
             <li>• CLAIM $ TRIV daily after quiz and when prompted</li>
             <li className="font-bold text-[#DC8291]">• Top T point holders can claim HUGE Airdrops of $TRIV tokens daily!</li>
-            <li className="text-xs italic">BUY $TRIV with 💱</li>
+            <li className="text-xs italic">BUY $TRIV with 💱 Jackpot coming soon......................</li>
           </ul>
         </div>
       </div>
