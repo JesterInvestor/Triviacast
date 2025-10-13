@@ -91,7 +91,6 @@ export async function addPointsOnChain(
   if (!isContractConfigured()) {
     throw new Error("Smart contract not configured");
   }
-
   const contract = getContractInstance();
   console.info('[Triviacast] addPointsOnChain', {
     contract: CONTRACT_ADDRESS,
@@ -99,19 +98,41 @@ export async function addPointsOnChain(
     walletAddress,
     points
   });
-  
+  // Sanity check: ensure the connected account address matches the target wallet
+  try {
+    const activeAddress = (account as any)?.address;
+    if (!activeAddress) {
+      throw new Error('No active account address available for signing');
+    }
+
+    if (activeAddress.toLowerCase() !== walletAddress.toLowerCase()) {
+      throw new Error(`Connected account (${activeAddress}) does not match target wallet (${walletAddress}). The contract requires the caller to be the target wallet.`);
+    }
+  } catch (e) {
+    console.error('[Triviacast] addPointsOnChain pre-check failed', e);
+    throw e;
+  }
+
   const transaction = prepareContractCall({
     contract,
     method: "addPoints",
     params: [walletAddress as `0x${string}`, BigInt(points)],
   });
 
-  const result = await sendTransaction({
-    transaction,
-    account,
-  });
-
-  return result;
+  try {
+    const result = await sendTransaction({
+      transaction,
+      account,
+    });
+    return result;
+  } catch (error: any) {
+    // Try to surface a revert reason if available
+    console.error('[Triviacast] addPointsOnChain transaction failed', {
+      error: error?.message || error,
+      details: error
+    });
+    throw error;
+  }
 }
 
 /**
