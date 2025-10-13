@@ -54,6 +54,15 @@ export default function QuizResults({
         // If contract is configured, also save to blockchain
         if (isContractConfigured()) {
           try {
+            // Debug: log the account and params so we can see what will be sent
+            try {
+              console.info('[Triviacast] saving points to chain', {
+                activeAccount: account?.address,
+                walletParam: account?.address,
+                points: tPoints,
+              });
+            } catch {}
+
             await addPointsOnChain(account, account.address, tPoints);
             console.log('Points saved to blockchain successfully');
           } catch (error) {
