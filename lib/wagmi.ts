@@ -1,7 +1,7 @@
 import { http, createConfig } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { farcasterMiniApp } from '@farcaster/miniapp-wagmi-connector';
-import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
+import { coinbaseWallet } from '@wagmi/connectors';
 
 export const wagmiConfig = createConfig({
   chains: [base],
@@ -10,11 +10,9 @@ export const wagmiConfig = createConfig({
   },
   connectors: [
     farcasterMiniApp(),
-    new CoinbaseWalletConnector({
-      options: {
-        // Optional label to show in wallets list
-        appName: 'Triviacast',
-      },
+    coinbaseWallet({
+      // Optional label to show in wallets list
+      appName: 'Triviacast',
     })
   ]
 });

@@ -8,8 +8,8 @@ import Timer from './Timer';
 import { calculateTPoints } from '@/lib/tpoints';
 import { useActiveAccount } from 'thirdweb/react';
 
-const QUIZ_TIME_LIMIT = 300; // 5 minutes in seconds
-const TIME_PER_QUESTION = 30; // 30 seconds per question
+const QUIZ_TIME_LIMIT = 60; // 1 minute in seconds
+const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
 
 export default function Quiz() {
   const account = useActiveAccount();
@@ -131,7 +131,7 @@ export default function Quiz() {
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-[#2d1b2e]">Quiz Challenge</h1>
           <p className="text-[#5a3d5c] mb-8 text-base sm:text-lg">
-            Test your knowledge with 10 trivia questions. You have 5 minutes to complete the quiz!
+            Test your knowledge with 10 trivia questions. You have 1 minute to complete the quiz!
           </p>
           {!account?.address && (
             <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#F4A6B7] text-[#5a3d5c] rounded-lg text-sm sm:text-base">

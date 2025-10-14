@@ -7,8 +7,7 @@ import { useEffect, useState } from 'react';
 import { addPointsOnChain, isContractConfigured } from '@/lib/contract';
 import { addWalletTPoints } from '@/lib/tpoints';
 import { shareResultsUrl, openShareUrl } from '@/lib/farcaster';
-import { callDailyClaim, isDistributorConfigured, hasDistributorAddress } from '@/lib/distributor';
-import { getDailyClaimLabel } from '@/lib/config';
+// Distributor/claim functionality removed from this component
 
 interface QuizResultsProps {
   score: number;
@@ -201,6 +200,18 @@ export default function QuizResults({
           </div>
         </div>
 
+        {/* Share results button moved below the review section */}
+        <div className="text-center mb-4 sm:mb-6">
+          <button
+            onClick={() => openShareUrl(shareResultsUrl(score, totalQuestions, percentage, tPoints))}
+            className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-4 px-8 rounded-lg text-base sm:text-lg transition inline-flex items-center justify-center shadow-lg min-h-[52px] w-full sm:w-auto gap-2"
+            aria-label="Share results on Farcaster"
+          >
+            <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
+            Share Results
+          </button>
+        </div>
+
         <div className="text-center flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
           <button
             onClick={onRestart}
@@ -214,54 +225,10 @@ export default function QuizResults({
           >
             View Leaderboard
           </Link>
-          <button
-            onClick={() => openShareUrl(shareResultsUrl(score, totalQuestions, percentage, tPoints))}
-            className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-4 px-8 rounded-lg text-base sm:text-lg transition inline-flex items-center justify-center shadow-lg min-h-[52px] w-full sm:w-auto gap-2"
-            aria-label="Share results on Farcaster"
-          >
-            <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
-            Share Results
-          </button>
-          {hasDistributorAddress() && (
-            <ClaimButton account={account} tPoints={tPoints} />
-          )}
+          
         </div>
       </div>
     </div>
   );
 }
-
-function ClaimButton({ account, tPoints }: { account: any; tPoints: number }) {
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-
-  const onClaim = async () => {
-    setErr(null);
-    setBusy(true);
-    try {
-      if (!account) throw new Error('Please connect your wallet');
-      await callDailyClaim(account as any);
-      try { window.dispatchEvent(new CustomEvent('triviacast:pointsUpdated')); } catch {}
-  try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: `You claimed ${getDailyClaimLabel()}` } })); } catch {}
-    } catch (e: any) {
-      const msg = e?.message || 'Unable to claim. Try again later.';
-      setErr(msg);
-      try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'error', message: msg } })); } catch {}
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <div className="w-full sm:w-auto">
-      <button
-        onClick={onClaim}
-        disabled={busy}
-        className="bg-[#3CB371] hover:bg-[#2fa960] active:bg-[#2b9f56] text-white font-bold py-4 px-8 rounded-lg text-base sm:text-lg transition shadow-lg min-h-[52px] w-full sm:w-auto"
-      >
-        {busy ? 'Processing…' : 'Claim Daily'}
-      </button>
-      {err && <div className="mt-2 text-xs text-red-600">{err}</div>}
-    </div>
-  );
-}
+// Claim daily functionality removed from this component

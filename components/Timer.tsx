@@ -9,8 +9,9 @@ export default function Timer({ timeRemaining }: TimerProps) {
   const seconds = timeRemaining % 60;
   
   const getTimerColor = () => {
-    if (timeRemaining > 120) return "text-green-600";
-    if (timeRemaining > 60) return "text-[#DC8291]";
+    // For a 60s quiz, show green when >40s, yellow when >20s, red otherwise
+    if (timeRemaining > 40) return "text-green-600";
+    if (timeRemaining > 20) return "text-[#DC8291]";
     return "text-red-600";
   };
 
