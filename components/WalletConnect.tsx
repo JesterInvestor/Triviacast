@@ -27,7 +27,7 @@ export default function WalletConnect() {
   }
 
   return (
-    <div className="flex justify-end flex-1 sm:flex-initial">
+    <div className="flex justify-center flex-1 sm:flex-initial">
       <ConnectButton
         client={client}
         chain={base}
