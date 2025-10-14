@@ -1,21 +1,36 @@
 "use client";
+import Leaderboard from '@/components/Leaderboard';
+import WalletConnect from '@/components/WalletConnect';
+import ShareButton from '@/components/ShareButton';
+import WalletPoints from '@/components/WalletPoints';
+import Link from 'next/link';
+import Image from 'next/image';
+import { shareAppUrl } from '@/lib/farcaster';
 import React, { useEffect } from 'react';
 import { sdk } from '@farcaster/miniapp-sdk';
-import Image from 'next/image';
 import Quiz from '@/components/Quiz';
-import { shareAppUrl } from '@/lib/farcaster';
 
 export const dynamic = 'force-dynamic';
 
+// The $TRIV token address to autofill for swap
+const TRIV_TOKEN_ADDRESS = "0xa889A10126024F39A0ccae31D09C18095CB461B8";
 
-import WalletConnect from '@/components/WalletConnect';
-import WalletPoints from '@/components/WalletPoints';
-import ShareButton from '@/components/ShareButton';
-import Link from 'next/link';
+const handleBuyClick = async () => {
+  try {
+    // Try swapping via SDK if available
+    if (sdk && sdk.actions && typeof sdk.actions.swapToken === "function") {
+      await sdk.actions.swapToken({ sellToken: TRIV_TOKEN_ADDRESS });
+    } else {
+      // Fallback: open a swap site (example: Baseswap on Base)
+      window.open(`https://baseswap.xyz/swap?outputCurrency=${TRIV_TOKEN_ADDRESS}`, "_blank");
+    }
+  } catch (error) {
+    console.error("Swap failed:", error);
+    alert("Swap failed. Please try again later.");
+  }
+};
 
-
-
-export default function Home() {
+export default function HomePage() {
   useEffect(() => {
     (async () => {
       try {
@@ -23,26 +38,6 @@ export default function Home() {
       } catch {}
     })();
   }, []);
-  
-  const handleBuyClick = async (e: React.MouseEvent) => {
-    e.preventDefault();
-  // Use Farcaster swapToken format: eip155:8453/erc20:<address>
-  // USDC on Base mainnet: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
-  const usdcAddress = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
-  const sellToken = `eip155:8453/erc20:${usdcAddress}`;
-    try {
-      const mod = await import('@farcaster/miniapp-sdk');
-      const sdkLocal = mod?.sdk;
-      if (sdkLocal && (await sdkLocal.isInMiniApp())) {
-        if (sdkLocal.actions?.swapToken) {
-          await (sdkLocal.actions.swapToken as unknown as (params: { sellToken: string }) => Promise<void>)({ sellToken });
-        }
-      }
-    } catch {
-      // SDK not available or import failed — do nothing
-    }
-    // No fallback: do nothing if not in miniapp or swapToken unavailable
-  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1]">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
