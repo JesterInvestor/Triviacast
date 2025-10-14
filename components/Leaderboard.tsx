@@ -41,6 +41,24 @@ export default function Leaderboard() {
           const names = await batchResolveDisplayNames(addresses);
           console.log('Resolved display names:', names);
           setDisplayNames(names);
+
+          // For any addresses that didn't resolve to a Farcaster username, poll a few times
+          // to give indexers a chance to catch up (helps when a username was recently created).
+          const unresolved = addresses.filter(a => !names.has(a.toLowerCase()));
+          if (unresolved.length > 0) {
+            console.log('Polling for unresolved Farcaster usernames:', unresolved);
+            // Import the poller (keeps initial bundle smaller)
+            try {
+              const { pollFarcasterUsernames } = await import('@/lib/addressResolver');
+              const polled = await pollFarcasterUsernames(unresolved, 8, 1500);
+              if (polled && polled.size > 0) {
+                setDisplayNames(prev => new Map([...Array.from(prev.entries()), ...Array.from(polled.entries())]));
+                console.log('Polled and updated names:', polled);
+              }
+            } catch (e) {
+              console.warn('Polling for Farcaster usernames failed', e);
+            }
+          }
         }
         
         if (account?.address) {

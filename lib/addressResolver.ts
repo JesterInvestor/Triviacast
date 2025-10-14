@@ -151,3 +151,45 @@ export async function batchResolveDisplayNames(
   
   return displayNames;
 }
+
+/**
+ * Poll for Farcaster usernames for a set of addresses.
+ * Tries multiple times with a delay and returns a map of newly discovered usernames
+ * (address -> `@username`).
+ */
+export async function pollFarcasterUsernames(
+  addresses: string[],
+  attempts: number = 10,
+  delayMs: number = 1500
+): Promise<Map<string, string>> {
+  const found = new Map<string, string>();
+
+  // Helper to wait
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  // Addresses should be lowercased when stored in the map
+  const remaining = new Set(addresses.map((a) => a.toLowerCase()));
+
+  for (let i = 0; i < attempts && remaining.size > 0; i++) {
+    const tries = Array.from(remaining).map(async (address) => {
+      try {
+        const username = await resolveFarcasterUsername(address);
+        if (username) {
+          found.set(address, `@${username}`);
+          remaining.delete(address);
+        }
+      } catch (e) {
+        // ignore and try again on next round
+      }
+    });
+
+    await Promise.all(tries);
+
+    if (remaining.size === 0) break;
+
+    // wait before next attempt
+    await wait(delayMs);
+  }
+
+  return found;
+}
