@@ -104,6 +104,17 @@ export default function QuizResults({
             Quiz Complete!
           </h2>
         </div>
+        {/* Share results CTA moved to top under header */}
+        <div className="text-center mb-4 sm:mb-6">
+          <button
+            onClick={() => openShareUrl(shareResultsUrl(score, totalQuestions, percentage, tPoints))}
+            className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-6 rounded-lg text-base sm:text-lg transition inline-flex items-center justify-center shadow-lg min-h-[48px] w-full sm:w-auto gap-2"
+            aria-label="Share results on Farcaster"
+          >
+            <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
+            Share Results
+          </button>
+        </div>
         
         <div className="text-center mb-6 sm:mb-8">
           <div className={`text-4xl sm:text-6xl font-bold mb-2 ${getResultColor()}`}>
@@ -200,17 +211,7 @@ export default function QuizResults({
           </div>
         </div>
 
-        {/* Share results button moved below the review section */}
-        <div className="text-center mb-4 sm:mb-6">
-          <button
-            onClick={() => openShareUrl(shareResultsUrl(score, totalQuestions, percentage, tPoints))}
-            className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-4 px-8 rounded-lg text-base sm:text-lg transition inline-flex items-center justify-center shadow-lg min-h-[52px] w-full sm:w-auto gap-2"
-            aria-label="Share results on Farcaster"
-          >
-            <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
-            Share Results
-          </button>
-        </div>
+        
 
         <div className="text-center flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
           <button
