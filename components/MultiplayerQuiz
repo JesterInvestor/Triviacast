@@ -1,0 +1,207 @@
+import React, { useState, useEffect } from 'react';
+import { useActiveAccount } from 'thirdweb/react'; // Or Farcaster MiniApp SDK
+
+type Question = {
+  category: string;
+  type: string;
+  difficulty: string;
+  question: string;
+  correct_answer: string;
+  incorrect_answers: string[];
+};
+
+type PlayerScore = {
+  player: string;
+  score: number;
+};
+
+export default function MultiplayerQuiz() {
+  const account = useActiveAccount(); // Or Farcaster user context
+  const [mode, setMode] = useState<'lobby' | 'quiz' | 'waiting' | 'results'>('lobby');
+  const [sessionCode, setSessionCode] = useState('');
+  const [inputCode, setInputCode] = useState('');
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [current, setCurrent] = useState(0);
+  const [scores, setScores] = useState<PlayerScore[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Create session
+  const handleCreateSession = async () => {
+    setLoading(true);
+    const response = await fetch('/api/session/create', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ creator: account?.address }),
+    });
+    const data = await response.json();
+    setSessionCode(data.sessionCode);
+    setQuestions(data.questions);
+    setAnswers([]);
+    setMode('quiz');
+    setLoading(false);
+  };
+
+  // Join session
+  const handleJoinSession = async () => {
+    if (!inputCode) return;
+    setLoading(true);
+    const joinRes = await fetch('/api/session/join', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ sessionCode: inputCode, player: account?.address }),
+    });
+    const joinData = await joinRes.json();
+    if (joinData.success) {
+      const qRes = await fetch(`/api/session/${inputCode}/questions`);
+      const qData = await qRes.json();
+      setSessionCode(inputCode);
+      setQuestions(qData.questions);
+      setAnswers([]);
+      setMode('quiz');
+    }
+    setLoading(false);
+  };
+
+  // Submit answers
+  const handleSubmitAnswers = async () => {
+    setLoading(true);
+    await fetch(`/api/session/${sessionCode}/answers`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ player: account?.address, answers }),
+    });
+    setMode('waiting');
+    setLoading(false);
+  };
+
+  // Poll results if waiting
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (mode === 'waiting') {
+      interval = setInterval(async () => {
+        const res = await fetch(`/api/session/${sessionCode}/results`);
+        const data = await res.json();
+        if (data.scores) {
+          setScores(data.scores);
+          setMode('results');
+        }
+      }, 3000);
+    }
+    return () => interval && clearInterval(interval);
+  }, [mode, sessionCode]);
+
+  // Quiz UI
+  if (mode === 'lobby') {
+    return (
+      <div className="max-w-md mx-auto bg-white rounded p-6 shadow">
+        <h2 className="text-xl font-bold mb-4">Multiplayer Quiz</h2>
+        <button onClick={handleCreateSession} disabled={loading} className="mt-2 mb-4 px-4 py-2 bg-pink-500 text-white rounded">
+          {loading ? 'Creating...' : 'Create Game'}
+        </button>
+        <div className="mt-4">
+          <input
+            className="border p-2 rounded mr-2"
+            placeholder="Enter session code"
+            value={inputCode}
+            onChange={e => setInputCode(e.target.value)}
+            disabled={loading}
+          />
+          <button onClick={handleJoinSession} disabled={loading || !inputCode} className="px-4 py-2 bg-purple-500 text-white rounded">
+            {loading ? 'Joining...' : 'Join Game'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === 'quiz') {
+    const q = questions[current];
+    return (
+      <div className="max-w-xl mx-auto bg-white rounded p-6 shadow">
+        <h2 className="text-xl font-bold mb-4">Session Code: {sessionCode}</h2>
+        <div className="mb-2 font-semibold">{q.category}</div>
+        <div className="mb-4">{q.question}</div>
+        <div className="mb-4">
+          {[q.correct_answer, ...q.incorrect_answers].sort().map((opt, i) => (
+            <button
+              key={i}
+              className={`block w-full mb-2 p-2 rounded border ${answers[current] === opt ? 'bg-pink-200' : 'bg-gray-50'}`}
+              onClick={() => {
+                const newAnswers = [...answers];
+                newAnswers[current] = opt;
+                setAnswers(newAnswers);
+              }}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+        <div className="flex justify-between mt-4">
+          {current > 0 &&
+            <button className="px-3 py-2 rounded bg-gray-200" onClick={() => setCurrent(current - 1)}>
+              Previous
+            </button>
+          }
+          {current < questions.length - 1 ? (
+            <button
+              className="px-3 py-2 rounded bg-pink-500 text-white"
+              onClick={() => setCurrent(current + 1)}
+              disabled={!answers[current]}
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              className="px-3 py-2 rounded bg-purple-500 text-white"
+              onClick={handleSubmitAnswers}
+              disabled={answers.length !== questions.length || answers.includes(undefined)}
+            >
+              Submit Answers
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === 'waiting') {
+    return (
+      <div className="max-w-md mx-auto bg-white rounded p-6 shadow text-center">
+        <h2 className="text-xl font-bold mb-4">Waiting for other players...</h2>
+        <div className="text-gray-600 mb-2">Session Code: {sessionCode}</div>
+        <div className="animate-pulse">⏳</div>
+      </div>
+    );
+  }
+
+  if (mode === 'results') {
+    return (
+      <div className="max-w-lg mx-auto bg-white rounded p-6 shadow text-center">
+        <h2 className="text-xl font-bold mb-4">Results</h2>
+        <div className="mb-4">Session Code: {sessionCode}</div>
+        <table className="w-full text-left mb-4">
+          <thead>
+            <tr>
+              <th className="py-2">Player</th>
+              <th className="py-2">Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {scores.map((ps, i) => (
+              <tr key={i}>
+                <td className="py-1">{ps.player}</td>
+                <td className="py-1">{ps.score}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <button className="px-4 py-2 rounded bg-pink-500 text-white" onClick={() => setMode('lobby')}>
+          Play Again
+        </button>
+      </div>
+    );
+  }
+
+  return null;
+}
