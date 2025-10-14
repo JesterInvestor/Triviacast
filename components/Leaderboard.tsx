@@ -43,7 +43,21 @@ export default function Leaderboard() {
           console.log('Resolving names for addresses:', addresses);
           const names = await batchResolveDisplayNames(addresses);
           console.log('Resolved display names:', names);
-          setDisplayNames(names);
+          // Merge names into state but don't overwrite an existing canonical name
+          // (canonical = Farcaster username starting with '@' or ENS containing '.eth').
+          setDisplayNames(prev => {
+            const merged = new Map(prev);
+            for (const [k, v] of names.entries()) {
+              const existing = merged.get(k);
+              const existingIsCanonical = existing && (existing.startsWith('@') || existing.includes('.eth'));
+              const incomingIsCanonical = v && (v.startsWith('@') || v.includes('.eth'));
+              // If there's already a canonical name, keep it. Otherwise prefer incoming value.
+              if (!existing || !existingIsCanonical || incomingIsCanonical) {
+                merged.set(k, v);
+              }
+            }
+            return merged;
+          });
 
           // For any addresses that didn't resolve to a Farcaster username, poll a few times
           // to give indexers a chance to catch up (helps when a username was recently created).
