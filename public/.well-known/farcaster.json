@@ -25,7 +25,7 @@
     "ogTitle": "Triviacast - Test your brain",
     "ogDescription": "Next.js-based trivia quiz mini-game",
     "ogImageUrl": "https://triviacast.xyz/screenshot.png",
-    "castShareUrl": "https://triviacast.xyz/leaderboard"
+    "castShareUrl": "https://triviacast.xyz"
   },
   "accountAssociation": {
     "header": "eyJmaWQiOjExNzU1MDYsInR5cGUiOiJhdXRoIiwia2V5IjoiMHhmRWZiMTRCOTkyNjQwZDUwZWJiMDBmYTlkOTY3NGFlMzlDNjA3ZDhiIn0",
