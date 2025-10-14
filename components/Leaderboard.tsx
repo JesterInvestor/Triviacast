@@ -8,6 +8,7 @@ import { useActiveAccount } from 'thirdweb/react';
 import { getDistributorOwner } from '@/lib/distributor';
 
 import { batchResolveDisplayNames } from '@/lib/addressResolver';
+import * as Sentry from '@sentry/nextjs';
 
 import { shareLeaderboardUrl, openShareUrl } from '@/lib/farcaster';
 
@@ -16,6 +17,7 @@ export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [displayNames, setDisplayNames] = useState<Map<string, string>>(new Map());
   const [updatingNames, setUpdatingNames] = useState(false);
+  const [updatedCount, setUpdatedCount] = useState<number | null>(null);
   const [walletTotal, setWalletTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [dataSource, setDataSource] = useState<'chain' | 'none'>('none');
@@ -49,18 +51,31 @@ export default function Leaderboard() {
           if (unresolved.length > 0) {
             console.log('Polling for unresolved Farcaster usernames:', unresolved);
             setUpdatingNames(true);
+            setUpdatedCount(null);
+            // Add a Sentry breadcrumb for the polling start
+            Sentry.addBreadcrumb({ category: 'farcaster.poll', message: 'start polling unresolved names', level: 'info', data: { count: unresolved.length } });
             // Import the poller (keeps initial bundle smaller)
             try {
               const { pollFarcasterUsernames } = await import('@/lib/addressResolver');
-              const polled = await pollFarcasterUsernames(unresolved, 8, 1500);
+              // Use tuned defaults: attempts=10, delay=1200ms, backoffFactor=1.5
+              const polled = await pollFarcasterUsernames(unresolved, 10, 1200, 1.5, 5000);
               if (polled && polled.size > 0) {
                 setDisplayNames(prev => new Map([...Array.from(prev.entries()), ...Array.from(polled.entries())]));
                 console.log('Polled and updated names:', polled);
+                setUpdatedCount(polled.size);
+                Sentry.addBreadcrumb({ category: 'farcaster.poll', message: 'polled and updated names', level: 'info', data: { updated: polled.size } });
+              } else {
+                setUpdatedCount(0);
+                Sentry.addBreadcrumb({ category: 'farcaster.poll', message: 'poll completed with no updates', level: 'info' });
               }
             } catch (e) {
               console.warn('Polling for Farcaster usernames failed', e);
+              setUpdatedCount(0);
+              Sentry.captureException(e);
             } finally {
               setUpdatingNames(false);
+              // Clear the updatedCount message after a short delay (UX)
+              setTimeout(() => setUpdatedCount(null), 3000);
             }
           }
         }

@@ -160,7 +160,9 @@ export async function batchResolveDisplayNames(
 export async function pollFarcasterUsernames(
   addresses: string[],
   attempts: number = 10,
-  delayMs: number = 1500
+  delayMs: number = 1200,
+  backoffFactor: number = 1.5,
+  maxDelayMs: number = 5000
 ): Promise<Map<string, string>> {
   const found = new Map<string, string>();
 
@@ -171,9 +173,38 @@ export async function pollFarcasterUsernames(
   const remaining = new Set(addresses.map((a) => a.toLowerCase()));
 
   for (let i = 0; i < attempts && remaining.size > 0; i++) {
+    console.debug(`pollFarcasterUsernames attempt ${i + 1}/${attempts} — remaining: ${remaining.size}`);
+    try {
+      // Add a breadcrumb so Sentry can show polling progress when debugging
+      const Sentry = await import('@sentry/nextjs');
+      Sentry.addBreadcrumb({
+        category: 'farcaster.poll',
+        message: `poll attempt ${i + 1}/${attempts}`,
+        level: 'info',
+        data: { remaining: remaining.size }
+      });
+    } catch (e) {
+      // if Sentry isn't available, ignore — logging still works
+    }
+
     const tries = Array.from(remaining).map(async (address) => {
       try {
+        const start = Date.now();
         const username = await resolveFarcasterUsername(address);
+        const latency = Date.now() - start;
+        // Add a per-address breadcrumb with latency
+        try {
+          const Sentry = await import('@sentry/nextjs');
+          Sentry.addBreadcrumb({
+            category: 'farcaster.poll.addr',
+            message: `polled address ${address}`,
+            level: 'debug',
+            data: { address, latency, attempt: i + 1 }
+          });
+        } catch (_) {
+          // ignore if Sentry not available
+        }
+
         if (username) {
           found.set(address, `@${username}`);
           remaining.delete(address);
@@ -187,8 +218,12 @@ export async function pollFarcasterUsernames(
 
     if (remaining.size === 0) break;
 
-    // wait before next attempt
-    await wait(delayMs);
+    // compute next delay with exponential backoff and a little jitter
+    const rawDelay = Math.min(maxDelayMs, Math.round(delayMs * Math.pow(backoffFactor, i)));
+    const jitter = 0.9 + Math.random() * 0.2; // 0.9 - 1.1
+    const nextDelay = Math.round(rawDelay * jitter);
+    console.debug(`Waiting ${nextDelay}ms before next poll attempt`);
+    await wait(nextDelay);
   }
 
   return found;
