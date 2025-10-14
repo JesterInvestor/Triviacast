@@ -220,6 +220,23 @@ You'll need to do a few more things before distributing your app to users:
 1. publish the app by providing information about who created it and how it should displayed
 2. make it sharable in feeds
 
+## Leaderboard FID display rule
+
+The Triviacast leaderboard shows a compact, privacy-minded identity label above each wallet address. We've simplified the UI rule to make behavior predictable and easy to reason about.
+
+Rule (simple):
+- If a Farcaster username (e.g. "@alice") or an ENS name (contains ".eth") is available for a wallet address, show that name on the first/primary line (bold), and always show the shortened wallet address on the second line in monospace for verification.
+- If no Farcaster username or ENS name is available, show only the shortened address on the primary line.
+
+This logic lives in the React component at `components/Leaderboard.tsx` in this repository. The implementation intentionally avoids additional network calls during render; it uses a batch resolution step and a short polling helper to surface newly-created Farcaster usernames when needed. The design follows the Farcaster docs guidance that profile metadata (usernames) is public and can be resolved using indexers like Neynar — see the Farcaster docs above for how Mini Apps should resolve and display user identifiers.
+
+Rationale:
+- Predictability: Users always see a shortened address for verification.
+- Minimal surface area: avoids extra lookups and privacy leakage.
+- Matches Farcaster expectations: show the canonical social name when present, otherwise fall back to on-chain address.
+
+If you'd like a different rule (for example: hide addresses and only show usernames, hash addresses for Sentry privacy, or prefer ENS over Farcaster names), tell me which preference and I will update the component and documentation accordingly.
+
 
 ## Specification
 

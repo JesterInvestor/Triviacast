@@ -170,10 +170,15 @@ export default function Leaderboard() {
                 </thead>
                 <tbody>
                   {leaderboard.map((entry, index) => {
-                    const displayName = displayNames.get(entry.walletAddress.toLowerCase()) || 
-                      `${entry.walletAddress.slice(0, 6)}...${entry.walletAddress.slice(-4)}`;
+                    const resolved = displayNames.get(entry.walletAddress.toLowerCase()) || null;
                     const isTopThree = index < 3;
-                    
+                    const shortened = `${entry.walletAddress.slice(0, 6)}...${entry.walletAddress.slice(-4)}`;
+                    // Simple display rule:
+                    // - If we have a Farcaster username (e.g. starts with '@') or an ENS name (contains '.eth'),
+                    //   show that on the first line (bold), and always show the shortened address on the second line.
+                    // - Otherwise show only the shortened address as the primary line.
+                    const farcasterOrEns = resolved && (resolved.startsWith('@') || resolved.includes('.eth')) ? resolved : null;
+
                     return (
                       <tr
                         key={entry.walletAddress}
@@ -191,12 +196,18 @@ export default function Leaderboard() {
                         </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-4">
                           <div className="flex flex-col">
-                            <span className={`text-[#2d1b2e] text-xs sm:text-sm ${displayName.startsWith('@') || displayName.includes('.eth') ? 'font-semibold' : 'font-mono'}`}>
-                              {displayName}
-                            </span>
-                            {(displayName.startsWith('@') || displayName.includes('.eth')) && (
-                              <span className="font-mono text-[#5a3d5c] text-xs opacity-70">
-                                {entry.walletAddress.slice(0, 6)}...{entry.walletAddress.slice(-4)}
+                            {farcasterOrEns ? (
+                              <>
+                                <span className="text-[#2d1b2e] text-xs sm:text-sm font-semibold">
+                                  {farcasterOrEns}
+                                </span>
+                                <span className="font-mono text-[#5a3d5c] text-xs opacity-70">
+                                  {shortened}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-[#2d1b2e] text-xs sm:text-sm font-mono">
+                                {shortened}
                               </span>
                             )}
                           </div>
