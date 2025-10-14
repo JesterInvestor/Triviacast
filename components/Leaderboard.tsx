@@ -224,7 +224,7 @@ export default function Leaderboard() {
             <li>• CLAIM $ TRIV daily after quiz and when prompted</li>
             <li className="font-bold text-[#DC8291]">• Top T point holders can claim HUGE Airdrops of $TRIV tokens daily!</li>
             <li className="text-xs italic">BUY $TRIV with 💱</li>
-            <li className="text-xs italic">Jackpot coming soon............ Users with 1,000,000 T points. So triviacast now!!!</li>
+            <li className="text-xs italic">Jackpot coming soon............ Users with 100,000 T points. So triviacast now!!!</li>
           </ul>
         </div>
       </div>
