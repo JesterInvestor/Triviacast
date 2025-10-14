@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Question, QuizState } from '@/types/quiz';
 import QuizQuestion from './QuizQuestion';
 import QuizResults from './QuizResults';
@@ -26,6 +26,8 @@ export default function Quiz() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [musicMuted, setMusicMuted] = useState(false);
 
   const startQuiz = async () => {
     setLoading(true);
@@ -73,6 +75,42 @@ export default function Quiz() {
 
     return () => clearInterval(timer);
   }, [quizState.quizStarted, quizState.quizCompleted]);
+
+  // Background music lifecycle: create audio when quiz starts, loop, allow mute toggle.
+  useEffect(() => {
+    // Only create/play while quiz is active
+    if (quizState.quizStarted && !quizState.quizCompleted) {
+      if (!audioRef.current) {
+        const audio = new Audio('/giggly-bubbles-222533.mp3');
+        audio.loop = true;
+        audio.volume = 0.25; // low volume
+        audioRef.current = audio;
+      }
+
+      // Ensure muted state is applied
+      if (audioRef.current) audioRef.current.muted = musicMuted;
+
+      const playPromise = audioRef.current.play();
+      if (playPromise && typeof playPromise.then === 'function') {
+        playPromise.catch(() => {
+          // Autoplay prevented; set muted so user can unmute later after interaction
+          setMusicMuted(true);
+        });
+      }
+    }
+
+    // Pause/cleanup when quiz ends
+    if (quizState.quizCompleted && audioRef.current) {
+      try { audioRef.current.pause(); audioRef.current.currentTime = 0; } catch (_) {}
+    }
+
+    return () => {
+      // If component unmounts, stop audio
+      if (audioRef.current) {
+        try { audioRef.current.pause(); audioRef.current = null; } catch (_) { audioRef.current = null; }
+      }
+    };
+  }, [quizState.quizStarted, quizState.quizCompleted, musicMuted]);
 
   const handleAnswer = (answer: string) => {
     const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
@@ -175,7 +213,21 @@ export default function Quiz() {
           <img src="/brain-small.svg" alt="Brain" className="w-6 h-6 sm:w-8 sm:h-8" loading="lazy" />
           Question {quizState.currentQuestionIndex + 1} of {quizState.questions.length}
         </div>
-        <Timer timeRemaining={quizState.timeRemaining} />
+        <div className="flex items-center gap-2">
+          <Timer timeRemaining={quizState.timeRemaining} />
+          <button
+            type="button"
+            aria-pressed={musicMuted}
+            onClick={() => {
+              setMusicMuted(prev => !prev);
+              if (audioRef.current) audioRef.current.muted = !musicMuted;
+            }}
+            className="bg-white border-2 border-[#F4A6B7] rounded-md p-2 shadow-sm text-sm"
+            aria-label={musicMuted ? 'Unmute background music' : 'Mute background music'}
+          >
+            {musicMuted ? '🔈' : '🔊'}
+          </button>
+        </div>
       </div>
       
       <div className="mb-4">
