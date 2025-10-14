@@ -12,7 +12,6 @@ import * as Sentry from '@sentry/nextjs';
 
 import { shareLeaderboardUrl, openShareUrl } from '@/lib/farcaster';
 
-
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [displayNames, setDisplayNames] = useState<Map<string, string>>(new Map());
@@ -157,16 +156,47 @@ export default function Leaderboard() {
           <>
             <div className="mb-4 text-center text-[#5a3d5c] text-sm flex flex-col items-center">
               <div className="flex items-center justify-center gap-2 mb-1">
-                {/* Five farcaster user icons */}
-                {[...Array(5)].map((_, i) => (
+                {/* Five unique SVG icons */}
+                <span className="rounded-full bg-white border-2 border-[#F4A6B7] shadow w-7 h-7 flex items-center justify-center">
                   <img
-                    key={i}
-                    src="/farcaster-user-icon.svg"
-                    alt="Farcaster User"
-                    className="w-5 h-5 sm:w-7 sm:h-7"
+                    src="/https___i.imgur.com_84EvySZ.svg"
+                    alt="Icon 1"
+                    className="w-full h-full object-contain"
                     loading="lazy"
                   />
-                ))}
+                </span>
+                <span className="rounded-full bg-white border-2 border-[#F4A6B7] shadow w-7 h-7 flex items-center justify-center">
+                  <img
+                    src="/https___i.imgur.com_MScXeOp.svg"
+                    alt="Icon 2"
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                  />
+                </span>
+                <span className="rounded-full bg-white border-2 border-[#F4A6B7] shadow w-7 h-7 flex items-center justify-center">
+                  <img
+                    src="/anim=false,fit=contain,f=auto,w=288.svg"
+                    alt="Icon 3"
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                  />
+                </span>
+                <span className="rounded-full bg-white border-2 border-[#F4A6B7] shadow w-7 h-7 flex items-center justify-center">
+                  <img
+                    src="/anim=false,fit=contain,f=auto,w=288 (1).svg"
+                    alt="Icon 4"
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                  />
+                </span>
+                <span className="rounded-full bg-white border-2 border-[#F4A6B7] shadow w-7 h-7 flex items-center justify-center">
+                  <img
+                    src="/anim=false,fit=contain,f=auto,w=288 (2).svg"
+                    alt="Icon 5"
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                  />
+                </span>
               </div>
               <span>
                 {leaderboard.length} active Triviacasters
