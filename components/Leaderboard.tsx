@@ -164,11 +164,25 @@ export default function Leaderboard() {
           </div>
         ) : (
           <>
-            <div className="mb-4 text-center text-[#5a3d5c] text-sm">
-              Showing all {leaderboard.length} {leaderboard.length === 1 ? 'player' : 'players'} with T points
-              {process.env.NODE_ENV !== 'production' && (
-                <span className="ml-2 text-[10px] text-gray-400">[{dataSource}]</span>
-              )}
+            <div className="mb-4 text-center text-[#5a3d5c] text-sm flex flex-col items-center">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                {/* Five farcaster user icons */}
+                {[...Array(5)].map((_, i) => (
+                  <img
+                    key={i}
+                    src="/farcaster-user-icon.svg"
+                    alt="Farcaster User"
+                    className="w-5 h-5 sm:w-7 sm:h-7"
+                    loading="lazy"
+                  />
+                ))}
+              </div>
+              <span>
+                {leaderboard.length} active Triviacasters
+                {process.env.NODE_ENV !== 'production' && (
+                  <span className="ml-2 text-[10px] text-gray-400">[{dataSource}]</span>
+                )}
+              </span>
               {updatingNames && (
                 <div className="mt-2 text-xs text-[#5a3d5c] italic">Updating display names…</div>
               )}
@@ -241,7 +255,7 @@ export default function Leaderboard() {
             <div className="mt-6 sm:mt-8 text-center">
               <Link
                 href="/"
-                className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-base sm:text-lg transition inline-block shadow-lg w-full sm:w-auto min-h-[52px] mx-auto"
+                className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-base sm:text-lg transition inline-block shadow-lg w-full sm:w-auto min-h-[[...]
               >
                 Play Quiz
               </Link>
