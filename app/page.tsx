@@ -49,7 +49,7 @@ export default function Home() {
               >
                 Leaderboard
               </Link>
-              <ShareButton shareUrl={shareAppUrl} />
+              <ShareButton url={shareAppUrl()} />
             </div>
           </div>
         </div>
