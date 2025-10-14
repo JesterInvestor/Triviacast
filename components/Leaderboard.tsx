@@ -32,17 +32,15 @@ export default function Leaderboard() {
     async function fetchData() {
       setLoading(true);
       try {
-  const board = await getLeaderboard();
-        console.log('Leaderboard data:', board);
+        const board = await getLeaderboard();
         setLeaderboard(board);
-  setDataSource(board.length > 0 ? 'chain' : 'none');
+        setDataSource(board.length > 0 ? 'chain' : 'none');
         
         // Resolve display names for all addresses
         if (board.length > 0) {
           const addresses = board.map(entry => entry.walletAddress);
-          console.log('Resolving names for addresses:', addresses);
           const names = await batchResolveDisplayNames(addresses);
-          console.log('Resolved display names:', names);
+
           // Merge names into state but don't overwrite an existing canonical name
           // (canonical = Farcaster username starting with '@' or ENS containing '.eth').
           setDisplayNames(prev => {
@@ -63,19 +61,14 @@ export default function Leaderboard() {
           // to give indexers a chance to catch up (helps when a username was recently created).
           const unresolved = addresses.filter(a => !names.has(a.toLowerCase()));
           if (unresolved.length > 0) {
-            console.log('Polling for unresolved Farcaster usernames:', unresolved);
             setUpdatingNames(true);
             setUpdatedCount(null);
-            // Add a Sentry breadcrumb for the polling start
             Sentry.addBreadcrumb({ category: 'farcaster.poll', message: 'start polling unresolved names', level: 'info', data: { count: unresolved.length } });
-            // Import the poller (keeps initial bundle smaller)
             try {
               const { pollFarcasterUsernames } = await import('@/lib/addressResolver');
-              // Use tuned defaults: attempts=10, delay=1200ms, backoffFactor=1.5
               const polled = await pollFarcasterUsernames(unresolved, 10, 1200, 1.5, 5000);
               if (polled && polled.size > 0) {
                 setDisplayNames(prev => new Map([...Array.from(prev.entries()), ...Array.from(polled.entries())]));
-                console.log('Polled and updated names:', polled);
                 setUpdatedCount(polled.size);
                 Sentry.addBreadcrumb({ category: 'farcaster.poll', message: 'polled and updated names', level: 'info', data: { updated: polled.size } });
               } else {
@@ -83,12 +76,10 @@ export default function Leaderboard() {
                 Sentry.addBreadcrumb({ category: 'farcaster.poll', message: 'poll completed with no updates', level: 'info' });
               }
             } catch (e) {
-              console.warn('Polling for Farcaster usernames failed', e);
               setUpdatedCount(0);
               Sentry.captureException(e);
             } finally {
               setUpdatingNames(false);
-              // Clear the updatedCount message after a short delay (UX)
               setTimeout(() => setUpdatedCount(null), 3000);
             }
           }
@@ -255,7 +246,7 @@ export default function Leaderboard() {
             <div className="mt-6 sm:mt-8 text-center">
               <Link
                 href="/"
-                className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-base sm:text-lg transition inline-block shadow-lg w-full sm:w-auto min-h-[[...]
+                className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-base sm:text-lg transition inline-block shadow-lg w-full sm:w-auto min-h-[52px]"
               >
                 Play Quiz
               </Link>
