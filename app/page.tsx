@@ -39,17 +39,26 @@ export default function Home() {
               <p className="text-xs sm:text-sm text-[#5a3d5c]">Test Your Brain Power</p>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+          {/* Center wallet connect and leaderboard on mobile, and place ShareButton outside */}
+          <div className="flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-4 w-full sm:w-auto justify-center">
             <WalletPoints />
-            <div className="flex items-center gap-2 sm:gap-4">
-              <WalletConnect />
-              <Link
-                href="/leaderboard"
-                className="rounded-md bg-[#fff] text-[#c85b86] hover:bg-[#f7f7f7] px-3 py-2 font-semibold text-xs sm:text-sm shadow transition"
-              >
-                Leaderboard
-              </Link>
-              <ShareButton url={shareAppUrl()} />
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto">
+              <div className="flex flex-row items-center justify-center gap-2 w-full">
+                <WalletConnect />
+                <Link
+                  href="/leaderboard"
+                  className="rounded-md bg-[#fff] text-[#c85b86] hover:bg-[#f7f7f7] px-3 py-2 font-semibold text-xs sm:text-sm shadow transition"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  Leaderboard
+                </Link>
+              </div>
+            </div>
+            {/* Share icon outside the button, with background color */}
+            <div className="flex justify-center mt-2 sm:mt-0 w-full sm:w-auto">
+              <div className="rounded-md bg-[#c85b86] px-3 py-2 shadow transition">
+                <ShareButton url={shareAppUrl()} />
+              </div>
             </div>
           </div>
         </div>
