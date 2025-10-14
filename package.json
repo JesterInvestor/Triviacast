@@ -17,6 +17,7 @@
     "@farcaster/miniapp-wagmi-connector": "^1.1.0",
     "@sentry/nextjs": "^10.19.0",
     "@tanstack/react-query": "^5.90.2",
+    "@coinbase/wallet-sdk": "^3.0.0",
     "crypto": "^1.0.1",
     "next": "15.5.4",
     "pino-pretty": "^10.0.0",
