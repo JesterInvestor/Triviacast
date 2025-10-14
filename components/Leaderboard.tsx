@@ -15,6 +15,7 @@ import { shareLeaderboardUrl, openShareUrl } from '@/lib/farcaster';
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [displayNames, setDisplayNames] = useState<Map<string, string>>(new Map());
+  const [updatingNames, setUpdatingNames] = useState(false);
   const [walletTotal, setWalletTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [dataSource, setDataSource] = useState<'chain' | 'none'>('none');
@@ -47,6 +48,7 @@ export default function Leaderboard() {
           const unresolved = addresses.filter(a => !names.has(a.toLowerCase()));
           if (unresolved.length > 0) {
             console.log('Polling for unresolved Farcaster usernames:', unresolved);
+            setUpdatingNames(true);
             // Import the poller (keeps initial bundle smaller)
             try {
               const { pollFarcasterUsernames } = await import('@/lib/addressResolver');
@@ -57,6 +59,8 @@ export default function Leaderboard() {
               }
             } catch (e) {
               console.warn('Polling for Farcaster usernames failed', e);
+            } finally {
+              setUpdatingNames(false);
             }
           }
         }
@@ -135,6 +139,9 @@ export default function Leaderboard() {
               Showing all {leaderboard.length} {leaderboard.length === 1 ? 'player' : 'players'} with T points
               {process.env.NODE_ENV !== 'production' && (
                 <span className="ml-2 text-[10px] text-gray-400">[{dataSource}]</span>
+              )}
+              {updatingNames && (
+                <div className="mt-2 text-xs text-[#5a3d5c] italic">Updating display names…</div>
               )}
             </div>
             <div className="overflow-x-auto -mx-2 sm:mx-0">
