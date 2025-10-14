@@ -37,7 +37,7 @@ export default function LeaderboardPage() {
               <p className="text-xs sm:text-sm text-[#5a3d5c]">Top Brain Power Rankings</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
+          <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-center sm:justify-end">
             <WalletConnect />
             <div className="flex items-center gap-2">
               <ShareButton
