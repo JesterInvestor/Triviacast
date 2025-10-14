@@ -27,7 +27,6 @@ export default function Quiz() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [musicMuted, setMusicMuted] = useState(false);
 
   const startQuiz = async () => {
     setLoading(true);
@@ -83,18 +82,15 @@ export default function Quiz() {
       if (!audioRef.current) {
         const audio = new Audio('/giggly-bubbles-222533.mp3');
         audio.loop = true;
-        audio.volume = 0.25; // low volume
+        audio.volume = 0.14; // lower background volume
         audioRef.current = audio;
       }
 
-      // Ensure muted state is applied
-      if (audioRef.current) audioRef.current.muted = musicMuted;
-
+      // Attempt to play; if autoplay is blocked, ignore the error (user can start via interaction)
       const playPromise = audioRef.current.play();
       if (playPromise && typeof playPromise.then === 'function') {
         playPromise.catch(() => {
-          // Autoplay prevented; set muted so user can unmute later after interaction
-          setMusicMuted(true);
+          // Autoplay prevented; do nothing (we removed the mute control)
         });
       }
     }
@@ -110,7 +106,7 @@ export default function Quiz() {
         try { audioRef.current.pause(); audioRef.current = null; } catch (_) { audioRef.current = null; }
       }
     };
-  }, [quizState.quizStarted, quizState.quizCompleted, musicMuted]);
+  }, [quizState.quizStarted, quizState.quizCompleted]);
 
   const handleAnswer = (answer: string) => {
     const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
@@ -215,18 +211,6 @@ export default function Quiz() {
         </div>
         <div className="flex items-center gap-2">
           <Timer timeRemaining={quizState.timeRemaining} />
-          <button
-            type="button"
-            aria-pressed={musicMuted}
-            onClick={() => {
-              setMusicMuted(prev => !prev);
-              if (audioRef.current) audioRef.current.muted = !musicMuted;
-            }}
-            className="bg-white border-2 border-[#F4A6B7] rounded-md p-2 shadow-sm text-sm"
-            aria-label={musicMuted ? 'Unmute background music' : 'Mute background music'}
-          >
-            {musicMuted ? '🔈' : '🔊'}
-          </button>
         </div>
       </div>
       
