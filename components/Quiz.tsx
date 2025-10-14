@@ -165,7 +165,9 @@ export default function Quiz() {
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-[#2d1b2e]">Quiz Challenge</h1>
           <p className="text-[#5a3d5c] mb-8 text-base sm:text-lg">
-            Only 1 minute. 10 questions. Endless bragging rights<br />
+            Only 1 minute.<br />
+            10 questions.<br />
+            Endless bragging rights.<br />
             Ready to prove you're a genius? 🧠
           </p>
           {!account?.address && (
