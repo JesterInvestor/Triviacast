@@ -38,26 +38,23 @@ export default function LeaderboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
-            {/* Sticky CTA on mobile, static on larger screens */}
-            <div className="sticky sm:static top-0 z-50 w-full sm:w-auto">
+            <WalletConnect />
+            <div className="flex items-center gap-2">
+              <ShareButton
+                url={shareLeaderboardUrl(null, 0)}
+                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[44px]"
+                ariaLabel="Share leaderboard on Farcaster"
+              />
+
               <Link
                 href="/"
                 aria-label="Play Quiz — start 10-question timed challenge"
-                className="w-full bg-[#FF6B99] hover:bg-[#E85C88] active:bg-[#D94E78] text-white font-extrabold py-4 px-5 sm:py-2 sm:px-6 rounded-lg transition shadow-md flex items-center justify-center gap-3 sm:flex-initial min-h-[56px] text-lg sm:text-base"
+                className="bg-[#FF6B99] hover:bg-[#E85C88] active:bg-[#D94E78] text-white font-extrabold py-3 px-4 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center justify-center gap-2 min-h-[44px] text-sm sm:text-base"
               >
-                <img src="/brain-small.svg" alt="Brain icon" className="w-5 h-5" aria-hidden="true" />
+                <img src="/brain-small.svg" alt="Brain icon" className="w-4 h-4" aria-hidden="true" />
                 <span>Play Quiz</span>
               </Link>
             </div>
-            <WalletConnect />
-            <ShareButton
-              url={shareLeaderboardUrl(null, 0)}
-              className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-4 sm:py-2 sm:px-6 rounded-lg transition shadow-md flex items-center gap-2 justify-center flex-1 sm:flex-initial min-h-[44px]"
-              ariaLabel="Share leaderboard on Farcaster"
-            >
-              <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
-              <span className="hidden xs:inline">Share</span>
-            </ShareButton>
           </div>
         </div>
         <Leaderboard />

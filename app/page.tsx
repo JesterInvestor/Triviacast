@@ -75,10 +75,7 @@ export default function Home() {
                 url={shareAppUrl()}
                 className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-4 sm:py-2 sm:px-6 rounded-lg transition shadow-lg flex items-center gap-2 justify-center flex-1 sm:flex-initial min-h-[44px]"
                 ariaLabel="Share on Farcaster"
-              >
-                <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
-                <span className="hidden xs:inline">Share</span>
-              </ShareButton>
+              />
               <button
                 onClick={handleBuyClick}
                 className="bg-[#3CB371] hover:bg-[#2fa960] active:bg-[#2b9f56] text-white font-bold py-3 px-4 sm:py-2 sm:px-6 rounded-lg transition shadow-lg flex items-center gap-2 justify-center flex-1 sm:flex-initial min-h-[44px]"
