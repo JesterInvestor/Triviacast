@@ -1,36 +1,18 @@
 "use client";
-import Leaderboard from '@/components/Leaderboard';
-import WalletConnect from '@/components/WalletConnect';
-import ShareButton from '@/components/ShareButton';
-import WalletPoints from '@/components/WalletPoints';
-import Link from 'next/link';
-import Image from 'next/image';
-import { shareAppUrl } from '@/lib/farcaster';
 import React, { useEffect } from 'react';
 import { sdk } from '@farcaster/miniapp-sdk';
+import Image from 'next/image';
 import Quiz from '@/components/Quiz';
+import { shareAppUrl } from '@/lib/farcaster';
 
 export const dynamic = 'force-dynamic';
 
-// The $TRIV token address to autofill for swap
-const TRIV_TOKEN_ADDRESS = "0xa889A10126024F39A0ccae31D09C18095CB461B8";
+import WalletConnect from '@/components/WalletConnect';
+import WalletPoints from '@/components/WalletPoints';
+import ShareButton from '@/components/ShareButton';
+import Link from 'next/link';
 
-const handleBuyClick = async () => {
-  try {
-    // Try swapping via SDK if available
-    if (sdk && sdk.actions && typeof sdk.actions.swapToken === "function") {
-      await sdk.actions.swapToken({ sellToken: TRIV_TOKEN_ADDRESS });
-    } else {
-      // Fallback: open a swap site (example: Baseswap on Base)
-      window.open(`https://baseswap.xyz/swap?outputCurrency=${TRIV_TOKEN_ADDRESS}`, "_blank");
-    }
-  } catch (error) {
-    console.error("Swap failed:", error);
-    alert("Swap failed. Please try again later.");
-  }
-};
-
-export default function HomePage() {
+export default function Home() {
   useEffect(() => {
     (async () => {
       try {
@@ -38,6 +20,7 @@ export default function HomePage() {
       } catch {}
     })();
   }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1]">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
@@ -62,22 +45,11 @@ export default function HomePage() {
               <WalletConnect />
               <Link
                 href="/leaderboard"
-                className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-3 px-4 sm:py-2 sm:px-6 rounded-lg transition shadow-lg flex items-center gap-2 justify-center flex-1 sm:flex-initial min-h-[44px]"
+                className="rounded-md bg-[#fff] text-[#c85b86] hover:bg-[#f7f7f7] px-3 py-2 font-semibold text-xs sm:text-sm shadow transition"
               >
-                🏆 <span className="hidden xs:inline">Leaderboard</span>
+                Leaderboard
               </Link>
-              <ShareButton
-                url={shareAppUrl()}
-                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-4 sm:py-2 sm:px-6 rounded-lg transition shadow-lg flex items-center gap-2 justify-center flex-1 sm:flex-initial min-h-[44px]"
-                ariaLabel="Share on Farcaster"
-              />
-              <button
-                onClick={handleBuyClick}
-                className="bg-[#3CB371] hover:bg-[#2fa960] active:bg-[#2b9f56] text-white font-bold py-3 px-4 sm:py-2 sm:px-6 rounded-lg transition shadow-lg flex items-center gap-2 justify-center flex-1 sm:flex-initial min-h-[44px]"
-                aria-label="Buy TRIV"
-              >
-                💱 <span className="hidden xs:inline">BUY $TRIV</span>
-              </button>
+              <ShareButton shareUrl={shareAppUrl} />
             </div>
           </div>
         </div>
