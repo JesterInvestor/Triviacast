@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useActiveAccount } from 'thirdweb/react';
 
 import { shareLeaderboardUrl, openShareUrl } from '@/lib/farcaster';
+import { batchResolveDisplayNames } from '@/lib/addressResolver';
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -20,6 +21,7 @@ export default function Leaderboard() {
   const [mfDisplayName, setMfDisplayName] = useState<string | undefined>(undefined);
   const [mfUsername, setMfUsername] = useState<string | undefined>(undefined);
   const [mfPfpUrl, setMfPfpUrl] = useState<string | undefined>(undefined);
+  const [resolvedNames, setResolvedNames] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
     let mounted = true;
@@ -102,6 +104,15 @@ export default function Leaderboard() {
       try {
         const board = await getLeaderboard();
         setLeaderboard(board);
+
+          // Resolve display names (Farcaster username / ENS / fallback) for leaderboard addresses
+          try {
+            const addresses = board.map((b) => b.walletAddress);
+            const namesMap = await batchResolveDisplayNames(addresses);
+            setResolvedNames(namesMap);
+          } catch (e) {
+            // ignore name resolution errors
+          }
 
         if (account?.address) {
           const points = await getWalletTotalPoints(account.address);
@@ -262,14 +273,21 @@ export default function Leaderboard() {
                               <img src={pfpUrl} alt="Profile" className="w-6 h-6 rounded-full border border-[#F4A6B7]" />
                             )}
                             <div className="flex flex-col">
-                              <span className="text-[#2d1b2e] text-xs sm:text-sm font-semibold">
-                                {isCurrentUser ? (displayName || username || 'User') : 'Unknown'}
-                              </span>
-                              {isCurrentUser && username && (
-                                <span className="font-mono text-[#5a3d5c] text-xs opacity-70">
-                                  @{username}
-                                </span>
-                              )}
+                              {
+                                (() => {
+                                  const key = entry.walletAddress.toLowerCase();
+                                  const otherName = resolvedNames.get(key) || `${entry.walletAddress.slice(0, 6)}...${entry.walletAddress.slice(-4)}`;
+                                  const label = isCurrentUser ? (displayName || username || 'User') : otherName;
+                                  return (
+                                    <>
+                                      <span className="text-[#2d1b2e] text-xs sm:text-sm font-semibold">{label}</span>
+                                      {isCurrentUser && username && (
+                                        <span className="font-mono text-[#5a3d5c] text-xs opacity-70">@{username}</span>
+                                      )}
+                                    </>
+                                  );
+                                })()
+                              }
                             </div>
                           </div>
                         </td>
