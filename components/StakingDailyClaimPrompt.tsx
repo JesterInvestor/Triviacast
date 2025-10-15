@@ -113,7 +113,7 @@ export default function StakingDailyClaimPrompt() {
               </button>
             </div>
           </div>
-          <p className="mt-3 text-[11px] text-neutral-500">Daily claims are limited to once per 24 hours. Staking is available on the web staking page.</p>
+          <p className="mt-3 text-[11px] text-neutral-500">Daily claims are limited to once per 24 hours.</p>
         </div>
       </div>
       
