@@ -25,21 +25,58 @@ export default function Leaderboard() {
     let mounted = true;
     async function loadMiniAppContext() {
       try {
-        // Use the installed miniapp sdk to detect whether we're running inside
-        // a Farcaster mini app and read the provided context.user info.
-  const mod = await import('@farcaster/miniapp-sdk');
-        const sdk = mod?.sdk;
-        if (!sdk) return;
+        // Try the miniapp SDK first (preferred)
+        try {
+          const mod = await import('@farcaster/miniapp-sdk');
+          const sdk = mod?.sdk;
+          if (sdk) {
+            const inMiniApp = await sdk.isInMiniApp();
+            if (inMiniApp) {
+              const context = await sdk.context;
+              if (!mounted) return;
+              setMfDisplayName(context?.user?.displayName);
+              setMfUsername(context?.user?.username);
+              setMfPfpUrl(context?.user?.pfpUrl);
+              return;
+            }
+          }
+        } catch {
+          // ignore and fall through to auth-kit attempt
+        }
 
-        const inMiniApp = await sdk.isInMiniApp();
-        if (!inMiniApp) return;
+        // Fallback: try to load @farcaster/auth-kit which may export a hook or context
+        try {
+          const mod = await import('@farcaster/auth-kit');
+          const modAny = mod as any;
+          if (modAny) {
+            // Some versions export `useMiniKit` hook, others may export a `MiniKit` object.
+            if (typeof modAny.useMiniKit === 'function') {
+              const { context } = modAny.useMiniKit();
+              if (!mounted) return;
+              setMfDisplayName(context?.user?.displayName);
+              setMfUsername(context?.user?.username);
+              setMfPfpUrl(context?.user?.pfpUrl);
+              return;
+            }
 
-        const context = await sdk.context;
-        if (!mounted) return;
-        setMfDisplayName(context?.user?.displayName);
-        setMfUsername(context?.user?.username);
-        setMfPfpUrl(context?.user?.pfpUrl);
-      } catch (e) {
+            // Try common named exports if present
+            const exportedSdk = modAny.sdk || modAny.MiniKit || modAny.miniApp;
+            if (exportedSdk) {
+              const inMiniApp = await (exportedSdk.isInMiniApp ? exportedSdk.isInMiniApp() : false);
+              if (inMiniApp) {
+                const context = await (exportedSdk.context ? exportedSdk.context : undefined);
+                if (!mounted) return;
+                setMfDisplayName(context?.user?.displayName);
+                setMfUsername(context?.user?.username);
+                setMfPfpUrl(context?.user?.pfpUrl);
+                return;
+              }
+            }
+          }
+        } catch {
+          // ignore - neither SDKs available
+        }
+      } catch {
         // Ignore failures to load SDK in non-miniapp environments
       }
     }
