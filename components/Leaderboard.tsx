@@ -105,7 +105,8 @@ export default function Leaderboard() {
           </h1>
         </div>
         <p className="text-center text-[#5a3d5c] mb-4 sm:mb-6 text-sm sm:text-lg">
-          There are always some winners... 🥳🥇🏆     and some losers 😭😩😞
+          There are always some winners... 🥳🥇🏆<br />
+          and some losers 😭😩😞
         </p>
 
         {walletTotal > 0 && account?.address && (
