@@ -165,10 +165,10 @@ export default function Quiz() {
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-[#2d1b2e]">Trivia Challenge</h1>
           <p className="text-[#5a3d5c] mb-8 text-base sm:text-lg">
-            Only 1 minute ⏱️<br />
-            10 questions ⁉️<br />
-            Endless bragging rights 😎🤓🧐<br />
-            Ready to prove you're a genius? 🧠
+            ⏱️ Only 1 minute ⏱️<br />
+            ⁉️ 10 questions ⁉️<br />
+            😎🤓🧐 Endless bragging rights 😎🤓🧐<br />
+            🧠 Ready to prove you're a genius? 🧠
           </p>
           {!account?.address && (
             <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#F4A6B7] text-[#5a3d5c] rounded-lg text-sm sm:text-base">
