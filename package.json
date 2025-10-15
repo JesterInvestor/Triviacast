@@ -12,6 +12,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@coinbase/onchainkit": "^1.1.1",
     "@coinbase/wallet-sdk": "^3.0.0",
     "@farcaster/auth-kit": "^0.1.4",
     "@farcaster/miniapp-node": "^0.1.10",
