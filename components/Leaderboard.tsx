@@ -5,11 +5,8 @@ import { LeaderboardEntry } from '@/types/quiz';
 import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
 import Link from 'next/link';
 import { useActiveAccount } from 'thirdweb/react';
-import { getDistributorOwner } from '@/lib/distributor';
-
 import { batchResolveDisplayNames } from '@/lib/addressResolver';
 import * as Sentry from '@sentry/nextjs';
-
 import { shareLeaderboardUrl, openShareUrl } from '@/lib/farcaster';
 
 export default function Leaderboard() {
@@ -34,21 +31,16 @@ export default function Leaderboard() {
         const board = await getLeaderboard();
         setLeaderboard(board);
         setDataSource(board.length > 0 ? 'chain' : 'none');
-        
-        // Resolve display names for all addresses
+
         if (board.length > 0) {
           const addresses = board.map(entry => entry.walletAddress);
           const names = await batchResolveDisplayNames(addresses);
-
-          // Merge names into state but don't overwrite an existing canonical name
-          // (canonical = Farcaster username starting with '@' or ENS containing '.eth').
           setDisplayNames(prev => {
             const merged = new Map(prev);
             for (const [k, v] of names.entries()) {
               const existing = merged.get(k);
               const existingIsCanonical = existing && (existing.startsWith('@') || existing.includes('.eth'));
               const incomingIsCanonical = v && (v.startsWith('@') || v.includes('.eth'));
-              // If there's already a canonical name, keep it. Otherwise prefer incoming value.
               if (!existing || !existingIsCanonical || incomingIsCanonical) {
                 merged.set(k, v);
               }
@@ -56,8 +48,6 @@ export default function Leaderboard() {
             return merged;
           });
 
-          // For any addresses that didn't resolve to a Farcaster username, poll a few times
-          // to give indexers a chance to catch up (helps when a username was recently created).
           const unresolved = addresses.filter(a => !names.has(a.toLowerCase()));
           if (unresolved.length > 0) {
             setUpdatingNames(true);
@@ -83,7 +73,7 @@ export default function Leaderboard() {
             }
           }
         }
-        
+
         if (account?.address) {
           const points = await getWalletTotalPoints(account.address);
           setWalletTotal(points);
@@ -127,7 +117,6 @@ export default function Leaderboard() {
                   <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
                   Share on Farcaster
                 </button>
-              
               </div>
             </div>
           </div>
@@ -223,10 +212,6 @@ export default function Leaderboard() {
                     const resolved = displayNames.get(entry.walletAddress.toLowerCase()) || null;
                     const isTopThree = index < 3;
                     const shortened = `${entry.walletAddress.slice(0, 6)}...${entry.walletAddress.slice(-4)}`;
-                    // Simple display rule:
-                    // - If we have a Farcaster username (e.g. starts with '@') or an ENS name (contains '.eth'),
-                    //   show that on the first line (bold), and always show the shortened address on the second line.
-                    // - Otherwise show only the shortened address as the primary line.
                     const farcasterOrEns = resolved && (resolved.startsWith('@') || resolved.includes('.eth')) ? resolved : null;
 
                     return (
@@ -285,7 +270,7 @@ export default function Leaderboard() {
           </>
         )}
 
-                <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-[#FFE4EC] rounded-lg border-2 border-[#F4A6B7]">
+        <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-[#FFE4EC] rounded-lg border-2 border-[#F4A6B7]">
           <h3 className="font-semibold text-[#2d1b2e] mb-2 flex items-center gap-2 text-sm sm:text-base">
             <img src="/brain-small.svg" alt="Brain" className="w-5 h-5 sm:w-6 sm:h-6" loading="lazy" />
             About T Points:
@@ -297,13 +282,13 @@ export default function Leaderboard() {
             <li>• Perfect 10 in a row for +2000 bonus points!</li>
             <li>• T points will be used in this app</li>
           </ul>
-          <h3 className="font-semibold text-[#2d1b2e] mb-2 flex items-center gap-2 text-sm sm:text-base mt-4">
+          <h3 className="font-semibold text-[#2d1b2e] mb-2 mt-4 flex items-center gap-2 text-sm sm:text-base">
             <img src="/brain-small.svg" alt="Brain" className="w-5 h-5 sm:w-6 sm:h-6" loading="lazy" />
             About $TRIV
           </h3>
           <ul className="text-xs sm:text-sm text-[#5a3d5c] space-y-1 font-medium">
-            <li>• $ TRIV is the native token CA 0xa889A10126024F39A0ccae31D09C18095CB461B8</li>
-            <li>• CLAIM $ TRIV daily after quiz and when prompted</li>
+            <li>• $TRIV is the native token CA 0xa889A10126024F39A0ccae31D09C18095CB461B8</li>
+            <li>• CLAIM $TRIV daily after quiz and when prompted</li>
             <li className="font-bold text-[#DC8291]">• Top T point holders can claim HUGE Airdrops of $TRIV tokens daily!</li>
             <li className="text-xs italic">BUY $TRIV with 💱</li>
             <li className="text-xs italic">Jackpot coming soon............ Users with 100,000 T points. So triviacast now!!!</li>
