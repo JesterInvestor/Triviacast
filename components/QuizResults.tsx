@@ -65,14 +65,14 @@ export default function QuizResults({
             console.log('Points saved to blockchain successfully');
           } catch (error) {
             console.warn('Failed to save points to blockchain:', error);
-            setSaveError('Points saved locally but failed to save to blockchain. Please try again later.');
+            setSaveError('You forgot to confirm the transaction. T Points failed to save to blockchain. Just try again and ');
           }
         }
 
         setPointsSaved(true);
       } catch (error) {
         console.error('Error saving points:', error);
-        setSaveError('Failed to save points. Please try again.');
+        setSaveError('Failed to save points. Please try again and score even better this time.');
       } finally {
         setSavingPoints(false);
       }
