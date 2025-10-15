@@ -285,7 +285,7 @@ export default function Leaderboard() {
           </>
         )}
 
-        <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-[#FFE4EC] rounded-lg border-2 border-[#F4A6B7]">
+                <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-[#FFE4EC] rounded-lg border-2 border-[#F4A6B7]">
           <h3 className="font-semibold text-[#2d1b2e] mb-2 flex items-center gap-2 text-sm sm:text-base">
             <img src="/brain-small.svg" alt="Brain" className="w-5 h-5 sm:w-6 sm:h-6" loading="lazy" />
             About T Points:
@@ -296,12 +296,13 @@ export default function Leaderboard() {
             <li>• Get 5 in a row for +1000 bonus points</li>
             <li>• Perfect 10 in a row for +2000 bonus points!</li>
             <li>• T points will be used in this app</li>
-         <h3 className="font-semibold text-[#2d1b2e] mb-2 flex items-center gap-2 text-sm sm:text-base">
+          </ul>
+          <h3 className="font-semibold text-[#2d1b2e] mb-2 flex items-center gap-2 text-sm sm:text-base mt-4">
             <img src="/brain-small.svg" alt="Brain" className="w-5 h-5 sm:w-6 sm:h-6" loading="lazy" />
             About $TRIV
           </h3>
-          </div>
-            <li>• $ TRIV is the native token $ TRIV is the native token CA 0xa889A10126024F39A0ccae31D09C18095CB461B8</li>
+          <ul className="text-xs sm:text-sm text-[#5a3d5c] space-y-1 font-medium">
+            <li>• $ TRIV is the native token CA 0xa889A10126024F39A0ccae31D09C18095CB461B8</li>
             <li>• CLAIM $ TRIV daily after quiz and when prompted</li>
             <li className="font-bold text-[#DC8291]">• Top T point holders can claim HUGE Airdrops of $TRIV tokens daily!</li>
             <li className="text-xs italic">BUY $TRIV with 💱</li>
