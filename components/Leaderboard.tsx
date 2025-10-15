@@ -5,19 +5,22 @@ import { LeaderboardEntry } from '@/types/quiz';
 import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
 import Link from 'next/link';
 import { useActiveAccount } from 'thirdweb/react';
-import { batchResolveDisplayNames } from '@/lib/addressResolver';
-import * as Sentry from '@sentry/nextjs';
+import { useMiniKit } from '@farcaster/auth-kit'; // Import MiniKit
+
 import { shareLeaderboardUrl, openShareUrl } from '@/lib/farcaster';
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [displayNames, setDisplayNames] = useState<Map<string, string>>(new Map());
-  const [updatingNames, setUpdatingNames] = useState(false);
-  const [updatedCount, setUpdatedCount] = useState<number | null>(null);
   const [walletTotal, setWalletTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [dataSource, setDataSource] = useState<'chain' | 'none'>('none');
   const account = useActiveAccount();
+
+  // MiniKit context for Farcaster info
+  const { context } = useMiniKit();
+  const displayName = context?.user?.displayName;
+  const username = context?.user?.username;
+  const pfpUrl = context?.user?.pfpUrl; // profile picture
+
   const myRank = useMemo(() => {
     if (!account?.address) return null;
     const idx = leaderboard.findIndex(l => l.walletAddress.toLowerCase() === account.address!.toLowerCase());
@@ -30,49 +33,6 @@ export default function Leaderboard() {
       try {
         const board = await getLeaderboard();
         setLeaderboard(board);
-        setDataSource(board.length > 0 ? 'chain' : 'none');
-
-        if (board.length > 0) {
-          const addresses = board.map(entry => entry.walletAddress);
-          const names = await batchResolveDisplayNames(addresses);
-          setDisplayNames(prev => {
-            const merged = new Map(prev);
-            for (const [k, v] of names.entries()) {
-              const existing = merged.get(k);
-              const existingIsCanonical = existing && (existing.startsWith('@') || existing.includes('.eth'));
-              const incomingIsCanonical = v && (v.startsWith('@') || v.includes('.eth'));
-              if (!existing || !existingIsCanonical || incomingIsCanonical) {
-                merged.set(k, v);
-              }
-            }
-            return merged;
-          });
-
-          const unresolved = addresses.filter(a => !names.has(a.toLowerCase()));
-          if (unresolved.length > 0) {
-            setUpdatingNames(true);
-            setUpdatedCount(null);
-            Sentry.addBreadcrumb({ category: 'farcaster.poll', message: 'start polling unresolved names', level: 'info', data: { count: unresolved.length } });
-            try {
-              const { pollFarcasterUsernames } = await import('@/lib/addressResolver');
-              const polled = await pollFarcasterUsernames(unresolved, 10, 1200, 1.5, 5000);
-              if (polled && polled.size > 0) {
-                setDisplayNames(prev => new Map([...Array.from(prev.entries()), ...Array.from(polled.entries())]));
-                setUpdatedCount(polled.size);
-                Sentry.addBreadcrumb({ category: 'farcaster.poll', message: 'polled and updated names', level: 'info', data: { updated: polled.size } });
-              } else {
-                setUpdatedCount(0);
-                Sentry.addBreadcrumb({ category: 'farcaster.poll', message: 'poll completed with no updates', level: 'info' });
-              }
-            } catch (e) {
-              setUpdatedCount(0);
-              Sentry.captureException(e);
-            } finally {
-              setUpdatingNames(false);
-              setTimeout(() => setUpdatedCount(null), 3000);
-            }
-          }
-        }
 
         if (account?.address) {
           const points = await getWalletTotalPoints(account.address);
@@ -106,9 +66,16 @@ export default function Leaderboard() {
               <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">
                 {walletTotal.toLocaleString()}
               </div>
-              <div className="text-xs text-[#5a3d5c] mt-1 truncate">
-                {account.address.slice(0, 6)}...{account.address.slice(-4)}
-              </div>
+              {/* Farcaster profile info */}
+              {pfpUrl && (
+                <div className="flex justify-center items-center gap-2 mt-2">
+                  <img src={pfpUrl} alt="Profile" className="w-8 h-8 rounded-full border border-[#F4A6B7]" />
+                  <span className="font-bold text-[#2d1b2e] text-sm">{displayName || username || 'User'}</span>
+                  {username && (
+                    <span className="text-xs text-[#5a3d5c]">@{username}</span>
+                  )}
+                </div>
+              )}
               <div className="mt-3 flex items-center gap-2 justify-center flex-wrap">
                 <button
                   onClick={() => openShareUrl(shareLeaderboardUrl(myRank, walletTotal))}
@@ -190,13 +157,7 @@ export default function Leaderboard() {
               </div>
               <span>
                 {leaderboard.length} active Triviacasters
-                {process.env.NODE_ENV !== 'production' && (
-                  <span className="ml-2 text-[10px] text-gray-400">[{dataSource}]</span>
-                )}
               </span>
-              {updatingNames && (
-                <div className="mt-2 text-xs text-[#5a3d5c] italic">Updating display names…</div>
-              )}
             </div>
             <div className="overflow-x-auto -mx-2 sm:mx-0">
               <table className="w-full min-w-[400px]">
@@ -209,42 +170,38 @@ export default function Leaderboard() {
                 </thead>
                 <tbody>
                   {leaderboard.map((entry, index) => {
-                    const resolved = displayNames.get(entry.walletAddress.toLowerCase()) || null;
-                    const isTopThree = index < 3;
-                    const shortened = `${entry.walletAddress.slice(0, 6)}...${entry.walletAddress.slice(-4)}`;
-                    const farcasterOrEns = resolved && (resolved.startsWith('@') || resolved.includes('.eth')) ? resolved : null;
-
+                    // Use MiniKit context for all leaderboard entries
+                    // If you want to show other users, you might need to fetch their profile info separately
+                    const isCurrentUser = account?.address?.toLowerCase() === entry.walletAddress.toLowerCase();
                     return (
                       <tr
                         key={entry.walletAddress}
-                        className={`border-b border-[#FFC4D1] active:bg-[#FFE4EC] transition ${
-                          isTopThree ? 'bg-[#FFF0F5]' : ''
-                        }`}
+                        className={`border-b border-[#FFC4D1] active:bg-[#FFE4EC] transition ${index < 3 ? 'bg-[#FFF0F5]' : ''}`}
                       >
                         <td className="py-2 sm:py-3 px-2 sm:px-4">
                           <div className="flex items-center gap-2">
-                            {isTopThree && index === 0 && <span>🥇</span>}
-                            {isTopThree && index === 1 && <span>🥈</span>}
-                            {isTopThree && index === 2 && <span>🥉</span>}
+                            {index === 0 && <span>🥇</span>}
+                            {index === 1 && <span>🥈</span>}
+                            {index === 2 && <span>🥉</span>}
                             <span className="font-semibold text-[#2d1b2e] text-xs sm:text-base">#{index + 1}</span>
                           </div>
                         </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-4">
-                          <div className="flex flex-col">
-                            {farcasterOrEns ? (
-                              <>
-                                <span className="text-[#2d1b2e] text-xs sm:text-sm font-semibold">
-                                  {farcasterOrEns}
-                                </span>
-                                <span className="font-mono text-[#5a3d5c] text-xs opacity-70">
-                                  {shortened}
-                                </span>
-                              </>
-                            ) : (
-                              <span className="text-[#2d1b2e] text-xs sm:text-sm font-mono">
-                                {shortened}
-                              </span>
+                          <div className="flex items-center gap-2">
+                            {/* Show pfp, displayName, username for current user */}
+                            {isCurrentUser && pfpUrl && (
+                              <img src={pfpUrl} alt="Profile" className="w-6 h-6 rounded-full border border-[#F4A6B7]" />
                             )}
+                            <div className="flex flex-col">
+                              <span className="text-[#2d1b2e] text-xs sm:text-sm font-semibold">
+                                {isCurrentUser ? (displayName || username || 'User') : 'Unknown'}
+                              </span>
+                              {isCurrentUser && username && (
+                                <span className="font-mono text-[#5a3d5c] text-xs opacity-70">
+                                  @{username}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-4 text-right">
