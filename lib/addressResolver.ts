@@ -228,3 +228,40 @@ export async function pollFarcasterUsernames(
 
   return found;
 }
+
+/**
+ * Resolve a Farcaster profile (username + pfp) for an address using Neynar v2 bulk-by-address
+ * Returns null if no profile found or on error. The returned username is prefixed with '@' when present.
+ */
+export async function resolveFarcasterProfile(
+  address: string
+): Promise<{ username?: string; pfpUrl?: string } | null> {
+  try {
+    const apiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
+    const resp = await fetch(
+      `https://api.neynar.com/v2/farcaster/user/bulk-by-address?addresses=${address}`,
+      {
+        headers: {
+          'accept': 'application/json',
+          ...(apiKey ? { api_key: apiKey, 'X-API-KEY': apiKey } : {}),
+        },
+      }
+    );
+
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    const key = address.toLowerCase();
+    const users = data[key] || data[address] || data[key as any];
+    if (!users || users.length === 0) return null;
+    const user = users[0];
+    const username = user?.username ? `@${user.username}` : undefined;
+
+    // Try a few common fields for pfp/ avatar
+    const pfpUrl = user?.pfpUrl || user?.avatar || user?.profile?.pfpUrl || user?.profile?.avatarUrl || undefined;
+
+    return { username, pfpUrl };
+  } catch (e) {
+    console.error('Error fetching Farcaster profile for', address, e);
+    return null;
+  }
+}

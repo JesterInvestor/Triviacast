@@ -9,6 +9,7 @@ import { useActiveAccount } from 'thirdweb/react';
 import { shareLeaderboardUrl, openShareUrl } from '@/lib/farcaster';
 import { Avatar, Name } from '@coinbase/onchainkit/identity';
 import { base } from 'viem/chains';
+import { pollFarcasterUsernames, resolveFarcasterProfile } from '@/lib/addressResolver';
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -22,6 +23,8 @@ export default function Leaderboard() {
   const [mfDisplayName, setMfDisplayName] = useState<string | undefined>(undefined);
   const [mfUsername, setMfUsername] = useState<string | undefined>(undefined);
   const [mfPfpUrl, setMfPfpUrl] = useState<string | undefined>(undefined);
+  // Progressive Farcaster profile map: address (lowercase) -> { username, pfpUrl }
+  const [farcasterProfiles, setFarcasterProfiles] = useState<Record<string, { username?: string; pfpUrl?: string }>>({});
 
   useEffect(() => {
     let mounted = true;
@@ -104,6 +107,53 @@ export default function Leaderboard() {
       try {
         const board = await getLeaderboard();
         setLeaderboard(board);
+
+          // Progressive Farcaster profile discovery: start polling for usernames for all addresses on the board
+          // We intentionally run this client-side and update UI as profiles appear.
+          // Non-blocking polling strategy:
+          // - Aggressive poll for newly-joined users (last N entries) with shorter delays.
+          // - Background poll for the rest with more relaxed timing.
+          // We intentionally don't await these so they run in the background and update UI as profiles arrive.
+          (async () => {
+            const allAddrs = board.map((b) => b.walletAddress.toLowerCase());
+            const newlyJoinedCount = Math.min(10, allAddrs.length);
+            const newlyJoined = allAddrs.slice(-newlyJoinedCount);
+            const rest = allAddrs.filter((a) => !newlyJoined.includes(a));
+
+            const runPollAndApply = async (addresses: string[], attempts: number, delayMs: number, backoff: number, maxDelay: number) => {
+              try {
+                const found = await pollFarcasterUsernames(addresses, attempts, delayMs, backoff, maxDelay);
+                // For any addresses that reported a username, fetch fuller profile (pfp) and update immediately
+                await Promise.all(Array.from(found.entries()).map(async ([addr, uname]) => {
+                  try {
+                    const prof = await resolveFarcasterProfile(addr);
+                    const key = addr.toLowerCase();
+                    setFarcasterProfiles((prev) => ({
+                      ...prev,
+                      [key]: {
+                        username: prof?.username || uname,
+                        pfpUrl: prof?.pfpUrl,
+                      }
+                    }));
+                  } catch (e) {
+                    // ignore per-address failures
+                  }
+                }));
+              } catch (e) {
+                console.debug('Farcaster polling batch failed', e);
+              }
+            };
+
+            // Aggressive poll for newly-joined users (shorter delay, more frequent attempts)
+            if (newlyJoined.length > 0) {
+              void runPollAndApply(newlyJoined, 12, 500, 1.25, 2500);
+            }
+
+            // Background poll for the rest (non-blocking, less frequent)
+            if (rest.length > 0) {
+              void runPollAndApply(rest, 8, 1200, 1.5, 5000);
+            }
+          })();
 
           // We now use OnchainKit Avatar and Name components for consistent identity rendering
 
@@ -268,14 +318,29 @@ export default function Leaderboard() {
                             <div className="flex flex-col">
                                 {/* Use OnchainKit Avatar/Name for all users; show MiniApp profile details for connected user if available */}
                                 <div className="flex items-center gap-2">
-                                  <Avatar address={entry.walletAddress as `0x${string}`} chain={base} className="w-6 h-6 rounded-full border border-[#F4A6B7]" />
+                                  {/* Prefer Farcaster pfp if discovered */}
+                                  {farcasterProfiles[entry.walletAddress.toLowerCase()]?.pfpUrl ? (
+                                    <img src={farcasterProfiles[entry.walletAddress.toLowerCase()]?.pfpUrl} alt="pfp" className="w-6 h-6 rounded-full border border-[#F4A6B7]" />
+                                  ) : (
+                                    <Avatar address={entry.walletAddress as `0x${string}`} chain={base} className="w-6 h-6 rounded-full border border-[#F4A6B7]" />
+                                  )}
+
                                   {isCurrentUser ? (
                                     <div className="flex flex-col">
-                                      <span className="text-[#2d1b2e] text-xs sm:text-sm font-semibold">{displayName || username || 'User'}</span>
-                                      {username && <span className="font-mono text-[#5a3d5c] text-xs opacity-70">@{username}</span>}
+                                      <span className="text-[#2d1b2e] text-xs sm:text-sm font-semibold">{displayName || username || farcasterProfiles[entry.walletAddress.toLowerCase()]?.username || 'User'}</span>
+                                      {(username || farcasterProfiles[entry.walletAddress.toLowerCase()]?.username) && (
+                                        <span className="font-mono text-[#5a3d5c] text-xs opacity-70">{`@${(username ?? farcasterProfiles[entry.walletAddress.toLowerCase()]?.username ?? '').replace(/^@/, '')}`}</span>
+                                      )}
                                     </div>
                                   ) : (
-                                    <Name address={entry.walletAddress as `0x${string}`} chain={base} />
+                                    // If the farcaster username was found, show it; otherwise render the OnchainKit Name component
+                                    farcasterProfiles[entry.walletAddress.toLowerCase()]?.username ? (
+                                      <div className="flex flex-col">
+                                        <span className="text-[#2d1b2e] text-xs sm:text-sm font-semibold">{farcasterProfiles[entry.walletAddress.toLowerCase()]?.username}</span>
+                                      </div>
+                                    ) : (
+                                      <Name address={entry.walletAddress as `0x${string}`} chain={base} />
+                                    )
                                   )}
                                 </div>
                             </div>
