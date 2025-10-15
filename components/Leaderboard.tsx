@@ -5,7 +5,6 @@ import { LeaderboardEntry } from '@/types/quiz';
 import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
 import Link from 'next/link';
 import { useActiveAccount } from 'thirdweb/react';
-import { useMiniKit } from '@farcaster/auth-kit'; // Import MiniKit
 
 import { shareLeaderboardUrl, openShareUrl } from '@/lib/farcaster';
 
@@ -15,11 +14,44 @@ export default function Leaderboard() {
   const [loading, setLoading] = useState(true);
   const account = useActiveAccount();
 
-  // MiniKit context for Farcaster info
-  const { context } = useMiniKit();
-  const displayName = context?.user?.displayName;
-  const username = context?.user?.username;
-  const pfpUrl = context?.user?.pfpUrl; // profile picture
+  // MiniKit context for Farcaster info.
+  // We dynamically import `useMiniKit` at runtime so that builds don't fail
+  // when `@farcaster/auth-kit` isn't installed in the environment
+  const [mfDisplayName, setMfDisplayName] = useState<string | undefined>(undefined);
+  const [mfUsername, setMfUsername] = useState<string | undefined>(undefined);
+  const [mfPfpUrl, setMfPfpUrl] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadMiniAppContext() {
+      try {
+        // Use the installed miniapp sdk to detect whether we're running inside
+        // a Farcaster mini app and read the provided context.user info.
+  const mod = await import('@farcaster/miniapp-sdk');
+        const sdk = mod?.sdk;
+        if (!sdk) return;
+
+        const inMiniApp = await sdk.isInMiniApp();
+        if (!inMiniApp) return;
+
+        const context = await sdk.context;
+        if (!mounted) return;
+        setMfDisplayName(context?.user?.displayName);
+        setMfUsername(context?.user?.username);
+        setMfPfpUrl(context?.user?.pfpUrl);
+      } catch (e) {
+        // Ignore failures to load SDK in non-miniapp environments
+      }
+    }
+    loadMiniAppContext();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const displayName = mfDisplayName;
+  const username = mfUsername;
+  const pfpUrl = mfPfpUrl; // profile picture
 
   const myRank = useMemo(() => {
     if (!account?.address) return null;
