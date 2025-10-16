@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect } from 'react';
-import { sdk } from '@farcaster/miniapp-sdk';
 import Image from 'next/image';
 import Quiz from '@/components/Quiz';
 import { shareAppUrl } from '@/lib/farcaster';
@@ -16,6 +15,8 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       try {
+        const mod = await import('@farcaster/miniapp-sdk');
+        const { sdk } = mod;
         await sdk.actions.ready();
       } catch {}
     })();
