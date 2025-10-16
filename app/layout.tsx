@@ -89,6 +89,14 @@ export default function RootLayout({
             `,
           }}
         />
+        {/* Minimal critical CSS to avoid a flash of unstyled content (FOUC).
+            Keeps background and text color correct on first paint while full CSS loads.
+            This is intentionally tiny and safe to keep as a fallback. */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `:root{--background:#ffffff;--foreground:#2d1b2e}html,body{background:var(--background)!important;color:var(--foreground)!important;min-height:100%}h1,h2,h3{color:var(--foreground)!important}`,
+          }}
+        />
       </head>
       <body className="antialiased">
         <WagmiProvider>
