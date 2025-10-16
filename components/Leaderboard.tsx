@@ -25,6 +25,65 @@ export default function Leaderboard() {
   const [mfPfpUrl, setMfPfpUrl] = useState<string | undefined>(undefined);
   // Progressive Farcaster profile map: address (lowercase) -> { username, pfpUrl }
   const [farcasterProfiles, setFarcasterProfiles] = useState<Record<string, { username?: string; pfpUrl?: string }>>({});
+  const FARCASTER_CACHE_KEY = 'triviacast.farcasterProfiles.v1';
+  const FARCASTER_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+  // Simple concurrency runner: accepts array of async functions and runs up to `limit` in parallel
+  async function runWithConcurrency<T>(tasks: Array<() => Promise<T>>, limit = 4) {
+    const results: T[] = [];
+    let i = 0;
+    const workers: Promise<void>[] = [];
+    const runOne = async () => {
+      while (i < tasks.length) {
+        const idx = i++;
+        try {
+          const res = await tasks[idx]();
+          results[idx] = res as T;
+        } catch (e) {
+          results[idx] = undefined as unknown as T;
+        }
+      }
+    };
+    for (let w = 0; w < Math.min(limit, tasks.length); w++) {
+      workers.push(runOne());
+    }
+    await Promise.all(workers);
+    return results;
+  }
+
+  // Load cached profiles (client-only). Returns a map of address -> { username, pfpUrl }
+  const loadCachedProfiles = (): Record<string, { username?: string; pfpUrl?: string; fetchedAt?: number }> => {
+    try {
+      const raw = localStorage.getItem(FARCASTER_CACHE_KEY);
+      if (!raw) return {};
+      const parsed = JSON.parse(raw) as Record<string, { username?: string; pfpUrl?: string; fetchedAt?: number }>;
+      const now = Date.now();
+      const valid: Record<string, { username?: string; pfpUrl?: string; fetchedAt?: number }> = {};
+      for (const [addr, v] of Object.entries(parsed)) {
+        if (!v || !v.fetchedAt) continue;
+        if (now - v.fetchedAt <= FARCASTER_CACHE_TTL_MS) {
+          valid[addr] = v;
+        }
+      }
+      return valid;
+    } catch (e) {
+      return {};
+    }
+  };
+
+  const saveProfilesToCache = (updates: Record<string, { username?: string; pfpUrl?: string }>) => {
+    try {
+      const now = Date.now();
+      const raw = localStorage.getItem(FARCASTER_CACHE_KEY);
+      const base = raw ? JSON.parse(raw) : {};
+      for (const [k, v] of Object.entries(updates)) {
+        base[k] = { ...(base[k] || {}), username: v.username, pfpUrl: v.pfpUrl, fetchedAt: now };
+      }
+      localStorage.setItem(FARCASTER_CACHE_KEY, JSON.stringify(base));
+    } catch (e) {
+      // ignore storage errors
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -110,12 +169,25 @@ export default function Leaderboard() {
 
           // Progressive Farcaster profile discovery: start polling for usernames for all addresses on the board
           // We intentionally run this client-side and update UI as profiles appear.
-          // Non-blocking polling strategy:
+          // Non-blocking polling strategy with cache + concurrency limits:
           // - Aggressive poll for newly-joined users (last N entries) with shorter delays.
           // - Background poll for the rest with more relaxed timing.
           // We intentionally don't await these so they run in the background and update UI as profiles arrive.
           (async () => {
             const allAddrs = board.map((b) => b.walletAddress.toLowerCase());
+            // Load any cached profiles first and apply them immediately
+            try {
+              const cached = loadCachedProfiles();
+              if (Object.keys(cached).length > 0) {
+                const normalized: Record<string, { username?: string; pfpUrl?: string }> = {};
+                for (const [k, v] of Object.entries(cached)) {
+                  normalized[k.toLowerCase()] = { username: v.username, pfpUrl: v.pfpUrl };
+                }
+                setFarcasterProfiles((prev) => ({ ...normalized, ...prev }));
+              }
+            } catch (e) {
+              // ignore cache load failures
+            }
             const newlyJoinedCount = Math.min(10, allAddrs.length);
             const newlyJoined = allAddrs.slice(-newlyJoinedCount);
             const rest = allAddrs.filter((a) => !newlyJoined.includes(a));
@@ -144,14 +216,34 @@ export default function Leaderboard() {
               }
             };
 
-            // Aggressive poll for newly-joined users (shorter delay, more frequent attempts)
+            // Aggressive strategy for newly-joined users:
+            // 1) Try an immediate direct profile fetch for each newly-joined address (fast, per-address).
+            // 2) Run a tighter poll with more attempts and shorter delays.
             if (newlyJoined.length > 0) {
-              void runPollAndApply(newlyJoined, 12, 500, 1.25, 2500);
+              // Immediate per-address attempts (concurrency-limited)
+              const tasks = newlyJoined.map((addr) => async () => {
+                try {
+                  const prof = await resolveFarcasterProfile(addr);
+                  if (prof?.username || prof?.pfpUrl) {
+                    const key = addr.toLowerCase();
+                    const update = { [key]: { username: prof.username, pfpUrl: prof.pfpUrl } };
+                    setFarcasterProfiles((prev) => ({ ...prev, ...update }));
+                    saveProfilesToCache(update);
+                  }
+                } catch (e) {
+                  // ignore per-address failures
+                }
+              });
+              void runWithConcurrency(tasks, 4);
+
+              // More aggressive polling parameters for newly joined users
+              void runPollAndApply(newlyJoined, 24, 250, 1.12, 1500);
             }
 
             // Background poll for the rest (non-blocking, less frequent)
             if (rest.length > 0) {
-              void runPollAndApply(rest, 8, 1200, 1.5, 5000);
+              // Slightly more aggressive background polling for the rest
+              void runPollAndApply(rest, 12, 800, 1.4, 3000);
             }
           })();
 

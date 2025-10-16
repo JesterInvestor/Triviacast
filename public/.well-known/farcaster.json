@@ -3,7 +3,7 @@
     "name": "Triviacast",
     "version": "1",
     "iconUrl": "https://triviacast.xyz/icon.png",
-    "homeUrl": "https://triviacast.xyz/leaderboard",
+    "homeUrl": "https://triviacast.xyz",
     "imageUrl": "https://triviacast.xyz/image.png",
     "buttonTitle": "Open Triviacast",
     "splashImageUrl": "https://triviacast.xyz/icon.png",
@@ -16,16 +16,17 @@
     ],
     "primaryCategory": "education",
     "tags": [
-      "social",
-      "messaging",
       "community",
-      "trivia"
+      "trivia",
+      "fun",
+      "quiz"
     ],
     "heroImageUrl": "https://triviacast.xyz/screenshot.png",
     "ogTitle": "Triviacast - Test your brain",
-    "ogDescription": "Next.js-based trivia quiz mini-game",
+    "ogDescription": "Trivia quiz mini-game with unique open source quesitons (video games, history, culture, and more)",
     "ogImageUrl": "https://triviacast.xyz/screenshot.png",
-    "castShareUrl": "https://triviacast.xyz"
+    "castShareUrl": "https://triviacast.xyz",
+    "tagline": "Test, Claim, and Share"
   },
   "accountAssociation": {
     "header": "eyJmaWQiOjExNzU1MDYsInR5cGUiOiJhdXRoIiwia2V5IjoiMHhmRWZiMTRCOTkyNjQwZDUwZWJiMDBmYTlkOTY3NGFlMzlDNjA3ZDhiIn0",
