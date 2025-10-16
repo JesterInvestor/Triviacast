@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useMiniApp } from "@neynar/react";
 
 const DISMISS_KEY = "triviacast:add_prompt:dismissedAt";
 const DISMISS_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
 
 export default function AddMiniAppPrompt() {
+  const { isSDKLoaded, addMiniApp } = useMiniApp();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,18 +26,16 @@ export default function AddMiniAppPrompt() {
       }
     };
 
+    // Wait for Neynar SDK to load and only show prompt if loaded and allowed
     const setup = async () => {
       try {
-        const { sdk } = await import("@farcaster/miniapp-sdk");
-        if (cancelled) return;
-        if (!(await sdk.isInMiniApp())) return; // Only show in Farcaster hosts
-
+        if (!isSDKLoaded) return;
         // Small delay to avoid racing with splash dismiss and first paint
         setTimeout(() => {
           if (!cancelled && shouldShow()) setOpen(true);
         }, 1200);
       } catch {
-        // ignore if SDK not available on non-host environments
+        // ignore — non-host environments
       }
     };
 
@@ -43,7 +43,7 @@ export default function AddMiniAppPrompt() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isSDKLoaded]);
 
   const dismiss = () => {
     try {
@@ -56,10 +56,20 @@ export default function AddMiniAppPrompt() {
     setBusy(true);
     setError(null);
     try {
-      const { sdk } = await import("@farcaster/miniapp-sdk");
-      await sdk.actions.addMiniApp();
-      // Success: don’t nag again
-      dismiss();
+      const result = await addMiniApp();
+      if (result.added) {
+        // Success: don’t nag again
+        dismiss();
+      } else {
+        if (result.reason === 'invalid_domain_manifest') {
+          setError('This site cannot be added from this domain.');
+        } else if (result.reason === 'rejected_by_user') {
+          setError('You rejected the add prompt.');
+        } else {
+          setError('Unable to add app.');
+        }
+        setBusy(false);
+      }
     } catch (e: any) {
       const msg = (e?.message as string) || "Unable to add app. Try again later.";
       setError(msg);
