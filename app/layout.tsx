@@ -58,16 +58,53 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Move Farcaster ready() script to the absolute top for reliability */}
+        {/* Move Farcaster ready() script to the absolute top for reliability.
+            This script is defensive: it attempts multiple ways to access the
+            miniapp SDK (global injection, local package, CDN) and logs which
+            method succeeded or failed. Desktop webviews sometimes block CDN
+            ESM imports or don't inject the same globals as mobile, so this
+            gives better compatibility and diagnostics. */}
         <script
           type="module"
           dangerouslySetInnerHTML={{
             __html: `
-              try {
-                import('https://esm.sh/@farcaster/miniapp-sdk').then(({ sdk }) => {
-                  sdk.actions.ready().catch(() => {});
-                }).catch(() => {});
-              } catch {}
+              (async function() {
+                function safeLog(...args) {
+                  try { console.debug('[farcaster-ready]', ...args); } catch {}
+                }
+
+                // 1) If the SDK is already present on window, use it
+                try {
+                  const globalSdk = (window as any).sdk || (window as any).Farcaster?.sdk;
+                  if (globalSdk && globalSdk.actions && typeof globalSdk.actions.ready === 'function') {
+                    safeLog('Using global SDK');
+                    try { await globalSdk.actions.ready(); safeLog('ready() succeeded (global)'); return; } catch(e){ safeLog('ready() failed (global)', e); }
+                  }
+                } catch (e) { safeLog('global check failed', e); }
+
+                // 2) Try to dynamically import the installed package (works when bundler exposes it)
+                try {
+                  const mod = await import('@farcaster/miniapp-sdk');
+                  const sdk = (mod && mod.sdk) || mod.default?.sdk || mod.default;
+                  if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
+                    safeLog('Using local package import');
+                    try { await sdk.actions.ready(); safeLog('ready() succeeded (local import)'); return; } catch(e){ safeLog('ready() failed (local import)', e); }
+                  }
+                } catch (e) { safeLog('local package import failed', e); }
+
+                // 3) Try CDN fallback (may be blocked by desktop webviews/CSP)
+                try {
+                  const mod = await import('https://esm.sh/@farcaster/miniapp-sdk');
+                  const sdk = (mod && mod.sdk) || mod.default?.sdk || mod.default;
+                  if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
+                    safeLog('Using CDN import');
+                    try { await sdk.actions.ready(); safeLog('ready() succeeded (CDN)'); return; } catch(e){ safeLog('ready() failed (CDN)', e); }
+                  }
+                } catch (e) { safeLog('CDN import failed', e); }
+
+                // If we reached here, none of the strategies worked.
+                safeLog('Farcaster SDK ready() could not be invoked. If this is a desktop host, check webview CSP and that the SDK is exposed to the page.');
+              })();
             `,
           }}
         />
