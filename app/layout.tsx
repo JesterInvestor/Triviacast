@@ -78,7 +78,13 @@ export default function RootLayout({
                   const globalSdk = (window as any).sdk || (window as any).Farcaster?.sdk;
                   if (globalSdk && globalSdk.actions && typeof globalSdk.actions.ready === 'function') {
                     safeLog('Using global SDK');
-                    try { await globalSdk.actions.ready(); safeLog('ready() succeeded (global)'); return; } catch(e){ safeLog('ready() failed (global)', e); }
+                    try {
+                      if (typeof globalSdk.isInMiniApp === 'function') {
+                        const inMini = await globalSdk.isInMiniApp();
+                        if (!inMini) { safeLog('Not in mini app (global), skipping ready()'); return; }
+                      }
+                      await globalSdk.actions.ready(); safeLog('ready() succeeded (global)'); return;
+                    } catch(e){ safeLog('ready() failed (global)', e); }
                   }
                 } catch (e) { safeLog('global check failed', e); }
 
@@ -88,7 +94,13 @@ export default function RootLayout({
                   const sdk = (mod && mod.sdk) || mod.default?.sdk || mod.default;
                   if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
                     safeLog('Using local package import');
-                    try { await sdk.actions.ready(); safeLog('ready() succeeded (local import)'); return; } catch(e){ safeLog('ready() failed (local import)', e); }
+                    try {
+                      if (typeof sdk.isInMiniApp === 'function') {
+                        const inMini = await sdk.isInMiniApp();
+                        if (!inMini) { safeLog('Not in mini app (local import), skipping ready()'); return; }
+                      }
+                      await sdk.actions.ready(); safeLog('ready() succeeded (local import)'); return;
+                    } catch(e){ safeLog('ready() failed (local import)', e); }
                   }
                 } catch (e) { safeLog('local package import failed', e); }
 
@@ -98,7 +110,13 @@ export default function RootLayout({
                   const sdk = (mod && mod.sdk) || mod.default?.sdk || mod.default;
                   if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
                     safeLog('Using CDN import');
-                    try { await sdk.actions.ready(); safeLog('ready() succeeded (CDN)'); return; } catch(e){ safeLog('ready() failed (CDN)', e); }
+                    try {
+                      if (typeof sdk.isInMiniApp === 'function') {
+                        const inMini = await sdk.isInMiniApp();
+                        if (!inMini) { safeLog('Not in mini app (CDN), skipping ready()'); return; }
+                      }
+                      await sdk.actions.ready(); safeLog('ready() succeeded (CDN)'); return;
+                    } catch(e){ safeLog('ready() failed (CDN)', e); }
                   }
                 } catch (e) { safeLog('CDN import failed', e); }
 
