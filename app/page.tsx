@@ -18,8 +18,15 @@ export default function Home() {
       try {
         const mod = await import('@farcaster/miniapp-sdk');
         const { sdk } = mod;
-        await sdk.actions.ready();
-      } catch {}
+        if (sdk?.actions?.ready) {
+          sdk.actions.ready();
+          console.log('sdk.actions.ready() called');
+        } else {
+          console.log('sdk.actions.ready() not available');
+        }
+      } catch (err) {
+        console.log('Farcaster SDK not available or failed to load:', err);
+      }
     })();
   }, []);
 
