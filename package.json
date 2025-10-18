@@ -19,6 +19,7 @@
     "@farcaster/miniapp-sdk": "^0.2.0",
     "@farcaster/miniapp-wagmi-connector": "^1.1.0",
     "@neynar/react": "^1.2.15",
+    "@reduxjs/toolkit": "^2.9.1",
     "@sentry/nextjs": "^10.19.0",
     "@tanstack/react-query": "^5.90.2",
     "crypto": "^1.0.1",
@@ -26,6 +27,7 @@
     "pino-pretty": "^10.0.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-redux": "^9.2.0",
     "thirdweb": "^5.108.12",
     "viem": "^2.38.0",
     "wagmi": "^2.18.0"
