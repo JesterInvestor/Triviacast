@@ -51,11 +51,10 @@ export default function WalletConnect() {
 
   // If we are sure we're not in a mini app (i.e., browser), show a CTA to open in Farcaster
   if (inMiniApp === false) {
-    const encoded = encodeURIComponent(window.location.href);
-    const previewUrl = `https://farcaster.xyz/~/developers/mini-apps/preview?url=${encoded}`;
+    const farcasterAppUrl = 'https://farcaster.xyz/miniapps/UmWywlPILouA/triviacast';
     return (
       <div className="flex justify-center sm:flex-initial">
-        <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="px-3 py-2 sm:px-4 sm:py-2 bg-[#6C47FF] text-white rounded-lg text-xs sm:text-sm font-medium min-h-[44px] flex items-center">
+        <a href={farcasterAppUrl} target="_blank" rel="noopener noreferrer" className="px-3 py-2 sm:px-4 sm:py-2 bg-[#6C47FF] text-white rounded-lg text-xs sm:text-sm font-medium min-h-[44px] flex items-center">
           Open in Farcaster App
         </a>
       </div>
