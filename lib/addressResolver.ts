@@ -159,10 +159,11 @@ export async function batchResolveDisplayNames(
  */
 export async function pollFarcasterUsernames(
   addresses: string[],
-  attempts: number = 10,
-  delayMs: number = 1200,
-  backoffFactor: number = 1.5,
-  maxDelayMs: number = 5000
+  // Defaults tuned to be a bit more aggressive for apps that want faster discovery
+  attempts: number = 20,
+  delayMs: number = 600,
+  backoffFactor: number = 1.35,
+  maxDelayMs: number = 3000
 ): Promise<Map<string, string>> {
   const found = new Map<string, string>();
 

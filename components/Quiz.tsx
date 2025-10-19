@@ -167,7 +167,7 @@ export default function Quiz() {
           <p className="text-[#5a3d5c] mb-8 text-base sm:text-lg">
             ⏱️ Only 1 minute ⏱️<br />
             ⁉️ 10 questions ⁉️<br />
-            😎🤓🧐 Endless bragging rights 😎🤓🧐<br />
+            😎🤓 Endless bragging rights 😎🤓<br />
             🧠 Ready to prove you're a genius? 🧠
           </p>
           {!account?.address && (

@@ -220,30 +220,38 @@ export default function Leaderboard() {
             // 1) Try an immediate direct profile fetch for each newly-joined address (fast, per-address).
             // 2) Run a tighter poll with more attempts and shorter delays.
             if (newlyJoined.length > 0) {
-              // Immediate per-address attempts (concurrency-limited)
+              // Immediate per-address attempts (concurrency-limited) with short retries
               const tasks = newlyJoined.map((addr) => async () => {
-                try {
-                  const prof = await resolveFarcasterProfile(addr);
-                  if (prof?.username || prof?.pfpUrl) {
-                    const key = addr.toLowerCase();
-                    const update = { [key]: { username: prof.username, pfpUrl: prof.pfpUrl } };
-                    setFarcasterProfiles((prev) => ({ ...prev, ...update }));
-                    saveProfilesToCache(update);
+                const key = addr.toLowerCase();
+                const maxTries = 3;
+                const retryDelay = 300; // ms
+                for (let t = 0; t < maxTries; t++) {
+                  try {
+                    const prof = await resolveFarcasterProfile(addr);
+                    if (prof?.username || prof?.pfpUrl) {
+                      const update = { [key]: { username: prof.username, pfpUrl: prof.pfpUrl } };
+                      setFarcasterProfiles((prev) => ({ ...prev, ...update }));
+                      saveProfilesToCache(update);
+                      break; // success, stop retrying
+                    }
+                  } catch (e) {
+                    // swallow and retry
                   }
-                } catch (e) {
-                  // ignore per-address failures
+                  // small delay between retries
+                  await new Promise((r) => setTimeout(r, retryDelay));
                 }
               });
-              void runWithConcurrency(tasks, 4);
+              void runWithConcurrency(tasks, 6);
 
               // More aggressive polling parameters for newly joined users
-              void runPollAndApply(newlyJoined, 24, 250, 1.12, 1500);
+              // Increase attempts and shorten delays so usernames/pfps appear faster
+              void runPollAndApply(newlyJoined, 40, 200, 1.1, 1200);
             }
 
-            // Background poll for the rest (non-blocking, less frequent)
+            // Background poll for the rest (non-blocking, slightly more frequent)
             if (rest.length > 0) {
-              // Slightly more aggressive background polling for the rest
-              void runPollAndApply(rest, 12, 800, 1.4, 3000);
+              // Increase attempts and run a bit faster to discover more usernames/pfps
+              void runPollAndApply(rest, 24, 600, 1.35, 3000);
             }
           })();
 
