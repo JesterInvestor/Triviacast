@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
@@ -17,9 +17,7 @@ const OnchainKit: {
   Avatar: React.ComponentType<AvatarProps> | null;
   Name: React.ComponentType<NameProps> | null;
 } = { Avatar: null, Name: null };
-let onchainKitLoaded = false;
 async function ensureOnchainKit() {
-  if (onchainKitLoaded) return;
   try {
     // Use eval import to prevent bundlers from resolving this optional package at build time
     const mod = await (eval('import("@coinbase/onchainkit/identity")') as Promise<unknown>);
@@ -33,8 +31,6 @@ async function ensureOnchainKit() {
     OnchainKit.Name = (props: NameProps) => (
       <span className={props.className}>{(props.address || '').slice(0, 8) + '...'}</span>
     );
-  } finally {
-    onchainKitLoaded = true;
   }
 }
 import { pollFarcasterUsernames, resolveFarcasterProfile } from '@/lib/addressResolver';
@@ -54,8 +50,6 @@ export default function Leaderboard() {
   const [mfPfpUrl, setMfPfpUrl] = useState<string | undefined>(undefined);
   // Progressive Farcaster profile map: address (lowercase) -> { username, pfpUrl }
   const [farcasterProfiles, setFarcasterProfiles] = useState<Record<string, { username?: string; pfpUrl?: string }>>({});
-  const FARCASTER_CACHE_KEY = 'triviacast.farcasterProfiles.v1';
-  const FARCASTER_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
   // Handler for manual Farcaster lookups (updates profile cache/state)
   const handleLookupResult = (address: string, profile: { username?: string; pfpUrl?: string } | null) => {
@@ -106,14 +100,14 @@ export default function Leaderboard() {
   // Load cached profiles (client-only). Returns a map of address -> { username, pfpUrl }
   const loadCachedProfiles = (): Record<string, { username?: string; pfpUrl?: string; fetchedAt?: number }> => {
     try {
-      const raw = localStorage.getItem(FARCASTER_CACHE_KEY);
+      const raw = localStorage.getItem('triviacast.farcasterProfiles.v1');
       if (!raw) return {};
       const parsed = JSON.parse(raw) as Record<string, { username?: string; pfpUrl?: string; fetchedAt?: number }>;
       const now = Date.now();
       const valid: Record<string, { username?: string; pfpUrl?: string; fetchedAt?: number }> = {};
       for (const [addr, v] of Object.entries(parsed)) {
         if (!v || !v.fetchedAt) continue;
-        if (now - v.fetchedAt <= FARCASTER_CACHE_TTL_MS) {
+        if (now - v.fetchedAt <= 24 * 60 * 60 * 1000) {
           valid[addr] = v;
         }
       }
@@ -126,12 +120,12 @@ export default function Leaderboard() {
   const saveProfilesToCache = (updates: Record<string, { username?: string; pfpUrl?: string }>) => {
     try {
       const now = Date.now();
-      const raw = localStorage.getItem(FARCASTER_CACHE_KEY);
+      const raw = localStorage.getItem('triviacast.farcasterProfiles.v1');
       const base = raw ? JSON.parse(raw) : {};
       for (const [k, v] of Object.entries(updates)) {
         base[k] = { ...(base[k] || {}), username: v.username, pfpUrl: v.pfpUrl, fetchedAt: now };
       }
-      localStorage.setItem(FARCASTER_CACHE_KEY, JSON.stringify(base));
+      localStorage.setItem('triviacast.farcasterProfiles.v1', JSON.stringify(base));
     } catch (e) {
       // ignore storage errors
     }
@@ -382,7 +376,7 @@ export default function Leaderboard() {
               {/* Farcaster profile info */}
               {pfpUrl && (
                 <div className="flex justify-center items-center gap-2 mt-2">
-                  <img src={pfpUrl} alt="Profile" className="w-8 h-8 rounded-full border border-[#F4A6B7]" />
+                  <Image src={pfpUrl} alt="Profile" width={32} height={32} className="w-8 h-8 rounded-full border border-[#F4A6B7]" />
                   <span className="font-bold text-[#2d1b2e] text-sm">{displayName || username || 'User'}</span>
                   {username && (
                     <span className="text-xs text-[#5a3d5c]">@{username}</span>
@@ -394,7 +388,7 @@ export default function Leaderboard() {
                   onClick={() => openShareUrl(shareLeaderboardUrl(myRank, walletTotal))}
                   className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-4 rounded-lg text-sm transition inline-flex items-center justify-center shadow gap-2"
                 >
-                  <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
+                  <Image src="/farcaster.svg" alt="Farcaster" width={16} height={16} className="w-4 h-4" />
                   Share on Farcaster
                 </button>
               </div>
@@ -404,14 +398,14 @@ export default function Leaderboard() {
 
         {loading ? (
           <div className="text-center py-8 sm:py-12">
-            <img src="/brain-large.svg" alt="Brain" className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 opacity-50 animate-pulse" loading="eager" />
+            <Image src="/brain-large.svg" alt="Brain" width={80} height={80} className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 opacity-50 animate-pulse" priority />
             <p className="text-[#5a3d5c] text-base sm:text-lg">
               Loading leaderboard...
             </p>
           </div>
         ) : leaderboard.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
-            <img src="/brain-large.svg" alt="Brain" className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 opacity-50" loading="eager" />
+            <Image src="/brain-large.svg" alt="Brain" width={80} height={80} className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 opacity-50" priority />
             <p className="text-[#5a3d5c] text-base sm:text-lg mb-4">
               No scores yet. Be the first to complete a quiz!
             </p>
@@ -422,7 +416,9 @@ export default function Leaderboard() {
               Start Quiz
             </Link>
           </div>
-        ) : (
+        ) : null}
+
+        {leaderboard.length > 0 && (
           <>
             <div className="mb-4 text-center text-[#5a3d5c] text-sm flex flex-col items-center">
               <div className="flex items-center justify-center gap-2 mb-1">
@@ -478,7 +474,7 @@ export default function Leaderboard() {
                           <div className="flex items-center gap-2">
                             {/* Show pfp, displayName, username for current user */}
                             {isCurrentUser && pfpUrl && (
-                              <Image src={pfpUrl} alt="Profile" width={24} height={24} className="rounded-full border border-[#F4A6B7]" />
+                              <Image src={pfpUrl} alt="Profile" width={32} height={32} className="w-8 h-8 rounded-full border border-[#F4A6B7]" />
                             )}
                             <div className="flex flex-col">
                                 {/* Use OnchainKit Avatar/Name for all users; show MiniApp profile details for connected user if available */}

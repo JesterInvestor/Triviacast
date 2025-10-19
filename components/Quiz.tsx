@@ -7,6 +7,7 @@ import QuizResults from './QuizResults';
 import Timer from './Timer';
 import { calculateTPoints } from '@/lib/tpoints';
 import { useActiveAccount } from 'thirdweb/react';
+import Image from 'next/image';
 
 const QUIZ_TIME_LIMIT = 60; // 1 minute in seconds
 const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
@@ -161,7 +162,7 @@ export default function Quiz() {
       <div className="max-w-2xl mx-auto px-2 sm:px-6">
         <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 text-center border-4 border-[#F4A6B7]">
           <div className="mb-6 flex justify-center">
-            <img src="/brain-large.svg" alt="Brain" className="w-24 h-24 sm:w-32 sm:h-32" loading="eager" />
+            <Image src="/brain-large.svg" alt="Brain" width={96} height={96} className="w-24 h-24 sm:w-32 sm:h-32" priority />
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-[#2d1b2e]">Trivia Challenge</h1>
           <p className="text-[#5a3d5c] mb-8 text-base sm:text-lg">
@@ -209,7 +210,7 @@ export default function Quiz() {
     <div className="max-w-2xl mx-auto px-2 sm:px-6">
       <div className="mb-3 sm:mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
         <div className="text-[#2d1b2e] font-semibold flex items-center gap-2 text-sm sm:text-base">
-          <img src="/brain-small.svg" alt="Brain" className="w-6 h-6 sm:w-8 sm:h-8" loading="lazy" />
+          <Image src="/brain-small.svg" alt="Brain" width={24} height={24} className="w-6 h-6 sm:w-8 sm:h-8" loading="lazy" />
           Question {quizState.currentQuestionIndex + 1} of {quizState.questions.length}
         </div>
         <div className="flex items-center gap-2">

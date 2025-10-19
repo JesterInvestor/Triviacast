@@ -14,7 +14,7 @@ export default function ThirdwebProvider({ children }: { children: React.ReactNo
       if (typeof window === 'undefined') return;
       try {
         const mod = await import('@farcaster/miniapp-sdk');
-        const { sdk } = mod as { sdk?: any };
+        const { sdk } = mod as { sdk?: { isInMiniApp: () => Promise<boolean>; actions: { ready: () => Promise<void> }; wallet?: { getEthereumProvider?: () => Promise<unknown> } } };
         if (sdk && (await sdk.isInMiniApp())) {
           // Wait for host ready
           try { await sdk.actions.ready(); } catch {}

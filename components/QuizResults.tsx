@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react';
 import { addPointsOnChain, isContractConfigured } from '@/lib/contract';
 import { addWalletTPoints } from '@/lib/tpoints';
 import { shareResultsUrl, openShareUrl } from '@/lib/farcaster';
+import Image from 'next/image';
+
 // Distributor/claim functionality removed from this component
 
 interface QuizResultsProps {
@@ -99,7 +101,7 @@ export default function QuizResults({
     <div className="max-w-3xl mx-auto px-2 sm:px-6">
       <div className="bg-white rounded-lg shadow-xl p-4 sm:p-8 border-4 border-[#F4A6B7]">
         <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4">
-          <img src="/brain-large.svg" alt="Brain" className="w-16 h-16 sm:w-20 sm:h-20" loading="eager" />
+          <Image src="/brain-large.svg" alt="Brain" width={64} height={64} className="w-16 h-16 sm:w-20 sm:h-20" priority />
           <h2 className="text-2xl sm:text-3xl font-bold text-center text-[#2d1b2e]">
             Quiz Complete!
           </h2>
@@ -111,7 +113,7 @@ export default function QuizResults({
             className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-6 rounded-lg text-base sm:text-lg transition inline-flex items-center justify-center shadow-lg min-h-[48px] w-full sm:w-auto gap-2"
             aria-label="Share results on Farcaster"
           >
-            <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" />
+            <Image src="/farcaster.svg" alt="Farcaster" width={16} height={16} className="w-4 h-4" />
             Share Results
           </button>
         </div>
@@ -157,7 +159,7 @@ export default function QuizResults({
 
         <div className="mb-4 sm:mb-6">
           <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-[#2d1b2e] flex items-center gap-2">
-            <img src="/brain-small.svg" alt="Brain" className="w-5 h-5 sm:w-6 sm:h-6" loading="lazy" />
+            <Image src="/brain-small.svg" alt="Brain" width={20} height={20} className="w-5 h-5 sm:w-6 sm:h-6" loading="lazy" />
             Review Answers:
           </h3>
           <div className="space-y-3 sm:space-y-4">
