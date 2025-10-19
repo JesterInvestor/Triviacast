@@ -13,7 +13,9 @@ export default function ClientOnlyWidgets() {
     let mounted = true;
     (async () => {
       try {
-        const mod = await import('@neynar/react');
+  // Use eval import to avoid bundlers attempting to resolve optional package at build-time
+  // @ts-expect-error - dynamic runtime import
+  const mod = await (eval('import("@neynar/react")') as Promise<any>);
         if (mounted && mod && mod.MiniAppProvider) {
           setMiniAppProviderComp(() => mod.MiniAppProvider as React.ComponentType<any>);
         }

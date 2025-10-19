@@ -18,14 +18,11 @@ let onchainKitLoaded = false;
 async function ensureOnchainKit() {
   if (onchainKitLoaded) return;
   try {
-    // Dynamically import OnchainKit identity helpers if available. This is optional;
-    // silence type-checking for environments where the package isn't installed.
-    // @ts-ignore
-    const mod = await import('@coinbase/onchainkit/identity');
+    // Use eval import to prevent bundlers from resolving this optional package at build time
+  const mod = await (eval('import("@coinbase/onchainkit/identity")') as Promise<any>);
     OnchainKit.Avatar = mod.Avatar;
     OnchainKit.Name = mod.Name;
   } catch {
-    // package not available; fallbacks will be used
     OnchainKit.Avatar = (props: any) => (
       <img src={`/identicon-${(props.address || '').slice(2, 10)}.png`} alt="avatar" className={props.className} />
     );
@@ -37,6 +34,7 @@ async function ensureOnchainKit() {
   }
 }
 import { pollFarcasterUsernames, resolveFarcasterProfile } from '@/lib/addressResolver';
+import FarcasterLookup from './FarcasterLookup';
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -54,6 +52,29 @@ export default function Leaderboard() {
   const [farcasterProfiles, setFarcasterProfiles] = useState<Record<string, { username?: string; pfpUrl?: string }>>({});
   const FARCASTER_CACHE_KEY = 'triviacast.farcasterProfiles.v1';
   const FARCASTER_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+  // Handler for manual Farcaster lookups (updates profile cache/state)
+  const handleLookupResult = (address: string, profile: { username?: string; pfpUrl?: string } | null) => {
+    const key = address.toLowerCase();
+    if (profile) {
+      setFarcasterProfiles((prev) => {
+        const next = { ...prev, [key]: { username: profile.username?.replace(/^@/, ''), pfpUrl: profile.pfpUrl } };
+        saveProfilesToCache(next as any);
+        return next;
+      });
+      if (account?.address && account.address.toLowerCase() === key) {
+        setMfUsername(profile.username?.replace(/^@/, ''));
+        setMfPfpUrl(profile.pfpUrl);
+      }
+    } else {
+      setFarcasterProfiles((prev) => {
+        const copy = { ...prev };
+        delete copy[key];
+        saveProfilesToCache(copy as any);
+        return copy;
+      });
+    }
+  };
 
   // Simple concurrency runner: accepts array of async functions and runs up to `limit` in parallel
   async function runWithConcurrency<T>(tasks: Array<() => Promise<T>>, limit = 4) {
@@ -173,6 +194,23 @@ export default function Leaderboard() {
       }
     }
     loadMiniAppContext();
+    // Auto-resolve the connected user's profile if available and not already cached
+    (async () => {
+      try {
+        if (account?.address) {
+          const key = account.address.toLowerCase();
+          // If we don't already have it, fetch a profile
+          if (!farcasterProfiles[key]) {
+            const prof = await resolveFarcasterProfile(key);
+            if (prof) {
+              setFarcasterProfiles((prev) => ({ ...prev, [key]: prof }));
+            }
+          }
+        }
+      } catch (_) {
+        // ignore
+      }
+    })();
     return () => {
       mounted = false;
     };
@@ -274,6 +312,31 @@ export default function Leaderboard() {
               // More aggressive polling parameters for newly joined users
               // Increase attempts and shorten delays so usernames/pfps appear faster
               void runPollAndApply(newlyJoined, 40, 200, 1.1, 1200);
+
+              // Handler for external manual lookups from the FarcasterLookup component.
+              const handleLookupResult = (address: string, profile: { username?: string; pfpUrl?: string } | null) => {
+                const key = address.toLowerCase();
+                if (profile) {
+                  setFarcasterProfiles((prev) => {
+                    const next = { ...prev, [key]: { username: profile.username?.replace(/^@/, ''), pfpUrl: profile.pfpUrl } };
+                    saveProfilesToCache(next as any);
+                    return next;
+                  });
+                  // If this matches the connected wallet, update the displayed miniapp context fields
+                  if (account?.address && account.address.toLowerCase() === key) {
+                    setMfUsername(profile.username?.replace(/^@/, ''));
+                    setMfPfpUrl(profile.pfpUrl);
+                  }
+                } else {
+                  // Clear any cached entry for the address if lookup returned null
+                  setFarcasterProfiles((prev) => {
+                    const copy = { ...prev };
+                    delete copy[key];
+                    saveProfilesToCache(copy as any);
+                    return copy;
+                  });
+                }
+              };
             }
 
             // Background poll for the rest (non-blocking, slightly more frequent)
@@ -288,6 +351,11 @@ export default function Leaderboard() {
         if (account?.address) {
           const points = await getWalletTotalPoints(account.address);
           setWalletTotal(points);
+          // Trigger a manual lookup for the connected user so display name/pfp appear faster
+          try {
+            const profile = await resolveFarcasterProfile(account.address);
+            if (profile) handleLookupResult(account.address, profile);
+          } catch (_) {}
         }
       } finally {
         setLoading(false);
@@ -304,6 +372,19 @@ export default function Leaderboard() {
           <h1 className="text-2xl sm:text-4xl font-bold text-center text-[#2d1b2e]">
             Leaderboard
           </h1>
+        </div>
+        {/* Manual lookup widget for admin/debug or user-supplied addresses */}
+        <FarcasterLookup onResult={handleLookupResult} />
+        <div className="mb-4 flex items-center justify-center">
+          <div className="w-full max-w-md">
+            <FarcasterLookup
+              initialAddress={account?.address}
+              onResult={(addr, profile) => {
+                if (!addr) return;
+                setFarcasterProfiles((prev) => ({ ...prev, [addr.toLowerCase()]: profile || {} }));
+              }}
+            />
+          </div>
         </div>
         <p className="text-center text-[#5a3d5c] mb-4 sm:mb-6 text-sm sm:text-lg">
           There are always some winners... 🥳🥇🏆<br />
