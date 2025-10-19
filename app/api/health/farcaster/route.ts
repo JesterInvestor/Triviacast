@@ -83,7 +83,7 @@ export async function GET(req: Request) {
             );
           }
         }
-      } catch (e) {
+      } catch (_) {
         result.errors.push("Failed to decode/parse accountAssociation.payload as JSON");
       }
     }
@@ -95,8 +95,9 @@ export async function GET(req: Request) {
 
     result.ok = result.errors.length === 0;
     return NextResponse.json(result, { status: result.ok ? 200 : 500 });
-  } catch (err: any) {
-    result.errors.push(`Unexpected error: ${err?.message || String(err)}`);
+  } catch (err: unknown) {
+    const e = err as { message?: string } | null;
+    result.errors.push(`Unexpected error: ${e?.message || String(err)}`);
     return NextResponse.json(result, { status: 500 });
   }
 }

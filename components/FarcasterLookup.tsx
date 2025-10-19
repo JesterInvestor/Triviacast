@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from 'react';
+import Image from 'next/image';
+
+type Profile = { username?: string; pfpUrl?: string } | null;
 
 export default function FarcasterLookup({
   onResult,
   initialAddress,
 }: {
-  onResult: (address: string, profile: { username?: string; pfpUrl?: string } | null) => void;
+  onResult: (address: string, profile: Profile) => void;
   initialAddress?: string;
 }) {
   const [address, setAddress] = useState(initialAddress || '');
@@ -22,14 +25,15 @@ export default function FarcasterLookup({
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ address }),
       });
-      const data = await res.json();
+      const data: { found?: boolean; profile?: { username?: string; pfpUrl?: string }; error?: string } = await res.json();
       if (!res.ok) throw new Error(data?.error || 'lookup failed');
       if (data?.found) {
         onResult(address.toLowerCase(), data.profile || null);
       } else {
         onResult(address.toLowerCase(), null);
       }
-    } catch (e: any) {
+    } catch (err) {
+      const e = err as Error | undefined;
       setError(e?.message || 'error');
       onResult(address.toLowerCase(), null);
     } finally {

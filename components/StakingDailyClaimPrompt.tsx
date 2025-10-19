@@ -44,7 +44,7 @@ export default function StakingDailyClaimPrompt() {
         setTimeout(() => {
           if (!cancelled && shouldShow()) setOpen(true);
         }, 800);
-      } catch (e) {
+      } catch (_) {
         // ignore - SDK not present outside host
       }
     };
@@ -63,13 +63,14 @@ export default function StakingDailyClaimPrompt() {
     setError(null);
     try {
       if (!account) throw new Error('Please connect your wallet');
-      await callDailyClaim(account as any);
+  await callDailyClaim(account as unknown as { address: string });
       // notify points updated and show success toast
       try { window.dispatchEvent(new CustomEvent('triviacast:pointsUpdated')); } catch {}
       try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: `You claimed ${DAILY_CLAIM_AMOUNT}` } })); } catch {}
       // hide for 24 hours on success
       dismiss();
-    } catch (e: any) {
+    } catch (err: unknown) {
+      const e = err as { message?: string } | null;
       let msg = e?.message || 'Unable to claim. Try again later.';
       if (msg?.toLowerCase().includes('cooldown')) {
         msg = 'Try again tomorrow.............';

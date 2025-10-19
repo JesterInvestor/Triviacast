@@ -9,8 +9,10 @@ export default function Toaster() {
 
   useEffect(() => {
     let idCounter = 1;
-    const handler = (e: any) => {
-      const payload = e?.detail || {};
+    type Detail = { type?: Toast['type']; message?: string };
+    const handler = (e: Event) => {
+      const custom = e as CustomEvent<Detail>;
+      const payload = custom?.detail || {};
       const toast: Toast = { id: idCounter++, type: payload.type || 'info', message: payload.message || '' };
       setToasts((t) => [...t, toast]);
       // auto remove
@@ -18,8 +20,8 @@ export default function Toaster() {
         setToasts((t) => t.filter((x) => x.id !== toast.id));
       }, 4500);
     };
-    window.addEventListener('triviacast:toast', handler);
-    return () => window.removeEventListener('triviacast:toast', handler);
+    window.addEventListener('triviacast:toast', handler as EventListener);
+    return () => window.removeEventListener('triviacast:toast', handler as EventListener);
   }, []);
 
   if (!toasts.length) return null;

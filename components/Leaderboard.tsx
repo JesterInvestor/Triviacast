@@ -1,6 +1,7 @@
  'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import { LeaderboardEntry } from '@/types/quiz';
 import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
 import Link from 'next/link';
@@ -10,23 +11,26 @@ import { shareLeaderboardUrl, openShareUrl } from '@/lib/farcaster';
 import { base } from 'viem/chains';
 // Avatar/Name from @coinbase/onchainkit/identity are optional at build time.
 // We'll load them dynamically at runtime and provide fallbacks.
-const OnchainKit = {
-  Avatar: null as unknown as React.FC<any>,
-  Name: null as unknown as React.FC<any>,
-};
+type AvatarProps = { address?: string; className?: string; chain?: unknown };
+type NameProps = { address?: string; className?: string; chain?: unknown };
+const OnchainKit: {
+  Avatar: React.ComponentType<AvatarProps> | null;
+  Name: React.ComponentType<NameProps> | null;
+} = { Avatar: null, Name: null };
 let onchainKitLoaded = false;
 async function ensureOnchainKit() {
   if (onchainKitLoaded) return;
   try {
     // Use eval import to prevent bundlers from resolving this optional package at build time
-  const mod = await (eval('import("@coinbase/onchainkit/identity")') as Promise<any>);
-    OnchainKit.Avatar = mod.Avatar;
-    OnchainKit.Name = mod.Name;
+    const mod = await (eval('import("@coinbase/onchainkit/identity")') as Promise<unknown>);
+    const modAny = mod as any;
+    OnchainKit.Avatar = modAny?.Avatar ?? null;
+    OnchainKit.Name = modAny?.Name ?? null;
   } catch {
-    OnchainKit.Avatar = (props: any) => (
-      <img src={`/identicon-${(props.address || '').slice(2, 10)}.png`} alt="avatar" className={props.className} />
+    OnchainKit.Avatar = (props: AvatarProps) => (
+      <Image src={`/identicon-${(props.address || '').slice(2, 10)}.png`} alt="avatar" width={24} height={24} className={props.className} />
     );
-    OnchainKit.Name = (props: any) => (
+    OnchainKit.Name = (props: NameProps) => (
       <span className={props.className}>{(props.address || '').slice(0, 8) + '...'}</span>
     );
   } finally {
@@ -58,8 +62,8 @@ export default function Leaderboard() {
     const key = address.toLowerCase();
     if (profile) {
       setFarcasterProfiles((prev) => {
-        const next = { ...prev, [key]: { username: profile.username?.replace(/^@/, ''), pfpUrl: profile.pfpUrl } };
-        saveProfilesToCache(next as any);
+  const next = { ...prev, [key]: { username: profile.username?.replace(/^@/, ''), pfpUrl: profile.pfpUrl } };
+  saveProfilesToCache(next);
         return next;
       });
       if (account?.address && account.address.toLowerCase() === key) {
@@ -68,9 +72,9 @@ export default function Leaderboard() {
       }
     } else {
       setFarcasterProfiles((prev) => {
-        const copy = { ...prev };
-        delete copy[key];
-        saveProfilesToCache(copy as any);
+  const copy = { ...prev };
+  delete copy[key];
+  saveProfilesToCache(copy);
         return copy;
       });
     }
@@ -158,8 +162,8 @@ export default function Leaderboard() {
 
         // Fallback: try to load @farcaster/auth-kit which may export a hook or context
         try {
-          // @ts-ignore - optional dynamic import for auth-kit
-          const mod = await import('@farcaster/auth-kit');
+            // optional dynamic import for auth-kit; evaluate at runtime so bundler doesn't resolve it
+            const mod = await (eval('import("@farcaster/auth-kit")') as Promise<any>);
           const modAny = mod as any;
           if (modAny) {
             // Some versions export `useMiniKit` hook, others may export a `MiniKit` object.
@@ -313,30 +317,7 @@ export default function Leaderboard() {
               // Increase attempts and shorten delays so usernames/pfps appear faster
               void runPollAndApply(newlyJoined, 40, 200, 1.1, 1200);
 
-              // Handler for external manual lookups from the FarcasterLookup component.
-              const handleLookupResult = (address: string, profile: { username?: string; pfpUrl?: string } | null) => {
-                const key = address.toLowerCase();
-                if (profile) {
-                  setFarcasterProfiles((prev) => {
-                    const next = { ...prev, [key]: { username: profile.username?.replace(/^@/, ''), pfpUrl: profile.pfpUrl } };
-                    saveProfilesToCache(next as any);
-                    return next;
-                  });
-                  // If this matches the connected wallet, update the displayed miniapp context fields
-                  if (account?.address && account.address.toLowerCase() === key) {
-                    setMfUsername(profile.username?.replace(/^@/, ''));
-                    setMfPfpUrl(profile.pfpUrl);
-                  }
-                } else {
-                  // Clear any cached entry for the address if lookup returned null
-                  setFarcasterProfiles((prev) => {
-                    const copy = { ...prev };
-                    delete copy[key];
-                    saveProfilesToCache(copy as any);
-                    return copy;
-                  });
-                }
-              };
+              // external manual lookups will use the outer `handleLookupResult` defined above
             }
 
             // Background poll for the rest (non-blocking, slightly more frequent)
@@ -368,7 +349,7 @@ export default function Leaderboard() {
     <div className="max-w-4xl mx-auto px-2 sm:px-6">
       <div className="bg-white rounded-lg shadow-xl p-4 sm:p-8 border-4 border-[#F4A6B7]">
         <div className="flex items-center justify-center gap-3 sm:gap-4 mb-2">
-          <img src="/brain-large.svg" alt="Brain" className="w-12 h-12 sm:w-16 sm:h-16" loading="eager" />
+          <Image src="/brain-large.svg" alt="Brain" width={64} height={64} priority />
           <h1 className="text-2xl sm:text-4xl font-bold text-center text-[#2d1b2e]">
             Leaderboard
           </h1>
@@ -447,44 +428,19 @@ export default function Leaderboard() {
               <div className="flex items-center justify-center gap-2 mb-1">
                 {/* Five unique SVG icons */}
                 <span className="rounded-full bg-white border-2 border-[#F4A6B7] shadow w-7 h-7 flex items-center justify-center">
-                  <img
-                    src="/https___i.imgur.com_84EvySZ.svg"
-                    alt="Icon 1"
-                    className="w-full h-full object-contain"
-                    loading="lazy"
-                  />
+                  <Image src="/https___i.imgur.com_84EvySZ.svg" alt="Icon 1" width={28} height={28} className="object-contain" />
                 </span>
                 <span className="rounded-full bg-white border-2 border-[#F4A6B7] shadow w-7 h-7 flex items-center justify-center">
-                  <img
-                    src="/https___i.imgur.com_MScXeOp.svg"
-                    alt="Icon 2"
-                    className="w-full h-full object-contain"
-                    loading="lazy"
-                  />
+                  <Image src="/https___i.imgur.com_MScXeOp.svg" alt="Icon 2" width={28} height={28} className="object-contain" />
                 </span>
                 <span className="rounded-full bg-white border-2 border-[#F4A6B7] shadow w-7 h-7 flex items-center justify-center">
-                  <img
-                    src="/anim=false,fit=contain,f=auto,w=288.svg"
-                    alt="Icon 3"
-                    className="w-full h-full object-contain"
-                    loading="lazy"
-                  />
+                  <Image src="/anim=false,fit=contain,f=auto,w=288.svg" alt="Icon 3" width={28} height={28} className="object-contain" />
                 </span>
                 <span className="rounded-full bg-white border-2 border-[#F4A6B7] shadow w-7 h-7 flex items-center justify-center">
-                  <img
-                    src="/anim=false,fit=contain,f=auto,w=288 (1).svg"
-                    alt="Icon 4"
-                    className="w-full h-full object-contain"
-                    loading="lazy"
-                  />
+                  <Image src="/anim=false,fit=contain,f=auto,w=288 (1).svg" alt="Icon 4" width={28} height={28} className="object-contain" />
                 </span>
                 <span className="rounded-full bg-white border-2 border-[#F4A6B7] shadow w-7 h-7 flex items-center justify-center">
-                  <img
-                    src="/anim=false,fit=contain,f=auto,w=288 (2).svg"
-                    alt="Icon 5"
-                    className="w-full h-full object-contain"
-                    loading="lazy"
-                  />
+                  <Image src="/anim=false,fit=contain,f=auto,w=288 (2).svg" alt="Icon 5" width={28} height={28} className="object-contain" />
                 </span>
               </div>
               <span>
@@ -522,14 +478,14 @@ export default function Leaderboard() {
                           <div className="flex items-center gap-2">
                             {/* Show pfp, displayName, username for current user */}
                             {isCurrentUser && pfpUrl && (
-                              <img src={pfpUrl} alt="Profile" className="w-6 h-6 rounded-full border border-[#F4A6B7]" />
+                              <Image src={pfpUrl} alt="Profile" width={24} height={24} className="rounded-full border border-[#F4A6B7]" />
                             )}
                             <div className="flex flex-col">
                                 {/* Use OnchainKit Avatar/Name for all users; show MiniApp profile details for connected user if available */}
                                 <div className="flex items-center gap-2">
                                   {/* Prefer Farcaster pfp if discovered */}
                                   {farcasterProfiles[entry.walletAddress.toLowerCase()]?.pfpUrl ? (
-                                    <img src={farcasterProfiles[entry.walletAddress.toLowerCase()]?.pfpUrl} alt="pfp" className="w-6 h-6 rounded-full border border-[#F4A6B7]" />
+                                    <Image src={farcasterProfiles[entry.walletAddress.toLowerCase()]?.pfpUrl || ''} alt="pfp" width={24} height={24} className="rounded-full border border-[#F4A6B7]" />
                                   ) : (
                                     // Use dynamically loaded OnchainKit Avatar or fallback
                                     (() => {
@@ -537,7 +493,7 @@ export default function Leaderboard() {
                                       if (AvatarComp) {
                                         return <AvatarComp address={entry.walletAddress} chain={base} className="w-6 h-6 rounded-full border border-[#F4A6B7]" />;
                                       }
-                                      return <img src={`/identicon-${entry.walletAddress.slice(2, 10)}.png`} alt="pfp" className="w-6 h-6 rounded-full border border-[#F4A6B7]" />;
+                                      return <Image src={`/identicon-${entry.walletAddress.slice(2, 10)}.png`} alt="pfp" width={24} height={24} className="rounded-full border border-[#F4A6B7]" />;
                                     })()
                                   )}
 
@@ -593,7 +549,7 @@ export default function Leaderboard() {
 
         <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-[#FFE4EC] rounded-lg border-2 border-[#F4A6B7]">
           <h3 className="font-semibold text-[#2d1b2e] mb-2 flex items-center gap-2 text-sm sm:text-base">
-            <img src="/brain-small.svg" alt="Brain" className="w-5 h-5 sm:w-6 sm:h-6" loading="lazy" />
+            <Image src="/brain-small.svg" alt="Brain" width={24} height={24} />
             About T Points:
           </h3>
           <ul className="text-xs sm:text-sm text-[#5a3d5c] space-y-1 font-medium">
@@ -604,7 +560,7 @@ export default function Leaderboard() {
             <li>• T points will be used in this app</li>
           </ul>
           <h3 className="font-semibold text-[#2d1b2e] mb-2 mt-4 flex items-center gap-2 text-sm sm:text-base">
-            <img src="/brain-small.svg" alt="Brain" className="w-5 h-5 sm:w-6 sm:h-6" loading="lazy" />
+            <Image src="/brain-small.svg" alt="Brain" width={24} height={24} />
             About $TRIV
           </h3>
           <ul className="text-xs sm:text-sm text-[#5a3d5c] space-y-1 font-medium">

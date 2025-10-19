@@ -16,7 +16,7 @@ export default class ClientErrorBoundary extends React.Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, info: any) {
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
     // Log to console and / or remote logging
     console.error('ClientErrorBoundary caught error', error, info);
   }

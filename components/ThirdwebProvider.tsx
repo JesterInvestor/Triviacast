@@ -14,14 +14,14 @@ export default function ThirdwebProvider({ children }: { children: React.ReactNo
       if (typeof window === 'undefined') return;
       try {
         const mod = await import('@farcaster/miniapp-sdk');
-        const { sdk } = mod;
+        const { sdk } = mod as { sdk?: any };
         if (sdk && (await sdk.isInMiniApp())) {
           // Wait for host ready
           try { await sdk.actions.ready(); } catch {}
           const provider = await sdk.wallet?.getEthereumProvider?.();
-          if (provider && !(window as any).ethereum) {
+          if (provider && !(window as unknown as { ethereum?: unknown }).ethereum) {
             // set provider as window.ethereum — many libraries will use this
-            (window as any).ethereum = provider;
+            (window as unknown as { ethereum?: unknown }).ethereum = provider;
             console.debug('Farcaster EIP-1193 provider wired to window.ethereum');
           }
         }

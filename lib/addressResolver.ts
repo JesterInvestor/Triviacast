@@ -86,12 +86,13 @@ export async function resolveFarcasterUsername(address: string): Promise<string 
   const data = await response.json();
   console.log(`Farcaster data for ${address}:`, data);
   const key = address.toLowerCase();
-  const users = data[key] || data[address] || data[key as any];
-    
-    if (users && users.length > 0) {
-      console.log(`Found Farcaster username for ${address}:`, users[0].username);
-      return users[0].username || null;
-    }
+  // data may use lowercase keys or original; guard with safe typing
+  const raw = (data as Record<string, unknown>)[key] || (data as Record<string, unknown>)[address] || undefined;
+  if (Array.isArray(raw) && raw.length > 0) {
+    const first = raw[0] as { username?: string };
+    console.log(`Found Farcaster username for ${address}:`, first.username);
+    return first.username || null;
+  }
     
     console.log(`No Farcaster users found for ${address}`);
     return null;
@@ -250,16 +251,16 @@ export async function resolveFarcasterProfile(
 
     if (!resp.ok) return null;
     const data = await resp.json();
-    const key = address.toLowerCase();
-    const users = data[key] || data[address] || data[key as any];
-    if (!users || users.length === 0) return null;
-    const user = users[0];
-    const username = user?.username ? `@${user.username}` : undefined;
+  const key = address.toLowerCase();
+  const raw = (data as Record<string, unknown>)[key] || (data as Record<string, unknown>)[address] || undefined;
+  if (!Array.isArray(raw) || raw.length === 0) return null;
+  const user = raw[0] as Record<string, unknown>;
+  const username = (user?.username as string | undefined) ? `@${String(user.username)}` : undefined;
 
-    // Try a few common fields for pfp/ avatar
-    const pfpUrl = user?.pfpUrl || user?.avatar || user?.profile?.pfpUrl || user?.profile?.avatarUrl || undefined;
+  // Try a few common fields for pfp/ avatar
+  const pfpUrl = (user?.pfpUrl as string | undefined) || (user?.avatar as string | undefined) || (user?.profile as any)?.pfpUrl || (user?.profile as any)?.avatarUrl || undefined;
 
-    return { username, pfpUrl };
+  return { username, pfpUrl };
   } catch (e) {
     console.error('Error fetching Farcaster profile for', address, e);
     return null;

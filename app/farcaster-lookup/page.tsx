@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from 'react';
+import Image from 'next/image';
+
+type LookupResult = { found?: boolean; profile?: { username?: string; pfpUrl?: string }; error?: string } | null;
 
 export default function FarcasterLookupPage() {
-  const [address, setAddress] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [address, setAddress] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [result, setResult] = useState<LookupResult>(null);
   const [error, setError] = useState<string | null>(null);
 
   const lookup = async () => {
@@ -21,7 +24,8 @@ export default function FarcasterLookupPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'lookup failed');
       setResult(data);
-    } catch (e: any) {
+    } catch (err: unknown) {
+      const e = err as { message?: string } | null;
       setError(e?.message || 'unknown error');
     } finally {
       setLoading(false);
@@ -30,7 +34,7 @@ export default function FarcasterLookupPage() {
 
   return (
     <div className="min-h-screen p-6">
-      <h1 className="text-2xl font-bold mb-4">Farcaster profile lookup</h1>
+  <h1 className="text-2xl font-bold mb-4">Farcaster profile lookup</h1>
       <p className="mb-4 text-sm text-gray-600">Enter an Ethereum address to fetch the Farcaster profile (via server API).</p>
       <div className="mb-4 flex gap-2">
         <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="0x..." className="border p-2 rounded w-full" />

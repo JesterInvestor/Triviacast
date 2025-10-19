@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from 'next/image';
 
 
 const DISMISS_KEY = "triviacast:add_prompt:dismissedAt";
@@ -10,7 +11,8 @@ export default function AddMiniAppPrompt() {
   // The Neynar SDK is optional at build time. Dynamically load it at runtime
   // so that builds don't fail in environments where the package isn't installed.
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
-  const [addMiniAppFn, setAddMiniAppFn] = useState<(() => Promise<any>) | null>(null);
+  type AddMiniAppResult = { added?: boolean; reason?: string };
+  const [addMiniAppFn, setAddMiniAppFn] = useState<(() => Promise<AddMiniAppResult>) | null>(null);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,32 +24,30 @@ export default function AddMiniAppPrompt() {
     // we keep `isSDKLoaded` false and avoid showing the prompt.
     (async () => {
       try {
-        // Use an eval-backed dynamic import so bundlers don't attempt to resolve
-        // the optional package at build-time (some hosts don't install it).
-        // @ts-ignore
-        const mod = await eval('import("@neynar/react")');
-        if (mod && typeof mod.useMiniApp === 'function') {
+  // Use an eval-backed dynamic import so bundlers don't attempt to resolve
+  // the optional package at build-time (some hosts don't install it).
+  const mod = await (eval('import("@neynar/react")') as Promise<unknown>);
+    if (mod && typeof (mod as any).useMiniApp === 'function') {
           // We don't call the hook directly (can't call hooks conditionally). Instead
           // we create a thin runtime wrapper that proxies to the module's functions.
           setIsSDKLoaded(true);
           setAddMiniAppFn(() => async () => {
             // Re-import inside function to ensure fresh access to the hook implementation
             // Use eval import to avoid static bundler resolution
-            // @ts-ignore
-            const m = await eval('import("@neynar/react")');
+            const m = await (eval('import("@neynar/react")') as Promise<unknown>);
             try {
+              const mAny = m as any;
               // Some implementations export an `addMiniApp` helper. Use it if present.
-              if (m && typeof (m as any).addMiniApp === 'function') {
-                return await (m as any).addMiniApp();
+              if (mAny && typeof mAny.addMiniApp === 'function') {
+                return await mAny.addMiniApp();
               }
             } catch (e) {
               // ignore and fallback
             }
-            // Fallback to calling the hook's method via a temporary component isn't feasible here,
-            // but many host implementations also export an `addMiniApp` helper. If not available,
-            // we attempt to call via a simple global if present.
-            if ((window as any)?.neynar?.addMiniApp) {
-              return await (window as any).neynar.addMiniApp();
+            // Fallback to a global Neynar helper if host exposes it
+            const globalAny = (window as unknown) as Record<string, any>;
+            if (globalAny?.neynar?.addMiniApp) {
+              return await globalAny.neynar.addMiniApp();
             }
             // If we can't locate an add function, throw so callers show a friendly error.
             throw new Error('addMiniApp not available');
@@ -114,8 +114,9 @@ export default function AddMiniAppPrompt() {
         }
         setBusy(false);
       }
-    } catch (e: any) {
-      const msg = (e?.message as string) || "Unable to add app. Try again later.";
+    } catch (err: unknown) {
+      const e = err as { message?: string } | null;
+      const msg = e?.message || "Unable to add app. Try again later.";
       setError(msg);
       setBusy(false);
     }
@@ -128,7 +129,7 @@ export default function AddMiniAppPrompt() {
       <div className="w-full max-w-md rounded-2xl bg-white text-neutral-900 shadow-xl ring-1 ring-black/5">
         <div className="p-5">
           <div className="flex items-start gap-3">
-            <img src="/icon.png" alt="App icon" className="h-10 w-10 rounded" />
+            <Image src="/icon.png" alt="App icon" width={40} height={40} className="rounded" />
             <div className="flex-1">
               <h3 className="text-base font-semibold">Add Triviacast to Mini Apps</h3>
               <p className="mt-1 text-sm text-neutral-600">
