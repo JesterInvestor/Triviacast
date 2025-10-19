@@ -1,4 +1,4 @@
-'use client';
+ 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import { LeaderboardEntry } from '@/types/quiz';
@@ -7,8 +7,35 @@ import Link from 'next/link';
 import { useActiveAccount } from 'thirdweb/react';
 
 import { shareLeaderboardUrl, openShareUrl } from '@/lib/farcaster';
-import { Avatar, Name } from '@coinbase/onchainkit/identity';
 import { base } from 'viem/chains';
+// Avatar/Name from @coinbase/onchainkit/identity are optional at build time.
+// We'll load them dynamically at runtime and provide fallbacks.
+const OnchainKit = {
+  Avatar: null as unknown as React.FC<any>,
+  Name: null as unknown as React.FC<any>,
+};
+let onchainKitLoaded = false;
+async function ensureOnchainKit() {
+  if (onchainKitLoaded) return;
+  try {
+    // Dynamically import OnchainKit identity helpers if available. This is optional;
+    // silence type-checking for environments where the package isn't installed.
+    // @ts-ignore
+    const mod = await import('@coinbase/onchainkit/identity');
+    OnchainKit.Avatar = mod.Avatar;
+    OnchainKit.Name = mod.Name;
+  } catch {
+    // package not available; fallbacks will be used
+    OnchainKit.Avatar = (props: any) => (
+      <img src={`/identicon-${(props.address || '').slice(2, 10)}.png`} alt="avatar" className={props.className} />
+    );
+    OnchainKit.Name = (props: any) => (
+      <span className={props.className}>{(props.address || '').slice(0, 8) + '...'}</span>
+    );
+  } finally {
+    onchainKitLoaded = true;
+  }
+}
 import { pollFarcasterUsernames, resolveFarcasterProfile } from '@/lib/addressResolver';
 
 export default function Leaderboard() {
@@ -110,6 +137,7 @@ export default function Leaderboard() {
 
         // Fallback: try to load @farcaster/auth-kit which may export a hook or context
         try {
+          // @ts-ignore - optional dynamic import for auth-kit
           const mod = await import('@farcaster/auth-kit');
           const modAny = mod as any;
           if (modAny) {
@@ -422,7 +450,14 @@ export default function Leaderboard() {
                                   {farcasterProfiles[entry.walletAddress.toLowerCase()]?.pfpUrl ? (
                                     <img src={farcasterProfiles[entry.walletAddress.toLowerCase()]?.pfpUrl} alt="pfp" className="w-6 h-6 rounded-full border border-[#F4A6B7]" />
                                   ) : (
-                                    <Avatar address={entry.walletAddress as `0x${string}`} chain={base} className="w-6 h-6 rounded-full border border-[#F4A6B7]" />
+                                    // Use dynamically loaded OnchainKit Avatar or fallback
+                                    (() => {
+                                      const AvatarComp = OnchainKit.Avatar as unknown as React.ComponentType<any> | null;
+                                      if (AvatarComp) {
+                                        return <AvatarComp address={entry.walletAddress} chain={base} className="w-6 h-6 rounded-full border border-[#F4A6B7]" />;
+                                      }
+                                      return <img src={`/identicon-${entry.walletAddress.slice(2, 10)}.png`} alt="pfp" className="w-6 h-6 rounded-full border border-[#F4A6B7]" />;
+                                    })()
                                   )}
 
                                   {isCurrentUser ? (
@@ -439,7 +474,13 @@ export default function Leaderboard() {
                                         <span className="text-[#2d1b2e] text-xs sm:text-sm font-semibold">{farcasterProfiles[entry.walletAddress.toLowerCase()]?.username}</span>
                                       </div>
                                     ) : (
-                                      <Name address={entry.walletAddress as `0x${string}`} chain={base} />
+                                      (() => {
+                                        const NameComp = OnchainKit.Name as unknown as React.ComponentType<any> | null;
+                                        if (NameComp) {
+                                          return <NameComp address={entry.walletAddress} chain={base} className="" />;
+                                        }
+                                        return <span className="text-xs">{entry.walletAddress.slice(0, 8)}...</span>;
+                                      })()
                                     )
                                   )}
                                 </div>
@@ -496,4 +537,10 @@ export default function Leaderboard() {
       </div>
     </div>
   );
+}
+
+// Ensure OnchainKit is attempted on client mount
+if (typeof window !== 'undefined') {
+  // Fire-and-forget
+  void ensureOnchainKit();
 }
