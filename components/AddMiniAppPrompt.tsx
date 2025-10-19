@@ -22,14 +22,19 @@ export default function AddMiniAppPrompt() {
     // we keep `isSDKLoaded` false and avoid showing the prompt.
     (async () => {
       try {
-        const mod = await import('@neynar/react');
+        // Use an eval-backed dynamic import so bundlers don't attempt to resolve
+        // the optional package at build-time (some hosts don't install it).
+        // @ts-ignore
+        const mod = await eval('import("@neynar/react")');
         if (mod && typeof mod.useMiniApp === 'function') {
           // We don't call the hook directly (can't call hooks conditionally). Instead
           // we create a thin runtime wrapper that proxies to the module's functions.
           setIsSDKLoaded(true);
           setAddMiniAppFn(() => async () => {
             // Re-import inside function to ensure fresh access to the hook implementation
-            const m = await import('@neynar/react');
+            // Use eval import to avoid static bundler resolution
+            // @ts-ignore
+            const m = await eval('import("@neynar/react")');
             try {
               // Some implementations export an `addMiniApp` helper. Use it if present.
               if (m && typeof (m as any).addMiniApp === 'function') {

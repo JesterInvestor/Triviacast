@@ -5,7 +5,7 @@
  */
 export async function resolveFarcasterUsernameByFid(fid: number): Promise<string | null> {
   try {
-    const apiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
+  const apiKey = process.env.NEYNAR_API_KEY || process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
     if (!apiKey) throw new Error('Neynar API key missing');
     const response = await fetch(
       `https://hub-api.neynar.com/v1/userDataByFid?fid=${fid}&user_data_type=USER_DATA_TYPE_USERNAME`,
@@ -70,10 +70,9 @@ export async function resolveFarcasterUsername(address: string): Promise<string 
       `https://api.neynar.com/v2/farcaster/user/bulk-by-address?addresses=${address}`,
       {
         headers: {
-          'accept': 'application/json',
-          ...(apiKey ? { 'api_key': apiKey, 'X-API-KEY': apiKey } : {}),
-          // Prefer providing an API key via NEXT_PUBLIC_NEYNAR_API_KEY for higher limits
-        }
+          accept: 'application/json',
+          ...(apiKey ? { 'X-API-KEY': apiKey, 'api_key': apiKey } : {}),
+        },
       }
     );
     
@@ -238,13 +237,13 @@ export async function resolveFarcasterProfile(
   address: string
 ): Promise<{ username?: string; pfpUrl?: string } | null> {
   try {
-    const apiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
+    const apiKey = process.env.NEYNAR_API_KEY || process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
     const resp = await fetch(
       `https://api.neynar.com/v2/farcaster/user/bulk-by-address?addresses=${address}`,
       {
         headers: {
-          'accept': 'application/json',
-          ...(apiKey ? { api_key: apiKey, 'X-API-KEY': apiKey } : {}),
+          accept: 'application/json',
+          ...(apiKey ? { 'X-API-KEY': apiKey, api_key: apiKey } : {}),
         },
       }
     );
