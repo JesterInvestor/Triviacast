@@ -22,12 +22,15 @@ export default function WagmiWalletConnect() {
               </span>
             ) : null}
           </div>
-          <button
-            onClick={() => disconnect()}
-            className="px-3 py-2 bg-[#F4A6B7] hover:bg-[#E8949C] text-white rounded-lg text-sm font-medium min-h-[44px]"
-          >
-            Disconnect
-          </button>
+          <div className="flex items-center gap-2">
+            <ChangeWalletMenu connectors={connectors} connect={connect} />
+            <button
+              onClick={() => disconnect()}
+              className="px-3 py-2 bg-[#F4A6B7] hover:bg-[#E8949C] text-white rounded-lg text-sm font-medium min-h-[44px]"
+            >
+              Disconnect
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -64,6 +67,29 @@ export default function WagmiWalletConnect() {
           ) : null}
         </div>
       </div>
+    </div>
+  );
+}
+
+function ChangeWalletMenu({ connectors, connect }: { connectors: readonly any[]; connect: any }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative">
+      <button onClick={() => setOpen((s) => !s)} className="px-3 py-2 bg-white border rounded text-sm">Change</button>
+      {open ? (
+        <div className="absolute right-0 mt-2 w-[220px] bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 z-50">
+          {connectors.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => { setOpen(false); connect({ connector: c }); }}
+              disabled={!c.ready}
+              className={`w-full text-left px-3 py-2 rounded ${c.ready ? 'bg-[#F4A6B7] text-white' : 'bg-gray-100 text-gray-500 cursor-not-allowed'}`}
+            >
+              {c.name ?? c.id}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
