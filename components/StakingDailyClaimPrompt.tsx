@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useActiveAccount } from 'thirdweb/react';
+import { Account } from 'thirdweb';
 import { callDailyClaim, isDistributorConfigured } from '@/lib/distributor';
 import { getDailyClaimLabel } from '@/lib/config';
 
@@ -63,11 +64,25 @@ export default function StakingDailyClaimPrompt() {
     setError(null);
     try {
       if (!account) throw new Error('Please connect your wallet');
-  await callDailyClaim(account as unknown as { address: string });
-      // notify points updated and show success toast
-      try { window.dispatchEvent(new CustomEvent('triviacast:pointsUpdated')); } catch {}
-      try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: `You claimed ${DAILY_CLAIM_AMOUNT}` } })); } catch {}
-      // hide for 24 hours on success
+
+      // Ensure `account` satisfies the `Account` type
+      const accountAsAccount = account as unknown as Account;
+
+      await callDailyClaim(accountAsAccount);
+
+      // Notify points updated and show success toast
+      try {
+        window.dispatchEvent(new CustomEvent('triviacast:pointsUpdated'));
+      } catch {}
+      try {
+        window.dispatchEvent(
+          new CustomEvent('triviacast:toast', {
+            detail: { type: 'success', message: `You claimed ${DAILY_CLAIM_AMOUNT}` },
+          })
+        );
+      } catch {}
+
+      // Hide for 24 hours on success
       dismiss();
     } catch (err: unknown) {
       const e = err as { message?: string } | null;
@@ -76,7 +91,11 @@ export default function StakingDailyClaimPrompt() {
         msg = 'Try again tomorrow.............';
       }
       setError(msg);
-      try { window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'error', message: msg } })); } catch {}
+      try {
+        window.dispatchEvent(
+          new CustomEvent('triviacast:toast', { detail: { type: 'error', message: msg } })
+        );
+      } catch {}
       setBusy(false);
     }
   };
