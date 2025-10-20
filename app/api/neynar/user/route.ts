@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     // Try to load the Neynar SDK dynamically. If it's not installed or NEYNAR_API_KEY is missing,
     // return 204 so the client can treat it as "no profile available".
     const apiKey = process.env.NEYNAR_API_KEY;
-    if (!apiKey) return NextResponse.json({ result: null }, { status: 204 });
+  if (!apiKey) return new NextResponse(null, { status: 204 });
 
     const mod = await import('@neynar/nodejs-sdk');
     const { NeynarAPIClient, Configuration } = mod as any;
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
   const displayName = userObj?.displayName ?? userObj?.result?.displayName ?? null;
   return NextResponse.json({ result: { username: username ?? null, displayName: displayName ?? null } });
   } catch (e) {
-    // If SDK is missing or call fails, return 204 to indicate no profile
-    return NextResponse.json({ result: null }, { status: 204 });
+    // If SDK is missing or call fails, return an empty 204 to indicate no profile
+    return new NextResponse(null, { status: 204 });
   }
 }

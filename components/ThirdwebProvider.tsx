@@ -14,15 +14,17 @@ export default function ThirdwebProvider({ children }: { children: React.ReactNo
       if (typeof window === 'undefined') return;
       try {
         const mod = await import('@farcaster/miniapp-sdk');
-        const { sdk } = mod as { sdk?: { isInMiniApp: () => Promise<boolean>; actions: { ready: () => Promise<void> }; wallet?: { getEthereumProvider?: () => Promise<unknown> } } };
-        if (sdk && (await sdk.isInMiniApp())) {
-          // Wait for host ready
-          try { await sdk.actions.ready(); } catch {}
+        const { sdk } = mod as { sdk?: { actions?: { ready?: () => Promise<void> }; wallet?: { getEthereumProvider?: () => Promise<unknown> } } };
+        // If the SDK is present and exposes helper functions, call ready() and
+        // wire any EIP-1193 provider it exposes to window.ethereum. We do not
+        // gate this on an `isInMiniApp` check so the app loads the same way on
+        // all platforms; failure is silently ignored.
+        if (sdk) {
+          try { await sdk.actions?.ready?.(); } catch {}
           const provider = await sdk.wallet?.getEthereumProvider?.();
           if (provider && !(window as unknown as { ethereum?: unknown }).ethereum) {
-            // set provider as window.ethereum — many libraries will use this
             (window as unknown as { ethereum?: unknown }).ethereum = provider;
-            console.debug('Farcaster EIP-1193 provider wired to window.ethereum');
+            console.debug('Farcaster EIP-1193 provider (if available) wired to window.ethereum');
           }
         }
       } catch (e) {

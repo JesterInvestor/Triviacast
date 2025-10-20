@@ -35,18 +35,23 @@ export default function StakingDailyClaimPrompt() {
 
     const setup = async () => {
       try {
+        // Attempt to import the Farcaster miniapp SDK if present and call
+        // ready() to keep host splash behavior consistent. We do NOT block
+        // showing the prompt on absence of the SDK — the prompt should be
+        // available across devices.
         const { sdk } = await import('@farcaster/miniapp-sdk');
         if (cancelled) return;
-        if (!(await sdk.isInMiniApp())) return; // only in Farcaster hosts
-        if (!isDistributorConfigured()) return; // no distributor configured
-
-        // small delay so it doesn't clash with other prompts
-        setTimeout(() => {
-          if (!cancelled && shouldShow()) setOpen(true);
-        }, 800);
+        try { await sdk.actions?.ready?.(); } catch {}
       } catch (_) {
         // ignore - SDK not present outside host
       }
+
+      if (!isDistributorConfigured()) return; // no distributor configured
+
+      // small delay so it doesn't clash with other prompts
+      setTimeout(() => {
+        if (!cancelled && shouldShow()) setOpen(true);
+      }, 800);
     };
 
     setup();

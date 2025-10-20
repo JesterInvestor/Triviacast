@@ -60,6 +60,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Immediate, non-module script to aggressively clear service workers and caches before assets load.
+            This runs very early to help clients stuck with stale service workers that cause hashed-asset 404s. */}
+        <script dangerouslySetInnerHTML={{
+          __html: `try{if(typeof window!=='undefined'&&'serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){try{r.unregister();}catch(e){}});}).catch(function(){});}if(typeof window!=='undefined'&&window.caches&&caches.keys){caches.keys().then(function(names){names.forEach(function(n){try{caches.delete(n);}catch(e){}});}).catch(function(){});} }catch(e){};`
+        }} />
         {/* Move Farcaster ready() script to the absolute top for reliability.
             This script is defensive: it attempts multiple ways to access the
             miniapp SDK (global injection, local package, CDN) and logs which
@@ -190,24 +195,26 @@ export default function RootLayout({
               }catch(e){}
             })();
           ` }} />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                  navigator.serviceWorker.register('/sw.js').then(
-                    (registration) => {
-                      console.log('SW registered:', registration);
-                    },
-                    (error) => {
-                      console.log('SW registration failed:', error);
-                    }
-                  );
-                });
-              }
-            `,
-          }}
-        />
+        {process.env.NEXT_PUBLIC_ENABLE_SW === '1' ? (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                if ('serviceWorker' in navigator) {
+                  window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js').then(
+                      (registration) => {
+                        console.log('SW registered:', registration);
+                      },
+                      (error) => {
+                        console.log('SW registration failed:', error);
+                      }
+                    );
+                  });
+                }
+              `,
+            }}
+          />
+        ) : null}
         {/* Minimal critical CSS to avoid a flash of unstyled content (FOUC).
             Keeps background and text color correct on first paint while full CSS loads.
             This is intentionally tiny and safe to keep as a fallback. */}
