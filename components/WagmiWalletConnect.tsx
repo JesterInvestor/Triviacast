@@ -41,6 +41,13 @@ export default function WagmiWalletConnect() {
     if (autoConnectAttempted.current) return;
     // Only attempt when we know the environment
     if (inMiniApp === null) return;
+    // Prevent auto-connecting on public web host by default. Auto-connect will only run in the
+    // Farcaster miniapp or when explicitly allowed via the URL (?auto_connect=1) or an allowlist.
+    const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+    const allowAutoConnectHosts = ['localhost', '127.0.0.1'];
+    const explicit = typeof window !== 'undefined' && new URL(window.location.href).searchParams.get('auto_connect') === '1';
+    const hostAllowed = allowAutoConnectHosts.includes(hostname) || explicit;
+    if (!inMiniApp && !hostAllowed) return; // do not proceed with auto-connect in public browsers
 
   const farcasterConnector = connectors.find((c: Connector) => c.id === 'farcasterMiniApp');
   const coinbaseConnector = connectors.find((c: Connector) => c.id === 'coinbaseWallet' || /coinbase/i.test(String(c.name || '')));
