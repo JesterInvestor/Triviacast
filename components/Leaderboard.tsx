@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { LeaderboardEntry } from '@/types/quiz';
 import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
@@ -49,8 +49,7 @@ async function ensureOnchainKit() {
   }
   
 }
-import { pollFarcasterUsernames, resolveFarcasterProfile } from '@/lib/addressResolver';
-import FarcasterLookup from './FarcasterLookup';
+// Farcaster lookup logic removed
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -58,181 +57,11 @@ export default function Leaderboard() {
   const [loading, setLoading] = useState(true);
   const account = useActiveAccount();
 
-  // MiniKit context for Farcaster info.
-  // We dynamically import `useMiniKit` at runtime so that builds don't fail
-  // when `@farcaster/auth-kit` isn't installed in the environment
-  const [mfDisplayName, setMfDisplayName] = useState<string | undefined>(undefined);
-  const [mfUsername, setMfUsername] = useState<string | undefined>(undefined);
-  const [mfPfpUrl, setMfPfpUrl] = useState<string | undefined>(undefined);
-  // Progressive Farcaster profile map: address (lowercase) -> { username, pfpUrl }
-  const [farcasterProfiles, setFarcasterProfiles] = useState<Record<string, { username?: string; pfpUrl?: string }>>({});
+  // Farcaster lookup logic removed — leaderboard shows wallet addresses only
 
-  // Handler for manual Farcaster lookups (updates profile cache/state)
-  const handleLookupResult = useCallback((address: string, profile: { username?: string; pfpUrl?: string } | null) => {
-    const key = address.toLowerCase();
-    if (profile) {
-      setFarcasterProfiles((prev) => {
-        const next = { ...prev, [key]: { username: profile.username?.replace(/^@/, ''), pfpUrl: profile.pfpUrl } };
-        saveProfilesToCache(next);
-        return next;
-      });
-      if (account?.address && account.address.toLowerCase() === key) {
-        setMfUsername(profile.username?.replace(/^@/, ''));
-        setMfPfpUrl(profile.pfpUrl);
-      }
-    } else {
-      setFarcasterProfiles((prev) => {
-        const copy = { ...prev };
-        delete copy[key];
-        saveProfilesToCache(copy);
-        return copy;
-      });
-    }
-  }, [account?.address, handleLookupResult]);
+  // Farcaster context and lookup removed; nothing to do here
 
-  // Simple concurrency runner: accepts array of async functions and runs up to `limit` in parallel
-  async function runWithConcurrency<T>(tasks: Array<() => Promise<T>>, limit = 4) {
-    const results: T[] = [];
-    let i = 0;
-    const workers: Promise<void>[] = [];
-    const runOne = async () => {
-      while (i < tasks.length) {
-        const idx = i++;
-        try {
-          const res = await tasks[idx]();
-          results[idx] = res as T;
-        } catch (e) {
-          results[idx] = undefined as unknown as T;
-        }
-      }
-    };
-    for (let w = 0; w < Math.min(limit, tasks.length); w++) {
-      workers.push(runOne());
-    }
-    await Promise.all(workers);
-    return results;
-  }
-
-  // Load cached profiles (client-only). Returns a map of address -> { username, pfpUrl }
-  const loadCachedProfiles = (): Record<string, { username?: string; pfpUrl?: string; fetchedAt?: number }> => {
-    try {
-      const raw = localStorage.getItem('triviacast.farcasterProfiles.v1');
-      if (!raw) return {};
-      const parsed = JSON.parse(raw) as Record<string, { username?: string; pfpUrl?: string; fetchedAt?: number }>;
-      const now = Date.now();
-      const valid: Record<string, { username?: string; pfpUrl?: string; fetchedAt?: number }> = {};
-      for (const [addr, v] of Object.entries(parsed)) {
-        if (!v || !v.fetchedAt) continue;
-        if (now - v.fetchedAt <= 24 * 60 * 60 * 1000) {
-          valid[addr] = v;
-        }
-      }
-      return valid;
-    } catch (e) {
-      return {};
-    }
-  };
-
-  const saveProfilesToCache = (updates: Record<string, { username?: string; pfpUrl?: string }>) => {
-    try {
-      const now = Date.now();
-      const raw = localStorage.getItem('triviacast.farcasterProfiles.v1');
-      const base = raw ? JSON.parse(raw) : {};
-      for (const [k, v] of Object.entries(updates)) {
-        base[k] = { ...(base[k] || {}), username: v.username, pfpUrl: v.pfpUrl, fetchedAt: now };
-      }
-      localStorage.setItem('triviacast.farcasterProfiles.v1', JSON.stringify(base));
-    } catch (e) {
-      // ignore storage errors
-    }
-  };
-
-  useEffect(() => {
-    let mounted = true;
-    async function loadMiniAppContext() {
-      try {
-        // Try the miniapp SDK first (preferred)
-        try {
-          const mod = await import('@farcaster/miniapp-sdk');
-          const sdk = mod?.sdk;
-          if (sdk) {
-            const inMiniApp = await sdk.isInMiniApp();
-            if (inMiniApp) {
-              const context = await sdk.context;
-              if (!mounted) return;
-              setMfDisplayName(context?.user?.displayName);
-              setMfUsername(context?.user?.username);
-              setMfPfpUrl(context?.user?.pfpUrl);
-              return;
-            }
-          }
-        } catch {
-          // ignore and fall through to auth-kit attempt
-        }
-
-        // Fallback: try to load @farcaster/auth-kit which may export a hook or context
-        try {
-            // optional dynamic import for auth-kit; evaluate at runtime so bundler doesn't resolve it
-            const mod = await (eval('import("@farcaster/auth-kit")') as Promise<any>);
-          const modAny = mod as any;
-          if (modAny) {
-            // Some versions export `useMiniKit` hook, others may export a `MiniKit` object.
-            if (typeof modAny.useMiniKit === 'function') {
-              const { context } = modAny.useMiniKit();
-              if (!mounted) return;
-              setMfDisplayName(context?.user?.displayName);
-              setMfUsername(context?.user?.username);
-              setMfPfpUrl(context?.user?.pfpUrl);
-              return;
-            }
-
-            // Try common named exports if present
-            const exportedSdk = modAny.sdk || modAny.MiniKit || modAny.miniApp;
-            if (exportedSdk) {
-              const inMiniApp = await (exportedSdk.isInMiniApp ? exportedSdk.isInMiniApp() : false);
-              if (inMiniApp) {
-                const context = await (exportedSdk.context ? exportedSdk.context : undefined);
-                if (!mounted) return;
-                setMfDisplayName(context?.user?.displayName);
-                setMfUsername(context?.user?.username);
-                setMfPfpUrl(context?.user?.pfpUrl);
-                return;
-              }
-            }
-          }
-        } catch {
-          // ignore - neither SDKs available
-        }
-      } catch {
-        // Ignore failures to load SDK in non-miniapp environments
-      }
-    }
-    loadMiniAppContext();
-
-    (async () => {
-      try {
-        if (account?.address) {
-          const key = account.address.toLowerCase();
-          // If we don't already have it, fetch a profile
-          if (!farcasterProfiles[key]) {
-            const prof = await resolveFarcasterProfile(key);
-            if (prof) {
-              setFarcasterProfiles((prev) => ({ ...prev, [key]: prof }));
-            }
-          }
-        }
-      } catch (_) {
-        // ignore
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [account?.address, farcasterProfiles]); // Added missing dependencies
-
-  const displayName = mfDisplayName;
-  const username = mfUsername;
-  const pfpUrl = mfPfpUrl; // profile picture
+  // No Farcaster miniapp profile data available when lookup is removed
 
   const myRank = useMemo(() => {
     if (!account?.address) return null;
@@ -327,7 +156,7 @@ export default function Leaderboard() {
               // Increase attempts and shorten delays so usernames/pfps appear faster
               void runPollAndApply(newlyJoined, 40, 200, 1.1, 1200);
 
-              // external manual lookups will use the outer `handleLookupResult` defined above
+              // lookup logic removed
             }
 
             // Background poll for the rest (non-blocking, slightly more frequent)
@@ -342,11 +171,6 @@ export default function Leaderboard() {
         if (account?.address) {
           const points = await getWalletTotalPoints(account.address);
           setWalletTotal(points);
-          // Trigger a manual lookup for the connected user so display name/pfp appear faster
-          try {
-            const profile = await resolveFarcasterProfile(account.address);
-            if (profile) handleLookupResult(account.address, profile);
-          } catch (_) {}
         }
       } finally {
         setLoading(false);
@@ -440,8 +264,6 @@ export default function Leaderboard() {
                     .map((entry, i) => {
                       const rank = i + 1;
                       const addr = entry.walletAddress || '';
-                      const key = addr.toLowerCase();
-                      const profile = farcasterProfiles[key];
                       const Avatar = OnchainKit.Avatar;
                       const Name = OnchainKit.Name;
                       return (
@@ -464,9 +286,8 @@ export default function Leaderboard() {
                                 {Name ? (
                                   <Name address={addr} className="font-bold text-sm text-[#2d1b2e]" />
                                 ) : (
-                                  <span className="font-bold text-sm text-[#2d1b2e]">{profile?.username || (addr.slice(0, 6) + '...' + addr.slice(-4))}</span>
+                                  <span className="font-bold text-sm text-[#2d1b2e]">{addr.slice(0, 6) + '...' + addr.slice(-4)}</span>
                                 )}
-                                {profile?.username && <span className="text-xs text-[#5a3d5c]">@{profile.username}</span>}
                               </div>
                             </div>
                           </td>

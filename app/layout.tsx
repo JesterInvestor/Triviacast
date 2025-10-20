@@ -4,6 +4,7 @@ import "./globals.css";
 import ThirdwebProvider from "@/components/ThirdwebProvider";
 import WagmiProvider from "@/components/WagmiProvider";
 import ClientOnlyWidgets from '@/components/ClientOnlyWidgets';
+import FarcasterMiniAppReady from '@/components/FarcasterMiniAppReady';
 
 const frame = {
   version: "1",
@@ -156,6 +157,8 @@ export default function RootLayout({
       <body className="antialiased">
         <WagmiProvider>
           <ThirdwebProvider>
+            {/* Ensure the Farcaster miniapp hides its splash when the app is ready */}
+            <FarcasterMiniAppReady />
             {children}
             {/* Client-only widgets (miniapp prompt, staking prompt, toaster) */}
             <ClientOnlyWidgets />
