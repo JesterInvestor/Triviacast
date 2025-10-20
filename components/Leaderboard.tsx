@@ -25,20 +25,29 @@ async function ensureOnchainKit() {
     OnchainKit.Avatar = modAny?.Avatar ?? null;
     OnchainKit.Name = modAny?.Name ?? null;
   } catch {
-    OnchainKit.Avatar = (props: AvatarProps) => (
-      <Image src={`/identicon-${(props.address || '').slice(2, 10)}.png`} alt="avatar" width={24} height={24} className={props.className} />
-    );
-    OnchainKit.Name = (props: NameProps) => (
-      <span className={props.className}>{(props.address || '').slice(0, 8) + '...'}</span>
-    );
+    function OnchainKitAvatar(props: AvatarProps) {
+      return (
+        <Image
+          src={`/identicon-${(props.address || '').slice(2, 10)}.png`}
+          alt="avatar"
+          width={24}
+          height={24}
+          className={props.className}
+        />
+      );
+    }
+
+    function OnchainKitName(props: NameProps) {
+      return <span className={props.className}>{(props.address || '').slice(0, 8) + '...'}</span>;
+    }
+
+    OnchainKitAvatar.displayName = 'OnchainKitAvatar';
+    OnchainKitName.displayName = 'OnchainKitName';
+
+    OnchainKit.Avatar = OnchainKitAvatar;
+    OnchainKit.Name = OnchainKitName;
   }
-  // Added null checks before assigning display names
-  if (OnchainKit.Avatar) {
-    OnchainKit.Avatar.displayName = 'OnchainKitAvatar';
-  }
-  if (OnchainKit.Name) {
-    OnchainKit.Name.displayName = 'OnchainKitName';
-  }
+  
 }
 import { pollFarcasterUsernames, resolveFarcasterProfile } from '@/lib/addressResolver';
 import FarcasterLookup from './FarcasterLookup';
