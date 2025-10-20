@@ -47,7 +47,55 @@ async function ensureOnchainKit() {
     OnchainKit.Avatar = OnchainKitAvatar;
     OnchainKit.Name = OnchainKitName;
   }
-  
+}
+
+// Minimal client-side component to fetch a single Farcaster profile by wallet address
+function FarcasterProfile({ address, fallbackAddress }: { address: string; fallbackAddress: string }) {
+  // client-only fetch
+  const [profile, setProfile] = useState<{ displayName?: string; username?: string; pfp?: { url?: string } | null } | null>(null);
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      try {
+        const res = await fetch(`/api/neynar/user?address=${encodeURIComponent(address)}`);
+        if (!mounted) return;
+        if (!res.ok) return setProfile(null);
+        const json = await res.json();
+        if (!mounted) return;
+        setProfile(json?.result ?? null);
+      } catch (e) {
+        if (!mounted) return;
+        setProfile(null);
+      }
+    }
+    // Fire once on mount
+    void load();
+    return () => { mounted = false; };
+  }, [address]);
+
+  if (!profile) {
+    // show compact address while loading or when no profile found
+    return <span className="font-bold text-sm text-[#2d1b2e]">{fallbackAddress.slice(0, 6) + '...' + fallbackAddress.slice(-4)}</span>;
+  }
+
+  const pfpUrl = profile.pfp?.url ?? null;
+  const display = profile.displayName || profile.username || (fallbackAddress.slice(0, 6) + '...' + fallbackAddress.slice(-4));
+
+  return (
+    <div className="flex items-center gap-2">
+      {pfpUrl ? (
+        // next/image requires a static src or remote domains configured; prefer native img tag here for simplicity
+        // small inline img keeps bundle minimal and avoids needing next.config changes
+        // eslint-disable-next-line @next/next/no-img-element
+        // Using img tag avoids needing external image domains in next.config
+        <img src={pfpUrl} alt="pfp" className="w-8 h-8 rounded-full object-cover" />
+      ) : null}
+      <div className="flex flex-col">
+        <span className="font-bold text-sm text-[#2d1b2e]">{display}</span>
+        {profile.username ? <span className="text-xs text-[#5a3d5c]">@{profile.username}</span> : null}
+      </div>
+    </div>
+  );
 }
 // Farcaster lookup logic removed
 
@@ -75,96 +123,6 @@ export default function Leaderboard() {
       try {
         const board = await getLeaderboard();
         setLeaderboard(board);
-
-          // Progressive Farcaster profile discovery: start polling for usernames for all addresses on the board
-          // We intentionally run this client-side and update UI as profiles appear.
-          // Non-blocking polling strategy with cache + concurrency limits:
-          // - Aggressive poll for newly-joined users (last N entries) with shorter delays.
-          // - Background poll for the rest with more relaxed timing.
-          // We intentionally don't await these so they run in the background and update UI as profiles arrive.
-          (async () => {
-            const allAddrs = board.map((b) => b.walletAddress.toLowerCase());
-            // Load any cached profiles first and apply them immediately
-            try {
-              const cached = loadCachedProfiles();
-              if (Object.keys(cached).length > 0) {
-                const normalized: Record<string, { username?: string; pfpUrl?: string }> = {};
-                for (const [k, v] of Object.entries(cached)) {
-                  normalized[k.toLowerCase()] = { username: v.username, pfpUrl: v.pfpUrl };
-                }
-                setFarcasterProfiles((prev) => ({ ...normalized, ...prev }));
-              }
-            } catch (e) {
-              // ignore cache load failures
-            }
-            const newlyJoinedCount = Math.min(10, allAddrs.length);
-            const newlyJoined = allAddrs.slice(-newlyJoinedCount);
-            const rest = allAddrs.filter((a) => !newlyJoined.includes(a));
-
-            const runPollAndApply = async (addresses: string[], attempts: number, delayMs: number, backoff: number, maxDelay: number) => {
-              try {
-                const found = await pollFarcasterUsernames(addresses, attempts, delayMs, backoff, maxDelay);
-                // For any addresses that reported a username, fetch fuller profile (pfp) and update immediately
-                await Promise.all(Array.from(found.entries()).map(async ([addr, uname]) => {
-                  try {
-                    const prof = await resolveFarcasterProfile(addr);
-                    const key = addr.toLowerCase();
-                    setFarcasterProfiles((prev) => ({
-                      ...prev,
-                      [key]: {
-                        username: prof?.username || uname,
-                        pfpUrl: prof?.pfpUrl,
-                      }
-                    }));
-                  } catch (e) {
-                    // ignore per-address failures
-                  }
-                }));
-              } catch (e) {
-                console.debug('Farcaster polling batch failed', e);
-              }
-            };
-
-            // Aggressive strategy for newly-joined users:
-            // 1) Try an immediate direct profile fetch for each newly-joined address (fast, per-address).
-            // 2) Run a tighter poll with more attempts and shorter delays.
-            if (newlyJoined.length > 0) {
-              // Immediate per-address attempts (concurrency-limited) with short retries
-              const tasks = newlyJoined.map((addr) => async () => {
-                const key = addr.toLowerCase();
-                const maxTries = 3;
-                const retryDelay = 300; // ms
-                for (let t = 0; t < maxTries; t++) {
-                  try {
-                    const prof = await resolveFarcasterProfile(addr);
-                    if (prof?.username || prof?.pfpUrl) {
-                      const update = { [key]: { username: prof.username, pfpUrl: prof.pfpUrl } };
-                      setFarcasterProfiles((prev) => ({ ...prev, ...update }));
-                      saveProfilesToCache(update);
-                      break; // success, stop retrying
-                    }
-                  } catch (e) {
-                    // swallow and retry
-                  }
-                  // small delay between retries
-                  await new Promise((r) => setTimeout(r, retryDelay));
-                }
-              });
-              void runWithConcurrency(tasks, 6);
-
-              // More aggressive polling parameters for newly joined users
-              // Increase attempts and shorten delays so usernames/pfps appear faster
-              void runPollAndApply(newlyJoined, 40, 200, 1.1, 1200);
-
-              // lookup logic removed
-            }
-
-            // Background poll for the rest (non-blocking, slightly more frequent)
-            if (rest.length > 0) {
-              // Increase attempts and run a bit faster to discover more usernames/pfps
-              void runPollAndApply(rest, 24, 600, 1.35, 3000);
-            }
-          })();
 
           // We now use OnchainKit Avatar and Name components for consistent identity rendering
 
@@ -201,16 +159,7 @@ export default function Leaderboard() {
               <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">
                 {walletTotal.toLocaleString()}
               </div>
-              {/* Farcaster profile info */}
-              {pfpUrl && (
-                <div className="flex justify-center items-center gap-2 mt-2">
-                  <Image src={pfpUrl} alt="Profile" width={32} height={32} className="w-8 h-8 rounded-full border border-[#F4A6B7]" />
-                  <span className="font-bold text-[#2d1b2e] text-sm">{displayName || username || 'User'}</span>
-                  {username && (
-                    <span className="text-xs text-[#5a3d5c]">@{username}</span>
-                  )}
-                </div>
-              )}
+              {/* Profile UI removed */}
               <div className="mt-3 flex items-center gap-2 justify-center flex-wrap">
                 <button
                   onClick={() => openShareUrl(shareLeaderboardUrl(myRank, walletTotal))}
@@ -271,23 +220,21 @@ export default function Leaderboard() {
                           <td className="py-3 align-middle w-12 font-semibold text-sm text-[#2d1b2e]">{rank}</td>
                           <td className="py-3 align-middle">
                             <div className="flex items-center gap-3">
-                              {Avatar ? (
-                                <Avatar address={addr} className="w-8 h-8 rounded-full" chain={base} />
-                              ) : (
-                                <Image
-                                  src={`/identicon-${(addr || '').slice(2, 10)}.png`}
-                                  alt="avatar"
-                                  width={32}
-                                  height={32}
-                                  className="w-8 h-8 rounded-full"
-                                />
-                              )}
-                              <div className="flex flex-col">
-                                {Name ? (
-                                  <Name address={addr} className="font-bold text-sm text-[#2d1b2e]" />
+                              <div className="w-8 h-8 rounded-full overflow-hidden">
+                                {Avatar ? (
+                                  <Avatar address={addr} className="w-8 h-8 rounded-full" chain={base} />
                                 ) : (
-                                  <span className="font-bold text-sm text-[#2d1b2e]">{addr.slice(0, 6) + '...' + addr.slice(-4)}</span>
+                                  <Image
+                                    src={`/identicon-${(addr || '').slice(2, 10)}.png`}
+                                    alt="avatar"
+                                    width={32}
+                                    height={32}
+                                    className="w-8 h-8 rounded-full"
+                                  />
                                 )}
+                              </div>
+                              <div className="flex flex-col">
+                                <FarcasterProfile address={addr} fallbackAddress={addr} />
                               </div>
                             </div>
                           </td>
