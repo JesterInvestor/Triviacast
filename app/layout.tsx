@@ -128,6 +128,68 @@ export default function RootLayout({
             `,
           }}
         />
+          {/*
+            Inline early-error detector: watches for failed resource loads (404s) for /_next/static
+            or hashed JS/CSS files. When such an error is detected, aggressively clear caches and
+            unregister service workers, then force a single reload so the browser fetches current assets.
+            The operation is guarded by a localStorage flag to avoid reload loops.
+          */}
+          <script dangerouslySetInnerHTML={{ __html: `
+            (function(){
+              try{
+                var key = '__triviacast_asset_reload_v1';
+                if (localStorage.getItem(key)) return;
+                var triggered = false;
+                function doCleanup(){
+                  if (triggered) return; triggered = true;
+                  try{
+                    var finalize = function(){
+                      try{ localStorage.setItem(key, Date.now().toString()); }catch(e){}
+                      try{ window.location.reload(); }catch(e){}
+                    };
+                    // delete all caches if available
+                    if (window.caches && caches.keys){
+                      caches.keys().then(function(names){
+                        return Promise.all(names.map(function(n){ return caches.delete(n); }));
+                      }).finally(function(){
+                        if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
+                          navigator.serviceWorker.getRegistrations().then(function(rs){
+                            return Promise.all(rs.map(function(r){ return r.unregister(); }));
+                          }).finally(finalize);
+                        } else finalize();
+                      });
+                    } else if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
+                      navigator.serviceWorker.getRegistrations().then(function(rs){
+                        return Promise.all(rs.map(function(r){ return r.unregister(); }));
+                      }).finally(finalize);
+                    } else {
+                      finalize();
+                    }
+                  }catch(e){}
+                }
+
+                window.addEventListener('error', function(ev){
+                  try{
+                    var target = ev && ev.target || ev && ev.srcElement;
+                    var url = (target && (target.src || target.href)) || (ev && ev.message) || '';
+                    if (!url) return;
+                    if (typeof url === 'string' && (url.indexOf('/_next/static') !== -1 || /\.[0-9a-f]{6,}\.(js|css)($|\?)/i.test(url))){
+                      doCleanup();
+                    }
+                  }catch(e){}
+                }, true);
+
+                // Also watch for fetch failures surfaced as unhandled rejections
+                window.addEventListener('unhandledrejection', function(ev){
+                  try{
+                    var r = ev && ev.reason;
+                    var msg = r && r.message || '';
+                    if (typeof msg === 'string' && msg.indexOf('/_next/static') !== -1) doCleanup();
+                  }catch(e){}
+                });
+              }catch(e){}
+            })();
+          ` }} />
         <script
           dangerouslySetInnerHTML={{
             __html: `
