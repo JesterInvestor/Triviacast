@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { LeaderboardEntry } from '@/types/quiz';
 import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
@@ -68,7 +68,7 @@ export default function Leaderboard() {
   const [farcasterProfiles, setFarcasterProfiles] = useState<Record<string, { username?: string; pfpUrl?: string }>>({});
 
   // Handler for manual Farcaster lookups (updates profile cache/state)
-  const handleLookupResult = (address: string, profile: { username?: string; pfpUrl?: string } | null) => {
+  const handleLookupResult = useCallback((address: string, profile: { username?: string; pfpUrl?: string } | null) => {
     const key = address.toLowerCase();
     if (profile) {
       setFarcasterProfiles((prev) => {
@@ -88,7 +88,7 @@ export default function Leaderboard() {
         return copy;
       });
     }
-  };
+  }, [account?.address, handleLookupResult]);
 
   // Simple concurrency runner: accepts array of async functions and runs up to `limit` in parallel
   async function runWithConcurrency<T>(tasks: Array<() => Promise<T>>, limit = 4) {

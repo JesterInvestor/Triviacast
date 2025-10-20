@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import type { Connector } from 'wagmi';
 
 export default function WagmiWalletConnect() {
   const { address, isConnected, connector: activeConnector } = useAccount();
@@ -16,8 +17,9 @@ export default function WagmiWalletConnect() {
     let mounted = true;
     (async () => {
       try {
-        const mod = await import('@farcaster/miniapp-sdk');
-        const sdk = (mod as any).sdk;
+  const mod = await import('@farcaster/miniapp-sdk');
+  // module shape may vary; guard safely
+  const sdk = (mod as { sdk?: { isInMiniApp?: () => Promise<boolean>; context?: unknown } }).sdk;
         if (!mounted) return;
         if (sdk && typeof sdk.isInMiniApp === 'function') {
           const val = await sdk.isInMiniApp();
@@ -40,8 +42,8 @@ export default function WagmiWalletConnect() {
     // Only attempt when we know the environment
     if (inMiniApp === null) return;
 
-    const farcasterConnector = connectors.find((c) => c.id === 'farcasterMiniApp');
-    const coinbaseConnector = connectors.find((c) => c.id === 'coinbaseWallet' || /coinbase/i.test(c.name || ''));
+  const farcasterConnector = connectors.find((c: Connector) => c.id === 'farcasterMiniApp');
+  const coinbaseConnector = connectors.find((c: Connector) => c.id === 'coinbaseWallet' || /coinbase/i.test(String(c.name || '')));
 
     (async () => {
       try {
@@ -53,8 +55,10 @@ export default function WagmiWalletConnect() {
         }
 
         // Heuristic for Base app: check for coinbase injected provider or UA containing 'Base'
-        const ua = typeof navigator !== 'undefined' ? (navigator.userAgent || '').toLowerCase() : '';
-        const hasCoinbaseProvider = typeof (window as any).ethereum !== 'undefined' && Boolean((window as any).ethereum.isCoinbaseWallet || (window as any).ethereum.isCoinbaseBrowser);
+    const ua = typeof navigator !== 'undefined' ? (navigator.userAgent || '').toLowerCase() : '';
+  const eth = typeof window !== 'undefined' ? (window as unknown as { ethereum?: unknown }).ethereum : undefined;
+  const ethProvider = (eth as { isCoinbaseWallet?: boolean; isCoinbaseBrowser?: boolean } | undefined);
+  const hasCoinbaseProvider = Boolean(ethProvider && (ethProvider.isCoinbaseWallet || ethProvider.isCoinbaseBrowser));
         const isBaseUA = ua.includes('base') || ua.includes('coinbase');
 
         if (!inMiniApp && (hasCoinbaseProvider || isBaseUA) && coinbaseConnector && coinbaseConnector.ready && !isConnected) {
