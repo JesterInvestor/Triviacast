@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
-export const dynamic = 'force-dynamic';
+export const renderMode = 'force-dynamic';
 import "./globals.css";
 import ThirdwebProvider from "@/components/ThirdwebProvider";
 import WagmiProvider from "@/components/WagmiProvider";
 import ClientOnlyWidgets from '@/components/ClientOnlyWidgets';
 import FarcasterMiniAppReady from '@/components/FarcasterMiniAppReady';
+import ClientServiceWorkerCleanup from '@/components/ClientServiceWorkerCleanup';
 
 const frame = {
   version: "1",
@@ -159,6 +160,7 @@ export default function RootLayout({
           <ThirdwebProvider>
             {/* Ensure the Farcaster miniapp hides its splash when the app is ready */}
             <FarcasterMiniAppReady />
+            <ClientServiceWorkerCleanup />
             {children}
             {/* Client-only widgets (miniapp prompt, staking prompt, toaster) */}
             <ClientOnlyWidgets />
