@@ -49,45 +49,16 @@ async function ensureOnchainKit() {
   }
 }
 
-// Minimal client-side component to fetch a single Farcaster profile by wallet address
-function FarcasterProfile({ address, fallbackAddress }: { address: string; fallbackAddress: string }) {
-  // client-only fetch
-  const [profile, setProfile] = useState<{ displayName?: string; username?: string; pfp?: { url?: string } | null } | null>(null);
-  useEffect(() => {
-    let mounted = true;
-    async function load() {
-      try {
-        const res = await fetch(`/api/neynar/user?address=${encodeURIComponent(address)}`);
-        if (!mounted) return;
-        if (!res.ok) return setProfile(null);
-        const json = await res.json();
-        if (!mounted) return;
-        setProfile(json?.result ?? null);
-      } catch (e) {
-        if (!mounted) return;
-        setProfile(null);
-      }
-    }
-    // Fire once on mount
-    void load();
-    return () => { mounted = false; };
-  }, [address]);
-
+function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string; pfp?: { url?: string } | null } | null | undefined; fallbackAddress: string }) {
   if (!profile) {
-    // show compact address while loading or when no profile found
     return <span className="font-bold text-sm text-[#2d1b2e]">{fallbackAddress.slice(0, 6) + '...' + fallbackAddress.slice(-4)}</span>;
   }
-
   const pfpUrl = profile.pfp?.url ?? null;
   const display = profile.displayName || profile.username || (fallbackAddress.slice(0, 6) + '...' + fallbackAddress.slice(-4));
-
   return (
     <div className="flex items-center gap-2">
       {pfpUrl ? (
-        // next/image requires a static src or remote domains configured; prefer native img tag here for simplicity
-        // small inline img keeps bundle minimal and avoids needing next.config changes
         // eslint-disable-next-line @next/next/no-img-element
-        // Using img tag avoids needing external image domains in next.config
         <img src={pfpUrl} alt="pfp" className="w-8 h-8 rounded-full object-cover" />
       ) : null}
       <div className="flex flex-col">
@@ -102,6 +73,7 @@ function FarcasterProfile({ address, fallbackAddress }: { address: string; fallb
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [walletTotal, setWalletTotal] = useState(0);
+  const [profiles, setProfiles] = useState<Record<string, { displayName?: string; username?: string; pfp?: { url?: string } | null } | null>>({});
   const [loading, setLoading] = useState(true);
   const account = useActiveAccount();
 
@@ -124,7 +96,50 @@ export default function Leaderboard() {
         const board = await getLeaderboard();
         setLeaderboard(board);
 
-          // We now use OnchainKit Avatar and Name components for consistent identity rendering
+        // Aggressive Neynar profile fetching: kick off concurrent fetches (client-side) for all addresses on the board.
+        // This is intentionally aggressive per user instruction "call neynar a lot". We cap concurrency to avoid overwhelming the browser.
+        const addrs = board.map((b) => b.walletAddress?.toLowerCase()).filter(Boolean) as string[];
+        const concurrency = 12;
+        const results: Record<string, any> = {};
+
+        const fetchWithRetry = async (addr: string, tries = 0): Promise<any> => {
+          try {
+            const res = await fetch(`/api/neynar/user?address=${encodeURIComponent(addr)}`);
+            if (!res.ok) return null;
+            const json = await res.json();
+            return json?.result ?? null;
+          } catch (e) {
+            if (tries < 3) {
+              await new Promise((r) => setTimeout(r, 200 * (tries + 1)));
+              return fetchWithRetry(addr, tries + 1);
+            }
+            return null;
+          }
+        };
+
+        // runN concurrently
+        const queue: Promise<void>[] = [];
+        for (let i = 0; i < addrs.length; i++) {
+          const addr = addrs[i];
+          const p = (async () => {
+            const prof = await fetchWithRetry(addr);
+            results[addr] = prof;
+          })();
+          queue.push(p);
+          // throttle concurrency
+          if (queue.length >= concurrency) {
+            await Promise.race(queue).catch(() => {});
+            // remove settled promises from queue
+            for (let j = queue.length - 1; j >= 0; j--) {
+              if ((queue[j] as any).resolved) queue.splice(j, 1);
+            }
+          }
+        }
+        await Promise.all(queue).catch(() => {});
+        // apply results
+        setProfiles((prev) => ({ ...prev, ...results }));
+
+        // We now use OnchainKit Avatar and Name components for consistent identity rendering
 
         if (account?.address) {
           const points = await getWalletTotalPoints(account.address);
@@ -234,7 +249,7 @@ export default function Leaderboard() {
                                 )}
                               </div>
                               <div className="flex flex-col">
-                                <FarcasterProfile address={addr} fallbackAddress={addr} />
+                                <ProfileDisplay profile={profiles[addr.toLowerCase()]} fallbackAddress={addr} />
                               </div>
                             </div>
                           </td>
