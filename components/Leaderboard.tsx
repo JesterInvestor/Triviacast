@@ -424,7 +424,59 @@ export default function Leaderboard() {
 
         {leaderboard.length > 0 && (
           <>
-            
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full text-left table-auto">
+                <thead>
+                  <tr className="text-xs sm:text-sm text-[#5a3d5c] border-b border-[#f3dbe0]">
+                    <th className="py-2">#</th>
+                    <th className="py-2">Player</th>
+                    <th className="py-2">T Points</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {leaderboard
+                    .slice()
+                    .sort((a, b) => b.tPoints - a.tPoints)
+                    .map((entry, i) => {
+                      const rank = i + 1;
+                      const addr = entry.walletAddress || '';
+                      const key = addr.toLowerCase();
+                      const profile = farcasterProfiles[key];
+                      const Avatar = OnchainKit.Avatar;
+                      const Name = OnchainKit.Name;
+                      return (
+                        <tr key={addr} className="border-b border-[#f8e8eb]">
+                          <td className="py-3 align-middle w-12 font-semibold text-sm text-[#2d1b2e]">{rank}</td>
+                          <td className="py-3 align-middle">
+                            <div className="flex items-center gap-3">
+                              {Avatar ? (
+                                <Avatar address={addr} className="w-8 h-8 rounded-full" chain={base} />
+                              ) : (
+                                <Image
+                                  src={`/identicon-${(addr || '').slice(2, 10)}.png`}
+                                  alt="avatar"
+                                  width={32}
+                                  height={32}
+                                  className="w-8 h-8 rounded-full"
+                                />
+                              )}
+                              <div className="flex flex-col">
+                                {Name ? (
+                                  <Name address={addr} className="font-bold text-sm text-[#2d1b2e]" />
+                                ) : (
+                                  <span className="font-bold text-sm text-[#2d1b2e]">{profile?.username || (addr.slice(0, 6) + '...' + addr.slice(-4))}</span>
+                                )}
+                                {profile?.username && <span className="text-xs text-[#5a3d5c]">@{profile.username}</span>}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{entry.tPoints.toLocaleString()}</td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
 
             <div className="mt-6 sm:mt-8 text-center">
               <Link
