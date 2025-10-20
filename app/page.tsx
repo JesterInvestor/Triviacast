@@ -7,7 +7,7 @@ import { shareAppUrl } from '@/lib/farcaster';
 
 export const dynamic = 'force-dynamic';
 
-import WalletConnect from '@/components/WalletConnect';
+import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import WalletPoints from '@/components/WalletPoints';
 import ShareButton from '@/components/ShareButton';
 import Link from 'next/link';
@@ -53,7 +53,7 @@ export default function Home() {
             <WalletPoints />
             <div className="flex flex-row items-center justify-center gap-2 w-full sm:w-auto">
               <div className="h-[40px] flex items-center">
-                <WalletConnect />
+                <WagmiWalletConnect />
               </div>
               <Link
                 href="/leaderboard"

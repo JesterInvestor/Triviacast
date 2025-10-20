@@ -1,6 +1,6 @@
 "use client";
 import Leaderboard from '@/components/Leaderboard';
-import WalletConnect from '@/components/WalletConnect';
+import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import ShareButton from '@/components/ShareButton';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -38,7 +38,7 @@ export default function LeaderboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-center sm:justify-end">
-            <WalletConnect />
+            <WagmiWalletConnect />
             <div className="flex items-center gap-2">
               <ShareButton
                 url={shareLeaderboardUrl(null, 0)}
