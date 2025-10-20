@@ -16,11 +16,16 @@ export async function GET(request: Request) {
     const cfg = new Configuration({ apiKey });
     const client = new NeynarAPIClient(cfg);
 
-    // fetchBulkUsersByEthOrSolAddress expects an object with addresses: string[]
-    const res = await client.fetchBulkUsersByEthOrSolAddress({ addresses: [address] });
-    // Normalize response
-    const user = res?.result?.user ?? null;
-    return NextResponse.json({ result: user ?? null });
+  // fetchBulkUsersByEthOrSolAddress expects an object with addresses: string[]
+  const res = await client.fetchBulkUsersByEthOrSolAddress({ addresses: [address] });
+  // Normalize response and return only username/displayName to avoid fetching avatars on the client
+  const raw = res?.result?.user ?? null;
+  if (!raw) return NextResponse.json({ result: null });
+  // raw may be an array or object; try to normalize to a single user
+  const userObj = Array.isArray(raw) ? raw[0] ?? null : raw;
+  const username = userObj?.username ?? userObj?.result?.username ?? null;
+  const displayName = userObj?.displayName ?? userObj?.result?.displayName ?? null;
+  return NextResponse.json({ result: { username: username ?? null, displayName: displayName ?? null } });
   } catch (e) {
     // If SDK is missing or call fails, return 204 to indicate no profile
     return NextResponse.json({ result: null }, { status: 204 });

@@ -49,18 +49,13 @@ async function ensureOnchainKit() {
   }
 }
 
-function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string; pfp?: { url?: string } | null } | null | undefined; fallbackAddress: string }) {
+function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string } | null | undefined; fallbackAddress: string }) {
   if (!profile) {
     return <span className="font-bold text-sm text-[#2d1b2e]">{fallbackAddress.slice(0, 6) + '...' + fallbackAddress.slice(-4)}</span>;
   }
-  const pfpUrl = profile.pfp?.url ?? null;
   const display = profile.displayName || profile.username || (fallbackAddress.slice(0, 6) + '...' + fallbackAddress.slice(-4));
   return (
     <div className="flex items-center gap-2">
-      {pfpUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={pfpUrl} alt="pfp" className="w-8 h-8 rounded-full object-cover" />
-      ) : null}
       <div className="flex flex-col">
         <span className="font-bold text-sm text-[#2d1b2e]">{display}</span>
         {profile.username ? <span className="text-xs text-[#5a3d5c]">@{profile.username}</span> : null}
@@ -73,7 +68,7 @@ function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [walletTotal, setWalletTotal] = useState(0);
-  const [profiles, setProfiles] = useState<Record<string, { displayName?: string; username?: string; pfp?: { url?: string } | null } | null>>({});
+  const [profiles, setProfiles] = useState<Record<string, { displayName?: string; username?: string } | null>>({});
   const [loading, setLoading] = useState(true);
   const account = useActiveAccount();
 
@@ -136,8 +131,12 @@ export default function Leaderboard() {
           }
         }
         await Promise.all(queue).catch(() => {});
-        // apply results
-        setProfiles((prev) => ({ ...prev, ...results }));
+        // apply results (normalize keys to lowercase)
+        const normalized: Record<string, { displayName?: string; username?: string } | null> = {};
+        for (const [k, v] of Object.entries(results)) {
+          normalized[k.toLowerCase()] = v ? { displayName: v.displayName ?? null, username: v.username ?? null } : null;
+        }
+        setProfiles((prev) => ({ ...prev, ...normalized }));
 
         // We now use OnchainKit Avatar and Name components for consistent identity rendering
 
