@@ -421,6 +421,60 @@ export default function Leaderboard() {
         {leaderboard.length > 0 && (
           <>
             <div className="mb-4 text-center text-[#5a3d5c] text-sm flex flex-col items-center">
+              <h2 className="text-lg sm:text-xl font-bold text-[#2d1b2e] mb-4">Top T Points Holders</h2>
+              <div className="overflow-x-auto -mx-2 sm:mx-0">
+                <table className="w-full min-w-[400px]">
+                  <thead>
+                    <tr className="border-b-2 border-[#F4A6B7]">
+                      <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-[#2d1b2e] font-semibold text-xs sm:text-base">Rank</th>
+                      <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-[#2d1b2e] font-semibold text-xs sm:text-base">Player</th>
+                      <th className="text-right py-2 sm:py-3 px-2 sm:px-4 text-[#2d1b2e] font-semibold text-xs sm:text-base">T Points</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leaderboard.slice(0, 5).map((entry, index) => (
+                      <tr
+                        key={entry.walletAddress}
+                        className={`border-b border-[#FFC4D1] active:bg-[#FFE4EC] transition ${index < 3 ? 'bg-[#FFF0F5]' : ''}`}
+                      >
+                        <td className="py-2 sm:py-3 px-2 sm:px-4">
+                          <div className="flex items-center gap-2">
+                            {index === 0 && <span>🥇</span>}
+                            {index === 1 && <span>🥈</span>}
+                            {index === 2 && <span>🥉</span>}
+                            <span className="font-semibold text-[#2d1b2e] text-xs sm:text-base">#{index + 1}</span>
+                          </div>
+                        </td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4">
+                          <div className="flex items-center gap-2">
+                            {farcasterProfiles[entry.walletAddress.toLowerCase()]?.pfpUrl ? (
+                              <Image src={farcasterProfiles[entry.walletAddress.toLowerCase()]?.pfpUrl || ''} alt="pfp" width={24} height={24} className="rounded-full border border-[#F4A6B7]" />
+                            ) : (
+                              (() => {
+                                const AvatarComp = OnchainKit.Avatar as unknown as React.ComponentType<any> | null;
+                                if (AvatarComp) {
+                                  return <AvatarComp address={entry.walletAddress} chain={base} className="w-6 h-6 rounded-full border border-[#F4A6B7]" />;
+                                }
+                                return <Image src={`/identicon-${entry.walletAddress.slice(2, 10)}.png`} alt="pfp" width={24} height={24} className="rounded-full border border-[#F4A6B7]" />;
+                              })()
+                            )}
+                            <div className="flex flex-col">
+                              <span className="text-[#2d1b2e] text-xs sm:text-sm font-semibold">{farcasterProfiles[entry.walletAddress.toLowerCase()]?.username || entry.walletAddress.slice(0, 8) + '...'}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-right">
+                          <span className="font-bold text-[#DC8291] text-xs sm:text-base">
+                            {entry.tPoints.toLocaleString()}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div className="mb-4 text-center text-[#5a3d5c] text-sm flex flex-col items-center">
               <div className="flex items-center justify-center gap-2 mb-1">
                 {/* Five unique SVG icons */}
                 <span className="rounded-full bg-white border-2 border-[#F4A6B7] shadow w-7 h-7 flex items-center justify-center">

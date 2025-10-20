@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useActiveAccount } from 'thirdweb/react';
-import { Account } from 'thirdweb';
 import { callDailyClaim, isDistributorConfigured } from '@/lib/distributor';
 import { getDailyClaimLabel } from '@/lib/config';
 
@@ -66,8 +65,8 @@ export default function StakingDailyClaimPrompt() {
       if (!account) throw new Error('Please connect your wallet');
 
       // Ensure `account` satisfies the `Account` type
-      const accountAsAccount = account as unknown as Account;
-
+      // Ensure `account` satisfies the expected type for callDailyClaim
+      const accountAsAccount = account as any;
       await callDailyClaim(accountAsAccount);
 
       // Notify points updated and show success toast
