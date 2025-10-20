@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import Image from 'next/image';
 
 type LookupResult = { found?: boolean; profile?: { username?: string; pfpUrl?: string }; error?: string } | null;
 

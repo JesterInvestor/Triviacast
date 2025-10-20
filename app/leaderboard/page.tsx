@@ -51,7 +51,7 @@ export default function LeaderboardPage() {
                 aria-label="Play Quiz — start 10-question timed challenge"
                 className="bg-[#FF6B99] hover:bg-[#E85C88] active:bg-[#D94E78] text-white font-extrabold py-3 px-4 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center justify-center gap-2 min-h-[44px] text-sm sm:text-base"
               >
-                <img src="/brain-small.svg" alt="Brain icon" className="w-4 h-4" aria-hidden="true" />
+                <Image src="/brain-small.svg" alt="Brain icon" width={16} height={16} aria-hidden="true" />
                 <span>Play Quiz</span>
               </Link>
             </div>

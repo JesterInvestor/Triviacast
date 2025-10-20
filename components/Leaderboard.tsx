@@ -32,6 +32,13 @@ async function ensureOnchainKit() {
       <span className={props.className}>{(props.address || '').slice(0, 8) + '...'}</span>
     );
   }
+  // Added null checks before assigning display names
+  if (OnchainKit.Avatar) {
+    OnchainKit.Avatar.displayName = 'OnchainKitAvatar';
+  }
+  if (OnchainKit.Name) {
+    OnchainKit.Name.displayName = 'OnchainKitName';
+  }
 }
 import { pollFarcasterUsernames, resolveFarcasterProfile } from '@/lib/addressResolver';
 import FarcasterLookup from './FarcasterLookup';
@@ -56,8 +63,8 @@ export default function Leaderboard() {
     const key = address.toLowerCase();
     if (profile) {
       setFarcasterProfiles((prev) => {
-  const next = { ...prev, [key]: { username: profile.username?.replace(/^@/, ''), pfpUrl: profile.pfpUrl } };
-  saveProfilesToCache(next);
+        const next = { ...prev, [key]: { username: profile.username?.replace(/^@/, ''), pfpUrl: profile.pfpUrl } };
+        saveProfilesToCache(next);
         return next;
       });
       if (account?.address && account.address.toLowerCase() === key) {
@@ -66,9 +73,9 @@ export default function Leaderboard() {
       }
     } else {
       setFarcasterProfiles((prev) => {
-  const copy = { ...prev };
-  delete copy[key];
-  saveProfilesToCache(copy);
+        const copy = { ...prev };
+        delete copy[key];
+        saveProfilesToCache(copy);
         return copy;
       });
     }
@@ -192,7 +199,7 @@ export default function Leaderboard() {
       }
     }
     loadMiniAppContext();
-    // Auto-resolve the connected user's profile if available and not already cached
+
     (async () => {
       try {
         if (account?.address) {
@@ -212,7 +219,7 @@ export default function Leaderboard() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [account?.address, farcasterProfiles]); // Added missing dependencies
 
   const displayName = mfDisplayName;
   const username = mfUsername;

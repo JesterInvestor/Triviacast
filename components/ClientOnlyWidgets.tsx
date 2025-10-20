@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import AddMiniAppPrompt from './AddMiniAppPrompt';
 import StakingDailyClaimPrompt from './StakingDailyClaimPrompt';
 import Toaster from './Toaster';
