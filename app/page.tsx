@@ -7,15 +7,14 @@ import { shareAppUrl } from '@/lib/farcaster';
 
 export const dynamic = 'force-dynamic';
 
-import WagmiWalletConnect from '@/components/WagmiWalletConnect';
+// ...existing code...
 import WalletPoints from '@/components/WalletPoints';
-import { FarcasterProfile } from '@/components/FarcasterProfile';
-import { useAccount } from 'wagmi';
+import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import ShareButton from '@/components/ShareButton';
 import Link from 'next/link';
 
 export default function Home() {
-  const { address, isConnected } = useAccount();
+  // Wallet connect handled by WagmiWalletConnect
   useEffect(() => {
     import('@farcaster/miniapp-sdk').then(mod => {
       mod.sdk.actions.ready();
@@ -43,9 +42,7 @@ export default function Home() {
           {/* Center wallet connect, leaderboard, and share button together. All buttons are the same height */}
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto justify-center">
             <WalletPoints />
-            {isConnected && address && (
-              <FarcasterProfile address={address} className="mt-2" />
-            )}
+            <WagmiWalletConnect />
             <div className="flex flex-row items-center justify-center gap-2 w-full sm:w-auto">
               <Link
                 href="/leaderboard"
@@ -60,19 +57,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        {isConnected && address ? (
-          <>
-            <div className="text-center py-4">
-              <span className="inline-block bg-green-100 text-green-700 font-semibold px-4 py-2 rounded mb-2">Wallet Connected</span>
-            </div>
-            <Quiz />
-          </>
-        ) : (
-          <div className="text-center py-12">
-            <h2 className="text-xl font-bold text-[#DC8291] mb-4">Connect your wallet to play the quiz!</h2>
-            <p className="text-[#5a3d5c] mb-4">You must connect your wallet to start playing and earning T Points.</p>
-          </div>
-        )}
+        <Quiz />
       </div>
     </div>
   );
