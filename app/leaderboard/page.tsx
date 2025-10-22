@@ -1,11 +1,12 @@
 "use client";
 import Leaderboard from '@/components/Leaderboard';
-// ...existing code...
+
+import React, { useEffect, lazy, Suspense } from 'react';
+const ThirdwebConnectButton = lazy(() => import('@/components/ThirdwebConnectButton'));
 import ShareButton from '@/components/ShareButton';
 import Link from 'next/link';
 import Image from 'next/image';
 import { shareLeaderboardUrl } from '@/lib/farcaster';
-import React, { useEffect } from 'react';
 import { sdk } from '@farcaster/miniapp-sdk';
 
 export const dynamic = 'force-dynamic';
@@ -54,11 +55,9 @@ export default function LeaderboardPage() {
                 <span>Play Quiz</span>
               </Link>
               <div className="h-[44px] flex items-center">
-                <React.Suspense fallback={null}>
-                  {typeof window !== 'undefined' && (
-                    <>{require('@/components/ThirdwebConnectButton').default()}</>
-                  )}
-                </React.Suspense>
+                <Suspense fallback={null}>
+                  {typeof window !== 'undefined' && <ThirdwebConnectButton />}
+                </Suspense>
               </div>
             </div>
             <div className="flex items-center gap-2">

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
+const ThirdwebConnectButton = lazy(() => import('@/components/ThirdwebConnectButton'));
 import Image from 'next/image';
 import Quiz from '@/components/Quiz';
 import { shareAppUrl } from '@/lib/farcaster';
@@ -55,11 +56,9 @@ export default function Home() {
               <div className="h-[40px] flex items-center">
                 {/* Wallet connect UI replaced with Thirdweb connect button */}
                 <div className="h-[40px] flex items-center">
-                  <React.Suspense fallback={null}>
-                    {typeof window !== 'undefined' && (
-                      <>{require('@/components/ThirdwebConnectButton').default()}</>
-                    )}
-                  </React.Suspense>
+                  <Suspense fallback={null}>
+                    {typeof window !== 'undefined' && <ThirdwebConnectButton />}
+                  </Suspense>
                 </div>
               </div>
               <Link
