@@ -60,7 +60,19 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <Quiz />
+        {isConnected && address ? (
+          <>
+            <div className="text-center py-4">
+              <span className="inline-block bg-green-100 text-green-700 font-semibold px-4 py-2 rounded mb-2">Wallet Connected</span>
+            </div>
+            <Quiz />
+          </>
+        ) : (
+          <div className="text-center py-12">
+            <h2 className="text-xl font-bold text-[#DC8291] mb-4">Connect your wallet to play the quiz!</h2>
+            <p className="text-[#5a3d5c] mb-4">You must connect your wallet to start playing and earning T Points.</p>
+          </div>
+        )}
       </div>
     </div>
   );

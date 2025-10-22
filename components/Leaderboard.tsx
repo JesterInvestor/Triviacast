@@ -211,6 +211,12 @@ export default function Leaderboard() {
 
         {leaderboard.length > 0 && (
           <>
+            {/* Wallet Connected message for current user */}
+            {account?.address && (
+              <div className="text-center py-4">
+                <span className="inline-block bg-green-100 text-green-700 font-semibold px-4 py-2 rounded mb-2">Wallet Connected</span>
+              </div>
+            )}
             <div className="mt-4 overflow-x-auto">
               <table className="w-full text-left table-auto">
                 <thead>

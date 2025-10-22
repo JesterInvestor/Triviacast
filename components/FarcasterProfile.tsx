@@ -18,6 +18,7 @@ interface Profile {
   activeStatus: string;
 }
 
+
 export const FarcasterProfile: React.FC<FarcasterProfileProps> = ({ address, apiKey, className }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(false);
@@ -42,16 +43,18 @@ export const FarcasterProfile: React.FC<FarcasterProfileProps> = ({ address, api
   if (!profile) return <div className={className}>No Farcaster profile found.</div>;
 
   return (
-    <div className={`flex items-center gap-3 ${className || ""}`.trim()}>
-      <img
-        src={profile.pfp?.url || `https://cdn.stamp.fyi/avatar/${address}?s=44`}
-        alt={profile.username}
-        className="rounded-full border-2 border-[#F4A6B7] w-11 h-11"
-      />
-      <div>
-        <div className="font-semibold">{profile.displayName || profile.username}</div>
-        <div className="text-xs text-gray-500">FID: {profile.fid}</div>
-        <div className="text-xs text-gray-500">{profile.username}</div>
+    <div className={`flex items-center justify-center ${className || ""}`.trim()}>
+      <div className="bg-gradient-to-r from-[#FFE4EC] to-[#E6E6FF] border-2 border-[#F4A6B7] rounded-xl shadow-md px-4 py-3 flex items-center gap-4 min-w-[220px]">
+        <img
+          src={profile.pfp?.url || `https://cdn.stamp.fyi/avatar/${address}?s=44`}
+          alt={profile.username}
+          className="rounded-full border-2 border-[#DC8291] w-12 h-12 shadow"
+        />
+        <div className="flex flex-col justify-center">
+          <span className="font-bold text-[#2d1b2e] text-base leading-tight">{profile.displayName || profile.username}</span>
+          <span className="text-xs text-[#5a3d5c] font-medium">@{profile.username}</span>
+          <span className="text-[10px] text-gray-400">FID: {profile.fid}</span>
+        </div>
       </div>
     </div>
   );
