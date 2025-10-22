@@ -12,6 +12,7 @@ import Image from 'next/image';
 const QUIZ_TIME_LIMIT = 60; // 1 minute in seconds
 const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
 
+export default function Quiz() {
   const { address: accountAddress, isConnected } = useAccount();
   const [quizState, setQuizState] = useState<QuizState>({
     questions: [],
@@ -156,6 +157,7 @@ const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
     setError(null);
   };
 
+  // Top-level returns only
   if (!quizState.quizStarted) {
     return (
       <div className="max-w-2xl mx-auto px-2 sm:px-6">
