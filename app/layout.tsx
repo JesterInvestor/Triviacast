@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 export const renderMode = 'force-dynamic';
 import "./globals.css";
 import ThirdwebProvider from "@/components/ThirdwebProvider";
-import WagmiProvider from "@/components/WagmiProvider";
+// ...existing code...
 import ClientOnlyWidgets from '@/components/ClientOnlyWidgets';
 import FarcasterMiniAppReady from '@/components/FarcasterMiniAppReady';
 import ClientServiceWorkerCleanup from '@/components/ClientServiceWorkerCleanup';
@@ -217,16 +217,14 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <WagmiProvider>
-          <ThirdwebProvider>
-            {/* Ensure the Farcaster miniapp hides its splash when the app is ready */}
-            <FarcasterMiniAppReady />
-            <ClientServiceWorkerCleanup />
-            {children}
-            {/* Client-only widgets (miniapp prompt, staking prompt, toaster) */}
-            <ClientOnlyWidgets />
-          </ThirdwebProvider>
-        </WagmiProvider>
+        <ThirdwebProvider>
+          {/* Ensure the Farcaster miniapp hides its splash when the app is ready */}
+          <FarcasterMiniAppReady />
+          <ClientServiceWorkerCleanup />
+          {children}
+          {/* Client-only widgets (miniapp prompt, staking prompt, toaster) */}
+          <ClientOnlyWidgets />
+        </ThirdwebProvider>
       </body>
     </html>
   );

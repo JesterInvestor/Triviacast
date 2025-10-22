@@ -7,7 +7,7 @@ import { shareAppUrl } from '@/lib/farcaster';
 
 export const dynamic = 'force-dynamic';
 
-import WagmiWalletConnect from '@/components/WagmiWalletConnect';
+// ...existing code...
 import WalletPoints from '@/components/WalletPoints';
 import ShareButton from '@/components/ShareButton';
 import Link from 'next/link';
@@ -53,7 +53,14 @@ export default function Home() {
             <WalletPoints />
             <div className="flex flex-row items-center justify-center gap-2 w-full sm:w-auto">
               <div className="h-[40px] flex items-center">
-                <WagmiWalletConnect />
+                {/* Wallet connect UI replaced with Thirdweb connect button */}
+                <div className="h-[40px] flex items-center">
+                  <React.Suspense fallback={null}>
+                    {typeof window !== 'undefined' && (
+                      <>{require('@/components/ThirdwebConnectButton').default()}</>
+                    )}
+                  </React.Suspense>
+                </div>
               </div>
               <Link
                 href="/leaderboard"

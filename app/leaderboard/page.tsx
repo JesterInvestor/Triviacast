@@ -1,6 +1,6 @@
 "use client";
 import Leaderboard from '@/components/Leaderboard';
-import WagmiWalletConnect from '@/components/WagmiWalletConnect';
+// ...existing code...
 import ShareButton from '@/components/ShareButton';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -38,7 +38,29 @@ export default function LeaderboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-center sm:justify-end">
-            <WagmiWalletConnect />
+            {/* Wallet connect UI replaced with Thirdweb connect button */}
+            <div className="flex items-center gap-2">
+              <ShareButton
+                url={shareLeaderboardUrl(null, 0)}
+                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[44px]"
+                ariaLabel="Share leaderboard on Farcaster"
+              />
+              <Link
+                href="/"
+                aria-label="Play Quiz — start 10-question timed challenge"
+                className="bg-[#FF6B99] hover:bg-[#E85C88] active:bg-[#D94E78] text-white font-extrabold py-3 px-4 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center justify-center gap-2 min-h-[44px] text-sm sm:text-base"
+              >
+                <Image src="/brain-small.svg" alt="Brain icon" width={16} height={16} aria-hidden="true" />
+                <span>Play Quiz</span>
+              </Link>
+              <div className="h-[44px] flex items-center">
+                <React.Suspense fallback={null}>
+                  {typeof window !== 'undefined' && (
+                    <>{require('@/components/ThirdwebConnectButton').default()}</>
+                  )}
+                </React.Suspense>
+              </div>
+            </div>
             <div className="flex items-center gap-2">
               <ShareButton
                 url={shareLeaderboardUrl(null, 0)}
