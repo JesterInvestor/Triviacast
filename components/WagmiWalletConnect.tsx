@@ -33,27 +33,27 @@ export default function WagmiWalletConnect() {
     return () => { mounted = false; };
   }, [address, isConnected]);
 
-  // Connected view: show Farcaster username (or displayName) when available, otherwise shortened address
+  // Connected view: show Farcaster username, Base avatar, and 'Wallet Connected'. No disconnect allowed.
   if (isConnected && address) {
     const label = profile?.username || profile?.displayName || `${address.slice(0,6)}…${address.slice(-4)}`;
     return (
       <div className="flex justify-end flex-1 sm:flex-initial">
         <div className="flex items-center gap-2">
+          {/* Base avatar */}
+          <img
+            src={`https://cdn.stamp.fyi/avatar/${address}?s=44`}
+            alt="Base Avatar"
+            className="rounded-full border-2 border-[#F4A6B7] w-11 h-11"
+            style={{ marginRight: '8px' }}
+          />
           <div className="px-3 py-2 bg-[#FFE4EC] text-[#5a3d5c] rounded-lg text-sm border-2 border-[#F4A6B7] font-medium min-h-[44px] flex items-center">
-            {label}
+            <span className="font-semibold mr-2">{label}</span>
             {activeConnector ? (
               <span className="ml-2 text-[10px] bg-white text-black px-2 rounded">
                 {activeConnector.id === 'farcasterMiniApp' ? 'Farcaster' : activeConnector.name}
               </span>
             ) : null}
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => disconnect()}
-              className="px-3 py-2 bg-[#F4A6B7] hover:bg-[#E8949C] text-white rounded-lg text-sm font-medium min-h-[44px]"
-            >
-              Disconnect
-            </button>
+            <span className="ml-2 text-green-600 font-bold">Wallet Connected</span>
           </div>
         </div>
       </div>

@@ -1,24 +1,20 @@
 "use client";
 import Leaderboard from '@/components/Leaderboard';
-import WagmiWalletConnect from '@/components/WagmiWalletConnect';
+// import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import ShareButton from '@/components/ShareButton';
 import Link from 'next/link';
 import Image from 'next/image';
 import { shareLeaderboardUrl } from '@/lib/farcaster';
 import React, { useEffect } from 'react';
+import { FarcasterProfile } from '@/components/FarcasterProfile';
+import { useAccount } from 'wagmi';
 import { sdk } from '@farcaster/miniapp-sdk';
 
 export const dynamic = 'force-dynamic';
 
 
 export default function LeaderboardPage() {
-  useEffect(() => {
-    (async () => {
-      try {
-        await sdk.actions.ready();
-      } catch {}
-    })();
-  }, []);
+  const { address, isConnected } = useAccount();
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1]">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
@@ -35,17 +31,20 @@ export default function LeaderboardPage() {
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e]">Leaderboard</h1>
               <p className="text-xs sm:text-sm text-[#5a3d5c]">Top Brain Power Rankings</p>
+              {/* Show Farcaster profile for connected user */}
+              {isConnected && address && (
+                <FarcasterProfile address={address} className="mt-2" />
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-center sm:justify-end">
-            <WagmiWalletConnect />
+            {/* Removed WagmiWalletConnect as requested */}
             <div className="flex items-center gap-2">
               <ShareButton
                 url={shareLeaderboardUrl(null, 0)}
                 className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[44px]"
                 ariaLabel="Share leaderboard on Farcaster"
               />
-
               <Link
                 href="/"
                 aria-label="Play Quiz — start 10-question timed challenge"

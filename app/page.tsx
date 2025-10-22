@@ -9,10 +9,13 @@ export const dynamic = 'force-dynamic';
 
 import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import WalletPoints from '@/components/WalletPoints';
+import { FarcasterProfile } from '@/components/FarcasterProfile';
+import { useAccount } from 'wagmi';
 import ShareButton from '@/components/ShareButton';
 import Link from 'next/link';
 
 export default function Home() {
+  const { address, isConnected } = useAccount();
   useEffect(() => {
     import('@farcaster/miniapp-sdk').then(mod => {
       mod.sdk.actions.ready();
@@ -40,10 +43,10 @@ export default function Home() {
           {/* Center wallet connect, leaderboard, and share button together. All buttons are the same height */}
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto justify-center">
             <WalletPoints />
+            {isConnected && address && (
+              <FarcasterProfile address={address} className="mt-2" />
+            )}
             <div className="flex flex-row items-center justify-center gap-2 w-full sm:w-auto">
-              <div className="h-[40px] flex items-center">
-                <WagmiWalletConnect />
-              </div>
               <Link
                 href="/leaderboard"
                 className="h-[40px] flex items-center rounded-md bg-[#fff] text-[#c85b86] hover:bg-[#f7f7f7] px-3 py-2 font-semibold text-xs sm:text-sm shadow transition"
