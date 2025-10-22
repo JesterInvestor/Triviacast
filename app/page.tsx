@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useEffect, lazy, Suspense } from 'react';
-const ThirdwebConnectButton = lazy(() => import('@/components/ThirdwebConnectButton'));
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import Quiz from '@/components/Quiz';
 import { shareAppUrl } from '@/lib/farcaster';
 
 export const dynamic = 'force-dynamic';
 
-// ...existing code...
+import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import WalletPoints from '@/components/WalletPoints';
 import ShareButton from '@/components/ShareButton';
 import Link from 'next/link';
@@ -54,12 +53,7 @@ export default function Home() {
             <WalletPoints />
             <div className="flex flex-row items-center justify-center gap-2 w-full sm:w-auto">
               <div className="h-[40px] flex items-center">
-                {/* Wallet connect UI replaced with Thirdweb connect button */}
-                <div className="h-[40px] flex items-center">
-                  <Suspense fallback={null}>
-                    {typeof window !== 'undefined' && <ThirdwebConnectButton />}
-                  </Suspense>
-                </div>
+                <WagmiWalletConnect />
               </div>
               <Link
                 href="/leaderboard"

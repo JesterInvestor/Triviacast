@@ -1,39 +1,39 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useActiveAccount } from 'thirdweb/react';
+import { useAccount } from 'wagmi';
 import { getWalletTotalPoints } from '@/lib/tpoints';
 
 export default function WalletPoints() {
   const [walletTotal, setWalletTotal] = useState(0);
-  const account = useActiveAccount();
+  const { address } = useAccount();
 
   useEffect(() => {
     async function fetchPoints() {
-      if (account?.address) {
-        const points = await getWalletTotalPoints(account.address);
+      if (address) {
+        const points = await getWalletTotalPoints(address);
         setWalletTotal(points);
       } else {
         setWalletTotal(0);
       }
     }
     fetchPoints();
-  }, [account?.address]);
+  }, [address]);
 
   useEffect(() => {
     const handler = () => {
       (async () => {
-        if (account?.address) {
-          const points = await getWalletTotalPoints(account.address);
+        if (address) {
+          const points = await getWalletTotalPoints(address);
           setWalletTotal(points);
         }
       })();
     };
     window.addEventListener('triviacast:pointsUpdated', handler);
     return () => { window.removeEventListener('triviacast:pointsUpdated', handler); };
-  }, [account?.address]);
+  }, [address]);
 
-  if (!account?.address || walletTotal === 0) {
+  if (!address || walletTotal === 0) {
     return null;
   }
 
