@@ -14,20 +14,9 @@ import Link from 'next/link';
 
 export default function Home() {
   useEffect(() => {
-    (async () => {
-      try {
-        const mod = await import('@farcaster/miniapp-sdk');
-        const { sdk } = mod;
-        if (sdk?.actions?.ready) {
-          sdk.actions.ready();
-          console.log('sdk.actions.ready() called');
-        } else {
-          console.log('sdk.actions.ready() not available');
-        }
-      } catch (err) {
-        console.log('Farcaster SDK not available or failed to load:', err);
-      }
-    })();
+    import('@farcaster/miniapp-sdk').then(mod => {
+      mod.sdk.actions.ready();
+    });
   }, []);
 
   return (
