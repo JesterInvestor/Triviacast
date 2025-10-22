@@ -6,14 +6,13 @@ import QuizQuestion from './QuizQuestion';
 import QuizResults from './QuizResults';
 import Timer from './Timer';
 import { calculateTPoints } from '@/lib/tpoints';
-import { useActiveAccount } from 'thirdweb/react';
+import { useAccount } from 'wagmi';
 import Image from 'next/image';
 
 const QUIZ_TIME_LIMIT = 60; // 1 minute in seconds
 const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
 
-export default function Quiz() {
-  const account = useActiveAccount();
+  const { address: accountAddress, isConnected } = useAccount();
   const [quizState, setQuizState] = useState<QuizState>({
     questions: [],
     currentQuestionIndex: 0,
@@ -171,11 +170,11 @@ export default function Quiz() {
             😎🤓 Endless bragging rights 😎🤓<br />
             🧠 Ready to prove you're a genius? 🧠
           </p>
-          {!account?.address && (
+          {!isConnected || !accountAddress ? (
             <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#F4A6B7] text-[#5a3d5c] rounded-lg text-sm sm:text-base">
               🔒 Please connect your wallet to start the quiz
             </div>
-          )}
+          ) : null}
           {error && (
             <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#DC8291] text-[#C86D7D] rounded-lg text-sm sm:text-base">
               {error}
@@ -183,7 +182,7 @@ export default function Quiz() {
           )}
           <button
             onClick={startQuiz}
-            disabled={loading || !account?.address}
+            disabled={loading || !isConnected || !accountAddress}
             className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-lg transition disabled:opacity-50 shadow-lg w-full sm:w-auto min-h-[56px]"
           >
             {loading ? 'Loading...' : 'Start Quiz'}

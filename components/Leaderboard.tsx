@@ -50,16 +50,19 @@ async function ensureOnchainKit() {
 }
 
 function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string } | null | undefined; fallbackAddress: string }) {
-  if (!profile) {
-    return <span className="font-bold text-sm text-[#2d1b2e]">{fallbackAddress.slice(0, 6) + '...' + fallbackAddress.slice(-4)}</span>;
-  }
-  const display = profile.displayName || profile.username || (fallbackAddress.slice(0, 6) + '...' + fallbackAddress.slice(-4));
+  // Only show small avatar and username (or fallback address)
+  const avatarUrl = fallbackAddress
+    ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32`
+    : '/brain-small.svg';
+  const display = profile?.username || profile?.displayName || (fallbackAddress.slice(0, 6) + '...' + fallbackAddress.slice(-4));
   return (
     <div className="flex items-center gap-2">
-      <div className="flex flex-col">
-        <span className="font-bold text-sm text-[#2d1b2e]">{display}</span>
-        {profile.username ? <span className="text-xs text-[#5a3d5c]">@{profile.username}</span> : null}
-      </div>
+      <img
+        src={avatarUrl}
+        alt={display}
+        className="w-8 h-8 rounded-full border border-[#F4A6B7] bg-white"
+      />
+      <span className="font-bold text-sm text-[#2d1b2e]">{display}</span>
     </div>
   );
 }
