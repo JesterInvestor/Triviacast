@@ -31,11 +31,7 @@ export default function ClientOnlyWidgets() {
   const content = (
     <>
       <ConnectButton client={client} />
-      {account?.address && (
-        <div className="mt-2 text-green-600 font-bold">
-          Wallet Connected: {account.address}
-        </div>
-      )}
+      {/* Wallet address display removed as requested */}
       <AddMiniAppPrompt />
       <StakingDailyClaimPrompt />
       <Toaster />
