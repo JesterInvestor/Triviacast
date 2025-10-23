@@ -13,6 +13,7 @@ const QUIZ_TIME_LIMIT = 60; // 1 minute in seconds
 const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
 
 export default function Quiz() {
+  const [isMuted, setIsMuted] = useState(false);
   const { address: accountAddress, isConnected } = useAccount();
   const [quizState, setQuizState] = useState<QuizState>({
     questions: [],
@@ -83,15 +84,17 @@ export default function Quiz() {
       if (!audioRef.current) {
         const audio = new Audio('/giggly-bubbles-222533.mp3');
         audio.loop = true;
-        audio.volume = 0.14; // lower background volume
+        audio.volume = isMuted ? 0 : 0.14; // lower background volume
         audioRef.current = audio;
+      } else {
+        audioRef.current.volume = isMuted ? 0 : 0.14;
       }
 
       // Attempt to play; if autoplay is blocked, ignore the error (user can start via interaction)
       const playPromise = audioRef.current.play();
       if (playPromise && typeof playPromise.then === 'function') {
         playPromise.catch(() => {
-          // Autoplay prevented; do nothing (we removed the mute control)
+          // Autoplay prevented; do nothing (mute control available)
         });
       }
     }
@@ -107,7 +110,7 @@ export default function Quiz() {
         try { audioRef.current.pause(); audioRef.current = null; } catch (_) { audioRef.current = null; }
       }
     };
-  }, [quizState.quizStarted, quizState.quizCompleted]);
+  }, [quizState.quizStarted, quizState.quizCompleted, isMuted]);
 
   const handleAnswer = (answer: string) => {
     const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
@@ -218,7 +221,6 @@ export default function Quiz() {
           <Timer timeRemaining={quizState.timeRemaining} />
         </div>
       </div>
-      
       <div className="mb-4">
         <div className="w-full bg-[#FFE4EC] rounded-full h-2 sm:h-3 shadow-inner">
           <div
@@ -229,15 +231,31 @@ export default function Quiz() {
           />
         </div>
       </div>
-
       <QuizQuestion
         question={quizState.questions[quizState.currentQuestionIndex]}
         onAnswer={handleAnswer}
         answered={quizState.answers[quizState.currentQuestionIndex] !== null}
       />
-      
       <div className="mt-4 text-center text-[#2d1b2e] font-semibold text-base sm:text-lg">
         Score: {quizState.score} / {quizState.currentQuestionIndex + (quizState.answers[quizState.currentQuestionIndex] !== null ? 1 : 0)}
+      </div>
+      <div className="fixed bottom-0 left-0 w-full flex justify-center items-center py-4 bg-transparent pointer-events-none">
+        <button
+          className="pointer-events-auto bg-[#FFE4EC] hover:bg-[#F4A6B7] text-[#2d1b2e] font-bold px-4 py-2 rounded-full shadow transition flex items-center gap-2"
+          onClick={() => setIsMuted(m => !m)}
+          aria-label={isMuted ? 'Unmute quiz music' : 'Mute quiz music'}
+        >
+          {isMuted ? (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12v.01M19.5 12a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0zm-7.5 3.75V8.25" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 9v6h4l5 5V4L7 9H3z" />
+            </svg>
+          )}
+          {isMuted ? 'Unmute' : 'Mute'}
+        </button>
       </div>
     </div>
   );

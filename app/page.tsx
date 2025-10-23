@@ -51,9 +51,11 @@ export default function Home() {
               >
                 Leaderboard
               </Link>
-              <div className="h-[40px] flex items-center rounded-md bg-[#c85b86] px-3 py-2 shadow transition">
-                <ShareButton url={shareAppUrl()} />
-              </div>
+              <ShareButton
+                url={shareAppUrl()}
+                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[44px]"
+                ariaLabel="Share app on Farcaster"
+              />
             </div>
           </div>
         </div>
