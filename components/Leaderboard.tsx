@@ -50,19 +50,17 @@ async function ensureOnchainKit() {
 }
 
 function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string } | null | undefined; fallbackAddress: string }) {
-  // Only show small avatar and username (or fallback address)
+  // Show Farcaster username (or ENS) if available, otherwise fallback to shortened wallet address
   const avatarUrl = fallbackAddress
     ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32`
-    : '/brain-small.svg';
+    : undefined;
   const display = profile?.username || profile?.displayName || (fallbackAddress.slice(0, 6) + '...' + fallbackAddress.slice(-4));
   return (
     <div className="flex items-center gap-2">
-      <img
-        src={avatarUrl}
-        alt={display}
-        className="w-8 h-8 rounded-full border border-[#F4A6B7] bg-white"
-      />
-      <span className="font-bold text-sm text-[#2d1b2e]">{display}</span>
+      {avatarUrl && (
+        <img src={avatarUrl} alt="avatar" className="rounded-full w-8 h-8" />
+      )}
+      <span className="font-bold text-[#2d1b2e] text-base sm:text-lg">{display}</span>
     </div>
   );
 }
@@ -75,7 +73,7 @@ export default function Leaderboard() {
   const [loading, setLoading] = useState(true);
   const account = useActiveAccount();
 
-  // Farcaster lookup logic removed — leaderboard shows wallet addresses only
+  // Farcaster lookup logic enabled — leaderboard shows Farcaster username if available
 
   // Farcaster context and lookup removed; nothing to do here
 
