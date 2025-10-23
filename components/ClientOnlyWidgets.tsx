@@ -5,9 +5,12 @@ import AddMiniAppPrompt from './AddMiniAppPrompt';
 import StakingDailyClaimPrompt from './StakingDailyClaimPrompt';
 import Toaster from './Toaster';
 import ClientErrorBoundary from './ClientErrorBoundary';
+import { useActiveAccount, ConnectButton } from 'thirdweb/react';
+import { client } from '@/lib/thirdwebClient';
 
 export default function ClientOnlyWidgets() {
   const [MiniAppProviderComp, setMiniAppProviderComp] = useState<React.ComponentType<React.PropsWithChildren<unknown>> | null>(null);
+  const account = useActiveAccount();
 
   useEffect(() => {
     let mounted = true;
@@ -27,6 +30,12 @@ export default function ClientOnlyWidgets() {
 
   const content = (
     <>
+      <ConnectButton client={client} />
+      {account?.address && (
+        <div className="mt-2 text-green-600 font-bold">
+          Wallet Connected: {account.address}
+        </div>
+      )}
       <AddMiniAppPrompt />
       <StakingDailyClaimPrompt />
       <Toaster />
