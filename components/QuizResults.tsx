@@ -42,6 +42,7 @@ export default function QuizResults({
 
   // Save points when component mounts
   useEffect(() => {
+    if (!account?.address || tPoints === 0 || pointsSaved) return;
     async function savePoints() {
       // Debug: log key state so we can see why on-chain save might be skipped
       console.info('[Triviacast] savePoints called', {
@@ -51,18 +52,16 @@ export default function QuizResults({
         activeAccount: account?.address,
       });
 
-      if (!account?.address || tPoints === 0 || pointsSaved) return;
-
       setSavingPoints(true);
       setSaveError(null);
       try {
         // Always save to localStorage first
-        await addWalletTPoints(account.address, tPoints);
+        await addWalletTPoints(account!.address, tPoints);
 
         // If contract is configured, also save to blockchain
         if (isContractConfigured()) {
           try {
-            await addPointsOnChain(account, account.address, tPoints);
+            await addPointsOnChain(account!, account!.address, tPoints);
             console.log('Points saved to blockchain successfully');
           } catch (error) {
             console.warn('Failed to save points to blockchain:', error);
