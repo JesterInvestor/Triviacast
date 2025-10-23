@@ -243,22 +243,7 @@ export default function Leaderboard() {
                           <td className="py-3 align-middle w-12 font-semibold text-sm text-[#2d1b2e]">{rank}</td>
                           <td className="py-3 align-middle">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full overflow-hidden">
-                                {Avatar ? (
-                                  <Avatar address={addr} className="w-8 h-8 rounded-full" chain={base} />
-                                ) : (
-                                  <Image
-                                    src={`/identicon-${(addr || '').slice(2, 10)}.png`}
-                                    alt="avatar"
-                                    width={32}
-                                    height={32}
-                                    className="w-8 h-8 rounded-full"
-                                  />
-                                )}
-                              </div>
-                              <div className="flex flex-col">
-                                <ProfileDisplay profile={profiles[addr.toLowerCase()]} fallbackAddress={addr} />
-                              </div>
+                              <ProfileDisplay profile={profiles[addr.toLowerCase()]} fallbackAddress={addr} />
                             </div>
                           </td>
                           <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{entry.tPoints.toLocaleString()}</td>
