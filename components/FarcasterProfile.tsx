@@ -40,7 +40,7 @@ export const FarcasterProfile: React.FC<FarcasterProfileProps> = ({ address, api
 
   if (loading) return <div className={className}>Loading Farcaster profile...</div>;
   if (error) return <div className={className}>Error: {error}</div>;
-  if (!profile) return <div className={className}>No Farcaster profile found.</div>;
+  if (!profile) return null;
 
   return (
     <div className={`flex items-center justify-center ${className || ""}`.trim()}>
