@@ -1,23 +1,33 @@
 "use client";
 import Leaderboard from '@/components/Leaderboard';
-// import WagmiWalletConnect from '@/components/WagmiWalletConnect';
+import ClientOnlyWidgets from '@/components/ClientOnlyWidgets';
 import ShareButton from '@/components/ShareButton';
 import Link from 'next/link';
 import Image from 'next/image';
 import { shareLeaderboardUrl } from '@/lib/farcaster';
 import React, { useEffect } from 'react';
 import { FarcasterProfile } from '@/components/FarcasterProfile';
-import { useAccount } from 'wagmi';
+import { useActiveAccount } from 'thirdweb/react';
 import { sdk } from '@farcaster/miniapp-sdk';
 
 export const dynamic = 'force-dynamic';
 
 
 export default function LeaderboardPage() {
-  const { address, isConnected } = useAccount();
+  const account = useActiveAccount();
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1]">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        {/* Top section: Farcaster profile and wallet connect */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sm:mb-8">
+          <div className="flex flex-col items-start gap-2 w-full sm:w-auto">
+            {account?.address && (
+              <FarcasterProfile address={account.address} className="mb-2" />
+            )}
+            <ClientOnlyWidgets />
+          </div>
+        </div>
+        {/* Header and leaderboard */}
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3 sm:gap-4">
             <Image 
@@ -31,14 +41,9 @@ export default function LeaderboardPage() {
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e]">Leaderboard</h1>
               <p className="text-xs sm:text-sm text-[#5a3d5c]">Top Brain Power Rankings</p>
-              {/* Show Farcaster profile for connected user */}
-              {isConnected && address && (
-                <FarcasterProfile address={address} className="mt-2" />
-              )}
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-center sm:justify-end">
-            {/* Removed WagmiWalletConnect as requested */}
             <div className="flex items-center gap-2">
               <ShareButton
                 url={shareLeaderboardUrl(null, 0)}

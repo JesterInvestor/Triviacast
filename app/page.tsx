@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 // ...existing code...
 import WalletPoints from '@/components/WalletPoints';
-import WagmiWalletConnect from '@/components/WagmiWalletConnect';
+import ClientOnlyWidgets from '@/components/ClientOnlyWidgets';
 import ShareButton from '@/components/ShareButton';
 import Link from 'next/link';
 
@@ -42,7 +42,7 @@ export default function Home() {
           {/* Center wallet connect, leaderboard, and share button together. All buttons are the same height */}
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto justify-center">
             <WalletPoints />
-            <WagmiWalletConnect />
+            <ClientOnlyWidgets />
             <div className="flex flex-row items-center justify-center gap-2 w-full sm:w-auto">
               <Link
                 href="/leaderboard"
