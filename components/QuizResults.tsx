@@ -2,7 +2,7 @@
 
 import { Question } from '@/types/quiz';
 import Link from 'next/link';
-import { useActiveAccount, useSignMessage } from 'thirdweb/react';
+import { useActiveAccount } from 'thirdweb/react';
 import { signMessage } from 'thirdweb/utils';
 import { useEffect, useState } from 'react';
 import { addPointsOnChain, isContractConfigured } from '@/lib/contract';
@@ -37,7 +37,9 @@ export default function QuizResults({
 }: QuizResultsProps) {
   const percentage = Math.round((score / totalQuestions) * 100);
   const account = useActiveAccount();
-  const { signMessage, isLoading: signing, error: signError } = useSignMessage();
+  // Use signMessage from thirdweb/utils, not a hook
+  const [signing, setSigning] = useState(false);
+  const [signError, setSignError] = useState<Error | null>(null);
   const [savingPoints, setSavingPoints] = useState(false);
   const [pointsSaved, setPointsSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -54,7 +56,6 @@ export default function QuizResults({
     }
     // All async/await and try/catch must be inside this async function
     const savePoints = async () => {
-      // Debug: log key state so we can see why on-chain save might be skipped
       console.info('[Triviacast] savePoints called', {
         tPoints,
         pointsSaved,
@@ -64,13 +65,19 @@ export default function QuizResults({
 
       setSavingPoints(true);
       setSaveError(null);
+      setSigning(true);
+      setSignError(null);
       try {
         // Require user to sign a message before awarding T Points
         const message = `I am claiming ${tPoints} T Points for completing the Triviacast quiz on ${new Date().toISOString()}`;
         console.debug('[Triviacast] Requesting signature:', { address: account!.address, message });
-        const signature = await signMessage({ message });
-        if (!signature) {
+        let signature;
+        try {
+          signature = await signMessage({ message, account });
+        } catch (err) {
+          setSignError(err as Error);
           setSaveError('Signature was not provided. T Points cannot be awarded.');
+          setSigning(false);
           setSavingPoints(false);
           return;
         }
@@ -98,6 +105,7 @@ export default function QuizResults({
         console.error('Failed to save points (local or blockchain):', error);
         setSaveError('Failed to save points. Please try again and score even better this time.');
       } finally {
+        setSigning(false);
         setSavingPoints(false);
       }
     };
