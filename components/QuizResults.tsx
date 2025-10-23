@@ -35,7 +35,7 @@ export default function QuizResults({
   onRestart 
 }: QuizResultsProps) {
   const percentage = Math.round((score / totalQuestions) * 100);
-  const { address: accountAddress, isConnected } = useAccount();
+  const account = useActiveAccount();
   const [savingPoints, setSavingPoints] = useState(false);
   const [pointsSaved, setPointsSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -45,35 +45,33 @@ export default function QuizResults({
     async function savePoints() {
       // Debug: log key state so we can see why on-chain save might be skipped
       console.info('[Triviacast] savePoints called', {
-    const account = useActiveAccount();
         tPoints,
         pointsSaved,
         contractConfigured: isContractConfigured(),
+        activeAccount: account?.address,
       });
 
-      if (!isConnected || !accountAddress || tPoints === 0 || pointsSaved) return;
+      if (!account?.address || tPoints === 0 || pointsSaved) return;
 
       setSavingPoints(true);
       setSaveError(null);
-          activeAccount: account?.address,
       try {
         // Always save to localStorage first
-  await addWalletTPoints(accountAddress, tPoints);
+        await addWalletTPoints(account.address, tPoints);
 
         // If contract is configured, also save to blockchain
-        if (!account?.address || tPoints === 0 || pointsSaved) return;
+        if (isContractConfigured()) {
           try {
-            await addPointsOnChain({ address: accountAddress }, accountAddress, tPoints);
+            await addPointsOnChain(account, account.address, tPoints);
             console.log('Points saved to blockchain successfully');
           } catch (error) {
             console.warn('Failed to save points to blockchain:', error);
             setSaveError('You forgot to confirm the transaction. T Points failed to save to blockchain. Just try again and ');
-          await addWalletTPoints(account.address, tPoints);
+          }
         }
 
         setPointsSaved(true);
       } catch (error) {
-              await addPointsOnChain(account, account.address, tPoints);
         setSaveError('Failed to save points. Please try again and score even better this time.');
       } finally {
         setSavingPoints(false);
