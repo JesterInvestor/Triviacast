@@ -42,7 +42,14 @@ export default function QuizResults({
 
   // Save points when component mounts
   useEffect(() => {
-    if (!account?.address || tPoints === 0 || pointsSaved) return;
+    if (!account?.address || tPoints === 0 || pointsSaved) {
+      console.debug('[Triviacast] Skipping savePoints:', {
+        account,
+        tPoints,
+        pointsSaved
+      });
+      return;
+    }
     async function savePoints() {
       // Debug: log key state so we can see why on-chain save might be skipped
       console.info('[Triviacast] savePoints called', {
@@ -56,21 +63,26 @@ export default function QuizResults({
       setSaveError(null);
       try {
         // Always save to localStorage first
+        console.debug('[Triviacast] addWalletTPoints', { address: account!.address, tPoints });
         await addWalletTPoints(account!.address, tPoints);
 
         // If contract is configured, also save to blockchain
         if (isContractConfigured()) {
           try {
+            console.debug('[Triviacast] Calling addPointsOnChain', { account, address: account!.address, tPoints });
             await addPointsOnChain(account!, account!.address, tPoints);
             console.log('Points saved to blockchain successfully');
           } catch (error) {
-            console.warn('Failed to save points to blockchain:', error);
-            setSaveError('You forgot to confirm the transaction. T Points failed to save to blockchain. Just try again and ');
+            console.error('Failed to save points to blockchain:', error);
+            setSaveError('You forgot to confirm the transaction or there was a blockchain error. T Points failed to save to blockchain. Try again and check your wallet.');
           }
+        } else {
+          console.warn('[Triviacast] Contract not configured, skipping blockchain save');
         }
 
         setPointsSaved(true);
       } catch (error) {
+        console.error('Failed to save points (local or blockchain):', error);
         setSaveError('Failed to save points. Please try again and score even better this time.');
       } finally {
         setSavingPoints(false);
