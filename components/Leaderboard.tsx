@@ -54,7 +54,7 @@ function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?
   const avatarUrl = fallbackAddress
     ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32`
     : undefined;
-  const display = profile?.username || profile?.displayName || 'No username found.';
+  const display = profile?.username || profile?.displayName || fallbackAddress;
   return (
     <div className="flex items-center gap-2">
       {avatarUrl && (
