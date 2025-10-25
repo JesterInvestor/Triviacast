@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ProfileCard } from '@/components/ProfileCard';
+import { NeynarCastCard } from '@/components/NeynarCastCard';
 import NeynarUserDropdown from '@/components/NeynarUserDropdown';
 
 type Cast = {
@@ -99,9 +100,12 @@ export default function FarcasterLookupPage() {
                   <h3 className="font-bold text-[#2d1b2e] text-base mb-2">Recent Casts</h3>
                   <ul className="space-y-2">
                     {result.profile.casts.map((cast: Cast, idx: number) => (
-                      <li key={cast.hash || idx} className="bg-gradient-to-r from-pink-50 to-blue-50 rounded-lg p-3 shadow">
-                        <div className="text-sm text-[#2d1b2e]">{cast.text || <span className="italic text-gray-400">(No text)</span>}</div>
-                        <div className="text-xs text-gray-400 mt-1">{cast.timestamp ? new Date(cast.timestamp).toLocaleString() : ''}</div>
+                      <li key={cast.hash || idx}>
+                        <NeynarCastCard
+                          identifier={cast.hash || ''}
+                          renderEmbeds={true}
+                          type="url"
+                        />
                       </li>
                     ))}
                   </ul>
