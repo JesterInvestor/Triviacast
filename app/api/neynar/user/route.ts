@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 
 function normalizeEthOrSolAddress(input: string): string | null {
@@ -43,6 +44,43 @@ export async function GET(request: Request) {
       return NextResponse.json({ result: userObj, rawResponse: res });
     }
     return NextResponse.json({ result: userObj });
+  } catch (e) {
+    return new NextResponse(null, { status: 204 });
+  }
+
+}
+
+export async function POST(request: Request) {
+  try {
+    const apiKey = process.env.NEYNAR_API_KEY;
+    if (!apiKey) return new NextResponse(null, { status: 204 });
+
+    const mod = await import('@neynar/nodejs-sdk');
+    const { NeynarAPIClient, Configuration } = mod as any;
+    const cfg = new Configuration({ apiKey });
+    const client = new NeynarAPIClient(cfg);
+
+    const body = await request.json();
+    let addresses = body.addresses;
+    if (!Array.isArray(addresses) || addresses.length === 0) {
+      return NextResponse.json({ error: 'missing addresses array' }, { status: 400 });
+    }
+
+    // Normalize addresses
+    addresses = addresses
+      .map((addr: string) => normalizeEthOrSolAddress(addr))
+      .filter(Boolean);
+    if (addresses.length === 0) {
+      return NextResponse.json({ error: 'no valid addresses' }, { status: 400 });
+    }
+
+    const res = await client.fetchBulkUsersByEthOrSolAddress({ addresses });
+    const rawUsers = res?.result?.user ?? res?.result ?? res ?? null;
+    if (!rawUsers) return NextResponse.json({ result: null });
+    const userArr = Array.isArray(rawUsers) ? rawUsers : [rawUsers];
+
+    // Flatten: return the user array as result so clients can read json.result[n].custodyAddress, etc.
+    return NextResponse.json({ result: userArr });
   } catch (e) {
     return new NextResponse(null, { status: 204 });
   }
