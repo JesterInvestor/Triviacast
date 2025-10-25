@@ -77,8 +77,8 @@ export async function POST(request: Request) {
     // Debug: log incoming addresses
     console.log('[Neynar API] Incoming addresses:', addresses);
 
-    let addressToProfile: Record<string, any> = {};
-    let errors: Record<string, string> = {};
+  const addressToProfile: Record<string, any> = {};
+  const errors: Record<string, string> = {};
     try {
       // Fetch full user profiles by wallet address
       const res = await client.fetchBulkUsersByEthOrSolAddress({ addresses });
