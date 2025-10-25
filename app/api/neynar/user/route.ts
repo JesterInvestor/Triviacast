@@ -53,7 +53,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const apiKey = process.env.NEYNAR_API_KEY;
-  if (!apiKey) return NextResponse.json({ error: 'missing NEYNAR_API_KEY' }, { status: 500 });
+    if (!apiKey) return NextResponse.json({ error: 'missing NEYNAR_API_KEY' }, { status: 500 });
 
     const mod = await import('@neynar/nodejs-sdk');
     const { NeynarAPIClient, Configuration } = mod as any;
@@ -74,30 +74,47 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No valid addresses after normalization.' }, { status: 400 });
     }
 
-    // Fetch full user profiles by wallet address
-    const res = await client.fetchBulkUsersByEthOrSolAddress({ addresses });
-    console.log('Neynar API response:', JSON.stringify(res, null, 2));
-    const rawUsers = res?.result?.user ?? res?.result ?? res ?? null;
-    if (!rawUsers) return NextResponse.json({ error: 'No users found for provided addresses.', result: null });
-    const userArr = Array.isArray(rawUsers) ? rawUsers : [rawUsers];
+    // Debug: log incoming addresses
+    console.log('[Neynar API] Incoming addresses:', addresses);
 
-    // Map address to profile info (fully hydrated)
-    const addressToProfile: Record<string, any> = {};
-    for (const user of userArr) {
-      addressToProfile[user.custody_address?.toLowerCase() || ''] = {
-        fid: user.fid,
-        username: user.username,
-        displayName: user.display_name,
-        avatarImgUrl: user.pfp_url,
-        bio: user.profile?.bio?.text ?? '',
-        followers: user.follower_count ?? 0,
-        following: user.following_count ?? 0,
-        hasPowerBadge: user.power_badge ?? false,
-      };
+    let addressToProfile: Record<string, any> = {};
+    let errors: Record<string, string> = {};
+    try {
+      // Fetch full user profiles by wallet address
+      const res = await client.fetchBulkUsersByEthOrSolAddress({ addresses });
+      console.log('[Neynar API] Raw response:', JSON.stringify(res, null, 2));
+      const rawUsers = res?.result?.user ?? res?.result ?? res ?? null;
+      if (!rawUsers) {
+        errors['all'] = 'No users found for provided addresses.';
+      } else {
+        const userArr = Array.isArray(rawUsers) ? rawUsers : [rawUsers];
+        for (const user of userArr) {
+          const key = user.custody_address?.toLowerCase() || '';
+          if (!key) {
+            errors['unknown'] = 'Missing custody_address for user.';
+            continue;
+          }
+          addressToProfile[key] = {
+            fid: user.fid,
+            username: user.username,
+            displayName: user.display_name,
+            avatarImgUrl: user.pfp_url,
+            bio: user.profile?.bio?.text ?? '',
+            followers: user.follower_count ?? 0,
+            following: user.following_count ?? 0,
+            hasPowerBadge: user.power_badge ?? false,
+          };
+        }
+      }
+    } catch (err) {
+      console.error('[Neynar API] Error fetching profiles:', err);
+      errors['api'] = String(err);
     }
 
-    return NextResponse.json({ result: addressToProfile });
+    // Always return partial results and errors
+    return NextResponse.json({ result: addressToProfile, errors });
   } catch (e) {
-  return NextResponse.json({ error: 'unexpected error', details: String(e) }, { status: 500 });
+    console.error('[Neynar API] Unexpected error:', e);
+    return NextResponse.json({ error: 'unexpected error', details: String(e) }, { status: 500 });
   }
 }
