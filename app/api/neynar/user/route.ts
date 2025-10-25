@@ -84,37 +84,63 @@ export async function POST(request: Request) {
       const res = await client.fetchBulkUsersByEthOrSolAddress({ addresses });
       console.log('[Neynar API] Raw response:', JSON.stringify(res, null, 2));
       const rawUsers = res?.result?.user ?? res?.result ?? res ?? null;
-      if (!rawUsers) {
-        errors['all'] = 'No users found for provided addresses.';
-      } else {
-        const userArr = Array.isArray(rawUsers) ? rawUsers : [rawUsers];
-        for (const user of userArr) {
-          const key = user.custody_address?.toLowerCase() || '';
-          if (!key) {
-            errors['unknown'] = 'Missing custody_address for user.';
-            continue;
+      // Normalize addresses
+      const normalizedAddresses = addresses
+        .map((addr: string) => {
+          let a = normalizeEthOrSolAddress(addr);
+          if (a && !a.startsWith('0x') && a.length === 40) a = '0x' + a;
+          return a ? a.toLowerCase() : null;
+        })
+        .filter(Boolean);
+      if (normalizedAddresses.length === 0) {
+        return NextResponse.json({ error: 'No valid addresses after normalization.' }, { status: 400 });
+      }
+
+      // Debug: log incoming addresses
+      console.log('[Neynar API] Incoming addresses:', normalizedAddresses);
+
+      const addressToProfile: Record<string, any> = {};
+      const errors: Record<string, string> = {};
+      try {
+        // Fetch full user profiles by wallet address
+        const res = await client.fetchBulkUsersByEthOrSolAddress({ addresses: normalizedAddresses });
+        console.log('[Neynar API] Raw response:', JSON.stringify(res, null, 2));
+        // Neynar returns a mapping: address -> [user, ...]
+        for (const addr of normalizedAddresses) {
+          const key = addr.toLowerCase();
+          const users = res[key];
+          if (Array.isArray(users) && users.length > 0) {
+            // Use the first user (most cases only one)
+            const user = users[0];
+            addressToProfile[key] = {
+              fid: user.fid,
+              username: user.username,
+              displayName: user.display_name,
+              avatarImgUrl: user.pfp_url,
+              bio: user.profile?.bio?.text ?? '',
+              followers: user.follower_count ?? 0,
+              following: user.following_count ?? 0,
+              hasPowerBadge: user.power_badge ?? false,
+              custody_address: user.custody_address,
+              verified_addresses: user.verified_addresses,
+            };
+          } else {
+            errors[key] = 'No Farcaster profile found for this address.';
           }
-          addressToProfile[key] = {
-            fid: user.fid,
-            username: user.username,
-            displayName: user.display_name,
-            avatarImgUrl: user.pfp_url,
-            bio: user.profile?.bio?.text ?? '',
-            followers: user.follower_count ?? 0,
-            following: user.following_count ?? 0,
-            hasPowerBadge: user.power_badge ?? false,
-          };
+        }
+      } catch (err) {
+        console.error('[Neynar API] Error fetching profiles:', err);
+        // If API fails, mark all as error
+        for (const addr of normalizedAddresses) {
+          const key = addr.toLowerCase();
+          errors[key] = 'Neynar API error: ' + String(err);
         }
       }
-    } catch (err) {
-      console.error('[Neynar API] Error fetching profiles:', err);
-      errors['api'] = String(err);
-    }
 
-    // Always return partial results and errors
-    return NextResponse.json({ result: addressToProfile, errors });
-  } catch (e) {
-    console.error('[Neynar API] Unexpected error:', e);
-    return NextResponse.json({ error: 'unexpected error', details: String(e) }, { status: 500 });
+      // Always return a result for every address
+      return NextResponse.json({ result: addressToProfile, errors });
+    } catch (e) {
+      console.error('[Neynar API] Unexpected error:', e);
+      return NextResponse.json({ error: 'unexpected error', details: String(e) }, { status: 500 });
   }
 }
