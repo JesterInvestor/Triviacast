@@ -52,7 +52,7 @@ async function ensureOnchainKit() {
 function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string; avatarImgUrl?: string; fid?: number; bio?: string; followers?: number; following?: number; hasPowerBadge?: boolean } | null | undefined; fallbackAddress: string }) {
   // Use avatar from profile if available, else fallback to stamp
   const avatarUrl = profile?.avatarImgUrl || (fallbackAddress ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32` : undefined);
-  const display = profile?.username || profile?.displayName || "Unknown User";
+  const display = profile?.username || profile?.displayName || "Get on Facaster bro";
   return (
     <div className="flex items-center gap-2">
       {avatarUrl && (
