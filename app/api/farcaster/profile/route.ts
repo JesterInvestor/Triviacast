@@ -41,6 +41,9 @@ export async function POST(req: Request) {
       profile = await resolveFarcasterProfile(address);
     }
 
+    if (!username && !address) {
+      return NextResponse.json({ error: 'username or address required' }, { status: 400 });
+    }
     if (!profile) return NextResponse.json({ found: false, profile: null }, { status: 200 });
     return NextResponse.json({ found: true, profile }, { status: 200 });
   } catch (e) {
