@@ -4,6 +4,12 @@ import { useState } from 'react';
 import { ProfileCard } from '@/components/ProfileCard';
 import NeynarUserDropdown from '@/components/NeynarUserDropdown';
 
+type Cast = {
+  hash?: string;
+  text?: string;
+  timestamp?: string;
+};
+
 type LookupResult = {
   found?: boolean;
   profile?: {
@@ -16,6 +22,7 @@ type LookupResult = {
     hasPowerBadge?: boolean;
     isFollowing?: boolean;
     isOwnProfile?: boolean;
+    casts?: Cast[];
   };
   error?: string;
 } | null;
@@ -57,7 +64,7 @@ export default function FarcasterLookupPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] text-center">Farcaster Profile Lookup</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] text-center">Farcaster Profile Lookup </h1>
           <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Enter a Farcaster username to fetch the Farcaster profile.</p>
           <div className="flex flex-col items-center gap-2 w-full max-w-md bg-white rounded-xl border-2 border-[#F4A6B7] shadow-md px-4 py-4">
             <NeynarUserDropdown value={username} onChange={setUsername} />

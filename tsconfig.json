@@ -5,13 +5,20 @@
     "target": "ESNext",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "strict": true,
     "noEmit": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-  "jsx": "react-jsx",
+    "jsx": "preserve",
+    "types": [
+      "react"
+    ],
     "incremental": true,
     "plugins": [
       {
@@ -19,12 +26,23 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
   "ts-node": {
     "esm": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "hardhat", "contracts/hardhat"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "hardhat",
+    "contracts/hardhat"
+  ]
 }
