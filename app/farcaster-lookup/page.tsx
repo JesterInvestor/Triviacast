@@ -1,3 +1,6 @@
+
+import React from 'react';
+import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 "use client";
 
 import { useState } from 'react';
@@ -71,7 +74,10 @@ export default function FarcasterLookupPage() {
       {/* Wallet connect at top */}
       <div className="w-full flex flex-col items-center justify-center pt-4 pb-2">
         {/* Dynamically import to avoid SSR issues if needed */}
-        {require('@/components/WagmiWalletConnect').default()}
+import React from 'react';
+import WagmiWalletConnect from '@/components/WagmiWalletConnect';
+
+  <WagmiWalletConnect />
       </div>
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
