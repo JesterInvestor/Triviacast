@@ -64,33 +64,36 @@ export default function FarcasterLookupPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] text-center">Farcaster Profile Lookup </h1>
+            <div className="flex flex-col items-center">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] text-center">Farcaster Profile Lookup</h1>
+            <span className="text-xs text-[#5a3d5c] mt-1">powered by <strong className="text-[#2d1b2e]">neynar</strong></span>
+            </div>
           <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Enter a Farcaster username to fetch the Farcaster profile.</p>
           <div className="flex flex-col items-center gap-2 w-full max-w-md bg-white rounded-xl border-2 border-[#F4A6B7] shadow-md px-4 py-4">
             <NeynarUserDropdown value={username} onChange={setUsername} />
             <button onClick={lookup} disabled={loading} className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg transition shadow-md w-full">{loading ? 'Loading...' : 'Lookup'}</button>
           </div>
           {error && <div className="text-red-600 mt-2">{error}</div>}
-          {result && result.profile && (
+          {result && (result.profile || result.username) && (
             <div className="mt-4 bg-white p-4 rounded-xl shadow-md w-full max-w-md flex flex-col items-center">
               <ProfileCard
-                avatarImgUrl={result.profile.pfpUrl || "https://i.imgur.com/naZWL9n.gif"}
-                bio={result.profile.bio || "No bio available."}
-                displayName={result.profile.displayName || result.profile.username || "Unknown"}
-                followers={result.profile.followers || 0}
-                following={result.profile.following || 0}
-                hasPowerBadge={!!result.profile.hasPowerBadge}
-                isFollowing={!!result.profile.isFollowing}
-                isOwnProfile={!!result.profile.isOwnProfile}
+                avatarImgUrl={(result.profile?.pfpUrl || result.pfpUrl) ?? "https://i.imgur.com/naZWL9n.gif"}
+                bio={(result.profile?.bio || result.bio) ?? "No bio available."}
+                displayName={(result.profile?.displayName || result.displayName || result.profile?.username || result.username) ?? "Unknown"}
+                followers={result.profile?.followers ?? result.followers ?? 0}
+                following={result.profile?.following ?? result.following ?? 0}
+                hasPowerBadge={!!(result.profile?.hasPowerBadge ?? result.hasPowerBadge)}
+                isFollowing={!!(result.profile?.isFollowing ?? result.isFollowing)}
+                isOwnProfile={!!(result.profile?.isOwnProfile ?? result.isOwnProfile)}
                 onCast={() => {}}
-                username={result.profile.username || ""}
+                username={(result.profile?.username || result.username) ?? ""}
               />
               {/* Show recent casts if available */}
-              {Array.isArray(result.profile.casts) && result.profile.casts.length > 0 && (
+              {Array.isArray(result.profile?.casts ?? result.casts) && (result.profile?.casts?.length ?? result.casts?.length ?? 0) > 0 && (
                 <div className="mt-4 w-full">
                   <h3 className="font-bold text-[#2d1b2e] text-base mb-2">Recent Casts</h3>
                   <ul className="space-y-2">
-                    {result.profile.casts.map((cast: any, idx: number) => (
+                    {(result.profile?.casts ?? result.casts)?.map((cast: any, idx: number) => (
                       <li key={cast.hash || idx} className="bg-gradient-to-r from-pink-50 to-blue-50 rounded-lg p-3 shadow">
                         <div className="text-sm text-[#2d1b2e]">{cast.text || <span className="italic text-gray-400">(No text)</span>}</div>
                         <div className="text-xs text-gray-400 mt-1">{cast.timestamp ? new Date(cast.timestamp).toLocaleString() : ''}</div>
@@ -98,6 +101,10 @@ export default function FarcasterLookupPage() {
                     ))}
                   </ul>
                 </div>
+              )}
+              {/* Show message if no casts */}
+              {Array.isArray(result.profile?.casts ?? result.casts) && (result.profile?.casts?.length ?? result.casts?.length ?? 0) === 0 && (
+                <div className="mt-4 w-full text-center text-gray-400 italic">No recent casts found.</div>
               )}
               <pre className="text-xs overflow-auto mt-2">{JSON.stringify(result, null, 2)}</pre>
             </div>
