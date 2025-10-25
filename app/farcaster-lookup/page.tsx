@@ -1,5 +1,6 @@
-
+"use client";
 import React from 'react';
+
 import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 "use client";
 
@@ -20,13 +21,7 @@ type LookupResult = {
     username?: string;
     pfpUrl?: string;
     bio?: string;
-    "use client";
-    import React from 'react';
-    import WagmiWalletConnect from '@/components/WagmiWalletConnect';
-    import { useState } from 'react';
-    import { ProfileCard } from '@/components/ProfileCard';
-    import { NeynarCastCard } from '@/components/NeynarCastCard';
-    import NeynarUserDropdown from '@/components/NeynarUserDropdown';
+// ...existing code...
     displayName?: string;
     isFollowing?: boolean;
     isOwnProfile?: boolean;

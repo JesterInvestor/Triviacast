@@ -15,9 +15,10 @@
     "noEmit": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "types": [
-      "react"
+      "react",
+      "react-dom"
     ],
     "incremental": true,
     "plugins": [
