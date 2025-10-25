@@ -10,10 +10,10 @@ export async function POST(req: Request) {
     let profile = null;
     let resolvedAddress = address;
     if (username) {
-      // Lookup by Farcaster username using Neynar API
+      // Lookup by Farcaster username using Neynar API (bulk-by-username)
       const apiKey = process.env.NEYNAR_API_KEY || process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
       const resp = await fetch(
-        `https://api.neynar.com/v2/farcaster/user-by-username?username=${username}`,
+        `https://api.neynar.com/v2/farcaster/user/bulk-by-username?usernames=${username}`,
         {
           headers: {
             accept: 'application/json',
@@ -23,8 +23,10 @@ export async function POST(req: Request) {
       );
       if (resp.ok) {
         const data = await resp.json();
-        if (data && data.result && data.result.custody_address) {
-          resolvedAddress = data.result.custody_address;
+        // Data shape: { [username]: [userObj] }
+        const users = data?.[username] || [];
+        if (Array.isArray(users) && users.length > 0 && users[0].custody_address) {
+          resolvedAddress = users[0].custody_address;
         } else {
           // Username not found
           return NextResponse.json({ error: 'Farcaster username not found', found: false, profile: null }, { status: 404 });

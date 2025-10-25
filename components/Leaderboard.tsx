@@ -120,8 +120,8 @@ export default function Leaderboard() {
   }, [account?.address]);
 
   return (
-    <div className="max-w-4xl mx-auto px-2 sm:px-6">
-      <div className="bg-white rounded-lg shadow-xl p-4 sm:p-8 border-4 border-[#F4A6B7]">
+    <div className="w-full px-0 sm:px-6">
+      <div className="bg-white rounded-lg shadow-xl p-2 sm:p-6 border-4 border-[#F4A6B7] w-full max-w-full">
         <div className="flex items-center justify-center gap-3 sm:gap-4 mb-2">
           <Image src="/brain-large.svg" alt="Brain" width={64} height={64} priority />
           <h1 className="text-2xl sm:text-4xl font-bold text-center text-[#2d1b2e]">
@@ -185,8 +185,8 @@ export default function Leaderboard() {
                 <span className="inline-block bg-green-100 text-green-700 font-semibold px-4 py-2 rounded mb-2">Wallet Connected</span>
               </div>
             )}
-            <div className="mt-4 overflow-x-auto">
-              <table className="w-full text-left table-auto">
+            <div className="mt-4 overflow-x-auto w-full">
+              <table className="min-w-[320px] w-full text-left table-auto">
                 <thead>
                   <tr className="text-xs sm:text-sm text-[#5a3d5c] border-b border-[#f3dbe0]">
                     <th className="py-2">#</th>

@@ -17,7 +17,7 @@ export default function LeaderboardPage() {
   const account = useActiveAccount();
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
+      <div className="w-full max-w-3xl px-2 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
         {/* Header and leaderboard */}
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
           <div className="flex flex-col items-center gap-3 sm:gap-4 w-full">
