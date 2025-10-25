@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from 'react';
+import { useAccount } from 'wagmi';
 import Image from 'next/image';
 import Quiz from '@/components/Quiz';
 import { shareAppUrl } from '@/lib/farcaster';
@@ -25,7 +26,7 @@ export default function Home() {
   // Add hooks for wallet info
   const [ethBalance, setEthBalance] = React.useState<string>('0.0000');
   const [username, setUsername] = React.useState<string>('');
-  const { address } = require('wagmi').useAccount();
+  const { address } = useAccount();
   React.useEffect(() => {
     async function fetchBalance() {
       if (address) {
