@@ -64,7 +64,7 @@ function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?
     </div>
   );
 }
-// Farcaster lookup logic removed
+// Farcaster profile display logic
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -73,11 +73,7 @@ export default function Leaderboard() {
   const [loading, setLoading] = useState(true);
   const account = useActiveAccount();
 
-  // Farcaster lookup logic enabled — leaderboard shows Farcaster username if available
 
-  // Farcaster context and lookup removed; nothing to do here
-
-  // No Farcaster miniapp profile data available when lookup is removed
 
   const myRank = useMemo(() => {
     if (!account?.address) return null;
@@ -92,54 +88,25 @@ export default function Leaderboard() {
         const board = await getLeaderboard();
         setLeaderboard(board);
 
-        // Aggressive Neynar profile fetching: kick off concurrent fetches (client-side) for all addresses on the board.
-        // This is intentionally aggressive per user instruction "call neynar a lot". We cap concurrency to avoid overwhelming the browser.
-        const addrs = board.map((b) => b.walletAddress?.toLowerCase()).filter(Boolean) as string[];
-        const concurrency = 12;
-        const results: Record<string, any> = {};
+        // Batch fetch Farcaster profiles for leaderboard addresses
+        const addresses = board.map(b => b.walletAddress?.toLowerCase()).filter(Boolean);
+        const response = await fetch('/api/neynar/user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ addresses }),
+        });
+        const data = await response.json();
 
-        const fetchWithRetry = async (addr: string, tries = 0): Promise<any> => {
-          try {
-            const res = await fetch(`/api/neynar/user?address=${encodeURIComponent(addr)}`);
-            if (!res.ok) return null;
-            const json = await res.json();
-            return json?.result ?? null;
-          } catch (e) {
-            if (tries < 3) {
-              await new Promise((r) => setTimeout(r, 200 * (tries + 1)));
-              return fetchWithRetry(addr, tries + 1);
-            }
-            return null;
-          }
-        };
-
-        // runN concurrently
-        const queue: Promise<void>[] = [];
-        for (let i = 0; i < addrs.length; i++) {
-          const addr = addrs[i];
-          const p = (async () => {
-            const prof = await fetchWithRetry(addr);
-            results[addr] = prof;
-          })();
-          queue.push(p);
-          // throttle concurrency
-          if (queue.length >= concurrency) {
-            await Promise.race(queue).catch(() => {});
-            // remove settled promises from queue
-            for (let j = queue.length - 1; j >= 0; j--) {
-              if ((queue[j] as any).resolved) queue.splice(j, 1);
-            }
-          }
+        // Normalize profiles by address
+        const profilesByAddress: Record<string, { displayName?: string; username?: string } | null> = {};
+        for (const user of data.users ?? []) {
+          const addr = user.custody_address?.toLowerCase();
+          profilesByAddress[addr] = {
+            displayName: user.display_name ?? undefined,
+            username: user.username ?? undefined,
+          };
         }
-        await Promise.all(queue).catch(() => {});
-        // apply results (normalize keys to lowercase)
-        const normalized: Record<string, { displayName?: string; username?: string } | null> = {};
-        for (const [k, v] of Object.entries(results)) {
-          normalized[k.toLowerCase()] = v ? { displayName: v.displayName ?? null, username: v.username ?? null } : null;
-        }
-        setProfiles((prev) => ({ ...prev, ...normalized }));
-
-        // We now use OnchainKit Avatar and Name components for consistent identity rendering
+        setProfiles(prev => ({ ...prev, ...profilesByAddress }));
 
         if (account?.address) {
           const points = await getWalletTotalPoints(account.address);
