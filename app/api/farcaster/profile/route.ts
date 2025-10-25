@@ -13,42 +13,110 @@ export async function POST(req: Request) {
     // If username provided, prefer getting the full user record from Neynar and build a richer profile
     if (username) {
       const apiKey = process.env.NEYNAR_API_KEY || process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
-      const resp = await fetch(
-        `https://api.neynar.com/v2/farcaster/user/bulk-by-username?usernames=${username}`,
-        {
-          headers: {
-            accept: 'application/json',
-            ...(apiKey ? { 'X-API-KEY': apiKey, api_key: apiKey } : {}),
-          },
+
+      // Prefer using the official Neynar SDK when available
+      try {
+        const mod = await import('@neynar/nodejs-sdk');
+        const { NeynarAPIClient, Configuration, isApiErrorResponse } = mod as any;
+        const client = new NeynarAPIClient(new Configuration({ apiKey }));
+
+        // SDK method name varies by version; try lookupUserByUsername signature first
+        let sdkResp: any = null;
+        if (typeof client.lookupUserByUsername === 'function') {
+          try {
+            sdkResp = await client.lookupUserByUsername({ username });
+          } catch (e) {
+            // some versions return a wrapped result
+            sdkResp = e?.response || null;
+          }
         }
-      );
 
-      if (resp.ok) {
-        const data = await resp.json();
-        const users = data?.[username] || [];
-        if (!Array.isArray(users) || users.length === 0) {
-          return NextResponse.json({ error: 'Farcaster username not found', found: false, profile: null }, { status: 404 });
+        // If we got a result from SDK, normalize it
+        if (sdkResp) {
+          const result = sdkResp.result || sdkResp.user || sdkResp.users?.[0] || sdkResp;
+          const user = result;
+          if (!user) {
+            return NextResponse.json({ error: 'Farcaster username not found', found: false, profile: null }, { status: 404 });
+          }
+          resolvedAddress = (user?.custody_address as string | undefined) || resolvedAddress || null;
+          profile = {
+            address: resolvedAddress || undefined,
+            username: user.username ? `@${String(user.username).replace(/^@/, '')}` : undefined,
+            pfpUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || undefined,
+            displayName: user.display_name || user.displayName || user.name || undefined,
+            bio: user.profile?.bio?.text || user.bio || undefined,
+            followers: user.follower_count ?? user.followers ?? undefined,
+            following: user.following_count ?? user.following ?? undefined,
+            hasPowerBadge: !!(user.power_badge || user.hasPowerBadge || user.powerBadge),
+            raw: user,
+          };
+        } else {
+          // If SDK not available or didn't return data, fall back to HTTP GET to the documented endpoint
+          const resp = await fetch(`https://api.neynar.com/v2/farcaster/user/by_username/?username=${encodeURIComponent(username)}`, {
+            headers: {
+              accept: 'application/json',
+              ...(apiKey ? { 'X-API-KEY': apiKey, api_key: apiKey } : {}),
+            },
+          });
+
+          if (!resp.ok) {
+            const errorText = await resp.text().catch(() => '');
+            return NextResponse.json({ error: `Neynar API error: ${resp.status} ${errorText}` }, { status: 502 });
+          }
+          const data = await resp.json();
+          // documented shape: { result: { ...user fields... } }
+          const user = data?.result || data?.user || data?.users?.[0] || data;
+          if (!user) {
+            return NextResponse.json({ error: 'Farcaster username not found', found: false, profile: null }, { status: 404 });
+          }
+          resolvedAddress = (user?.custody_address as string | undefined) || resolvedAddress || null;
+          profile = {
+            address: resolvedAddress || undefined,
+            username: user.username ? `@${String(user.username).replace(/^@/, '')}` : undefined,
+            pfpUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || undefined,
+            displayName: user.display_name || user.displayName || user.name || undefined,
+            bio: user.profile?.bio?.text || user.bio || undefined,
+            followers: user.follower_count ?? user.followers ?? undefined,
+            following: user.following_count ?? user.following ?? undefined,
+            hasPowerBadge: !!(user.power_badge || user.hasPowerBadge || user.powerBadge),
+            raw: user,
+          };
         }
-
-        const user = users[0] as Record<string, any>;
-        // Pull custody address if present
-        resolvedAddress = (user?.custody_address as string | undefined) || resolvedAddress || null;
-
-        // Build a richer profile object directly from the Neynar user object
-        profile = {
-          address: resolvedAddress || undefined,
-          username: user.username ? `@${String(user.username).replace(/^@/, '')}` : undefined,
-          pfpUrl: (user.pfpUrl as string | undefined) || (user.avatar as string | undefined) || (user.profile?.pfpUrl as string | undefined) || undefined,
-          displayName: (user.displayName as string | undefined) || (user.name as string | undefined) || undefined,
-          bio: (user.bio as string | undefined) || (user.profile?.bio as string | undefined) || undefined,
-          followers: typeof user.followers === 'number' ? user.followers : (user.follower_count as number | undefined),
-          following: typeof user.following === 'number' ? user.following : (user.following_count as number | undefined),
-          hasPowerBadge: !!(user.hasPowerBadge || user.powerBadge),
-          raw: user,
-        };
-      } else {
-        const errorText = await resp.text();
-        return NextResponse.json({ error: `Neynar API error: ${resp.status} ${errorText}` }, { status: 502 });
+      } catch (e) {
+        // If SDK import fails, attempt the HTTP fallback
+        try {
+          const apiKey = process.env.NEYNAR_API_KEY || process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
+          const resp = await fetch(`https://api.neynar.com/v2/farcaster/user/by_username/?username=${encodeURIComponent(username)}`, {
+            headers: {
+              accept: 'application/json',
+              ...(apiKey ? { 'X-API-KEY': apiKey, api_key: apiKey } : {}),
+            },
+          });
+          if (!resp.ok) {
+            const errorText = await resp.text().catch(() => '');
+            return NextResponse.json({ error: `Neynar API error: ${resp.status} ${errorText}` }, { status: 502 });
+          }
+          const data = await resp.json();
+          const user = data?.result || data?.user || data?.users?.[0] || data;
+          if (!user) {
+            return NextResponse.json({ error: 'Farcaster username not found', found: false, profile: null }, { status: 404 });
+          }
+          resolvedAddress = (user?.custody_address as string | undefined) || resolvedAddress || null;
+          profile = {
+            address: resolvedAddress || undefined,
+            username: user.username ? `@${String(user.username).replace(/^@/, '')}` : undefined,
+            pfpUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || undefined,
+            displayName: user.display_name || user.displayName || user.name || undefined,
+            bio: user.profile?.bio?.text || user.bio || undefined,
+            followers: user.follower_count ?? user.followers ?? undefined,
+            following: user.following_count ?? user.following ?? undefined,
+            hasPowerBadge: !!(user.power_badge || user.hasPowerBadge || user.powerBadge),
+            raw: user,
+          };
+        } catch (ee) {
+          console.error('Error looking up username with Neynar fallback', ee);
+          return NextResponse.json({ error: 'Neynar username lookup failed' }, { status: 502 });
+        }
       }
     }
 
