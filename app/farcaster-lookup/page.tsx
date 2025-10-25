@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import ProfileCard from '@/components/ProfileCard';
+import NeynarUserDropdown from '@/components/NeynarUserDropdown';
 
 type LookupResult = { found?: boolean; profile?: { username?: string; pfpUrl?: string }; error?: string } | null;
 
 export default function FarcasterLookupPage() {
   const [address, setAddress] = useState<string>('');
+  const [username, setUsername] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<LookupResult>(null);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +38,8 @@ export default function FarcasterLookupPage() {
     <div className="min-h-screen p-6">
   <h1 className="text-2xl font-bold mb-4">Farcaster profile lookup</h1>
       <p className="mb-4 text-sm text-gray-600">Enter an Ethereum address to fetch the Farcaster profile (via server API).</p>
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex flex-col gap-2" style={{ maxWidth: '400px' }}>
+        <NeynarUserDropdown value={username} onChange={setUsername} />
         <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="0x..." className="border p-2 rounded w-full" />
         <button onClick={lookup} disabled={loading} className="bg-blue-600 text-white px-4 rounded">{loading ? 'Loading...' : 'Lookup'}</button>
       </div>

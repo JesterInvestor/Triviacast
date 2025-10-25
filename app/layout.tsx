@@ -6,6 +6,7 @@ import WagmiProvider from "@/components/WagmiProvider";
 import ClientOnlyWidgets from '@/components/ClientOnlyWidgets';
 import FarcasterMiniAppReady from '@/components/FarcasterMiniAppReady';
 import ClientServiceWorkerCleanup from '@/components/ClientServiceWorkerCleanup';
+import BottomNav from '@/components/BottomNav';
 
 const frame = {
   version: "1",
@@ -85,7 +86,7 @@ export default function RootLayout({
             {children}
             {/* Bottom navigation tabs */}
             <div style={{ height: '56px' }} /> {/* Spacer for nav */}
-            {typeof window !== 'undefined' && require('@/components/BottomNav').default()}
+            <BottomNav />
             {/* Client-only widgets (miniapp prompt, staking prompt, toaster) */}
             <ClientOnlyWidgets />
           </ThirdwebProvider>
