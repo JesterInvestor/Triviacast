@@ -1,9 +1,7 @@
+
 "use client";
 import React from 'react';
-
 import WagmiWalletConnect from '@/components/WagmiWalletConnect';
-"use client";
-
 import { useState } from 'react';
 import { ProfileCard } from '@/components/ProfileCard';
 import { NeynarCastCard } from '@/components/NeynarCastCard';
