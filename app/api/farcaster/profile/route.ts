@@ -160,8 +160,8 @@ export async function POST(req: Request) {
     if (fid) {
       // Try SDK first
       try {
-        // dynamic import — ignore missing types at compile time
-        // @ts-ignore
+  // dynamic import — ignore missing types at compile time
+  // @ts-expect-error Allow dynamic import of optional SDK without types
         const mod = await import('@neynar/nodejs-sdk');
         const { NeynarAPIClient, Configuration } = mod as any;
         const client = new NeynarAPIClient(new Configuration({ apiKey }));
