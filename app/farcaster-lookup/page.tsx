@@ -111,7 +111,7 @@ export default function FarcasterLookupPage() {
               {Array.isArray(result.profile.casts) && result.profile.casts.length === 0 && (
                 <div className="mt-4 w-full text-center text-gray-400 italic">No recent casts found.</div>
               )}
-              <pre className="text-xs overflow-auto mt-2">{JSON.stringify(result, null, 2)}</pre>
+                {/* ...existing code... */}
             </div>
           )}
         </div>
