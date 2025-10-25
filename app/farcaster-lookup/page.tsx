@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import ProfileCard from '@/components/ProfileCard';
+import { ProfileCard } from '@/components/ProfileCard';
 import NeynarUserDropdown from '@/components/NeynarUserDropdown';
 
 type LookupResult = {
