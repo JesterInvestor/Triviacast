@@ -90,23 +90,32 @@ export default function Leaderboard() {
 
         // Batch fetch Farcaster profiles for leaderboard addresses
         const addresses = board.map(b => b.walletAddress?.toLowerCase()).filter(Boolean);
-        const response = await fetch('/api/neynar/user', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ addresses }),
-        });
-        const data = await response.json();
-
-        // Normalize profiles by address
-        const profilesByAddress: Record<string, { displayName?: string; username?: string } | null> = {};
-        for (const user of data.users ?? []) {
-          const addr = user.custody_address?.toLowerCase();
-          profilesByAddress[addr] = {
-            displayName: user.display_name ?? undefined,
-            username: user.username ?? undefined,
-          };
+        let profilesByAddress: Record<string, { displayName?: string; username?: string } | null> = {};
+        try {
+          const response = await fetch('/api/neynar/user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ addresses }),
+          });
+          if (!response.ok) throw new Error('Failed to fetch profiles');
+          const data = await response.text();
+          if (!data) {
+            setProfiles(prev => ({ ...prev }));
+          } else {
+            const parsed = JSON.parse(data);
+            const users = parsed.result ?? [];
+            for (const user of users) {
+              const addr = user.custody_address?.toLowerCase();
+              profilesByAddress[addr] = {
+                displayName: user.display_name ?? undefined,
+                username: user.username ?? undefined,
+              };
+            }
+            setProfiles(prev => ({ ...prev, ...profilesByAddress }));
+          }
+        } catch (err) {
+          setProfiles(prev => ({ ...prev }));
         }
-        setProfiles(prev => ({ ...prev, ...profilesByAddress }));
 
         if (account?.address) {
           const points = await getWalletTotalPoints(account.address);
