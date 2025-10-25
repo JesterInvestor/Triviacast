@@ -2,6 +2,7 @@
 "use client";
 import React from 'react';
 import WagmiWalletConnect from '@/components/WagmiWalletConnect';
+import ShareButton from '@/components/ShareButton';
 import { useState } from 'react';
 import { ProfileCard } from '@/components/ProfileCard';
 import { NeynarCastCard } from '@/components/NeynarCastCard';
@@ -78,6 +79,15 @@ export default function FarcasterLookupPage() {
       </div>
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
+          <div className="mb-2 flex justify-center">
+            <ShareButton
+              url="https://warpcast.com/~/compose?text=Come%20check%20out%20our%20farcaster%20lookup%20page%20powered%20by%20neynar!!%20https://triviacast.xyz/farcaster-lookup"
+              className="bg-[#DC8291] hover:bg-[#C86D7D] text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 shadow"
+              ariaLabel="Share Farcaster Lookup"
+            >
+              <span>Share on Farcaster</span>
+            </ShareButton>
+          </div>
             <div className="flex flex-col items-center">
             <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] text-center">Farcaster Profile Lookup</h1>
             <span className="text-xs text-[#5a3d5c] mt-1">powered by <strong className="text-[#2d1b2e]">neynar</strong></span>
