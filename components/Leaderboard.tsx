@@ -205,14 +205,24 @@ export default function Leaderboard() {
                     .sort((a, b) => b.tPoints - a.tPoints)
                     .map((entry, i) => {
                       const rank = i + 1;
-                      const addr = entry.walletAddress || '';
-                      // Try direct address lookup, then custody address lookup
-                      let profile = profiles[addr.toLowerCase()];
+                      // Always normalize address for lookup
+                      const addr = (entry.walletAddress || '').toLowerCase();
+                      let profile = profiles[addr];
+                      // Try custody address match
                       if (!profile) {
-                        // Try to find a profile whose custody address matches this wallet address
                         profile = Object.values(profiles).find(
-                          (p: any) => p?.custodyAddress?.toLowerCase() === addr.toLowerCase()
+                          (p: any) => p?.custody_address?.toLowerCase() === addr
                         );
+                      }
+                      // Try verified addresses match
+                      if (!profile) {
+                        profile = Object.values(profiles).find((p: any) => {
+                          const verified = [
+                            ...(p?.verified_addresses?.eth_addresses || []),
+                            ...(p?.verified_addresses?.sol_addresses || [])
+                          ].map((a: string) => a.toLowerCase());
+                          return verified.includes(addr);
+                        });
                       }
                       return (
                         <tr key={addr} className="border-b border-[#f8e8eb]">
@@ -221,8 +231,8 @@ export default function Leaderboard() {
                             <div className="flex items-center gap-3">
                               <ProfileDisplay profile={profile} fallbackAddress={addr} />
                               {/* Show error if no profile found and error exists for this address */}
-                              {!profile && profileErrors && (profileErrors[addr.toLowerCase()] || profileErrors['all']) && (
-                                <span className="text-xs text-red-500 ml-2">{profileErrors[addr.toLowerCase()] || profileErrors['all']}</span>
+                              {!profile && profileErrors && (profileErrors[addr] || profileErrors['all']) && (
+                                <span className="text-xs text-red-500 ml-2">{profileErrors[addr] || profileErrors['all']}</span>
                               )}
                             </div>
                           </td>
