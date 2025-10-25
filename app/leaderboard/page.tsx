@@ -46,11 +46,7 @@ export default function LeaderboardPage() {
               <Image src="/brain-small.svg" alt="Brain icon" width={16} height={16} aria-hidden="true" />
               <span>Play Quiz</span>
             </Link>
-            {account?.address && (
-              <div className="w-full sm:w-auto flex flex-col items-center justify-center">
-                <FarcasterProfile address={account.address} className="mt-2 sm:mt-0" />
-              </div>
-            )}
+            {/* Connected wallet Farcaster profile removed per request */}
           </div>
         </div>
         {/* Top section: ClientOnlyWidgets */}
