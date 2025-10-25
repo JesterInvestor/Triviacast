@@ -18,4 +18,5 @@ export const wagmiConfig = createConfig({
       showQrModal: true,
     }),
   ],
+  autoConnect: true,
 });
