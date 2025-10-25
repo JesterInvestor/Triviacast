@@ -52,7 +52,12 @@ export default function FarcasterLookupPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'lookup failed');
-      setResult(data);
+      // If the response is a profile object, wrap it as { profile: data }
+      if (data && (data.address || data.username) && !data.error) {
+        setResult({ profile: data });
+      } else {
+        setResult(data);
+      }
     } catch (err: unknown) {
       const e = err as { message?: string } | null;
       setError(e?.message || 'unknown error');
