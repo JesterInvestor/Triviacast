@@ -60,7 +60,7 @@ export default function Home() {
               Triviacast
               <ShareButton
                 url={shareAppUrl()}
-                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[32px] ml-2"
+                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[44px] w-full sm:w-auto"
                 ariaLabel="Share app on Farcaster"
               />
             </h1>
