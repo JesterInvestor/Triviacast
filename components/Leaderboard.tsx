@@ -49,11 +49,9 @@ async function ensureOnchainKit() {
   }
 }
 
-function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string } | null | undefined; fallbackAddress: string }) {
-  // Show Farcaster username (or ENS) if available, otherwise fallback to shortened wallet address
-  const avatarUrl = fallbackAddress
-    ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32`
-    : undefined;
+function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string; avatarImgUrl?: string; fid?: number; bio?: string; followers?: number; following?: number; hasPowerBadge?: boolean } | null | undefined; fallbackAddress: string }) {
+  // Use avatar from profile if available, else fallback to stamp
+  const avatarUrl = profile?.avatarImgUrl || (fallbackAddress ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32` : undefined);
   const display = profile?.username || profile?.displayName || fallbackAddress;
   return (
     <div className="flex items-center gap-2">
@@ -61,6 +59,9 @@ function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?
         <img src={avatarUrl} alt="avatar" className="rounded-full w-8 h-8" />
       )}
       <span className="font-bold text-[#2d1b2e] text-base sm:text-lg">{display}</span>
+      {profile?.fid && (
+        <span className="ml-2 text-xs text-gray-400">FID: {profile.fid}</span>
+      )}
     </div>
   );
 }
@@ -69,7 +70,7 @@ function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [walletTotal, setWalletTotal] = useState(0);
-  const [profiles, setProfiles] = useState<Record<string, { displayName?: string; username?: string } | null>>({});
+  const [profiles, setProfiles] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const account = useActiveAccount();
 
@@ -90,7 +91,6 @@ export default function Leaderboard() {
 
         // Batch fetch Farcaster profiles for leaderboard addresses
         const addresses = board.map(b => b.walletAddress?.toLowerCase()).filter(Boolean);
-  const profilesByAddress: Record<string, { displayName?: string; username?: string } | null> = {};
         try {
           const response = await fetch('/api/neynar/user', {
             method: 'POST',
@@ -103,15 +103,8 @@ export default function Leaderboard() {
             setProfiles(prev => ({ ...prev }));
           } else {
             const parsed = JSON.parse(data);
-            const users = parsed.result ?? [];
-            for (const user of users) {
-              const addr = user.custody_address?.toLowerCase();
-              profilesByAddress[addr] = {
-                displayName: user.display_name ?? undefined,
-                username: user.username ?? undefined,
-              };
-            }
-            setProfiles(prev => ({ ...prev, ...profilesByAddress }));
+            // API now returns address → profile mapping
+            setProfiles(prev => ({ ...prev, ...parsed.result }));
           }
         } catch (err) {
           setProfiles(prev => ({ ...prev }));

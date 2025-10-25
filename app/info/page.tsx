@@ -56,8 +56,8 @@ export default function InfoPage() {
       </div>
       <div className="mb-6 p-4 bg-fuchsia-50 rounded-xl shadow">
         <h2 className="text-xl font-bold mb-2 text-fuchsia-700">Connect & Cast</h2>
-        <p className="text-gray-700">Find us on Farcaster: <a href="https://warpcast.com/triviacast" className="text-fuchsia-600 underline" target="_blank" rel="noopener noreferrer">/triviacast</a></p>
-        <p className="mt-2 text-gray-700">Got a trivia fact, feature idea, or meme? Cast it our way!</p>
+  <p className="text-gray-700">Cast to <a href="https://warpcast.com/jesterinvestor" className="text-fuchsia-600 underline" target="_blank" rel="noopener noreferrer">@jesterinvestor</a> and say "message dev with error"</p>
+  <p className="mt-2 text-gray-700">Got a trivia fact, feature idea, or meme? Cast it our way!</p>
       </div>
       <footer className="mt-8 text-center text-xs text-gray-400">Triviacast &copy; 2025. May your answers be quick and your points be plenty! 🚀</footer>
     </div>

@@ -74,13 +74,42 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'no valid addresses' }, { status: 400 });
     }
 
+    // Step 1: Get FIDs for addresses
     const res = await client.fetchBulkUsersByEthOrSolAddress({ addresses });
     const rawUsers = res?.result?.user ?? res?.result ?? res ?? null;
     if (!rawUsers) return NextResponse.json({ result: null });
     const userArr = Array.isArray(rawUsers) ? rawUsers : [rawUsers];
 
-    // Flatten: return the user array as result so clients can read json.result[n].custodyAddress, etc.
-    return NextResponse.json({ result: userArr });
+    // Step 2: Get FIDs
+    const fids = userArr.map((u: any) => u.fid).filter(Boolean);
+    if (fids.length === 0) {
+      return NextResponse.json({ result: [] });
+    }
+
+    // Step 3: Fetch profile info for each FID
+    const profileRes = await client.fetchBulkUsersByFids({ fids });
+    const profiles = profileRes?.result?.users ?? [];
+
+    // Step 4: Map address to profile info
+    const addressToProfile: Record<string, any> = {};
+    for (const user of userArr) {
+      const fid = user.fid;
+      const profile = profiles.find((p: any) => p.fid === fid);
+      if (profile) {
+        addressToProfile[user.custody_address?.toLowerCase() || ''] = {
+          fid: profile.fid,
+          username: profile.username,
+          displayName: profile.display_name,
+          avatarImgUrl: profile.pfp_url,
+          bio: profile.profile?.bio?.text ?? '',
+          followers: profile.follower_count ?? 0,
+          following: profile.following_count ?? 0,
+          hasPowerBadge: profile.power_badge ?? false,
+        };
+      }
+    }
+
+    return NextResponse.json({ result: addressToProfile });
   } catch (e) {
     return new NextResponse(null, { status: 204 });
   }
