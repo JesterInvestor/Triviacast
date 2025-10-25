@@ -27,11 +27,12 @@ export async function POST(req: Request) {
           resolvedAddress = data.result.custody_address;
         } else {
           // Username not found
-          return NextResponse.json({ found: false, profile: null }, { status: 200 });
+          return NextResponse.json({ error: 'Farcaster username not found', found: false, profile: null }, { status: 404 });
         }
       } else {
-        // Username lookup failed
-        return NextResponse.json({ error: 'username lookup failed' }, { status: 500 });
+        // Username lookup failed (upstream error)
+        const errorText = await resp.text();
+        return NextResponse.json({ error: `Neynar API error: ${resp.status} ${errorText}` }, { status: 502 });
       }
     }
     if (resolvedAddress) {

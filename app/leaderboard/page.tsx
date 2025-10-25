@@ -18,15 +18,6 @@ export default function LeaderboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1]">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
-        {/* Top section: Farcaster profile and wallet connect */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sm:mb-8">
-          <div className="flex flex-col items-start gap-2 w-full sm:w-auto">
-            {account?.address && (
-              <FarcasterProfile address={account.address} className="mb-2" />
-            )}
-            <ClientOnlyWidgets />
-          </div>
-        </div>
         {/* Header and leaderboard */}
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3 sm:gap-4">
@@ -58,7 +49,16 @@ export default function LeaderboardPage() {
                 <Image src="/brain-small.svg" alt="Brain icon" width={16} height={16} aria-hidden="true" />
                 <span>Play Quiz</span>
               </Link>
+              {account?.address && (
+                <FarcasterProfile address={account.address} className="ml-2" />
+              )}
             </div>
+          </div>
+        </div>
+        {/* Top section: ClientOnlyWidgets */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sm:mb-8">
+          <div className="flex flex-col items-start gap-2 w-full sm:w-auto">
+            <ClientOnlyWidgets />
           </div>
         </div>
         <Leaderboard />
