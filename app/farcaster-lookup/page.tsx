@@ -52,12 +52,7 @@ export default function FarcasterLookupPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'lookup failed');
-      // If the response is a profile object, wrap it as { profile: data }
-      if (data && (data.address || data.username) && !data.error) {
-        setResult({ profile: data });
-      } else {
-        setResult(data);
-      }
+      setResult(data);
     } catch (err: unknown) {
       const e = err as { message?: string } | null;
       setError(e?.message || 'unknown error');
@@ -83,23 +78,23 @@ export default function FarcasterLookupPage() {
           {result && result.profile && (
             <div className="mt-4 bg-white p-4 rounded-xl shadow-md w-full max-w-md flex flex-col items-center">
               <ProfileCard
-                avatarImgUrl={result.profile.pfpUrl ?? "https://i.imgur.com/naZWL9n.gif"}
-                bio={result.profile.bio ?? "No bio available."}
-                displayName={result.profile.displayName ?? result.profile.username ?? "Unknown"}
-                followers={result.profile.followers ?? 0}
-                following={result.profile.following ?? 0}
+                avatarImgUrl={result.profile.pfpUrl || "https://i.imgur.com/naZWL9n.gif"}
+                bio={result.profile.bio || "No bio available."}
+                displayName={result.profile.displayName || result.profile.username || "Unknown"}
+                followers={result.profile.followers || 0}
+                following={result.profile.following || 0}
                 hasPowerBadge={!!result.profile.hasPowerBadge}
                 isFollowing={!!result.profile.isFollowing}
                 isOwnProfile={!!result.profile.isOwnProfile}
                 onCast={() => {}}
-                username={result.profile.username ?? ""}
+                username={result.profile.username || ""}
               />
               {/* Show recent casts if available */}
               {Array.isArray(result.profile.casts) && result.profile.casts.length > 0 && (
                 <div className="mt-4 w-full">
                   <h3 className="font-bold text-[#2d1b2e] text-base mb-2">Recent Casts</h3>
                   <ul className="space-y-2">
-                    {result.profile.casts.map((cast: Cast, idx: number) => (
+                    {result.profile.casts.map((cast: any, idx: number) => (
                       <li key={cast.hash || idx}>
                         <NeynarCastCard
                           identifier={cast.hash || ''}
@@ -111,11 +106,7 @@ export default function FarcasterLookupPage() {
                   </ul>
                 </div>
               )}
-              {/* Show message if no casts */}
-              {Array.isArray(result.profile.casts) && result.profile.casts.length === 0 && (
-                <div className="mt-4 w-full text-center text-gray-400 italic">No recent casts found.</div>
-              )}
-                {/* ...existing code... */}
+              <pre className="text-xs overflow-auto mt-2">{JSON.stringify(result, null, 2)}</pre>
             </div>
           )}
         </div>
