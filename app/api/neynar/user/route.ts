@@ -16,16 +16,16 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const addressParam = url.searchParams.get('address');
     if (!addressParam) {
-      return NextResponse.json({ error: 'missing address' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing address parameter in request.' }, { status: 400 });
     }
 
     const formattedAddress = normalizeEthOrSolAddress(addressParam);
     if (!formattedAddress) {
-      return NextResponse.json({ error: 'invalid address format' }, { status: 400 });
+      return NextResponse.json({ error: `Invalid address format: ${addressParam}` }, { status: 400 });
     }
 
     const apiKey = process.env.NEYNAR_API_KEY;
-    if (!apiKey) return new NextResponse(null, { status: 204 });
+  if (!apiKey) return NextResponse.json({ error: 'missing NEYNAR_API_KEY' }, { status: 500 });
 
     const mod = await import('@neynar/nodejs-sdk');
     const { NeynarAPIClient, Configuration } = mod as any;
@@ -45,7 +45,7 @@ export async function GET(request: Request) {
     }
     return NextResponse.json({ result: userObj });
   } catch (e) {
-    return new NextResponse(null, { status: 204 });
+    return NextResponse.json({ error: 'unexpected error', details: String(e) }, { status: 500 });
   }
 
 }
@@ -53,7 +53,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const apiKey = process.env.NEYNAR_API_KEY;
-    if (!apiKey) return new NextResponse(null, { status: 204 });
+  if (!apiKey) return NextResponse.json({ error: 'missing NEYNAR_API_KEY' }, { status: 500 });
 
     const mod = await import('@neynar/nodejs-sdk');
     const { NeynarAPIClient, Configuration } = mod as any;
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     let addresses = body.addresses;
     if (!Array.isArray(addresses) || addresses.length === 0) {
-      return NextResponse.json({ error: 'missing addresses array' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing addresses array in request body.' }, { status: 400 });
     }
 
     // Normalize addresses
@@ -71,46 +71,33 @@ export async function POST(request: Request) {
       .map((addr: string) => normalizeEthOrSolAddress(addr))
       .filter(Boolean);
     if (addresses.length === 0) {
-      return NextResponse.json({ error: 'no valid addresses' }, { status: 400 });
+      return NextResponse.json({ error: 'No valid addresses after normalization.' }, { status: 400 });
     }
 
-    // Step 1: Get FIDs for addresses
+    // Fetch full user profiles by wallet address
     const res = await client.fetchBulkUsersByEthOrSolAddress({ addresses });
+    console.log('Neynar API response:', JSON.stringify(res, null, 2));
     const rawUsers = res?.result?.user ?? res?.result ?? res ?? null;
-    if (!rawUsers) return NextResponse.json({ result: null });
+    if (!rawUsers) return NextResponse.json({ error: 'No users found for provided addresses.', result: null });
     const userArr = Array.isArray(rawUsers) ? rawUsers : [rawUsers];
 
-    // Step 2: Get FIDs
-    const fids = userArr.map((u: any) => u.fid).filter(Boolean);
-    if (fids.length === 0) {
-      return NextResponse.json({ result: [] });
-    }
-
-    // Step 3: Fetch profile info for each FID
-    const profileRes = await client.fetchBulkUsersByFids({ fids });
-    const profiles = profileRes?.result?.users ?? [];
-
-    // Step 4: Map address to profile info
+    // Map address to profile info (fully hydrated)
     const addressToProfile: Record<string, any> = {};
     for (const user of userArr) {
-      const fid = user.fid;
-      const profile = profiles.find((p: any) => p.fid === fid);
-      if (profile) {
-        addressToProfile[user.custody_address?.toLowerCase() || ''] = {
-          fid: profile.fid,
-          username: profile.username,
-          displayName: profile.display_name,
-          avatarImgUrl: profile.pfp_url,
-          bio: profile.profile?.bio?.text ?? '',
-          followers: profile.follower_count ?? 0,
-          following: profile.following_count ?? 0,
-          hasPowerBadge: profile.power_badge ?? false,
-        };
-      }
+      addressToProfile[user.custody_address?.toLowerCase() || ''] = {
+        fid: user.fid,
+        username: user.username,
+        displayName: user.display_name,
+        avatarImgUrl: user.pfp_url,
+        bio: user.profile?.bio?.text ?? '',
+        followers: user.follower_count ?? 0,
+        following: user.following_count ?? 0,
+        hasPowerBadge: user.power_badge ?? false,
+      };
     }
 
     return NextResponse.json({ result: addressToProfile });
   } catch (e) {
-    return new NextResponse(null, { status: 204 });
+  return NextResponse.json({ error: 'unexpected error', details: String(e) }, { status: 500 });
   }
 }
