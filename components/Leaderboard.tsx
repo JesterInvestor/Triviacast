@@ -71,6 +71,7 @@ export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [walletTotal, setWalletTotal] = useState(0);
   const [profiles, setProfiles] = useState<Record<string, any>>({});
+  const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const account = useActiveAccount();
 
@@ -101,13 +102,15 @@ export default function Leaderboard() {
           const data = await response.text();
           if (!data) {
             setProfiles(prev => ({ ...prev }));
+            setProfileErrors({});
           } else {
             const parsed = JSON.parse(data);
-            // API now returns address → profile mapping
             setProfiles(prev => ({ ...prev, ...parsed.result }));
+            setProfileErrors(parsed.errors || {});
           }
         } catch (err) {
           setProfiles(prev => ({ ...prev }));
+          setProfileErrors({ api: String(err) });
         }
 
         if (account?.address) {
@@ -203,14 +206,24 @@ export default function Leaderboard() {
                     .map((entry, i) => {
                       const rank = i + 1;
                       const addr = entry.walletAddress || '';
-                      const Avatar = OnchainKit.Avatar;
-                      const Name = OnchainKit.Name;
+                      // Try direct address lookup, then custody address lookup
+                      let profile = profiles[addr.toLowerCase()];
+                      if (!profile) {
+                        // Try to find a profile whose custody address matches this wallet address
+                        profile = Object.values(profiles).find(
+                          (p: any) => p?.custodyAddress?.toLowerCase() === addr.toLowerCase()
+                        );
+                      }
                       return (
                         <tr key={addr} className="border-b border-[#f8e8eb]">
                           <td className="py-3 align-middle w-12 font-semibold text-sm text-[#2d1b2e]">{rank}</td>
                           <td className="py-3 align-middle">
                             <div className="flex items-center gap-3">
-                              <ProfileDisplay profile={profiles[addr.toLowerCase()]} fallbackAddress={addr} />
+                              <ProfileDisplay profile={profile} fallbackAddress={addr} />
+                              {/* Show error if no profile found and error exists for this address */}
+                              {!profile && profileErrors && (profileErrors[addr.toLowerCase()] || profileErrors['all']) && (
+                                <span className="text-xs text-red-500 ml-2">{profileErrors[addr.toLowerCase()] || profileErrors['all']}</span>
+                              )}
                             </div>
                           </td>
                           <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{entry.tPoints.toLocaleString()}</td>
