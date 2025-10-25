@@ -26,8 +26,8 @@ export async function POST(req: Request) {
           try {
             sdkResp = await client.lookupUserByUsername({ username });
           } catch (e) {
-            // some versions return a wrapped result
-            sdkResp = e?.response || null;
+            // some versions return a wrapped result — cast to any to satisfy TS
+            sdkResp = (e as any)?.response || null;
           }
         }
 
