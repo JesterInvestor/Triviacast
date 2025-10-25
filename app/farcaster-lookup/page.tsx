@@ -73,9 +73,6 @@ export default function FarcasterLookupPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
       {/* Wallet connect at top */}
       <div className="w-full flex flex-col items-center justify-center pt-4 pb-2">
-        {/* Dynamically import to avoid SSR issues if needed */}
-import React from 'react';
-import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 
   <WagmiWalletConnect />
       </div>
