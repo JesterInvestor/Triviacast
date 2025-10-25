@@ -20,10 +20,14 @@ type LookupResult = {
     username?: string;
     pfpUrl?: string;
     bio?: string;
+    "use client";
+    import React from 'react';
+    import WagmiWalletConnect from '@/components/WagmiWalletConnect';
+    import { useState } from 'react';
+    import { ProfileCard } from '@/components/ProfileCard';
+    import { NeynarCastCard } from '@/components/NeynarCastCard';
+    import NeynarUserDropdown from '@/components/NeynarUserDropdown';
     displayName?: string;
-    followers?: number;
-    following?: number;
-    hasPowerBadge?: boolean;
     isFollowing?: boolean;
     isOwnProfile?: boolean;
     casts?: Cast[];
