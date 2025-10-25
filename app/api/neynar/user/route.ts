@@ -67,7 +67,7 @@ export async function POST(request: Request) {
           verified_addresses: user.verified_addresses,
         };
       } else {
-        errors[key] = 'Get on Facaster bro';
+        errors[key] = 'Please.....';
       }
     }
 

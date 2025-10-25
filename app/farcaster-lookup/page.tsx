@@ -32,10 +32,32 @@ export default function FarcasterLookupPage() {
     setError(null);
     setResult(null);
     try {
+      // Normalize address before sending to the API.
+      // Accepts either 0x-prefixed or bare 40-hex char addresses and returns lowercased 0x-prefixed address.
+      const normalizeAddress = (input: string | null | undefined): string | null => {
+        if (!input) return null;
+        const s = input.trim();
+        if (s === '') return null;
+        // If ENS-like (contains a dot) leave it as-is so server can attempt resolution
+        if (s.includes('.') && !s.startsWith('0x')) return s;
+        let hex = s.startsWith('0x') ? s.slice(2) : s;
+        // strip possible whitespace
+        hex = hex.trim();
+        if (!/^[a-fA-F0-9]{40}$/.test(hex)) return null;
+        return `0x${hex.toLowerCase()}`;
+      };
+
+      const normalized = normalizeAddress(address);
+      if (address && !normalized) {
+        setError('Invalid wallet address — must be a 0x-prefixed or 40-hex character address');
+        setLoading(false);
+        return;
+      }
+
       const res = await fetch('/api/farcaster/profile', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ address, username }),
+        body: JSON.stringify({ address: normalized || null, username }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'lookup failed');

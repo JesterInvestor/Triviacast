@@ -234,9 +234,21 @@ export async function pollFarcasterUsernames(
  * Resolve a Farcaster profile (username + pfp) for an address using Neynar v2 bulk-by-address
  * Returns null if no profile found or on error. The returned username is prefixed with '@' when present.
  */
+export type FarcasterProfile = {
+  username?: string;
+  pfpUrl?: string;
+  bio?: string;
+  displayName?: string;
+  followers?: number;
+  following?: number;
+  hasPowerBadge?: boolean;
+  custodyAddress?: string;
+  raw?: any;
+};
+
 export async function resolveFarcasterProfile(
   address: string
-): Promise<{ username?: string; pfpUrl?: string } | null> {
+): Promise<FarcasterProfile | null> {
   try {
     const apiKey = process.env.NEYNAR_API_KEY || process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
     const resp = await fetch(
@@ -251,16 +263,34 @@ export async function resolveFarcasterProfile(
 
     if (!resp.ok) return null;
     const data = await resp.json();
-  const key = address.toLowerCase();
-  const raw = (data as Record<string, unknown>)[key] || (data as Record<string, unknown>)[address] || undefined;
-  if (!Array.isArray(raw) || raw.length === 0) return null;
-  const user = raw[0] as Record<string, unknown>;
-  const username = (user?.username as string | undefined) ? `@${String(user.username)}` : undefined;
+    const key = address.toLowerCase();
+    const raw = (data as Record<string, unknown>)[key] || (data as Record<string, unknown>)[address] || undefined;
+    if (!Array.isArray(raw) || raw.length === 0) return null;
+    const user = raw[0] as Record<string, any>;
 
-  // Try a few common fields for pfp/ avatar
-  const pfpUrl = (user?.pfpUrl as string | undefined) || (user?.avatar as string | undefined) || (user?.profile as any)?.pfpUrl || (user?.profile as any)?.avatarUrl || undefined;
+    const username = user?.username ? `@${String(user.username).replace(/^@/, '')}` : undefined;
 
-  return { username, pfpUrl };
+    // Try a few common fields for pfp/ avatar
+    const pfpUrl = user?.pfpUrl || user?.avatar || user?.profile?.pfpUrl || user?.profile?.avatarUrl || undefined;
+
+    const displayName = user?.displayName || user?.name || user?.profile?.displayName || undefined;
+    const bio = user?.bio || user?.profile?.bio || undefined;
+    const followers = typeof user?.followers === 'number' ? user.followers : (user?.follower_count as number | undefined);
+    const following = typeof user?.following === 'number' ? user.following : (user?.following_count as number | undefined);
+    const hasPowerBadge = !!(user?.hasPowerBadge || user?.powerBadge);
+    const custodyAddress = user?.custody_address || undefined;
+
+    return {
+      username,
+      pfpUrl,
+      displayName,
+      bio,
+      followers,
+      following,
+      hasPowerBadge,
+      custodyAddress,
+      raw: user,
+    };
   } catch (e) {
     console.error('Error fetching Farcaster profile for', address, e);
     return null;
