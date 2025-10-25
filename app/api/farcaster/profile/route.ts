@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { resolveFarcasterProfile } from '@/lib/addressResolver';
 
+// Single implementation: lookup by username (preferred) or address (fallback),
+// normalize Neynar response, attach up to 5 recent casts (best-effort), and
+// return the profile object directly.
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -9,37 +12,25 @@ export async function POST(req: Request) {
 
     let profile: any = null;
     let resolvedAddress = address || null;
-
     const apiKey = process.env.NEYNAR_API_KEY || process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
 
     if (username) {
-      // Try SDK dynamic import first, otherwise HTTP fallback
+      // SDK first, then HTTP fallback
       try {
         const mod: any = await import('@neynar/nodejs-sdk');
         const { NeynarAPIClient, Configuration } = mod;
         const client = new NeynarAPIClient(new Configuration({ apiKey }));
-
         let sdkResp: any = null;
         if (typeof client.lookupUserByUsername === 'function') {
           sdkResp = await client.lookupUserByUsername({ username });
         }
-
         if (!sdkResp) {
-          const resp = await fetch(
-            `https://api.neynar.com/v2/farcaster/user/by_username/?username=${encodeURIComponent(username)}`,
-            { headers: { accept: 'application/json', ...(apiKey ? { 'X-API-KEY': apiKey } : {}) } }
-          );
-          if (!resp.ok) {
-            const errorText = await resp.text().catch(() => '');
-            return NextResponse.json({ error: `Neynar API error: ${resp.status} ${errorText}` }, { status: 502 });
-          }
+          const resp = await fetch(`https://api.neynar.com/v2/farcaster/user/by_username/?username=${encodeURIComponent(username)}`, { headers: { accept: 'application/json', ...(apiKey ? { 'X-API-KEY': apiKey } : {}) } });
+          if (!resp.ok) return NextResponse.json({ error: `Neynar API error: ${resp.status}` }, { status: 502 });
           sdkResp = await resp.json();
         }
-
-        const result = sdkResp?.result || sdkResp?.user || sdkResp?.users?.[0] || sdkResp;
-        const user = result;
+        const user = sdkResp?.result || sdkResp?.user || sdkResp?.users?.[0] || sdkResp;
         if (!user) return NextResponse.json({ error: 'Farcaster username not found' }, { status: 404 });
-
         resolvedAddress = user?.custody_address || resolvedAddress || null;
         profile = {
           address: resolvedAddress || undefined,
@@ -53,16 +44,10 @@ export async function POST(req: Request) {
           raw: user,
         };
       } catch (e) {
-        // try HTTP fallback if SDK fails
+        // HTTP fallback if SDK fails
         try {
-          const resp = await fetch(
-            `https://api.neynar.com/v2/farcaster/user/by_username/?username=${encodeURIComponent(username)}`,
-            { headers: { accept: 'application/json', ...(apiKey ? { 'X-API-KEY': apiKey } : {}) } }
-          );
-          if (!resp.ok) {
-            const errorText = await resp.text().catch(() => '');
-            return NextResponse.json({ error: `Neynar API error: ${resp.status} ${errorText}` }, { status: 502 });
-          }
+          const resp = await fetch(`https://api.neynar.com/v2/farcaster/user/by_username/?username=${encodeURIComponent(username)}`, { headers: { accept: 'application/json', ...(apiKey ? { 'X-API-KEY': apiKey } : {}) } });
+          if (!resp.ok) return NextResponse.json({ error: `Neynar API error: ${resp.status}` }, { status: 502 });
           const data = await resp.json();
           const user = data?.result || data?.user || data?.users?.[0] || data;
           if (!user) return NextResponse.json({ error: 'Farcaster username not found' }, { status: 404 });
@@ -79,8 +64,8 @@ export async function POST(req: Request) {
             raw: user,
           };
         } catch (ee) {
-          console.error('Error looking up username with Neynar fallback', ee);
-          return NextResponse.json({ error: 'Neynar username lookup failed' }, { status: 502 });
+          console.error('Neynar lookup failed', ee);
+          return NextResponse.json({ error: 'Neynar lookup failed' }, { status: 502 });
         }
       }
     }
@@ -105,34 +90,27 @@ export async function POST(req: Request) {
     if (!username && !address) return NextResponse.json({ error: 'username or address required' }, { status: 400 });
     if (!profile) return NextResponse.json({ error: 'not found' }, { status: 404 });
 
-    // Best-effort: fetch recent casts (up to 5) by fid
+    // Best-effort casts (non-blocking)
     try {
       const fid = profile.raw?.fid;
-      const casts: any[] = [];
       if (fid) {
         try {
           const mod: any = await import('@neynar/nodejs-sdk');
           const { NeynarAPIClient, Configuration } = mod;
           const client = new NeynarAPIClient(new Configuration({ apiKey }));
           let sdkResp: any = null;
-          if (typeof client.fetchCastsByFid === 'function') {
-            sdkResp = await client.fetchCastsByFid({ fid: String(fid), limit: 5 });
-          } else if (typeof client.fetchCasts === 'function') {
-            sdkResp = await client.fetchCasts({ fid: String(fid), limit: 5 });
-          }
+          if (typeof client.fetchCastsByFid === 'function') sdkResp = await client.fetchCastsByFid({ fid: String(fid), limit: 5 });
+          else if (typeof client.fetchCasts === 'function') sdkResp = await client.fetchCasts({ fid: String(fid), limit: 5 });
           const arr = sdkResp?.result?.casts || sdkResp?.casts || sdkResp?.result || sdkResp;
-          if (Array.isArray(arr)) arr.slice(0, 5).forEach((c: any) => casts.push({ hash: c.hash || c.castHash || null, text: c.text || c.body || null, timestamp: c.timestamp || c.created_at || null, raw: c }));
+          if (Array.isArray(arr)) (profile as any).casts = arr.slice(0, 5).map((c: any) => ({ hash: c.hash || c.castHash || null, text: c.text || c.body || null, timestamp: c.timestamp || c.created_at || null, raw: c }));
         } catch (e) {
-          // ignore SDK errors
+          // ignore
         }
-
-        if (profile.casts == null) profile.casts = [];
       }
     } catch (e) {
       // ignore
     }
 
-    // Return profile object only (per request)
     return NextResponse.json(profile, { status: 200 });
   } catch (e) {
     console.error('Error in /api/farcaster/profile', e);
