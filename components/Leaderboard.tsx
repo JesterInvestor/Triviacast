@@ -50,10 +50,18 @@ async function ensureOnchainKit() {
 }
 
 function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string; avatarImgUrl?: string; fid?: number; bio?: string; followers?: number; following?: number; hasPowerBadge?: boolean } | null | undefined; fallbackAddress: string }) {
-  // Only show wallet address, no Farcaster profile
+  // Use avatar from profile if available, else fallback to stamp
+  const avatarUrl = profile?.avatarImgUrl || (fallbackAddress ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32` : undefined);
+  const display = profile?.username || profile?.displayName || "Unknown User";
   return (
     <div className="flex items-center gap-2">
-      <span className="font-bold text-[#2d1b2e] text-base sm:text-lg">{fallbackAddress}</span>
+      {avatarUrl && (
+        <img src={avatarUrl} alt="avatar" className="rounded-full w-8 h-8" />
+      )}
+      <span className="font-bold text-[#2d1b2e] text-base sm:text-lg">{display}</span>
+      {profile?.fid && (
+        <span className="ml-2 text-xs text-gray-400">FID: {profile.fid}</span>
+      )}
     </div>
   );
 }
@@ -221,7 +229,11 @@ export default function Leaderboard() {
                           <td className="py-3 align-middle w-12 font-semibold text-sm text-[#2d1b2e]">{rank}</td>
                           <td className="py-3 align-middle">
                             <div className="flex items-center gap-3">
-                              <ProfileDisplay profile={null} fallbackAddress={addr} />
+                              <ProfileDisplay profile={profile} fallbackAddress={addr} />
+                              {/* Show error if no profile found and error exists for this address */}
+                              {!profile && profileErrors && (profileErrors[addr] || profileErrors['all']) && (
+                                <span className="text-xs text-red-500 ml-2">{profileErrors[addr] || profileErrors['all']}</span>
+                              )}
                             </div>
                           </td>
                           <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{entry.tPoints.toLocaleString()}</td>
