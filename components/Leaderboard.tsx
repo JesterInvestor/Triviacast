@@ -90,7 +90,7 @@ export default function Leaderboard() {
 
         // Batch fetch Farcaster profiles for leaderboard addresses
         const addresses = board.map(b => b.walletAddress?.toLowerCase()).filter(Boolean);
-        let profilesByAddress: Record<string, { displayName?: string; username?: string } | null> = {};
+  const profilesByAddress: Record<string, { displayName?: string; username?: string } | null> = {};
         try {
           const response = await fetch('/api/neynar/user', {
             method: 'POST',
