@@ -21,6 +21,27 @@ export default function Home() {
     });
   }, []);
 
+  // ...existing code...
+  // Add hooks for wallet info
+  const [ethBalance, setEthBalance] = React.useState<string>('0.0000');
+  const [username, setUsername] = React.useState<string>('');
+  const { address } = require('wagmi').useAccount();
+  React.useEffect(() => {
+    async function fetchBalance() {
+      if (address) {
+        // Fetch ETH balance
+        const res = await fetch(`/api/wallet/balance?address=${address}`);
+        const data = await res.json();
+        setEthBalance(data.balance || '0.0000');
+        // Fetch Farcaster username
+        const resp = await fetch(`/api/neynar/user?address=${address}`);
+        const json = await resp.json();
+        setUsername(json?.result?.user?.username || '');
+      }
+    }
+    fetchBalance();
+  }, [address]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1]">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
@@ -35,28 +56,33 @@ export default function Home() {
               priority
             />
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e]">Triviacast</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] flex items-center gap-2">
+                Triviacast
+                <ShareButton
+                  url={shareAppUrl()}
+                  className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[32px] ml-2"
+                  ariaLabel="Share app on Farcaster"
+                />
+              </h1>
               <p className="text-xs sm:text-sm text-[#5a3d5c]">Test Your Brain Power</p>
             </div>
           </div>
-          {/* Center wallet connect, leaderboard, and share button together. All buttons are the same height */}
+          {/* Wallet info and points */}
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto justify-center">
+            <div className="flex flex-col items-center justify-center bg-white rounded-lg border-2 border-[#F4A6B7] shadow-md px-4 py-2">
+              <span className="font-bold text-[#DC8291]">{username || 'Wallet'}</span>
+              <span className="text-xs text-gray-500">{address}</span>
+              <span className="text-xs text-[#5a3d5c]">{ethBalance} ETH</span>
+            </div>
             <WalletPoints />
             <ClientOnlyWidgets />
-            <div className="flex flex-row items-center justify-center gap-2 w-full sm:w-auto">
-              <Link
-                href="/leaderboard"
-                className="h-[40px] flex items-center rounded-md bg-[#fff] text-[#c85b86] hover:bg-[#f7f7f7] px-3 py-2 font-semibold text-xs sm:text-sm shadow transition"
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                Leaderboard
-              </Link>
-              <ShareButton
-                url={shareAppUrl()}
-                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[44px]"
-                ariaLabel="Share app on Farcaster"
-              />
-            </div>
+            <Link
+              href="/leaderboard"
+              className="h-[40px] flex items-center rounded-md bg-[#fff] text-[#c85b86] hover:bg-[#f7f7f7] px-3 py-2 font-semibold text-xs sm:text-sm shadow transition"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              Leaderboard
+            </Link>
           </div>
         </div>
         <Quiz />
