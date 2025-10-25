@@ -141,8 +141,87 @@ export async function POST(req: Request) {
     if (!username && !address) {
       return NextResponse.json({ error: 'username or address required' }, { status: 400 });
     }
-    if (!profile) return NextResponse.json({ found: false, profile: null }, { status: 200 });
-    return NextResponse.json({ found: true, profile }, { status: 200 });
+    // Try to fetch the user's recent casts (up to 5). This is best-effort — missing API key
+    // or missing endpoints will simply result in an empty array.
+  const apiKey = (globalThis as any).process?.env?.NEYNAR_API_KEY || (globalThis as any).process?.env?.NEXT_PUBLIC_NEYNAR_API_KEY;
+    const normalizeCast = (c: any) => {
+      // Normalise varying shapes coming from different Neynar SDK / HTTP shapes
+      return {
+        hash: c.hash || c.castHash || c.cast_hash || c.cast_hash_hex || c.hash_hex || null,
+        text: c.text || c.body || c.embed?.text || (c.data && c.data.text) || null,
+        timestamp: c.timestamp || c.created_at || c.createdAt || null,
+        embeds: c.embed ? (Array.isArray(c.embed) ? c.embed : [c.embed]) : (c.embeds || null),
+        raw: c,
+      };
+    };
+
+    let casts: any[] = [];
+    const fid = profile?.raw?.fid ?? profile?.raw?.fid;
+    if (fid) {
+      // Try SDK first
+      try {
+        // dynamic import — ignore missing types at compile time
+        // @ts-ignore
+        const mod = await import('@neynar/nodejs-sdk');
+        const { NeynarAPIClient, Configuration } = mod as any;
+        const client = new NeynarAPIClient(new Configuration({ apiKey }));
+
+        let sdkResp: any = null;
+        if (typeof client.fetchCastsByFid === 'function') {
+          sdkResp = await client.fetchCastsByFid({ fid: String(fid), limit: 5 });
+        } else if (typeof client.fetchCasts === 'function') {
+          sdkResp = await client.fetchCasts({ fid: String(fid), limit: 5 });
+        } else if (typeof client.fetchCastsByUser === 'function') {
+          sdkResp = await client.fetchCastsByUser({ fid: String(fid), limit: 5 });
+        }
+
+        if (sdkResp) {
+          const arr = sdkResp?.result?.casts || sdkResp?.casts || sdkResp?.result || sdkResp;
+          if (Array.isArray(arr)) casts = arr.slice(0, 5).map(normalizeCast);
+        }
+      } catch (e) {
+        // ignore SDK errors — we'll try HTTP fallbacks below
+      }
+
+      // If SDK didn't yield results, try a few HTTP endpoints Neynar might expose
+      if (casts.length === 0) {
+        try {
+          const tryUrls = [
+            `https://api.neynar.com/v2/farcaster/casts?fid=${encodeURIComponent(String(fid))}&limit=5`,
+            `https://api.neynar.com/v2/farcaster/cast/by_fid?fid=${encodeURIComponent(String(fid))}&limit=5`,
+            `https://api.neynar.com/v2/farcaster/cast/by_user?fid=${encodeURIComponent(String(fid))}&limit=5`,
+          ];
+          for (const url of tryUrls) {
+            try {
+              const resp = await fetch(url, {
+                headers: {
+                  accept: 'application/json',
+                  ...(apiKey ? { 'X-API-KEY': apiKey } : {}),
+                },
+              });
+              if (!resp.ok) continue;
+              const data = await resp.json();
+              const arr = data?.result?.casts || data?.casts || data?.result || data;
+              if (Array.isArray(arr) && arr.length > 0) {
+                casts = arr.slice(0, 5).map(normalizeCast);
+                break;
+              }
+            } catch (inner) {
+              // try next URL
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+    }
+
+    // Attach casts to the profile (may be empty array)
+  if (profile) (profile as any).casts = casts;
+
+    if (!profile) return NextResponse.json({ error: 'not found' }, { status: 404 });
+    // Per request: return only the profile object (no wrapper)
+    return NextResponse.json(profile, { status: 200 });
   } catch (e) {
     console.error('Error in /api/farcaster/profile', e);
     return NextResponse.json({ error: 'internal' }, { status: 500 });
