@@ -8,6 +8,7 @@ export async function POST(req: Request) {
     const username = typeof body?.username === 'string' ? body.username.trim().replace(/^@/, '') : null;
 
     let profile = null;
+    let resolvedAddress = address;
     if (username) {
       // Lookup by Farcaster username using Neynar API
       const apiKey = process.env.NEYNAR_API_KEY || process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
@@ -22,23 +23,19 @@ export async function POST(req: Request) {
       );
       if (resp.ok) {
         const data = await resp.json();
-        if (data && data.result) {
-          const user = data.result;
-          profile = {
-            username: user.username,
-            pfpUrl: user.pfp_url || user.avatar_url,
-            bio: user.bio?.text,
-            displayName: user.display_name,
-            followers: user.follower_count,
-            following: user.following_count,
-            hasPowerBadge: !!user.power_badge,
-            isFollowing: !!user.is_following,
-            isOwnProfile: !!user.is_own_profile,
-          };
+        if (data && data.result && data.result.custody_address) {
+          resolvedAddress = data.result.custody_address;
+        } else {
+          // Username not found
+          return NextResponse.json({ found: false, profile: null }, { status: 200 });
         }
+      } else {
+        // Username lookup failed
+        return NextResponse.json({ error: 'username lookup failed' }, { status: 500 });
       }
-    } else if (address) {
-      profile = await resolveFarcasterProfile(address);
+    }
+    if (resolvedAddress) {
+      profile = await resolveFarcasterProfile(resolvedAddress);
     }
 
     if (!username && !address) {
