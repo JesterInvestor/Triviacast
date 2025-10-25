@@ -49,34 +49,36 @@ export default function FarcasterLookupPage() {
   };
 
   return (
-    <div className="min-h-screen p-6">
-  <h1 className="text-2xl font-bold mb-4">Farcaster profile lookup</h1>
-  <p className="mb-4 text-sm text-gray-600">Enter a Farcaster username or Ethereum address to fetch the Farcaster profile.</p>
-      <div className="mb-4 flex flex-col gap-2" style={{ maxWidth: '400px' }}>
-        <NeynarUserDropdown value={username} onChange={setUsername} />
-        <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="0x... (optional)" className="border p-2 rounded w-full" />
-        <button onClick={lookup} disabled={loading} className="bg-blue-600 text-white px-4 rounded">{loading ? 'Loading...' : 'Lookup'}</button>
-      </div>
-
-      {error && <div className="text-red-600">{error}</div>}
-
-      {result && result.profile && (
-        <div className="mt-4 bg-white p-4 rounded shadow">
-          <ProfileCard
-            avatarImgUrl={result.profile.pfpUrl || "https://i.imgur.com/naZWL9n.gif"}
-            bio={result.profile.bio || "No bio available."}
-            displayName={result.profile.displayName || result.profile.username || "Unknown"}
-            followers={result.profile.followers || 0}
-            following={result.profile.following || 0}
-            hasPowerBadge={!!result.profile.hasPowerBadge}
-            isFollowing={!!result.profile.isFollowing}
-            isOwnProfile={!!result.profile.isOwnProfile}
-            onCast={() => {}}
-            username={result.profile.username || ""}
-          />
-          <pre className="text-xs overflow-auto">{JSON.stringify(result, null, 2)}</pre>
+    <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
+        <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] text-center">Farcaster Profile Lookup</h1>
+          <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Enter a Farcaster username or Ethereum address to fetch the Farcaster profile.</p>
+          <div className="flex flex-col items-center gap-2 w-full max-w-md bg-white rounded-xl border-2 border-[#F4A6B7] shadow-md px-4 py-4">
+            <NeynarUserDropdown value={username} onChange={setUsername} />
+            <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="0x... (optional)" className="border p-2 rounded w-full" />
+            <button onClick={lookup} disabled={loading} className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg transition shadow-md w-full">{loading ? 'Loading...' : 'Lookup'}</button>
+          </div>
+          {error && <div className="text-red-600 mt-2">{error}</div>}
+          {result && result.profile && (
+            <div className="mt-4 bg-white p-4 rounded-xl shadow-md w-full max-w-md flex flex-col items-center">
+              <ProfileCard
+                avatarImgUrl={result.profile.pfpUrl || "https://i.imgur.com/naZWL9n.gif"}
+                bio={result.profile.bio || "No bio available."}
+                displayName={result.profile.displayName || result.profile.username || "Unknown"}
+                followers={result.profile.followers || 0}
+                following={result.profile.following || 0}
+                hasPowerBadge={!!result.profile.hasPowerBadge}
+                isFollowing={!!result.profile.isFollowing}
+                isOwnProfile={!!result.profile.isOwnProfile}
+                onCast={() => {}}
+                username={result.profile.username || ""}
+              />
+              <pre className="text-xs overflow-auto mt-2">{JSON.stringify(result, null, 2)}</pre>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
