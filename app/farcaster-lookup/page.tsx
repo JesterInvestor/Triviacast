@@ -21,7 +21,6 @@ type LookupResult = {
 } | null;
 
 export default function FarcasterLookupPage() {
-  const [address, setAddress] = useState<string>('');
   const [username, setUsername] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<LookupResult>(null);
@@ -32,24 +31,8 @@ export default function FarcasterLookupPage() {
     setError(null);
     setResult(null);
     try {
-      // Normalize address before sending to the API.
-      // Accepts either 0x-prefixed or bare 40-hex char addresses and returns lowercased 0x-prefixed address.
-      const normalizeAddress = (input: string | null | undefined): string | null => {
-        if (!input) return null;
-        const s = input.trim();
-        if (s === '') return null;
-        // If ENS-like (contains a dot) leave it as-is so server can attempt resolution
-        if (s.includes('.') && !s.startsWith('0x')) return s;
-        let hex = s.startsWith('0x') ? s.slice(2) : s;
-        // strip possible whitespace
-        hex = hex.trim();
-        if (!/^[a-fA-F0-9]{40}$/.test(hex)) return null;
-        return `0x${hex.toLowerCase()}`;
-      };
-
-      const normalized = normalizeAddress(address);
-      if (address && !normalized) {
-        setError('Invalid wallet address — must be a 0x-prefixed or 40-hex character address');
+      if (!username || username.trim() === '') {
+        setError('Please provide a Farcaster username to lookup');
         setLoading(false);
         return;
       }
@@ -57,7 +40,7 @@ export default function FarcasterLookupPage() {
       const res = await fetch('/api/farcaster/profile', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ address: normalized || null, username }),
+        body: JSON.stringify({ username }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'lookup failed');
@@ -75,10 +58,9 @@ export default function FarcasterLookupPage() {
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
           <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] text-center">Farcaster Profile Lookup</h1>
-          <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Enter a Farcaster username or Ethereum address to fetch the Farcaster profile.</p>
+          <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Enter a Farcaster username to fetch the Farcaster profile.</p>
           <div className="flex flex-col items-center gap-2 w-full max-w-md bg-white rounded-xl border-2 border-[#F4A6B7] shadow-md px-4 py-4">
             <NeynarUserDropdown value={username} onChange={setUsername} />
-            <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="0x... (optional)" className="border p-2 rounded w-full" />
             <button onClick={lookup} disabled={loading} className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg transition shadow-md w-full">{loading ? 'Loading...' : 'Lookup'}</button>
           </div>
           {error && <div className="text-red-600 mt-2">{error}</div>}
