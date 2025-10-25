@@ -83,6 +83,9 @@ export default function RootLayout({
             <FarcasterMiniAppReady />
             <ClientServiceWorkerCleanup />
             {children}
+            {/* Bottom navigation tabs */}
+            <div style={{ height: '56px' }} /> {/* Spacer for nav */}
+            {typeof window !== 'undefined' && require('@/components/BottomNav').default()}
             {/* Client-only widgets (miniapp prompt, staking prompt, toaster) */}
             <ClientOnlyWidgets />
           </ThirdwebProvider>

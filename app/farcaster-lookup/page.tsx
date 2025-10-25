@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import ProfileCard from '@/components/ProfileCard';
 
 type LookupResult = { found?: boolean; profile?: { username?: string; pfpUrl?: string }; error?: string } | null;
 
@@ -44,6 +45,18 @@ export default function FarcasterLookupPage() {
 
       {result && (
         <div className="mt-4 bg-white p-4 rounded shadow">
+          <ProfileCard
+            avatarImgUrl="https://i.imgur.com/naZWL9n.gif"
+            bio="building /neynar 🪐 | neynar.com | /rish"
+            displayName="rish"
+            followers={127364}
+            following={676}
+            hasPowerBadge
+            isFollowing
+            isOwnProfile
+            onCast={function Xs(){}}
+            username="rish"
+          />
           <pre className="text-xs overflow-auto">{JSON.stringify(result, null, 2)}</pre>
         </div>
       )}
