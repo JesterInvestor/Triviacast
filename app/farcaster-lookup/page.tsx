@@ -20,10 +20,13 @@ type LookupResult = {
     pfpUrl?: string;
     bio?: string;
 // ...existing code...
-    displayName?: string;
-    isFollowing?: boolean;
-    isOwnProfile?: boolean;
-    casts?: Cast[];
+  displayName?: string;
+  followers?: number;
+  following?: number;
+  hasPowerBadge?: boolean;
+  isFollowing?: boolean;
+  isOwnProfile?: boolean;
+  casts?: Cast[];
   };
   error?: string;
 } | null;
