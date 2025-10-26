@@ -5,7 +5,9 @@ import { metaMask, walletConnect } from '@wagmi/connectors';
 
 const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
 
-export const wagmiConfig = createConfig({
+const _wagmiConfig: any = {
+  // Let wagmi attempt to restore previous sessions when possible.
+  autoConnect: true,
   chains: [base],
   transports: {
     [base.id]: rpcUrl ? http(rpcUrl) : http(),
@@ -18,4 +20,6 @@ export const wagmiConfig = createConfig({
       showQrModal: true,
     }),
   ],
-});
+};
+
+export const wagmiConfig = createConfig(_wagmiConfig);
