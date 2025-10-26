@@ -4,6 +4,7 @@ import { WagmiConfig } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { wagmiConfig } from '@/lib/wagmi';
 import { useState } from 'react';
+import AutoConnector from './AutoConnector';
 
 // A thin client-side wrapper for Wagmi's provider suitable for Next.js App Router.
 export default function WagmiProvider({ children }: { children: React.ReactNode }) {
@@ -11,6 +12,7 @@ export default function WagmiProvider({ children }: { children: React.ReactNode 
   return (
     <WagmiConfig config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
+        <AutoConnector />
         {children}
       </QueryClientProvider>
     </WagmiConfig>
