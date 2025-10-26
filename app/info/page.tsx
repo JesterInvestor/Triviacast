@@ -20,7 +20,7 @@ export default function InfoPage() {
           </div>
         </div>
         <div className="mb-4 text-lg text-gray-800 text-center">
-          <strong>Triviacast</strong> is not just a trivia game—it's a brain-powered party on Farcaster! Connect your wallet, flex your knowledge, and climb the leaderboard. Every question is a chance to show off your smarts and earn T Points. 🧠✨
+          <strong>Triviacast</strong> is not just a trivia game! It's a brain-powered party on Farcaster! Connect your wallet, flex your knowledge, and climb into the leaderboard. Every question is a chance to show off your smarty pants and earn T Points. 🧠✨
         </div>
         <div className="mb-4 text-lg text-fuchsia-800 font-semibold text-center">
           🚀 Connect with Farcaster and your Base wallet to unlock the full Triviacast experience!
@@ -29,18 +29,18 @@ export default function InfoPage() {
           <h2 className="text-xl font-bold mb-2 text-purple-600">How to Play</h2>
           <ul className="list-disc pl-6 text-gray-700">
             <li>Connect your Base wallet (no brain wallet required!)</li>
-            <li>Answer timed trivia questions—speed and accuracy matter!</li>
+            <li>Answer timed trivia open source questions. Speed and accuracy matter!</li>
             <li>Rack up T Points for every correct answer</li>
             <li>See your Farcaster profile and avatar on the leaderboard</li>
             <li>Claim your points on-chain and show off your trivia skills</li>
-            <li>Compete with friends, foes, and Farcaster legends</li>
+            <li>Compete with friends, foes, and Farcaster legends (Multiplayer coming......)</li>
           </ul>
         </div>
         <div className="mb-6 p-4 bg-yellow-50 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-yellow-700">Did You Know?</h2>
           <ul className="list-disc pl-6 text-gray-700">
-            <li>The fastest answer ever recorded on Triviacast was 0.42 seconds! ⚡</li>
-            <li>Our leaderboard is powered by Farcaster usernames—no more boring addresses!</li>
+            <li>The fastest answer ever recorded on Triviacast was 0.042 seconds!(render speed) ⚡</li>
+            <li>Our leaderboard is powered by neynar; no more boring addresses!</li>
             <li>Every T Point you earn is a badge of honor (and maybe bragging rights).</li>
             <li>We use Neynar to fetch Farcaster profiles in bulk—so you always look your best.</li>
           </ul>
