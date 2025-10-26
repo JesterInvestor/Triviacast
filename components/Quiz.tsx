@@ -33,6 +33,12 @@ export default function Quiz() {
   const startQuiz = async () => {
     setLoading(true);
     setError(null);
+    // Prevent starting if wallet is not connected (defensive guard in addition to disabled button)
+    if (!isConnected || !accountAddress) {
+      setError('Please connect your wallet to start the quiz');
+      setLoading(false);
+      return;
+    }
     
     try {
       const response = await fetch('/api/questions?amount=10&difficulty=medium');
