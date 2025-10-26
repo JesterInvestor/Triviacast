@@ -42,13 +42,13 @@ export default function InfoPage() {
             <li>The fastest answer ever recorded on Triviacast was 0.042 seconds!(render speed) ⚡</li>
             <li>Our leaderboard is powered by neynar; no more boring addresses!</li>
             <li>Every T Point you earn is a badge of honor (and maybe bragging rights).</li>
-            <li>We use Neynar to fetch Farcaster profiles in bulk—so you always look your best.</li>
+            <li>We use neynar to fetch Farcaster profiles in bulk—so you always look your best.</li>
           </ul>
         </div>
         <div className="mb-6 p-4 bg-blue-50 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-blue-700">Tech & Credits</h2>
           <ul className="list-disc pl-6 text-gray-700">
-            <li>Built with Next.js, React, Thirdweb, and Neynar SDK</li>
+            <li>Built with next.js, react, thirdweb, and neynar SDK</li>
             <li>Smart contracts live on Base (where trivia meets blockchain)</li>
             <li>Open source: <a href="https://github.com/JesterInvestor/Triviacast" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">GitHub</a></li>
           </ul>
