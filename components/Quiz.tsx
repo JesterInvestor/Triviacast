@@ -41,7 +41,8 @@ export default function Quiz() {
     }
     
     try {
-      const response = await fetch('/api/questions?amount=10&difficulty=medium');
+  // Request easy and medium questions explicitly
+  const response = await fetch('/api/questions?amount=10&difficulty=easy,medium');
       const data = await response.json();
       
       if (data.error) {
