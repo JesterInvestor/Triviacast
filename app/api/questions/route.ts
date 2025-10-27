@@ -93,23 +93,55 @@ const SAMPLE_QUESTIONS = {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const amount = searchParams.get('amount') || '10';
-  const difficulty = searchParams.get('difficulty') || 'medium';
+  const amount = Number(searchParams.get('amount') || '10');
+  // Always restrict to easy or medium questions. If the caller requested a
+  // different difficulty (e.g. hard or any), we'll still return a mix of easy
+  // and medium. This keeps gameplay accessible.
+  const requestedDifficulty = (searchParams.get('difficulty') || 'medium').toLowerCase();
   const category = searchParams.get('category') || '';
 
   try {
-    const url = `https://opentdb.com/api.php?amount=${amount}&difficulty=${difficulty}${category ? `&category=${category}` : ''}&type=multiple`;
-    const response = await fetch(url);
-    const data = await response.json();
-    
-    if (data.response_code !== 0) {
-      return NextResponse.json(
-        { error: 'Failed to fetch questions' },
-        { status: 500 }
-      );
+    // We will fetch separately for easy and medium and combine results so the
+    // response contains only easy/medium items regardless of requested difficulty.
+    const half = Math.ceil(amount / 2);
+    const easyCount = Math.floor(amount / 2);
+    const mediumCount = amount - easyCount;
+
+    const buildUrl = (count: number, diff: string) =>
+      `https://opentdb.com/api.php?amount=${count}&difficulty=${diff}${category ? `&category=${category}` : ''}&type=multiple`;
+
+    // If caller explicitly requested only easy or only medium, respect that by
+    // returning questions of that type only. Otherwise, return a mix.
+    if (requestedDifficulty === 'easy' || requestedDifficulty === 'medium') {
+      const url = buildUrl(amount, requestedDifficulty === 'easy' ? 'easy' : 'medium');
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.response_code !== 0) {
+        return NextResponse.json({ error: 'Failed to fetch questions' }, { status: 500 });
+      }
+      // Ensure returned items are only easy/medium (defensive)
+      const filtered = (data.results || []).filter((q: any) => q.difficulty === 'easy' || q.difficulty === 'medium');
+      return NextResponse.json({ ...data, results: filtered.slice(0, amount) });
     }
 
-    return NextResponse.json(data);
+    // Default: mix easy and medium
+    const [easyResp, mediumResp] = await Promise.all([
+      fetch(buildUrl(easyCount, 'easy')),
+      fetch(buildUrl(mediumCount, 'medium')),
+    ]);
+
+    const [easyData, mediumData] = await Promise.all([easyResp.json(), mediumResp.json()]);
+
+    // If either call failed, fall back to whichever succeeded or to samples
+    const easyResults = (easyData?.response_code === 0 && Array.isArray(easyData.results)) ? easyData.results : [];
+    const mediumResults = (mediumData?.response_code === 0 && Array.isArray(mediumData.results)) ? mediumData.results : [];
+
+    const combined = [...easyResults, ...mediumResults].slice(0, amount);
+    if (combined.length === 0) {
+      return NextResponse.json(SAMPLE_QUESTIONS);
+    }
+
+    return NextResponse.json({ response_code: 0, results: combined });
   } catch (error) {
     console.error('Error fetching questions:', error);
     console.log('Using sample questions as fallback');
