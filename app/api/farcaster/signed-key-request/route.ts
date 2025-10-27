@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { bytesToHex, hexToBytes } from "viem";
+import { getFid } from '@/utils/getFid';
 
 // Simple in-memory rate limiter (dev). Per-IP, max 10 requests per minute.
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -42,11 +43,16 @@ export async function POST(req: Request) {
         // deadline: 1 hour from now (server chooses reasonable short TTL)
         const deadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 60);
 
-        // NOTE: requestFid is application-specific. For a proper production flow you
-        // should determine the app FID (e.g., via Neynar or by configuration). For
-        // a convenient development fallback we use 0n here; downstream callers should
-        // treat this as a dev-signed metadata unless you wire a real app fid.
-        const requestFid = BigInt(0);
+        // Determine requestFid: prefer explicit APP_FID, otherwise resolve via Neynar
+        // using the FARCASTER_DEVELOPER_MNEMONIC-derived custody address.
+        let requestFid = BigInt(0);
+        try {
+          const fidNum = await getFid();
+          requestFid = BigInt(fidNum);
+        } catch (fidErr) {
+          console.warn('Could not resolve app FID via getFid(); falling back to 0', fidErr);
+          requestFid = BigInt(0);
+        }
 
         const keyBytes = hexToBytes(keyHex as `0x${string}`);
         const sig = await appSigner.signKeyRequest({ requestFid, key: keyBytes, deadline });

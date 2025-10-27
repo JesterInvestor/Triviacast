@@ -58,9 +58,22 @@ export async function POST(req: Request) {
       }
     }
 
-    // No bundler configured: perform a safe dev-only echo and return a mock tx hash.
-    console.info('[farcaster/register] dev-mode payload', { payload });
-    return NextResponse.json({ txHash: '0xdev-mock-register', dev: true, note: 'No FARCASTER_BUNDLER_URL configured; mock response' });
+    // If Neynar is configured and the payload looks like a signed-key registration
+    // (contains signerUuid & signature), attempt to register via Neynar's API.
+    if (process.env.NEYNAR_API_KEY && payload?.signerUuid && payload?.signature) {
+      try {
+        const neynarClient = (await import('@/lib/neynarClient')).default;
+        const resp = await (neynarClient as any).registerSignedKey({ signerUuid: payload.signerUuid, appFid: payload.appFid, deadline: payload.deadline, signature: payload.signature });
+        return NextResponse.json({ result: resp, note: 'Registered via Neynar API' });
+      } catch (err) {
+        console.error('neynar registerSignedKey failed', err);
+        return NextResponse.json({ error: 'Failed to register via Neynar' }, { status: 502 });
+      }
+    }
+
+    // No bundler configured: return a helpful error indicating required production config.
+    console.info('[farcaster/register] dev-mode payload (no bundler configured)', { payload });
+    return NextResponse.json({ error: 'FARCASTER_BUNDLER_URL not configured. Set FARCASTER_BUNDLER_URL to forward to a bundler or configure a bundler service.', dev: true }, { status: 501 });
   } catch (err: unknown) {
     console.error('register endpoint error', err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
