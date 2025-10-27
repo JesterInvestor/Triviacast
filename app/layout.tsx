@@ -78,6 +78,28 @@ export default function RootLayout({
         {/* Removed browser-specific service worker registration script */}
       </head>
       <body className="antialiased">
+        {/* Global client-side error guards: catch unhandled promise rejections and window errors
+            so third-party SDKs that reject during initialization don't break the whole app UI.
+            This is a defensive measure for dev/preview environments; keep monitoring/logging
+            properly in production (Sentry/monitoring configured server-side). */}
+        <script dangerouslySetInnerHTML={{
+          __html: `(function(){
+            if(typeof window==='undefined') return;
+            window.addEventListener('unhandledrejection', function(evt){
+              try{
+                console.warn('[unhandledrejection] prevented', evt.reason);
+                // Prevent default so it doesn't surface as an uncaught exception
+                if(evt && typeof evt.preventDefault === 'function') evt.preventDefault();
+              }catch(e){console.error('error handling unhandledrejection', e)}
+            });
+            window.addEventListener('error', function(evt){
+              try{
+                // Log and allow the app to continue; important runtime errors should still be visible
+                console.error('[window.error] caught', evt.message || evt.error || evt.filename || evt);
+              }catch(e){console.error('error handling window.error', e)}
+            });
+          })();`
+        }} />
         <WagmiProvider>
           <ThirdwebProvider>
             {/* Ensure the Farcaster miniapp hides its splash when the app is ready */}
