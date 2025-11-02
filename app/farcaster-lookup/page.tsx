@@ -1,6 +1,6 @@
 
 "use client";
-import React, { useEffect } from 'react';
+import React from 'react';
 import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import ShareButton from '@/components/ShareButton';
 import { useState } from 'react';
@@ -46,19 +46,8 @@ export default function FarcasterLookupPage() {
   const [sending, setSending] = useState(false);
   const [previewResult, setPreviewResult] = useState<any>(null);
   const { user: neynarUser } = useNeynarContext();
-  // Prefill the search box from the URL query on the client to avoid
-  // using Next's `useSearchParams` (which requires a Suspense boundary
-  // during prerender). This runs only in the browser.
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const u = params.get('username') || params.get('q');
-      if (u) setUsername(u);
-    } catch (e) {
-      // ignore malformed URL
-    }
-  }, []);
+  // NOTE: intentionally not auto-prefilling the lookup from URL params.
+  // Shares should point to the canonical site only (https://triviacast.xyz).
 
   const lookup = async () => {
     setLoading(true);
@@ -174,8 +163,8 @@ export default function FarcasterLookupPage() {
                         // Use canonical site URL for share links
                         const origin = 'https://triviacast.xyz';
                         // Use the share name format @username.farcaster.eth when mentioning the challenged user
-                        const senderWithSuffix = sender ? `@${sender}.farcaster.eth` : '';
-                        const challengeLink = senderWithSuffix ? `${origin}/farcaster-lookup?username=${encodeURIComponent(senderWithSuffix)}` : `${origin}/farcaster-lookup`;
+                        // But share only the canonical site URL (no prefilled query param)
+                        const challengeLink = origin; // always share https://triviacast.xyz
                         const defaultText = cleanHandle
                           ? `@${cleanHandle}.farcaster.eth I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
                           : `I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`;
