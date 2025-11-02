@@ -7,6 +7,7 @@ import "./globals.css";
 import { WagmiConfig } from 'wagmi';
 import { wagmiConfig } from '@/lib/wagmi';
 import ThirdwebProvider from '@/components/ThirdwebProvider';
+import BottomNav from '@/components/BottomNav';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,7 +28,10 @@ export default function RootLayout({
           },
         }}
       >
-          <body className={inter.className}>{children}</body>
+          <body className={inter.className}>
+            {children}
+            <BottomNav />
+          </body>
           </Neynar.NeynarContextProvider>
         </ThirdwebProvider>
       </WagmiConfig>
