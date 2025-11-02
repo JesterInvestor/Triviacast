@@ -28,7 +28,8 @@ function getPlatform(): 'farcaster' | 'base' | 'web' {
   try {
     // Check sessionStorage for connector info
     const connector = sessionStorage.getItem('wagmi.connector');
-    if (connector && connector.includes('base')) {
+    // Match Base-specific connector ID more precisely
+    if (connector && (connector === '"base"' || connector.includes('"id":"base"'))) {
       return 'base';
     }
   } catch (e) {

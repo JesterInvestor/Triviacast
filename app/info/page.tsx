@@ -1,5 +1,7 @@
 "use client";
 
+import Image from 'next/image';
+
 export default function InfoPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
@@ -7,7 +9,7 @@ export default function InfoPage() {
         {/* Mini brain icon and header */}
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
           <div className="flex flex-col items-center gap-3 sm:gap-4 w-full">
-            <img
+            <Image
               src="/brain-small.svg"
               alt="Mini Brain"
               width={48}
@@ -56,7 +58,7 @@ export default function InfoPage() {
       </div>
       <div className="mb-6 p-4 bg-gradient-to-r from-pink-100 to-purple-100 rounded-xl shadow w-full max-w-2xl">
         <h2 className="text-xl font-bold mb-2 text-purple-700 flex items-center gap-2">
-          <img src="/brain-small.svg" alt="Brain" width={24} height={24} />
+          <Image src="/brain-small.svg" alt="Brain" width={24} height={24} />
           About T Points
         </h2>
         <ul className="list-disc pl-6 text-gray-700">
@@ -69,7 +71,7 @@ export default function InfoPage() {
       </div>
       <div className="mb-6 p-4 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-xl shadow w-full max-w-2xl">
         <h2 className="text-xl font-bold mb-2 text-orange-700 flex items-center gap-2">
-          <img src="/brain-small.svg" alt="Brain" width={24} height={24} />
+          <Image src="/brain-small.svg" alt="Brain" width={24} height={24} />
           About $TRIV
         </h2>
         <ul className="list-disc pl-6 text-gray-700">
