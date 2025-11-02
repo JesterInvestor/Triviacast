@@ -171,11 +171,11 @@ export default function FarcasterLookupPage() {
                         const senderRaw = neynarUser?.username || neynarUser?.displayName || neynarUser?.fid || neynarUser?.address || '';
                         const sender = senderRaw && senderRaw.startsWith('@') ? senderRaw.slice(1) : senderRaw;
                         const origin = typeof window !== 'undefined' ? window.location.origin : 'https://triviacast.xyz';
-                        // Use the share name format @username.farcaster.eth when pre-filling the lookup page
-                        const senderWithSuffix = sender ? `@${sender}.farcaster.eth` : '';
+                        // Use the share name format username.farcaster.eth when mentioning the challenged user
+                        const senderWithSuffix = sender ? `${sender}.farcaster.eth` : '';
                         const challengeLink = senderWithSuffix ? `${origin}/farcaster-lookup?username=${encodeURIComponent(senderWithSuffix)}` : `${origin}/farcaster-lookup`;
                         const defaultText = cleanHandle
-                          ? `@${cleanHandle} I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
+                          ? `${cleanHandle}.farcaster.eth I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
                           : `I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`;
                         setPreviewResult(res);
                         setPreviewText(defaultText);
