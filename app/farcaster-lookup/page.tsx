@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import ShareButton from '@/components/ShareButton';
 import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { useNeynarContext } from '@neynar/react';
 import Quiz from '@/components/Quiz';
 import { ProfileCard } from '@/components/ProfileCard';
@@ -46,17 +45,19 @@ export default function FarcasterLookupPage() {
   const [sending, setSending] = useState(false);
   const [previewResult, setPreviewResult] = useState<any>(null);
   const { user: neynarUser } = useNeynarContext();
-  const searchParams = useSearchParams();
-
-  // Prefill the search box if a `username` or `q` param is present
+  // Prefill the search box from the URL query on the client to avoid
+  // using Next's `useSearchParams` (which requires a Suspense boundary
+  // during prerender). This runs only in the browser.
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     try {
-      const u = searchParams?.get('username') || searchParams?.get('q');
+      const params = new URLSearchParams(window.location.search);
+      const u = params.get('username') || params.get('q');
       if (u) setUsername(u);
     } catch (e) {
-      // ignore - search params might not be available during SSR
+      // ignore malformed URL
     }
-  }, [searchParams]);
+  }, []);
 
   const lookup = async () => {
     setLoading(true);
