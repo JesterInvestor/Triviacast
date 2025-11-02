@@ -1,6 +1,6 @@
 "use client";
 
-import { NeynarContextProvider, Theme } from "@neynar/react";
+import NeynarContextProvider, { Theme } from "@neynar/react";
 import "@neynar/react/dist/style.css";
 import { Inter } from "next/font/google";
 import "./globals.css";
