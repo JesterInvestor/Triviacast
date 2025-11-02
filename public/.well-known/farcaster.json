@@ -25,7 +25,7 @@
     "tagline": "Test, Claim, and Share",
     "ogTitle": "Triviacast - Test your brain",
     "ogDescription": "Trivia quiz mini-game with unique open source quesitons (video games, history, culture, and more)",
-    "ogImageUrl": "https://triviacast.xyz/ogimage.png",
+    "ogImageUrl": "https://triviacast.xyz/og-image.png",
     "castShareUrl": "https://triviacast.xyz"
   },
   "accountAssociation": {
