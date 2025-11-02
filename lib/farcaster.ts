@@ -9,22 +9,64 @@ function getBaseUrl(): string {
   return 'https://triviacast.xyz';
 }
 
+// Detect which platform we're running on
+function getPlatform(): 'farcaster' | 'base' | 'web' {
+  if (typeof window === 'undefined') return 'web';
+  
+  // Check for Farcaster miniapp SDK
+  try {
+    // Try to detect Farcaster context
+    const ethereum = (window as any).ethereum;
+    if (ethereum?.isFarcaster || ethereum?.isMiniApp) {
+      return 'farcaster';
+    }
+  } catch (e) {
+    // ignore
+  }
+  
+  // Check if we're in Base wallet by checking the connector
+  try {
+    // Check sessionStorage for connector info
+    const connector = sessionStorage.getItem('wagmi.connector');
+    if (connector && connector.includes('base')) {
+      return 'base';
+    }
+  } catch (e) {
+    // ignore
+  }
+  
+  return 'web';
+}
+
 // Helper to open share URL properly within mini app or externally
 export async function openShareUrl(url: string): Promise<void> {
   if (typeof window === 'undefined') return;
   
-  try {
-    // Try to use Farcaster SDK if available (running in mini app)
-    const { sdk } = await import('@farcaster/miniapp-sdk');
-    // Use SDK's openUrl to handle the URL within the Farcaster client
-    await sdk.actions.openUrl(url);
-    return;
-  } catch (error) {
-    // SDK not available or failed to load - fall through to normal handling
-    console.log('Farcaster SDK not available, using normal link');
+  const platform = getPlatform();
+  
+  // For Farcaster miniapp, use the SDK
+  if (platform === 'farcaster') {
+    try {
+      const { sdk } = await import('@farcaster/miniapp-sdk');
+      await sdk.actions.openUrl(url);
+      return;
+    } catch (error) {
+      console.log('Farcaster SDK not available, using normal link');
+    }
   }
   
-  // Fallback to normal window.open for non-mini-app contexts
+  // For Base miniapp, open the app URL directly instead of Warpcast compose
+  if (platform === 'base') {
+    // Extract the app URL from the Warpcast compose URL if it contains embeds
+    const match = url.match(/embeds\[\]=([^&]+)/);
+    if (match) {
+      const appUrl = decodeURIComponent(match[1]);
+      window.open(appUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+  }
+  
+  // Fallback to normal window.open for web contexts
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 
@@ -43,6 +85,22 @@ export function buildWarpcastShareUrl(text: string, embeds?: string[]): string {
   return embedsParam ? `${base}?${textParam}&${embedsParam}` : `${base}?${textParam}`;
 }
 
+// Build a share URL that works for both Farcaster and Base
+export function buildPlatformShareUrl(text: string, embeds?: string[]): string {
+  const platform = getPlatform();
+  
+  if (platform === 'base') {
+    // For Base, return the app URL directly (first embed if available)
+    if (embeds && embeds.length > 0) {
+      return embeds[0];
+    }
+    return getBaseUrl();
+  }
+  
+  // For Farcaster and web, use Warpcast compose URL
+  return buildWarpcastShareUrl(text, embeds);
+}
+
 // Convenience builders
 export function shareAppText(): string {
   const url = getBaseUrl();
@@ -51,7 +109,7 @@ export function shareAppText(): string {
 
 export function shareAppUrl(): string {
   const url = getBaseUrl();
-  return buildWarpcastShareUrl(shareAppText(), [url]);
+  return buildPlatformShareUrl(shareAppText(), [url]);
 }
 
 export function shareResultsText(score: number, total: number, percent: number, tPoints: number): string {
@@ -62,7 +120,7 @@ export function shareResultsText(score: number, total: number, percent: number, 
 
 export function shareResultsUrl(score: number, total: number, percent: number, tPoints: number): string {
   const url = getBaseUrl();
-  return buildWarpcastShareUrl(shareResultsText(score, total, percent, tPoints), [url]);
+  return buildPlatformShareUrl(shareResultsText(score, total, percent, tPoints), [url]);
 }
 
 export function shareLeaderboardText(rank: number | null, points: number): string {
@@ -75,5 +133,5 @@ export function shareLeaderboardText(rank: number | null, points: number): strin
 
 export function shareLeaderboardUrl(rank: number | null, points: number): string {
   const site = getBaseUrl();
-  return buildWarpcastShareUrl(shareLeaderboardText(rank, points), [`${site}/leaderboard`]);
+  return buildPlatformShareUrl(shareLeaderboardText(rank, points), [`${site}/leaderboard`]);
 }
