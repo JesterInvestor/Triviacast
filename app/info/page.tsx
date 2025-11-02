@@ -54,7 +54,33 @@ export default function InfoPage() {
           </ul>
         </div>
       </div>
-      <div className="mb-6 p-4 bg-fuchsia-50 rounded-xl shadow">
+      <div className="mb-6 p-4 bg-gradient-to-r from-pink-100 to-purple-100 rounded-xl shadow w-full max-w-2xl">
+        <h2 className="text-xl font-bold mb-2 text-purple-700 flex items-center gap-2">
+          <img src="/brain-small.svg" alt="Brain" width={24} height={24} />
+          About T Points
+        </h2>
+        <ul className="list-disc pl-6 text-gray-700">
+          <li>Earn 1000 T points for each correct answer</li>
+          <li>Get 3 in a row for +500 bonus points</li>
+          <li>Get 5 in a row for +1000 bonus points</li>
+          <li>Perfect 10 in a row for +2000 bonus points!</li>
+          <li>T points will be used in this app</li>
+        </ul>
+      </div>
+      <div className="mb-6 p-4 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-xl shadow w-full max-w-2xl">
+        <h2 className="text-xl font-bold mb-2 text-orange-700 flex items-center gap-2">
+          <img src="/brain-small.svg" alt="Brain" width={24} height={24} />
+          About $TRIV
+        </h2>
+        <ul className="list-disc pl-6 text-gray-700">
+          <li>$TRIV is the native token CA 0xa889A10126024F39A0ccae31D09C18095CB461B8</li>
+          <li>CLAIM $TRIV when prompted</li>
+          <li className="font-bold text-orange-600">Top T point holders can claim HUGE Airdrops of $TRIV tokens daily!</li>
+          <li className="text-sm italic">BUY $TRIV with swap</li>
+          <li className="text-sm italic">Jackpot coming soon............ Users with 100,000 T points. So triviacast now!!!</li>
+        </ul>
+      </div>
+      <div className="mb-6 p-4 bg-fuchsia-50 rounded-xl shadow w-full max-w-2xl">
         <h2 className="text-xl font-bold mb-2 text-fuchsia-700">Connect & Cast</h2>
   <p className="text-gray-700">Cast to <a href="https://warpcast.com/jesterinvestor" className="text-fuchsia-600 underline" target="_blank" rel="noopener noreferrer">@jesterinvestor</a> with errors and feedback</p>
   <p className="mt-2 text-gray-700">Got a trivia fact, feature idea, or meme? Cast it our way!</p>

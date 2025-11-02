@@ -240,41 +240,22 @@ export default function Leaderboard() {
               </table>
             </div>
 
-            <div className="mt-6 sm:mt-8 text-center">
+            <div className="mt-6 sm:mt-8 text-center flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <Link
                 href="/"
                 className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-base sm:text-lg transition inline-block shadow-lg w-full sm:w-auto min-h-[52px]"
               >
                 Play Quiz
               </Link>
+              <Link
+                href="/info"
+                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-4 px-8 rounded-lg text-base sm:text-lg transition inline-block shadow-lg w-full sm:w-auto min-h-[52px]"
+              >
+                Learn About T Points & $TRIV
+              </Link>
             </div>
           </>
         )}
-
-        <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-[#FFE4EC] rounded-lg border-2 border-[#F4A6B7]">
-          <h3 className="font-semibold text-[#2d1b2e] mb-2 flex items-center gap-2 text-sm sm:text-base">
-            <Image src="/brain-small.svg" alt="Brain" width={24} height={24} />
-            About T Points:
-          </h3>
-          <ul className="text-xs sm:text-sm text-[#5a3d5c] space-y-1 font-medium">
-            <li>• Earn 1000 T points for each correct answer</li>
-            <li>• Get 3 in a row for +500 bonus points</li>
-            <li>• Get 5 in a row for +1000 bonus points</li>
-            <li>• Perfect 10 in a row for +2000 bonus points!</li>
-            <li>• T points will be used in this app</li>
-          </ul>
-          <h3 className="font-semibold text-[#2d1b2e] mb-2 mt-4 flex items-center gap-2 text-sm sm:text-base">
-            <Image src="/brain-small.svg" alt="Brain" width={24} height={24} />
-            About $TRIV
-          </h3>
-          <ul className="text-xs sm:text-sm text-[#5a3d5c] space-y-1 font-medium">
-            <li>• $TRIV is the native token CA 0xa889A10126024F39A0ccae31D09C18095CB461B8</li>
-            <li>• CLAIM $TRIV when prompted</li>
-            <li className="font-bold text-[#DC8291]">• Top T point holders can claim HUGE Airdrops of $TRIV tokens daily!</li>
-            <li className="text-xs italic">BUY $TRIV with swap</li>
-            <li className="text-xs italic">Jackpot coming soon............ Users with 100,000 T points. So triviacast now!!!</li>
-          </ul>
-        </div>
       </div>
     </div>
   );
