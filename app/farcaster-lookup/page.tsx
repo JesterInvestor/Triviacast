@@ -4,6 +4,7 @@ import React from 'react';
 import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import ShareButton from '@/components/ShareButton';
 import { useState } from 'react';
+import { useNeynarContext } from '@neynar/react';
 import Quiz from '@/components/Quiz';
 import { ProfileCard } from '@/components/ProfileCard';
 import { NeynarCastCard } from '@/components/NeynarCastCard';
@@ -39,6 +40,7 @@ export default function FarcasterLookupPage() {
   const [result, setResult] = useState<LookupResult>(null);
   const [error, setError] = useState<string | null>(null);
   const [quizOpen, setQuizOpen] = useState(false);
+  const { user: neynarUser } = useNeynarContext();
 
   const lookup = async () => {
     setLoading(true);
@@ -129,13 +131,20 @@ export default function FarcasterLookupPage() {
                   <div className="w-11/12 max-w-3xl">
                     <Quiz
                       onComplete={async (res) => {
-                        // Post result to server. Include a simple x-neynar-user header as a stub auth value.
+                        // Post result to server. Use Neynar client signer_uuid for auth header when available.
                         try {
+                          const headers: Record<string, string> = { 'content-type': 'application/json' };
+                          if (neynarUser?.signer_uuid) {
+                            headers['authorization'] = `Neynar ${neynarUser.signer_uuid}`;
+                          }
+                          if (neynarUser?.fid) {
+                            headers['x-neynar-fid'] = String(neynarUser.fid);
+                          }
+
                           await fetch('/api/send-result', {
                             method: 'POST',
                             headers: {
-                              'content-type': 'application/json',
-                              'x-neynar-user': (result?.profile?.username as string) || 'unknown',
+                              ...headers,
                             },
                             body: JSON.stringify({ targetHandle: result?.profile?.username, quizId: res.quizId, score: res.score, details: res.details || {} }),
                           });

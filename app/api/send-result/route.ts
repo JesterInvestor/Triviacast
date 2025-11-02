@@ -18,14 +18,20 @@ const RATE_LIMIT_MAX = 5; // max requests per window per user/ip
 export async function POST(request: NextRequest) {
   // Basic auth guard: require either `authorization` header or `x-neynar-user` header.
   const authHeader = request.headers.get('authorization');
-  const neynarUser = request.headers.get('x-neynar-user');
-  if (!authHeader && !neynarUser) {
+  const neynarUserHeader = request.headers.get('x-neynar-user');
+  if (!authHeader && !neynarUserHeader) {
     return NextResponse.json({ error: 'authentication required' }, { status: 401 });
   }
 
-  // Rate limiter key: prefer authenticated user id, else fall back to IP address.
+  // Determine rate-limiter key: prefer Neynar signer UUID from Authorization header
+  // (format: "Neynar <signer_uuid>"), else fall back to `x-neynar-user` header, else IP.
+  let authSignerUuid: string | null = null;
+  if (authHeader && authHeader.startsWith('Neynar ')) {
+    authSignerUuid = authHeader.slice('Neynar '.length).trim();
+  }
+
   const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
-  const key = neynarUser || ip || 'anon';
+  const key = authSignerUuid || neynarUserHeader || ip || 'anon';
   const now = Date.now();
   const entry = rateMap.get(key);
   if (!entry) {
