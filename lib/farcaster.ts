@@ -59,7 +59,8 @@ export async function openShareUrl(url: string): Promise<void> {
   // For Base miniapp, open the app URL directly instead of Warpcast compose
   if (platform === 'base') {
     // Extract the app URL from the Warpcast compose URL if it contains embeds
-    const match = url.match(/embeds\[\]=([^&]+)/);
+    // Handle both URL-encoded (%5B%5D) and regular ([]) square brackets
+    const match = url.match(/embeds(?:%5B%5D|\[\])=([^&]+)/);
     if (match) {
       const appUrl = decodeURIComponent(match[1]);
       window.open(appUrl, '_blank', 'noopener,noreferrer');
