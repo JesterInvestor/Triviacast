@@ -234,14 +234,41 @@ export default function FarcasterLookupPage() {
                       {/* Removed server-post option per request; users can post from their account or copy the text */}
 
                       <button
+                        type="button"
                         className="border px-3 py-2 rounded"
                         onClick={async () => {
+                          const textToCopy = `${previewText}${previewLink ? ` ${previewLink}` : ''}`;
+                          // Try modern clipboard API first
                           try {
-                            await navigator.clipboard.writeText(previewText);
-                            alert('Copied to clipboard');
-                          } catch {
-                            alert('Copy failed');
+                            if (navigator && (navigator as any).clipboard && (navigator as any).clipboard.writeText) {
+                              await (navigator as any).clipboard.writeText(textToCopy);
+                              alert('Copied to clipboard');
+                              return;
+                            }
+                          } catch (err) {
+                            // ignore and fallback
                           }
+
+                          // Fallback for older browsers: create a temporary textarea and execCommand
+                          try {
+                            const ta = document.createElement('textarea');
+                            ta.value = textToCopy;
+                            // Move it off-screen
+                            ta.style.position = 'fixed';
+                            ta.style.left = '-9999px';
+                            document.body.appendChild(ta);
+                            ta.select();
+                            const ok = document.execCommand('copy');
+                            document.body.removeChild(ta);
+                            if (ok) {
+                              alert('Copied to clipboard');
+                              return;
+                            }
+                          } catch (err) {
+                            // ignore
+                          }
+
+                          alert('Copy failed — please select the text manually and copy.');
                         }}
                       >
                         Copy
