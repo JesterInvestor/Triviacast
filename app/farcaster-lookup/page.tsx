@@ -1,9 +1,10 @@
 
 "use client";
-import React from 'react';
+import React, { useEffect } from 'react';
 import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import ShareButton from '@/components/ShareButton';
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useNeynarContext } from '@neynar/react';
 import Quiz from '@/components/Quiz';
 import { ProfileCard } from '@/components/ProfileCard';
@@ -45,6 +46,17 @@ export default function FarcasterLookupPage() {
   const [sending, setSending] = useState(false);
   const [previewResult, setPreviewResult] = useState<any>(null);
   const { user: neynarUser } = useNeynarContext();
+  const searchParams = useSearchParams();
+
+  // Prefill the search box if a `username` or `q` param is present
+  useEffect(() => {
+    try {
+      const u = searchParams?.get('username') || searchParams?.get('q');
+      if (u) setUsername(u);
+    } catch (e) {
+      // ignore - search params might not be available during SSR
+    }
+  }, [searchParams]);
 
   const lookup = async () => {
     setLoading(true);
@@ -101,6 +113,15 @@ export default function FarcasterLookupPage() {
             <span className="text-xs text-[#5a3d5c] mt-1">powered by <strong className="text-[#2d1b2e]">neynar</strong></span>
             </div>
           <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Enter a Farcaster username to fetch the Farcaster profile.</p>
+          <div className="w-full max-w-md bg-white rounded-md border p-3 mt-3 text-sm text-gray-700">
+            <strong className="block mb-1">How to challenge a friend</strong>
+            <ol className="list-decimal pl-6">
+              <li>Search your friend's Farcaster handle using the field above.</li>
+              <li>Click <em>Lookup</em> and then <em>Play Quiz</em> on their profile.</li>
+              <li>After you finish the quiz you'll see a preview message that mentions them — edit it if you want.</li>
+              <li>Post from your account via Warpcast or use <em>Post as Triviacast</em> to have the server publish the cast.</li>
+            </ol>
+          </div>
           <div className="flex flex-col items-center gap-2 w-full max-w-md bg-white rounded-xl border-2 border-[#F4A6B7] shadow-md px-4 py-4">
             <NeynarUserDropdown value={username} onChange={setUsername} />
             <button onClick={lookup} disabled={loading} className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg transition shadow-md w-full">{loading ? 'Loading...' : 'Lookup'}</button>
@@ -137,9 +158,16 @@ export default function FarcasterLookupPage() {
                       onComplete={(res) => {
                         // Open an editable preview modal so the user can edit the cast text
                         const target = result?.profile?.username || '';
-                        const defaultText = target
-                          ? `@${target} I scored ${res.score} on the Triviacast Challenge — beat my score!`
-                          : `I scored ${res.score} on the Triviacast Challenge — beat my score!`;
+                        // normalize handle so we don't end up with duplicate @ (some sources include '@')
+                        const cleanHandle = target.startsWith('@') ? target.slice(1) : target;
+                        const tPoints = (res.score ?? 0) * 1000; // 1 correct = 1000 T points (info page)
+                        const senderRaw = neynarUser?.username || neynarUser?.displayName || neynarUser?.fid || neynarUser?.address || '';
+                        const sender = senderRaw && senderRaw.startsWith('@') ? senderRaw.slice(1) : senderRaw;
+                        const origin = typeof window !== 'undefined' ? window.location.origin : 'https://triviacast.xyz';
+                        const challengeLink = sender ? `${origin}/farcaster-lookup?username=${encodeURIComponent(sender)}` : `${origin}/farcaster-lookup`;
+                        const defaultText = cleanHandle
+                          ? `@${cleanHandle} I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
+                          : `I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`;
                         setPreviewResult(res);
                         setPreviewText(defaultText);
                         setPreviewOpen(true);
@@ -173,43 +201,7 @@ export default function FarcasterLookupPage() {
                         Post from my account
                       </button>
 
-                      <button
-                        className="bg-[#F4A6B7] text-white px-3 py-2 rounded font-semibold"
-                        onClick={async () => {
-                          // Post via server (server-signed cast)
-                          if (!result?.profile?.username) {
-                            alert('No target selected');
-                            return;
-                          }
-                          setSending(true);
-                          try {
-                            const headers: Record<string, string> = { 'content-type': 'application/json' };
-                            if (neynarUser?.signer_uuid) headers['authorization'] = `Neynar ${neynarUser.signer_uuid}`;
-                            if (neynarUser?.fid) headers['x-neynar-fid'] = String(neynarUser.fid);
-
-                            const resp = await fetch('/api/send-result', {
-                              method: 'POST',
-                              headers,
-                              body: JSON.stringify({ targetHandle: result.profile.username, quizId: previewResult?.quizId, score: previewResult?.score, details: previewResult?.details || {}, text: previewText }),
-                            });
-                            if (!resp.ok) {
-                              const d = await resp.json().catch(() => ({}));
-                              throw new Error(d?.error || 'Failed to post cast');
-                            }
-                            alert('Cast posted successfully (server)');
-                            setPreviewOpen(false);
-                            setQuizOpen(false);
-                          } catch (err: unknown) {
-                            const e = err as { message?: string } | null;
-                            alert(`Failed to post: ${e?.message || 'unknown error'}`);
-                          } finally {
-                            setSending(false);
-                          }
-                        }}
-                        disabled={sending}
-                      >
-                        {sending ? 'Posting...' : 'Post as Triviacast'}
-                      </button>
+                      {/* Removed server-post option per request; users can post from their account or copy the text */}
 
                       <button
                         className="border px-3 py-2 rounded"

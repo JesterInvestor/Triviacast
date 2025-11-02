@@ -38,6 +38,17 @@ export default function InfoPage() {
             <li>Compete with friends, foes, and Farcaster legends (Multiplayer coming......)</li>
           </ul>
         </div>
+        <div className="mb-6 p-4 bg-white rounded-xl shadow w-full max-w-2xl border">
+          <h2 className="text-xl font-bold mb-2 text-purple-600">How to Challenge a Friend</h2>
+          <p className="text-gray-700">Want to dare a friend? Here's the quick flow:</p>
+          <ol className="list-decimal pl-6 text-gray-700 mt-2">
+            <li>Open <strong>Challenge</strong> (Challenge page) and search for your friend's Farcaster handle.</li>
+            <li>Click <strong>Play Quiz</strong> after selecting their profile.</li>
+            <li>When you finish the quiz you'll see a preview of a cast that mentions your friend (you can edit it).</li>
+            <li>Choose <strong>Post from my account</strong> to open Warpcast and post from your Farcaster account, or copy the message to share it manually.</li>
+            <li>Your friend will be mentioned in the cast — and the challenge is on. May the best brain win!</li>
+          </ol>
+        </div>
         <div className="mb-6 p-4 bg-yellow-50 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-yellow-700">Did You Know?</h2>
           <ul className="list-disc pl-6 text-gray-700">
