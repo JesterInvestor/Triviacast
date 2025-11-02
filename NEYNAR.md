@@ -1,3 +1,28 @@
+# Neynar SIWN + Farcaster lookup + Play Quiz -> send-result integration
+
+This branch adds a small integration to let users lookup Farcaster identities (via your NEYNAR backend), select a friend, play a quiz, and send the result as a Farcaster cast published by a server signer.
+
+Important environment variables (add to Vercel):
+
+- `NEXT_PUBLIC_NEYNAR_CLIENT_ID` — Neynar client id for the client SDK
+- `NEYNAR_API_KEY` — Neynar API key used by server-side proxy endpoints
+- `NEYNAR_BACKEND_SIGNER_UUID` — server signer UUID (used to sign/publish casts)
+- `NEYNAR_API_BASE` — base URL for your NEYNAR backend (proxy endpoints like `/follows` and `/casts`)
+- `NEYNAR_BACKEND_WALLET_ADDRESS` — optional, for documentation/reference
+
+Security notes / TODOs (MEZ):
+
+- Do NOT store private keys in this repository. Use Vercel secrets or a vault.
+- Protect `/api/send-result` with authentication (require a valid session/token) and apply rate-limiting to avoid abuse.
+- Persist send logs if you need auditing and to enforce more advanced rate limits.
+
+How it works (quick):
+
+- Frontend calls `/api/friends?address=<addr>` which proxies to `NEYNAR_API_BASE/follows`.
+- After selecting a friend the user can open the quiz modal, complete the quiz, and the frontend POSTs to `/api/send-result` with the quiz result.
+- `/api/send-result` forwards the request to `NEYNAR_API_BASE/casts` with `signerUuid` and `text` so your NEYNAR backend can sign/publish.
+
+If you want me to fully publish casts from this app instead of proxying to a NEYNAR backend, I can implement the server-side signing here using `@neynar/nodejs-sdk` — but you must provision `NEYNAR_API_KEY` and `NEYNAR_BACKEND_SIGNER_UUID` as secrets first.
 # Add a Verification
 Source: https://docs.neynar.com/docs/add-a-verification
 
