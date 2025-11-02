@@ -1,3 +1,16 @@
+declare module "@neynar/react" {
+  // Minimal ambient declarations to satisfy TypeScript in this repo.
+  import React from 'react';
+  export const NeynarContextProvider: React.FC<any>;
+  export const NeynarAuthButton: React.FC<any>;
+  export const NeynarUserDropdown: React.FC<any>;
+  export const NeynarCastCard: React.FC<any>;
+  export const useNeynarContext: () => any;
+  export const Theme: any;
+  export const SIWN_variant: any;
+  const _default: any;
+  export default _default;
+}
 declare module '@neynar/react' {
   import * as React from 'react';
 

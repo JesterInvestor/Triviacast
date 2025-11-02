@@ -4,6 +4,7 @@ import React from 'react';
 import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import ShareButton from '@/components/ShareButton';
 import { useState } from 'react';
+import Quiz from '@/components/Quiz';
 import { ProfileCard } from '@/components/ProfileCard';
 import { NeynarCastCard } from '@/components/NeynarCastCard';
 import NeynarUserDropdown from '@/components/NeynarUserDropdown';
@@ -37,6 +38,7 @@ export default function FarcasterLookupPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<LookupResult>(null);
   const [error, setError] = useState<string | null>(null);
+  const [quizOpen, setQuizOpen] = useState(false);
 
   const lookup = async () => {
     setLoading(true);
@@ -112,6 +114,41 @@ export default function FarcasterLookupPage() {
                 onCast={() => {}}
                 username={result.profile.username || ""}
               />
+              {/* Play Quiz button shown inline after a successful lookup */}
+              <div className="w-full mt-3">
+                <button
+                  onClick={() => setQuizOpen(true)}
+                  className="w-full bg-[#F4A6B7] hover:bg-[#E8949C] text-white font-bold py-2 px-3 rounded-lg transition shadow-md"
+                >
+                  Play Quiz
+                </button>
+              </div>
+
+              {quizOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                  <div className="w-11/12 max-w-3xl">
+                    <Quiz
+                      onComplete={async (res) => {
+                        // Post result to server. Include a simple x-neynar-user header as a stub auth value.
+                        try {
+                          await fetch('/api/send-result', {
+                            method: 'POST',
+                            headers: {
+                              'content-type': 'application/json',
+                              'x-neynar-user': (result?.profile?.username as string) || 'unknown',
+                            },
+                            body: JSON.stringify({ targetHandle: result?.profile?.username, quizId: res.quizId, score: res.score, details: res.details || {} }),
+                          });
+                        } catch (e) {
+                          // ignore for now; the API will return a status we can inspect in the future
+                        } finally {
+                          setQuizOpen(false);
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
               {/* Show recent casts if available */}
               {Array.isArray(result.profile.casts) && result.profile.casts.length > 0 && (
                 <div className="mt-4 w-full">
