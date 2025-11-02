@@ -160,9 +160,9 @@ export default function FarcasterLookupPage() {
                         const tPoints = (res.score ?? 0) * 1000; // 1 correct = 1000 T points (info page)
                         const senderRaw = neynarUser?.username || neynarUser?.displayName || neynarUser?.fid || neynarUser?.address || '';
                         const sender = senderRaw && senderRaw.startsWith('@') ? senderRaw.slice(1) : senderRaw;
-                        // Use the Farcaster miniapp URL for share links so results point
-                        // directly to the Farcaster miniapp when someone clicks the link.
-                        const challengeLink = 'https://farcaster.xyz/miniapps/UmWywlPILouA/triviacast';
+                        // Use the Triviacast site link for share links (clickable HTTPS).
+                        // If you prefer the plain hostname without scheme (e.g. "triviacast.xyz"), tell me.
+                        const challengeLink = 'https://triviacast.xyz';
                         const defaultText = cleanHandle
                           ? `@${cleanHandle}.farcaster.eth I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
                           : `I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`;
