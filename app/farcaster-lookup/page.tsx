@@ -170,12 +170,13 @@ export default function FarcasterLookupPage() {
                         const tPoints = (res.score ?? 0) * 1000; // 1 correct = 1000 T points (info page)
                         const senderRaw = neynarUser?.username || neynarUser?.displayName || neynarUser?.fid || neynarUser?.address || '';
                         const sender = senderRaw && senderRaw.startsWith('@') ? senderRaw.slice(1) : senderRaw;
-                        const origin = typeof window !== 'undefined' ? window.location.origin : 'https://triviacast.xyz';
-                        // Use the share name format username.farcaster.eth when mentioning the challenged user
-                        const senderWithSuffix = sender ? `${sender}.farcaster.eth` : '';
+                        // Use canonical site URL for share links
+                        const origin = 'https://triviacast.xyz';
+                        // Use the share name format @username.farcaster.eth when mentioning the challenged user
+                        const senderWithSuffix = sender ? `@${sender}.farcaster.eth` : '';
                         const challengeLink = senderWithSuffix ? `${origin}/farcaster-lookup?username=${encodeURIComponent(senderWithSuffix)}` : `${origin}/farcaster-lookup`;
                         const defaultText = cleanHandle
-                          ? `${cleanHandle}.farcaster.eth I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
+                          ? `@${cleanHandle}.farcaster.eth I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
                           : `I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`;
                         setPreviewResult(res);
                         setPreviewText(defaultText);
@@ -196,10 +197,11 @@ export default function FarcasterLookupPage() {
                     <h2 className="text-lg font-bold mb-2">Preview your cast</h2>
                     <p className="text-sm text-gray-600 mb-2">Edit the message below, mention the user to notify them, or open Warpcast to post from your account.</p>
                     <textarea
-                      className="w-full h-32 p-2 border rounded mb-3"
+                      className="w-full h-32 p-2 border rounded mb-2 bg-gray-50"
                       value={previewText}
-                      onChange={(e) => setPreviewText(e.target.value)}
+                      readOnly
                     />
+                    <p className="text-xs text-gray-500 mb-3">To edit this message before posting, click "Post from my account" — edits should be done in Warpcast's compose box.</p>
 
                     <div className="flex gap-2 items-center">
                       <button
