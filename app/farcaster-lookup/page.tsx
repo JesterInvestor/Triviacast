@@ -1,9 +1,11 @@
 
 "use client";
-import React from 'react';
+import React, { useEffect } from 'react';
 import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import ShareButton from '@/components/ShareButton';
 import { useState } from 'react';
+import { useNeynarContext } from '@neynar/react';
+import Quiz from '@/components/Quiz';
 import { ProfileCard } from '@/components/ProfileCard';
 import { NeynarCastCard } from '@/components/NeynarCastCard';
 import NeynarUserDropdown from '@/components/NeynarUserDropdown';
@@ -37,6 +39,25 @@ export default function FarcasterLookupPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<LookupResult>(null);
   const [error, setError] = useState<string | null>(null);
+  const [quizOpen, setQuizOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewText, setPreviewText] = useState<string>('');
+  const [sending, setSending] = useState(false);
+  const [previewResult, setPreviewResult] = useState<any>(null);
+  const { user: neynarUser } = useNeynarContext();
+  // Prefill the search box from the URL query on the client to avoid
+  // using Next's `useSearchParams` (which requires a Suspense boundary
+  // during prerender). This runs only in the browser.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const u = params.get('username') || params.get('q');
+      if (u) setUsername(u);
+    } catch (e) {
+      // ignore malformed URL
+    }
+  }, []);
 
   const lookup = async () => {
     setLoading(true);
@@ -89,10 +110,19 @@ export default function FarcasterLookupPage() {
             </ShareButton>
           </div>
             <div className="flex flex-col items-center">
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] text-center">Farcaster Profile Lookup</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] text-center">Challenge</h1>
             <span className="text-xs text-[#5a3d5c] mt-1">powered by <strong className="text-[#2d1b2e]">neynar</strong></span>
             </div>
           <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Enter a Farcaster username to fetch the Farcaster profile.</p>
+          <div className="w-full max-w-md bg-white rounded-md border p-3 mt-3 text-sm text-gray-700">
+            <strong className="block mb-1">How to challenge a friend</strong>
+            <ol className="list-decimal pl-6">
+              <li>Search your friend's Farcaster handle using the field above.</li>
+              <li>Click <em>Lookup</em> and then <em>Play Quiz</em> on their profile.</li>
+              <li>After you finish the quiz you'll see a preview message that mentions them — edit it if you want.</li>
+              <li>Post from your account via Warpcast or use <em>Post as Triviacast</em> to have the server publish the cast.</li>
+            </ol>
+          </div>
           <div className="flex flex-col items-center gap-2 w-full max-w-md bg-white rounded-xl border-2 border-[#F4A6B7] shadow-md px-4 py-4">
             <NeynarUserDropdown value={username} onChange={setUsername} />
             <button onClick={lookup} disabled={loading} className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg transition shadow-md w-full">{loading ? 'Loading...' : 'Lookup'}</button>
@@ -112,6 +142,87 @@ export default function FarcasterLookupPage() {
                 onCast={() => {}}
                 username={result.profile.username || ""}
               />
+              {/* Play Quiz button shown inline after a successful lookup */}
+              <div className="w-full mt-3">
+                <button
+                  onClick={() => setQuizOpen(true)}
+                  className="w-full bg-[#F4A6B7] hover:bg-[#E8949C] text-white font-bold py-2 px-3 rounded-lg transition shadow-md"
+                >
+                  Play Quiz
+                </button>
+              </div>
+
+              {quizOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                  <div className="w-11/12 max-w-3xl">
+                    <Quiz
+                      onComplete={(res) => {
+                        // Open an editable preview modal so the user can edit the cast text
+                        const target = result?.profile?.username || '';
+                        // normalize handle so we don't end up with duplicate @ (some sources include '@')
+                        const cleanHandle = target.startsWith('@') ? target.slice(1) : target;
+                        const tPoints = (res.score ?? 0) * 1000; // 1 correct = 1000 T points (info page)
+                        const senderRaw = neynarUser?.username || neynarUser?.displayName || neynarUser?.fid || neynarUser?.address || '';
+                        const sender = senderRaw && senderRaw.startsWith('@') ? senderRaw.slice(1) : senderRaw;
+                        const origin = typeof window !== 'undefined' ? window.location.origin : 'https://triviacast.xyz';
+                        const challengeLink = sender ? `${origin}/farcaster-lookup?username=${encodeURIComponent(sender)}` : `${origin}/farcaster-lookup`;
+                        const defaultText = cleanHandle
+                          ? `@${cleanHandle} I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
+                          : `I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`;
+                        setPreviewResult(res);
+                        setPreviewText(defaultText);
+                        setPreviewOpen(true);
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Preview / Compose modal: lets user edit the cast, open Warpcast to post from their account, or post via server */}
+              {previewOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+                  <div className="w-11/12 max-w-2xl bg-white rounded-lg p-4 shadow-lg">
+                    <h2 className="text-lg font-bold mb-2">Preview your cast</h2>
+                    <p className="text-sm text-gray-600 mb-2">Edit the message below, mention the user to notify them, or open Warpcast to post from your account.</p>
+                    <textarea
+                      className="w-full h-32 p-2 border rounded mb-3"
+                      value={previewText}
+                      onChange={(e) => setPreviewText(e.target.value)}
+                    />
+
+                    <div className="flex gap-2 items-center">
+                      <button
+                        className="bg-[#4F46E5] text-white px-3 py-2 rounded font-semibold"
+                        onClick={() => {
+                          // Open Warpcast compose with the text so the user can post from their account
+                          const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(previewText)}`;
+                          window.open(url, '_blank');
+                        }}
+                      >
+                        Post from my account
+                      </button>
+
+                      {/* Removed server-post option per request; users can post from their account or copy the text */}
+
+                      <button
+                        className="border px-3 py-2 rounded"
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(previewText);
+                            alert('Copied to clipboard');
+                          } catch {
+                            alert('Copy failed');
+                          }
+                        }}
+                      >
+                        Copy
+                      </button>
+
+                      <button className="ml-auto text-sm text-gray-600" onClick={() => setPreviewOpen(false)}>Close</button>
+                    </div>
+                  </div>
+                </div>
+              )}
               {/* Show recent casts if available */}
               {Array.isArray(result.profile.casts) && result.profile.casts.length > 0 && (
                 <div className="mt-4 w-full">
