@@ -91,6 +91,12 @@ export default function FarcasterLookupPage() {
     }
   };
 
+  const handleClosePreview = () => {
+    // Close both preview and quiz to return to the profile view
+    setPreviewOpen(false);
+    setQuizOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
       {/* Wallet connect at top */}
@@ -165,7 +171,9 @@ export default function FarcasterLookupPage() {
                         const senderRaw = neynarUser?.username || neynarUser?.displayName || neynarUser?.fid || neynarUser?.address || '';
                         const sender = senderRaw && senderRaw.startsWith('@') ? senderRaw.slice(1) : senderRaw;
                         const origin = typeof window !== 'undefined' ? window.location.origin : 'https://triviacast.xyz';
-                        const challengeLink = sender ? `${origin}/farcaster-lookup?username=${encodeURIComponent(sender)}` : `${origin}/farcaster-lookup`;
+                        // Use the share name format @username.farcaster.eth when pre-filling the lookup page
+                        const senderWithSuffix = sender ? `@${sender}.farcaster.eth` : '';
+                        const challengeLink = senderWithSuffix ? `${origin}/farcaster-lookup?username=${encodeURIComponent(senderWithSuffix)}` : `${origin}/farcaster-lookup`;
                         const defaultText = cleanHandle
                           ? `@${cleanHandle} I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
                           : `I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`;
@@ -180,8 +188,11 @@ export default function FarcasterLookupPage() {
 
               {/* Preview / Compose modal: lets user edit the cast, open Warpcast to post from their account, or post via server */}
               {previewOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-                  <div className="w-11/12 max-w-2xl bg-white rounded-lg p-4 shadow-lg">
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+                  onClick={() => handleClosePreview()}
+                >
+                  <div className="w-11/12 max-w-2xl bg-white rounded-lg p-4 shadow-lg" onClick={(e) => e.stopPropagation()}>
                     <h2 className="text-lg font-bold mb-2">Preview your cast</h2>
                     <p className="text-sm text-gray-600 mb-2">Edit the message below, mention the user to notify them, or open Warpcast to post from your account.</p>
                     <textarea
@@ -202,6 +213,32 @@ export default function FarcasterLookupPage() {
                         Post from my account
                       </button>
 
+                      <button
+                        className="bg-[#06b6d4] text-white px-3 py-2 rounded font-semibold"
+                        onClick={async () => {
+                          // Prefer the Web Share API so mobile users can share to Base app or other apps.
+                          try {
+                            if (navigator && typeof (navigator as any).share === 'function') {
+                              await (navigator as any).share({
+                                title: 'Triviacast Challenge',
+                                text: previewText,
+                                // include link in url field when supported
+                                url: previewText.includes('https://') ? previewText.split('https://').slice(-1)[0] : undefined,
+                              });
+                              return;
+                            }
+                          } catch (err) {
+                            // fallthrough to warpcast compose
+                          }
+
+                          // Fallback: open Warpcast compose so user can post to Farcaster
+                          const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(previewText)}`;
+                          window.open(url, '_blank');
+                        }}
+                      >
+                        Share…
+                      </button>
+
                       {/* Removed server-post option per request; users can post from their account or copy the text */}
 
                       <button
@@ -218,7 +255,7 @@ export default function FarcasterLookupPage() {
                         Copy
                       </button>
 
-                      <button className="ml-auto text-sm text-gray-600" onClick={() => setPreviewOpen(false)}>Close</button>
+                      <button type="button" className="ml-auto text-sm text-gray-600" onClick={handleClosePreview}>Close</button>
                     </div>
                   </div>
                 </div>
