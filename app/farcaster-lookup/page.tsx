@@ -40,6 +40,10 @@ export default function FarcasterLookupPage() {
   const [result, setResult] = useState<LookupResult>(null);
   const [error, setError] = useState<string | null>(null);
   const [quizOpen, setQuizOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewText, setPreviewText] = useState<string>('');
+  const [sending, setSending] = useState(false);
+  const [previewResult, setPreviewResult] = useState<any>(null);
   const { user: neynarUser } = useNeynarContext();
 
   const lookup = async () => {
@@ -93,7 +97,7 @@ export default function FarcasterLookupPage() {
             </ShareButton>
           </div>
             <div className="flex flex-col items-center">
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] text-center">Farcaster Profile Lookup</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] text-center">Challenge</h1>
             <span className="text-xs text-[#5a3d5c] mt-1">powered by <strong className="text-[#2d1b2e]">neynar</strong></span>
             </div>
           <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Enter a Farcaster username to fetch the Farcaster profile.</p>
@@ -130,31 +134,99 @@ export default function FarcasterLookupPage() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                   <div className="w-11/12 max-w-3xl">
                     <Quiz
-                      onComplete={async (res) => {
-                        // Post result to server. Use Neynar client signer_uuid for auth header when available.
-                        try {
-                          const headers: Record<string, string> = { 'content-type': 'application/json' };
-                          if (neynarUser?.signer_uuid) {
-                            headers['authorization'] = `Neynar ${neynarUser.signer_uuid}`;
-                          }
-                          if (neynarUser?.fid) {
-                            headers['x-neynar-fid'] = String(neynarUser.fid);
-                          }
-
-                          await fetch('/api/send-result', {
-                            method: 'POST',
-                            headers: {
-                              ...headers,
-                            },
-                            body: JSON.stringify({ targetHandle: result?.profile?.username, quizId: res.quizId, score: res.score, details: res.details || {} }),
-                          });
-                        } catch (e) {
-                          // ignore for now; the API will return a status we can inspect in the future
-                        } finally {
-                          setQuizOpen(false);
-                        }
+                      onComplete={(res) => {
+                        // Open an editable preview modal so the user can edit the cast text
+                        const target = result?.profile?.username || '';
+                        const defaultText = target
+                          ? `@${target} I scored ${res.score} on the Triviacast Challenge — beat my score!`
+                          : `I scored ${res.score} on the Triviacast Challenge — beat my score!`;
+                        setPreviewResult(res);
+                        setPreviewText(defaultText);
+                        setPreviewOpen(true);
                       }}
                     />
+                  </div>
+                </div>
+              )}
+
+              {/* Preview / Compose modal: lets user edit the cast, open Warpcast to post from their account, or post via server */}
+              {previewOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+                  <div className="w-11/12 max-w-2xl bg-white rounded-lg p-4 shadow-lg">
+                    <h2 className="text-lg font-bold mb-2">Preview your cast</h2>
+                    <p className="text-sm text-gray-600 mb-2">Edit the message below, mention the user to notify them, or open Warpcast to post from your account.</p>
+                    <textarea
+                      className="w-full h-32 p-2 border rounded mb-3"
+                      value={previewText}
+                      onChange={(e) => setPreviewText(e.target.value)}
+                    />
+
+                    <div className="flex gap-2 items-center">
+                      <button
+                        className="bg-[#4F46E5] text-white px-3 py-2 rounded font-semibold"
+                        onClick={() => {
+                          // Open Warpcast compose with the text so the user can post from their account
+                          const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(previewText)}`;
+                          window.open(url, '_blank');
+                        }}
+                      >
+                        Post from my account
+                      </button>
+
+                      <button
+                        className="bg-[#F4A6B7] text-white px-3 py-2 rounded font-semibold"
+                        onClick={async () => {
+                          // Post via server (server-signed cast)
+                          if (!result?.profile?.username) {
+                            alert('No target selected');
+                            return;
+                          }
+                          setSending(true);
+                          try {
+                            const headers: Record<string, string> = { 'content-type': 'application/json' };
+                            if (neynarUser?.signer_uuid) headers['authorization'] = `Neynar ${neynarUser.signer_uuid}`;
+                            if (neynarUser?.fid) headers['x-neynar-fid'] = String(neynarUser.fid);
+
+                            const resp = await fetch('/api/send-result', {
+                              method: 'POST',
+                              headers,
+                              body: JSON.stringify({ targetHandle: result.profile.username, quizId: previewResult?.quizId, score: previewResult?.score, details: previewResult?.details || {}, text: previewText }),
+                            });
+                            if (!resp.ok) {
+                              const d = await resp.json().catch(() => ({}));
+                              throw new Error(d?.error || 'Failed to post cast');
+                            }
+                            alert('Cast posted successfully (server)');
+                            setPreviewOpen(false);
+                            setQuizOpen(false);
+                          } catch (err: unknown) {
+                            const e = err as { message?: string } | null;
+                            alert(`Failed to post: ${e?.message || 'unknown error'}`);
+                          } finally {
+                            setSending(false);
+                          }
+                        }}
+                        disabled={sending}
+                      >
+                        {sending ? 'Posting...' : 'Post as Triviacast'}
+                      </button>
+
+                      <button
+                        className="border px-3 py-2 rounded"
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(previewText);
+                            alert('Copied to clipboard');
+                          } catch {
+                            alert('Copy failed');
+                          }
+                        }}
+                      >
+                        Copy
+                      </button>
+
+                      <button className="ml-auto text-sm text-gray-600" onClick={() => setPreviewOpen(false)}>Close</button>
+                    </div>
                   </div>
                 </div>
               )}
