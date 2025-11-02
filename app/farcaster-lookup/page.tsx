@@ -42,6 +42,7 @@ export default function FarcasterLookupPage() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewText, setPreviewText] = useState<string>('');
+  const [previewLink, setPreviewLink] = useState<string>('');
   const [sending, setSending] = useState(false);
   const [previewResult, setPreviewResult] = useState<any>(null);
   const { user: neynarUser } = useNeynarContext();
@@ -126,7 +127,7 @@ export default function FarcasterLookupPage() {
               <li>Search your friend's Farcaster handle using the field above.</li>
               <li>Click <em>Lookup</em> and then <em>Play Quiz</em> on their profile.</li>
               <li>After you finish the quiz you'll see a preview message that mentions them — edit it if you want.</li>
-              <li>Post from your account via Warpcast or use <em>Post as Triviacast</em> to have the server publish the cast.</li>
+              <li>Post from your account via <strong>Base</strong> or <strong>Farcaster</strong>, or copy the message to share it manually.</li>
             </ol>
           </div>
           <div className="flex flex-col items-center gap-2 w-full max-w-md bg-white rounded-xl border-2 border-[#F4A6B7] shadow-md px-4 py-4">
@@ -180,6 +181,7 @@ export default function FarcasterLookupPage() {
                           : `I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`;
                         setPreviewResult(res);
                         setPreviewText(defaultText);
+                        setPreviewLink(challengeLink);
                         setPreviewOpen(true);
                       }}
                     />
@@ -224,8 +226,7 @@ export default function FarcasterLookupPage() {
                               await (navigator as any).share({
                                 title: 'Triviacast Challenge',
                                 text: previewText,
-                                // include link in url field when supported
-                                url: previewText.includes('https://') ? previewText.split('https://').slice(-1)[0] : undefined,
+                                url: previewLink || 'https://triviacast.xyz',
                               });
                               return;
                             }
