@@ -1,5 +1,5 @@
 {
-  "frame": {
+  "miniapp": {
     "name": "Triviacast",
     "version": "1",
     "iconUrl": "https://triviacast.xyz/icon.png",
