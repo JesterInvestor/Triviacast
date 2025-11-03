@@ -1,40 +1,55 @@
-"use client";
-
-import * as Neynar from "@neynar/react";
-import "@neynar/react/dist/style.css";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { WagmiConfig } from 'wagmi';
-import { wagmiConfig } from '@/lib/wagmi';
-import ThirdwebProvider from '@/components/ThirdwebProvider';
-import BottomNav from '@/components/BottomNav';
+import ClientLayout from '@/components/ClientLayout';
+import { Metadata } from 'next';
 
 const inter = Inter({ subsets: ["latin"] });
+
+// fc:miniapp / fc:frame meta tags for the site root so sharing https://triviacast.xyz
+// renders a rich embed in Farcaster clients.
+const miniappObj = {
+  version: '1',
+  imageUrl: 'https://triviacast.xyz/og-image.png',
+  button: {
+    title: 'Open Triviacast',
+    action: {
+      type: 'launch_frame',
+      url: 'https://triviacast.xyz',
+      name: 'Triviacast',
+      splashImageUrl: 'https://triviacast.xyz/R11.png',
+      splashBackgroundColor: '#FFE4EC',
+    },
+  },
+} as const;
+
+const miniapp = JSON.stringify(miniappObj);
+
+export const metadata: Metadata = {
+  title: 'Triviacast — Test your brain',
+  description: 'Trivia quiz mini-game — challenge friends, earn T Points, and share your results.',
+  openGraph: {
+    title: 'Triviacast — Test your brain',
+    description: 'Trivia quiz mini-game — challenge friends, earn T Points, and share your results.',
+    images: ['https://triviacast.xyz/hero-1200x630.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
+  other: {
+    'fc:miniapp': miniapp,
+  },
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode; }>) {
   return (
     <html lang="en">
-      <WagmiConfig config={wagmiConfig}>
-        <ThirdwebProvider>
-          <Neynar.NeynarContextProvider
-        settings={{
-          clientId: process.env.NEXT_PUBLIC_NEYNAR_CLIENT_ID || "",
-          defaultTheme: Neynar.Theme.Light,
-          eventsCallbacks: {
-            onAuthSuccess: () => {},
-            onSignout() {},
-          },
-        }}
-      >
-          <body className={inter.className}>
-            {children}
-            <BottomNav />
-          </body>
-          </Neynar.NeynarContextProvider>
-        </ThirdwebProvider>
-      </WagmiConfig>
+      <body className={inter.className}>
+        <ClientLayout>
+          {children}
+        </ClientLayout>
+      </body>
     </html>
   );
 }
