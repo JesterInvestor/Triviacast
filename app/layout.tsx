@@ -1,9 +1,9 @@
+import { Inter } from "next/font/google";
 import "./globals.css";
 import ClientLayout from '@/components/ClientLayout';
 import { Metadata } from 'next';
 
-// Using system fonts as fallback for build environment
-const inter = { className: "" };
+const inter = Inter({ subsets: ["latin"] });
 
 // fc:miniapp / fc:frame meta tags for the site root so sharing https://triviacast.xyz
 // renders a rich embed in Farcaster clients.
