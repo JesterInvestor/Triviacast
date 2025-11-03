@@ -7,7 +7,7 @@ export default function Head() {
       button: {
         title: 'Play Challenge',
       action: {
-        type: 'launch_miniapp',
+        type: 'launch_frame',
         url: 'https://triviacast.xyz/farcaster-lookup',
         name: 'Triviacast',
         splashImageUrl: 'https://triviacast.xyz/R11.png',

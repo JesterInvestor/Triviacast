@@ -7,10 +7,10 @@ export default function Head() {
     button: {
       title: 'Open Triviacast',
       action: {
-        type: 'launch_miniapp',
+        type: 'launch_frame',
         url: 'https://triviacast.xyz',
         name: 'Triviacast',
-        splashImageUrl: 'https://triviacast.xyz/splash-200.png',
+        splashImageUrl: 'https://triviacast.xyz/R11.png',
         splashBackgroundColor: '#FFE4EC',
       },
     },
