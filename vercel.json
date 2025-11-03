@@ -4,5 +4,12 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["iad1"],
-  
+  "redirects": [
+    {
+      "source": "/.well-known/farcaster.json",
+      "destination": "https://api.farcaster.xyz/miniapps/hosted-manifest/0199cc98-fc7e-210c-a91e-43dc305b8669",
+      "permanent": false,
+      "statusCode": 307
+    }
+  ]
 }
