@@ -3,7 +3,7 @@ export default function Head() {
   // renders a rich embed in Farcaster clients.
   const miniappObj = {
     version: '1',
-    imageUrl: 'https://triviacast.xyz/og-image-1200x630.png',
+    imageUrl: 'https://triviacast.xyz/og-image.png',
     button: {
       title: 'Open Triviacast',
       action: {
