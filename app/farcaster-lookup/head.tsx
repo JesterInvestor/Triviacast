@@ -1,7 +1,22 @@
 export default function Head() {
   // fc:miniapp / fc:frame meta tags make this page embeddable in Farcaster clients.
   // The content must be a JSON string with version, imageUrl and button.action details.
-  const miniapp = '{"version":"1","imageUrl":"https://triviacast.xyz/og-image-1200x630.png","button":{"title":"Play Challenge","action":{"type":"launch_miniapp","url":"https://triviacast.xyz/farcaster-lookup","name":"Triviacast","splashImageUrl":"https://triviacast.xyz/splash-200.png","splashBackgroundColor":"#FFE4EC"}}}';
+  const miniappObj = {
+    version: '1',
+    imageUrl: 'https://triviacast.xyz/og-image-1200x630.png',
+    button: {
+      title: 'Play Challenge',
+      action: {
+        type: 'launch_miniapp',
+        url: 'https://triviacast.xyz/farcaster-lookup',
+        name: 'Triviacast',
+        splashImageUrl: 'https://triviacast.xyz/splash-200.png',
+        splashBackgroundColor: '#FFE4EC',
+      },
+    },
+  } as const;
+
+  const miniapp = JSON.stringify(miniappObj);
 
   return (
     <>

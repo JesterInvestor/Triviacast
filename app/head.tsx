@@ -1,7 +1,22 @@
 export default function Head() {
   // fc:miniapp / fc:frame meta tags for the site root so sharing https://triviacast.xyz
   // renders a rich embed in Farcaster clients.
-  const miniapp = '{"version":"1","imageUrl":"https://triviacast.xyz/og-image-1200x630.png","button":{"title":"Open Triviacast","action":{"type":"launch_miniapp","url":"https://triviacast.xyz","name":"Triviacast","splashImageUrl":"https://triviacast.xyz/splash-200.png","splashBackgroundColor":"#FFE4EC"}}}';
+  const miniappObj = {
+    version: '1',
+    imageUrl: 'https://triviacast.xyz/og-image-1200x630.png',
+    button: {
+      title: 'Open Triviacast',
+      action: {
+        type: 'launch_miniapp',
+        url: 'https://triviacast.xyz',
+        name: 'Triviacast',
+        splashImageUrl: 'https://triviacast.xyz/splash-200.png',
+        splashBackgroundColor: '#FFE4EC',
+      },
+    },
+  } as const;
+
+  const miniapp = JSON.stringify(miniappObj);
 
   return (
     <>
