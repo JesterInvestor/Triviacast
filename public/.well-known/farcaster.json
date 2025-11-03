@@ -2,17 +2,19 @@
   "frame": {
     "name": "Triviacast",
     "version": "1",
-    "iconUrl": "https://triviacast.xyz/icon.png",
+    "iconUrl": "https://triviacast.xyz/icon-1024.png",
     "homeUrl": "https://triviacast.xyz",
-    "imageUrl": "https://triviacast.xyz/og-image.png",
+    "imageUrl": "https://triviacast.xyz/og-image-1200x630.png",
     "buttonTitle": "Open Triviacast",
-    "splashImageUrl": "https://triviacast.xyz/R11.png",
+    "splashImageUrl": "https://triviacast.xyz/splash-200.png",
     "splashBackgroundColor": "#FFE4EC",
     "webhookUrl": "https://api.neynar.com/f/app/7c993c25-2792-4ae9-abe5-4f5989de69a3/event",
     "subtitle": "Test Your Brain Power",
     "description": "A Next.js-based trivia quiz mini-game. Built for Farcaster",
     "screenshotUrls": [
-      "https://triviacast.xyz/Screenshot3.png"
+      "https://triviacast.xyz/Screenshot1-1284x2778.png",
+      "https://triviacast.xyz/Screenshot2-1284x2778.png",
+      "https://triviacast.xyz/Screenshot3-1284x2778.png"
     ],
     "primaryCategory": "education",
     "tags": [
@@ -21,7 +23,7 @@
       "fun",
       "quiz"
     ],
-    "heroImageUrl": "https://triviacast.xyz/hero.png",
+    "heroImageUrl": "https://triviacast.xyz/hero-1200x630.png",
     "tagline": "Test, Claim, and Share",
     "ogTitle": "Triviacast - Test your brain",
     "ogDescription": "Trivia quiz mini-game with unique open source quesitons (video games, history, culture, and more)",
