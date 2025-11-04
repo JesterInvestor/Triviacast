@@ -2,14 +2,12 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { shareAppUrl } from '@/lib/farcaster';
-import ShareButton from '@/components/ShareButton';
 
 const navItems = [
-  { label: 'Home', href: '/' },
-  { label: 'Leaderboard', href: '/leaderboard' },
-  { label: 'Challenge', href: '/farcaster-lookup' },
-  { label: 'Info', href: '/info' },
+  { label: 'Home', href: '/', icon: '🏠' },
+  { label: 'Leaderboard', href: '/leaderboard', icon: '🏆' },
+  { label: 'Challenge', href: '/farcaster-lookup', icon: '🎯' },
+  { label: 'Info', href: '/info', icon: 'ℹ️' },
 ];
 
 export default function BottomNav() {
@@ -31,27 +29,26 @@ export default function BottomNav() {
       <div style={{ display: 'flex', flex: 1, justifyContent: 'space-around' }}>
         {navItems.map(item => (
           <Link key={item.href} href={item.href} legacyBehavior>
-            <a style={{
-              color: pathname === item.href ? '#0070f3' : '#333',
-              fontWeight: pathname === item.href ? 'bold' : 'normal',
-              textDecoration: 'none',
-              fontSize: '1rem',
-              textAlign: 'center',
-              padding: '8px 0',
-              minWidth: '80px',
-            }}>{item.label}</a>
+            <a
+              aria-label={item.label}
+              title={item.label}
+              style={{
+                color: pathname === item.href ? '#7C3AED' : '#333',
+                fontWeight: pathname === item.href ? 'bold' : 'normal',
+                textDecoration: 'none',
+                fontSize: '1.25rem',
+                textAlign: 'center',
+                padding: '8px 0',
+                minWidth: '64px',
+                lineHeight: 1,
+              }}
+            >
+              <span role="img" aria-hidden="true">{item.icon}</span>
+            </a>
           </Link>
         ))}
       </div>
       <div style={{ display: 'flex', gap: '8px', paddingRight: '8px' }}>
-        <ShareButton
-          url={shareAppUrl()}
-          ariaLabel="Share app"
-          className="bg-[#DC8291] text-white rounded-lg px-3 py-2 shadow min-h-[36px] inline-flex items-center gap-1"
-        >
-          <img src="/farcaster.svg" alt="Farcaster" className="w-4 h-4" height={16} />
-          <span className="text-sm font-semibold">Share</span>
-        </ShareButton>
         <a
           href="https://tip.md/jesterinvestor"
           target="_blank"
