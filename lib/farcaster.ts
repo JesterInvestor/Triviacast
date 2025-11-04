@@ -45,14 +45,31 @@ export async function openShareUrl(url: string): Promise<void> {
   
   const platform = getPlatform();
   
-  // For Farcaster miniapp, use the SDK
+  // For Farcaster miniapp, use the SDK's composeCast action
   if (platform === 'farcaster') {
     try {
       const { sdk } = await import('@farcaster/miniapp-sdk');
-      await sdk.actions.openUrl(url);
+      
+      // Parse the Warpcast compose URL to extract text and embeds
+      const urlObj = new URL(url);
+      const text = urlObj.searchParams.get('text') || '';
+      const embeds: string[] = [];
+      
+      // Extract embeds (Warpcast uses embeds[] param)
+      urlObj.searchParams.forEach((value, key) => {
+        if (key === 'embeds[]' && embeds.length < 2) {
+          embeds.push(value);
+        }
+      });
+      
+      // Use composeCast to directly open the cast composer in Farcaster
+      await sdk.actions.composeCast({
+        text,
+        embeds: embeds.length === 0 ? undefined : embeds.length === 1 ? [embeds[0]] : [embeds[0], embeds[1]],
+      });
       return;
     } catch (error) {
-      console.log('Farcaster SDK not available, using normal link');
+      console.log('Farcaster SDK not available or composeCast failed, using normal link', error);
     }
   }
   
