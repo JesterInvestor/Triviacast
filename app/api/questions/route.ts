@@ -1,9 +1,17 @@
 import { NextResponse } from 'next/server';
 
-// Fallback sample questions for when the API is unavailable
+// Small fallback sample set used when the OpenTDB API fails
 const SAMPLE_QUESTIONS = {
   response_code: 0,
   results: [
+    {
+      category: "General Knowledge",
+      type: "multiple",
+      difficulty: "easy",
+      question: "What is the capital of France?",
+      correct_answer: "Paris",
+      incorrect_answers: ["London", "Berlin", "Madrid"]
+    },
     {
       category: "Science: Computers",
       type: "multiple",
@@ -17,170 +25,84 @@ const SAMPLE_QUESTIONS = {
       ]
     },
     {
-      category: "General Knowledge",
-      type: "multiple",
-      difficulty: "medium",
-      question: "What is the capital of France?",
-      correct_answer: "Paris",
-      incorrect_answers: ["London", "Berlin", "Madrid"]
-    },
-    {
-      category: "Science & Nature",
-      type: "multiple",
-      difficulty: "medium",
-      question: "What is the chemical symbol for gold?",
-      correct_answer: "Au",
-      incorrect_answers: ["Go", "Gd", "Ag"]
-    },
-    {
       category: "History",
       type: "multiple",
-      difficulty: "medium",
+      difficulty: "hard",
       question: "In what year did World War II end?",
       correct_answer: "1945",
       incorrect_answers: ["1944", "1946", "1943"]
-    },
-    {
-      category: "Geography",
-      type: "multiple",
-      difficulty: "medium",
-      question: "What is the largest ocean on Earth?",
-      correct_answer: "Pacific Ocean",
-      incorrect_answers: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean"]
-    },
-    {
-      category: "Entertainment: Music",
-      type: "multiple",
-      difficulty: "medium",
-      question: "Which band released the album 'Abbey Road'?",
-      correct_answer: "The Beatles",
-      incorrect_answers: ["The Rolling Stones", "Led Zeppelin", "Pink Floyd"]
-    },
-    {
-      category: "Science: Mathematics",
-      type: "multiple",
-      difficulty: "medium",
-      question: "What is the value of Pi to two decimal places?",
-      correct_answer: "3.14",
-      incorrect_answers: ["3.12", "3.16", "3.18"]
-    },
-    {
-      category: "Sports",
-      type: "multiple",
-      difficulty: "medium",
-      question: "How many players are on a basketball team on the court?",
-      correct_answer: "5",
-      incorrect_answers: ["6", "7", "4"]
-    },
-    {
-      category: "Entertainment: Film",
-      type: "multiple",
-      difficulty: "medium",
-      question: "Who directed the movie 'Inception'?",
-      correct_answer: "Christopher Nolan",
-      incorrect_answers: ["Steven Spielberg", "James Cameron", "Quentin Tarantino"]
-    },
-    {
-      category: "General Knowledge",
-      type: "multiple",
-      difficulty: "medium",
-      question: "What is the hardest natural substance on Earth?",
-      correct_answer: "Diamond",
-      incorrect_answers: ["Gold", "Iron", "Platinum"]
     }
   ]
 };
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const amount = Number(searchParams.get('amount') || '10');
-  const requestedDifficultyRaw = (searchParams.get('difficulty') || '').toLowerCase();
-  const requestedDifficulties = requestedDifficultyRaw.split(',').map(s => s.trim()).filter(Boolean);
+  const requestedAmount = Number(searchParams.get('amount') || '10');
+  // clamp amount to a sensible range (1..50)
+  const amount = Math.max(1, Math.min(50, requestedAmount));
   const category = searchParams.get('category') || '';
 
+  // Build an OpenTDB url WITHOUT specifying difficulty so we get mixed difficulties
+  const buildUrl = (count: number) =>
+    `https://opentdb.com/api.php?amount=${count}${category ? `&category=${category}` : ''}&type=multiple`;
+
   try {
-    const buildUrl = (count: number, diff: string) =>
-      `https://opentdb.com/api.php?amount=${count}&difficulty=${diff}${category ? `&category=${category}` : ''}&type=multiple`;
+    // We'll collect unique questions (dedupe by question text)
+    const collected: any[] = [];
+    const seen = new Set<string>();
+    let remaining = amount;
+    let attempts = 0;
 
-  // Use a 70% medium / 30% easy split by default (rounding up mediums).
-  const mediumCount = Math.ceil(amount * 0.7);
-  const easyCount = amount - mediumCount;
+    // Attempt multiple fetches to fill the requested amount (in case API returns duplicates)
+    // But guard attempts to avoid endless loops or too many requests.
+    while (collected.length < amount && attempts < 5 && remaining > 0) {
+      attempts += 1;
+      // Request up to `remaining` items. The API will return that many if available.
+      const resp = await fetch(buildUrl(remaining));
+      const data = await resp.json();
 
-    // If caller explicitly requested only easy or only medium, honor it.
-    if (requestedDifficulties.length === 1 && (requestedDifficulties[0] === 'easy' || requestedDifficulties[0] === 'medium')) {
-      const diff = requestedDifficulties[0];
-      const url = buildUrl(amount, diff);
-      const response = await fetch(url);
-      const data = await response.json();
-      if (data.response_code !== 0) {
-        return NextResponse.json({ error: 'Failed to fetch questions' }, { status: 500 });
+      if (!data || typeof data !== 'object' || data.response_code !== 0 || !Array.isArray(data.results)) {
+        // Stop trying if API returned an error code or malformed data
+        break;
       }
-      let filtered = (data.results || []).filter((q: any) => q.difficulty === 'easy' || q.difficulty === 'medium');
-      
-      // If we don't have enough questions, supplement with sample questions
-      if (filtered.length < amount) {
-        const needed = amount - filtered.length;
-        const supplemental = SAMPLE_QUESTIONS.results.slice(0, needed);
-        filtered = [...filtered, ...supplemental];
+
+      for (const q of data.results) {
+        // Use the raw question text as the dedupe key (OpenTDB returns HTML-escaped text).
+        // This prevents duplicates within the response array.
+        const key = String(q.question).trim();
+        if (!seen.has(key)) {
+          seen.add(key);
+          collected.push(q);
+          if (collected.length >= amount) break;
+        }
       }
-      
-      return NextResponse.json({ ...data, results: filtered.slice(0, amount) });
+
+      remaining = amount - collected.length;
+
+      // If API returned fewer results than requested and we still need more, loop again.
+      // The next request will ask for the smaller `remaining` amount.
+      if (data.results.length === 0) break;
     }
 
-    // If caller explicitly requested both easy and medium via comma-separated list, split the amount.
-    if (requestedDifficulties.includes('easy') && requestedDifficulties.includes('medium')) {
-      const [easyResp, mediumResp] = await Promise.all([
-        fetch(buildUrl(easyCount, 'easy')),
-        fetch(buildUrl(mediumCount, 'medium')),
-      ]);
-
-      const [easyData, mediumData] = await Promise.all([easyResp.json(), mediumResp.json()]);
-      const easyResults = (easyData?.response_code === 0 && Array.isArray(easyData.results)) ? easyData.results : [];
-      const mediumResults = (mediumData?.response_code === 0 && Array.isArray(mediumData.results)) ? mediumData.results : [];
-      let combined = [...easyResults, ...mediumResults];
-      
-      // If we don't have enough questions, supplement with sample questions
-      if (combined.length < amount) {
-        const needed = amount - combined.length;
-        const supplemental = SAMPLE_QUESTIONS.results.slice(0, needed);
-        combined = [...combined, ...supplemental];
-      }
-      
-      const results = combined.slice(0, amount);
-      if (results.length === 0) return NextResponse.json(SAMPLE_QUESTIONS);
-      return NextResponse.json({ response_code: 0, results });
+    // If after attempts we still don't have enough, supplement with SAMPLE_QUESTIONS (deduped)
+    if (collected.length < amount) {
+      const needed = amount - collected.length;
+      const supplemental = SAMPLE_QUESTIONS.results.filter((q: any) => !seen.has(q.question)).slice(0, needed);
+      collected.push(...supplemental);
     }
 
-    // Default: return a mix of easy and medium questions
-    const [easyResp, mediumResp] = await Promise.all([
-      fetch(buildUrl(easyCount, 'easy')),
-      fetch(buildUrl(mediumCount, 'medium')),
-    ]);
-
-    const [easyData, mediumData] = await Promise.all([easyResp.json(), mediumResp.json()]);
-
-    const easyResults = (easyData?.response_code === 0 && Array.isArray(easyData.results)) ? easyData.results : [];
-    const mediumResults = (mediumData?.response_code === 0 && Array.isArray(mediumData.results)) ? mediumData.results : [];
-
-    let combined = [...easyResults, ...mediumResults];
-    
-    // If we don't have enough questions, supplement with sample questions
-    if (combined.length < amount) {
-      const needed = amount - combined.length;
-      const supplemental = SAMPLE_QUESTIONS.results.slice(0, needed);
-      combined = [...combined, ...supplemental];
-    }
-    
-    const results = combined.slice(0, amount);
-    if (results.length === 0) {
+    if (collected.length === 0) {
+      // return sample questions as last resort
       return NextResponse.json(SAMPLE_QUESTIONS);
     }
 
-    return NextResponse.json({ response_code: 0, results });
+    // Shuffle final results so the order is random
+    const shuffled = collected.sort(() => Math.random() - 0.5).slice(0, amount);
+
+    return NextResponse.json({ response_code: 0, results: shuffled });
   } catch (error) {
     console.error('Error fetching questions:', error);
-    console.log('Using sample questions as fallback');
-    // Return sample questions as fallback
+    // Fallback to sample questions if something goes wrong
     return NextResponse.json(SAMPLE_QUESTIONS);
   }
 }
