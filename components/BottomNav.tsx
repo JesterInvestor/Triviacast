@@ -50,7 +50,7 @@ export default function BottomNav() {
       </div>
       <div style={{ display: 'flex', gap: '8px', paddingRight: '8px' }}>
         <a
-          href="https://tip.md/jesterinvestor"
+          href="https://tip.md/JesterInvestor"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Tip in Crypto"
