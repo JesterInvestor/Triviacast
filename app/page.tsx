@@ -63,6 +63,18 @@ export default function Home() {
                 className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[44px] w-full sm:w-auto"
                 ariaLabel="Share app on Farcaster"
               />
+              <a
+                href="https://tip.md/jesterinvestor"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center rounded-lg border-2 border-[#F4A6B7] bg-white hover:bg-[#fff7f9] px-2 py-1 shadow min-h-[44px]"
+              >
+                <img
+                  src="https://tip.md/badge.svg"
+                  alt="Tip in Crypto"
+                  height={28}
+                />
+              </a>
             </h1>
             <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Test Your Brain Power</p>
           </div>
