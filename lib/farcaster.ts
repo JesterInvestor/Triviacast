@@ -1,11 +1,8 @@
 // Simple helpers to build Farcaster (Warpcast) share URLs with prefilled text and embeds
-// We prefer client-origin when available; fallback to production URL.
+// Always use the canonical URL for share links.
 
 function getBaseUrl(): string {
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    return window.location.origin;
-  }
-  // Fallback to production domain
+  // Always return the canonical URL for share links
   return 'https://triviacast.xyz';
 }
 
