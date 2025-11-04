@@ -19,6 +19,7 @@ interface QuizResultsProps {
   answers: (string | null)[];
   tPoints: number;
   onRestart: () => void;
+  username?: string;
 }
 
 function decodeHtml(html: string): string {
@@ -33,7 +34,8 @@ export default function QuizResults({
   questions, 
   answers, 
   tPoints,
-  onRestart 
+  onRestart,
+  username
 }: QuizResultsProps) {
   const percentage = Math.round((score / totalQuestions) * 100);
   const account = useActiveAccount();
@@ -111,7 +113,7 @@ export default function QuizResults({
     };
 
     savePoints();
-  }, [account, tPoints, pointsSaved, signMessage]);
+  }, [account, tPoints, pointsSaved]);
   
   const getResultMessage = () => {
     if (percentage >= 80) return "Excellent! 🎉";
@@ -139,7 +141,7 @@ export default function QuizResults({
         {/* Share results CTA moved to top under header */}
         <div className="text-center mb-4 sm:mb-6">
           <button
-            onClick={() => openShareUrl(shareResultsUrl(score, totalQuestions, percentage, tPoints))}
+            onClick={() => openShareUrl(shareResultsUrl(score, totalQuestions, percentage, tPoints, username))}
             className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-6 rounded-lg text-base sm:text-lg transition inline-flex items-center justify-center shadow-lg min-h-[48px] w-full sm:w-auto gap-2"
             aria-label="Share results on Farcaster"
           >
