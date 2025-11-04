@@ -9,10 +9,8 @@ import { shareAppUrl } from '@/lib/farcaster';
 export const dynamic = 'force-dynamic';
 
 // ...existing code...
-import WalletPoints from '@/components/WalletPoints';
 import ClientOnlyWidgets from '@/components/ClientOnlyWidgets';
 import ShareButton from '@/components/ShareButton';
-import Link from 'next/link';
 
 export default function Home() {
   // Wallet connect handled by WagmiWalletConnect
@@ -58,9 +56,18 @@ export default function Home() {
             />
             <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] flex items-center gap-2 justify-center text-center">
               Triviacast
+            </h1>
+            {/* subtitle removed per request */}
+          </div>
+          {/* Wallet connect, then share + tip buttons below */}
+          <div className="flex flex-col items-center justify-center gap-3 sm:gap-4 w-full mt-4">
+            <div className="w-full sm:w-auto flex flex-col items-center">
+              <ClientOnlyWidgets />
+            </div>
+            <div className="flex items-center gap-2">
               <ShareButton
                 url={shareAppUrl()}
-                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[44px] w-full sm:w-auto"
+                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[44px]"
                 ariaLabel="Share app on Farcaster"
               />
               <a
@@ -75,24 +82,7 @@ export default function Home() {
                   height={28}
                 />
               </a>
-            </h1>
-            <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Test Your Brain Power</p>
-          </div>
-          {/* Points, widgets, and leaderboard button only */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full mt-4">
-            <div className="w-full sm:w-auto flex flex-col items-center">
-              <WalletPoints />
             </div>
-            <div className="w-full sm:w-auto flex flex-col items-center">
-              <ClientOnlyWidgets />
-            </div>
-            <Link
-              href="/leaderboard"
-              className="h-[40px] flex items-center rounded-md bg-[#fff] text-[#c85b86] hover:bg-[#f7f7f7] px-3 py-2 font-semibold text-xs sm:text-sm shadow transition w-full sm:w-auto justify-center"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >
-              Leaderboard
-            </Link>
           </div>
         </div>
         <Quiz />
