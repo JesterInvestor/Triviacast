@@ -115,7 +115,15 @@ export async function GET(request: Request) {
       if (data.response_code !== 0) {
         return NextResponse.json({ error: 'Failed to fetch questions' }, { status: 500 });
       }
-      const filtered = (data.results || []).filter((q: any) => q.difficulty === 'easy' || q.difficulty === 'medium');
+      let filtered = (data.results || []).filter((q: any) => q.difficulty === 'easy' || q.difficulty === 'medium');
+      
+      // If we don't have enough questions, supplement with sample questions
+      if (filtered.length < amount) {
+        const needed = amount - filtered.length;
+        const supplemental = SAMPLE_QUESTIONS.results.slice(0, needed);
+        filtered = [...filtered, ...supplemental];
+      }
+      
       return NextResponse.json({ ...data, results: filtered.slice(0, amount) });
     }
 
@@ -129,9 +137,18 @@ export async function GET(request: Request) {
       const [easyData, mediumData] = await Promise.all([easyResp.json(), mediumResp.json()]);
       const easyResults = (easyData?.response_code === 0 && Array.isArray(easyData.results)) ? easyData.results : [];
       const mediumResults = (mediumData?.response_code === 0 && Array.isArray(mediumData.results)) ? mediumData.results : [];
-      const combined = [...easyResults, ...mediumResults].slice(0, amount);
-      if (combined.length === 0) return NextResponse.json(SAMPLE_QUESTIONS);
-      return NextResponse.json({ response_code: 0, results: combined });
+      let combined = [...easyResults, ...mediumResults];
+      
+      // If we don't have enough questions, supplement with sample questions
+      if (combined.length < amount) {
+        const needed = amount - combined.length;
+        const supplemental = SAMPLE_QUESTIONS.results.slice(0, needed);
+        combined = [...combined, ...supplemental];
+      }
+      
+      const results = combined.slice(0, amount);
+      if (results.length === 0) return NextResponse.json(SAMPLE_QUESTIONS);
+      return NextResponse.json({ response_code: 0, results });
     }
 
     // Default: return a mix of easy and medium questions
@@ -145,12 +162,21 @@ export async function GET(request: Request) {
     const easyResults = (easyData?.response_code === 0 && Array.isArray(easyData.results)) ? easyData.results : [];
     const mediumResults = (mediumData?.response_code === 0 && Array.isArray(mediumData.results)) ? mediumData.results : [];
 
-    const combined = [...easyResults, ...mediumResults].slice(0, amount);
-    if (combined.length === 0) {
+    let combined = [...easyResults, ...mediumResults];
+    
+    // If we don't have enough questions, supplement with sample questions
+    if (combined.length < amount) {
+      const needed = amount - combined.length;
+      const supplemental = SAMPLE_QUESTIONS.results.slice(0, needed);
+      combined = [...combined, ...supplemental];
+    }
+    
+    const results = combined.slice(0, amount);
+    if (results.length === 0) {
       return NextResponse.json(SAMPLE_QUESTIONS);
     }
 
-    return NextResponse.json({ response_code: 0, results: combined });
+    return NextResponse.json({ response_code: 0, results });
   } catch (error) {
     console.error('Error fetching questions:', error);
     console.log('Using sample questions as fallback');
