@@ -1,4 +1,4 @@
-[![Tip in Crypto](https://tip.md/badge.svg)](https://tip.md/JesterInvestor)
+[![Tip in Crypto](https://tip.md/badge.svg)](https://tip.md/jesterinvestor)
 # Quiz Challenge - Farcaster Trivia App
 
 A Next.js-based trivia quiz mini-game that encourages users to answer questions in a timed format. Built for Farcaster with wallet connection support via Thirdweb.
