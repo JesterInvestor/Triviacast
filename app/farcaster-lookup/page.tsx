@@ -3,6 +3,7 @@
 import React from 'react';
 import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import ShareButton from '@/components/ShareButton';
+import { buildPlatformShareUrl, openShareUrl } from '@/lib/farcaster';
 import { useState } from 'react';
 import { useNeynarContext } from '@neynar/react';
 import Quiz from '@/components/Quiz';
@@ -98,7 +99,10 @@ export default function FarcasterLookupPage() {
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
           <div className="mb-2 flex justify-center">
             <ShareButton
-              url="https://warpcast.com/~/compose?text=Come%20check%20out%20our%20farcaster%20lookup%20page%20powered%20by%20neynar!!%20https://triviacast.xyz/farcaster-lookup"
+              url={buildPlatformShareUrl(
+                'Come check out our Farcaster lookup page powered by neynar!! https://triviacast.xyz/farcaster-lookup',
+                ['https://triviacast.xyz/farcaster-lookup']
+              )}
               className="bg-[#DC8291] hover:bg-[#C86D7D] text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 shadow"
               ariaLabel="Share Farcaster Lookup"
             >
@@ -218,12 +222,12 @@ export default function FarcasterLookupPage() {
                               return;
                             }
                           } catch (err) {
-                            // fallthrough to warpcast compose
+                            // fallthrough to canonical share link below
                           }
 
-                          // Fallback: open Warpcast compose so user can post to Farcaster
-                          const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(previewText)}`;
-                          window.open(url, '_blank');
+                          // Use canonical share link that works across Farcaster/Base
+                          const url = buildPlatformShareUrl(previewText, [previewLink || 'https://triviacast.xyz']);
+                          await openShareUrl(url);
                         }}
                       >
                         Share…
