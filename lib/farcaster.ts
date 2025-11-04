@@ -1,11 +1,8 @@
 // Simple helpers to build Farcaster (Warpcast) share URLs with prefilled text and embeds
-// We prefer client-origin when available; fallback to production URL.
+// Always use the canonical URL for share links.
 
 function getBaseUrl(): string {
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    return window.location.origin;
-  }
-  // Fallback to production domain
+  // Always return the canonical URL for share links
   return 'https://triviacast.xyz';
 }
 
@@ -45,11 +42,13 @@ export async function openShareUrl(url: string): Promise<void> {
   
   const platform = getPlatform();
   
-  // For Farcaster miniapp, use the SDK's composeCast action
-  if (platform === 'farcaster') {
-    try {
-      const { sdk } = await import('@farcaster/miniapp-sdk');
-      
+  // Always try to use Farcaster SDK first (works in miniapp and desktop app)
+  try {
+    const { sdk } = await import('@farcaster/miniapp-sdk');
+    
+    // Check if SDK context is available (indicates we're in a Farcaster environment)
+    const context = await sdk.context;
+    if (context) {
       // Parse the Warpcast compose URL to extract text and embeds
       const urlObj = new URL(url);
       const text = urlObj.searchParams.get('text') || '';
@@ -73,9 +72,10 @@ export async function openShareUrl(url: string): Promise<void> {
         embeds: formattedEmbeds,
       });
       return;
-    } catch (error) {
-      console.log('Farcaster SDK not available or composeCast failed, using normal link', error);
     }
+  } catch (error) {
+    // SDK not available or failed - fall through to other methods
+    console.log('Farcaster SDK not available or composeCast failed, using fallback', error);
   }
   
   // For Base miniapp, open the app URL directly instead of Warpcast compose
