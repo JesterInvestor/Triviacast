@@ -9,11 +9,11 @@ interface SignInModalProps {
 }
 
 export default function SignInModal({ isOpen, onClose }: SignInModalProps) {
-  const { connectors, connect, isPending } = useConnect();
-  const { isConnected } = useAccount();
+  const [isMounted, setIsMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     // Detect if user is on mobile
     const checkMobile = () => {
       const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
@@ -23,6 +23,10 @@ export default function SignInModal({ isOpen, onClose }: SignInModalProps) {
     checkMobile();
   }, []);
 
+  // Don't use wagmi hooks until mounted
+  const { connectors, connect, isPending } = useConnect();
+  const { isConnected } = useAccount();
+
   useEffect(() => {
     // Close modal when connected
     if (isConnected) {
@@ -30,7 +34,7 @@ export default function SignInModal({ isOpen, onClose }: SignInModalProps) {
     }
   }, [isConnected, onClose]);
 
-  if (!isOpen) return null;
+  if (!isMounted || !isOpen) return null;
 
   const handleConnect = async (connector: any) => {
     try {
