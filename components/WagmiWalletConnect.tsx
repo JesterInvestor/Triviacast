@@ -30,25 +30,36 @@ export default function WagmiWalletConnect() {
     return () => { mounted = false; };
   }, [address, isConnected]);
 
-  // Only show connected state if Farcaster MiniApp or Base wallet is active
-  if (isConnected && address && activeConnector && (activeConnector.id === 'farcasterMiniApp' || activeConnector.id === 'base')) {
+  // Show connected state for any wallet
+  if (isConnected && address && activeConnector) {
     const label = profile?.username || profile?.displayName || `${address.slice(0,6)}…${address.slice(-4)}`;
+    
+    // Determine wallet type for display
+    const getWalletLabel = () => {
+      const id = activeConnector.id?.toLowerCase() || '';
+      if (id.includes('farcaster')) return 'Farcaster';
+      if (id.includes('coinbase')) return 'Base';
+      if (id.includes('metamask')) return 'MetaMask';
+      if (id.includes('walletconnect')) return 'WalletConnect';
+      return 'Wallet';
+    };
+    
     return (
       <div className="flex justify-end flex-1 sm:flex-initial">
         <div className="flex items-center gap-2">
           {/* Base avatar */}
           <img
             src={`https://cdn.stamp.fyi/avatar/${address}?s=44`}
-            alt="Base Avatar"
+            alt="Wallet Avatar"
             className="rounded-full border-2 border-[#F4A6B7] w-11 h-11"
             style={{ marginRight: '8px' }}
           />
           <div className="px-3 py-2 bg-[#FFE4EC] text-[#5a3d5c] rounded-lg text-sm border-2 border-[#F4A6B7] font-medium min-h-[44px] flex items-center">
             <span className="font-semibold mr-2">{label}</span>
             <span className="ml-2 text-[10px] bg-white text-black px-2 rounded">
-              {activeConnector.id === 'farcasterMiniApp' ? 'Farcaster' : 'Base'}
+              {getWalletLabel()}
             </span>
-            <span className="ml-2 text-green-600 font-bold">Wallet Connected</span>
+            <span className="ml-2 text-green-600 font-bold">Connected</span>
           </div>
         </div>
       </div>

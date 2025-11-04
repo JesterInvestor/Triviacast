@@ -11,9 +11,18 @@ export default function AutoConnector() {
     if (typeof window === 'undefined') return;
     if (isConnected) return;
 
-    // Only attempt once per session to avoid repeated prompts.
+    // Only auto-connect if the user was previously connected (to restore session)
+    // Check if wagmi has stored a recent connection
+    const hasRecentConnection = sessionStorage.getItem('wagmi.recentConnectorId') || 
+                                 sessionStorage.getItem('wagmi.store') ||
+                                 localStorage.getItem('wagmi.recentConnectorId') ||
+                                 localStorage.getItem('wagmi.store');
+    
+    // Also check if we've already attempted auto-connect this session
     const attempted = sessionStorage.getItem('triviacast_auto_connect_attempted');
-    if (attempted) return;
+    
+    // Only auto-connect if there's evidence of a previous connection AND we haven't tried yet
+    if (!hasRecentConnection || attempted) return;
 
     (async () => {
       try {
@@ -54,7 +63,7 @@ export default function AutoConnector() {
         // Choose preferred connectors based on detection: farcaster first, then Base wallets
         const preferOrder: string[] = [];
         if (hasFarcasterProvider) preferOrder.push('farcaster', 'miniapp');
-        if (isOnBaseChain) preferOrder.push('metamask', 'walletconnect', 'walletconnectlegacy');
+        if (isOnBaseChain) preferOrder.push('coinbase', 'metamask', 'walletconnect', 'walletconnectlegacy');
 
         // Find the first connector that matches our preference list
         let target;

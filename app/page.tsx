@@ -13,6 +13,7 @@ import WalletPoints from '@/components/WalletPoints';
 import ClientOnlyWidgets from '@/components/ClientOnlyWidgets';
 import ShareButton from '@/components/ShareButton';
 import Link from 'next/link';
+import SignInButton from '@/components/SignInButton';
 
 export default function Home() {
   // Wallet connect handled by WagmiWalletConnect
@@ -26,7 +27,7 @@ export default function Home() {
   // Add hooks for wallet info
   const [ethBalance, setEthBalance] = React.useState<string>('0.0000');
   const [username, setUsername] = React.useState<string>('');
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   React.useEffect(() => {
     async function fetchBalance() {
       if (address) {
@@ -66,24 +67,33 @@ export default function Home() {
             </h1>
             <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Test Your Brain Power</p>
           </div>
-          {/* Points, widgets, and leaderboard button only */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full mt-4">
-            <div className="w-full sm:w-auto flex flex-col items-center">
-              <WalletPoints />
+          {/* Sign in button or points/widgets */}
+          {!isConnected ? (
+            <div className="flex flex-col items-center justify-center gap-3 w-full mt-4">
+              <SignInButton />
+              <p className="text-xs text-[#5a3d5c] text-center">
+                Connect your wallet to play and earn T Points
+              </p>
             </div>
-            <div className="w-full sm:w-auto flex flex-col items-center">
-              <ClientOnlyWidgets />
+          ) : (
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full mt-4">
+              <div className="w-full sm:w-auto flex flex-col items-center">
+                <WalletPoints />
+              </div>
+              <div className="w-full sm:w-auto flex flex-col items-center">
+                <ClientOnlyWidgets />
+              </div>
+              <Link
+                href="/leaderboard"
+                className="h-[40px] flex items-center rounded-md bg-[#fff] text-[#c85b86] hover:bg-[#f7f7f7] px-3 py-2 font-semibold text-xs sm:text-sm shadow transition w-full sm:w-auto justify-center"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                Leaderboard
+              </Link>
             </div>
-            <Link
-              href="/leaderboard"
-              className="h-[40px] flex items-center rounded-md bg-[#fff] text-[#c85b86] hover:bg-[#f7f7f7] px-3 py-2 font-semibold text-xs sm:text-sm shadow transition w-full sm:w-auto justify-center"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >
-              Leaderboard
-            </Link>
-          </div>
+          )}
         </div>
-        <Quiz />
+        {isConnected && <Quiz />}
       </div>
     </div>
   );

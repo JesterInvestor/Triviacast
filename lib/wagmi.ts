@@ -1,7 +1,7 @@
 import { http, createConfig } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { farcasterMiniApp } from '@farcaster/miniapp-wagmi-connector';
-import { metaMask, walletConnect } from '@wagmi/connectors';
+import { metaMask, walletConnect, coinbaseWallet } from '@wagmi/connectors';
 
 const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
 
@@ -14,6 +14,10 @@ const _wagmiConfig: any = {
   },
   connectors: [
     farcasterMiniApp(),
+    coinbaseWallet({
+      appName: 'Triviacast',
+      preference: 'all', // Support both mobile and extension
+    }),
     metaMask(),
     walletConnect({
       projectId: 'wagmi',
