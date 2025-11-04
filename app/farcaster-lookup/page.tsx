@@ -3,9 +3,8 @@
 import React from 'react';
 import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import ShareButton from '@/components/ShareButton';
-import { buildPlatformShareUrl, openShareUrl } from '@/lib/farcaster';
+import { buildPlatformShareUrl } from '@/lib/farcaster';
 import { useState } from 'react';
-import { useNeynarContext } from '@neynar/react';
 import Quiz from '@/components/Quiz';
 import { ProfileCard } from '@/components/ProfileCard';
 import { NeynarCastCard } from '@/components/NeynarCastCard';
@@ -44,9 +43,6 @@ export default function FarcasterLookupPage() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewText, setPreviewText] = useState<string>('');
   const [previewLink, setPreviewLink] = useState<string>('');
-  const [sending, setSending] = useState(false);
-  const [previewResult, setPreviewResult] = useState<any>(null);
-  const { user: neynarUser } = useNeynarContext();
   // NOTE: intentionally not auto-prefilling the lookup from URL params.
   // Shares should point to the canonical site only (https://triviacast.xyz).
 
@@ -101,7 +97,8 @@ export default function FarcasterLookupPage() {
             <ShareButton
               url={buildPlatformShareUrl(
                 'Come check out our Farcaster lookup page powered by neynar!! https://triviacast.xyz/farcaster-lookup',
-                ['https://triviacast.xyz/farcaster-lookup']
+                ['https://triviacast.xyz/farcaster-lookup'],
+                { action: 'share' }
               )}
               className="bg-[#DC8291] hover:bg-[#C86D7D] text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 shadow"
               ariaLabel="Share Farcaster Lookup"
@@ -162,15 +159,11 @@ export default function FarcasterLookupPage() {
                         // normalize handle so we don't end up with duplicate @ (some sources include '@')
                         const cleanHandle = target.startsWith('@') ? target.slice(1) : target;
                         const tPoints = (res.score ?? 0) * 1000; // 1 correct = 1000 T points (info page)
-                        const senderRaw = neynarUser?.username || neynarUser?.displayName || neynarUser?.fid || neynarUser?.address || '';
-                        const sender = senderRaw && senderRaw.startsWith('@') ? senderRaw.slice(1) : senderRaw;
                         // Use the Triviacast site link for share links (clickable HTTPS).
-                        // If you prefer the plain hostname without scheme (e.g. "triviacast.xyz"), tell me.
                         const challengeLink = 'https://triviacast.xyz';
                         const defaultText = cleanHandle
                           ? `@${cleanHandle}.farcaster.eth I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
                           : `I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`;
-                        setPreviewResult(res);
                         setPreviewText(defaultText);
                         setPreviewLink(challengeLink);
                         setPreviewOpen(true);
@@ -188,7 +181,7 @@ export default function FarcasterLookupPage() {
                 >
                   <div className="w-11/12 max-w-2xl bg-white rounded-lg p-4 shadow-lg" onClick={(e) => e.stopPropagation()}>
                     <h2 className="text-lg font-bold mb-2">Preview your cast</h2>
-                    <p className="text-sm text-gray-600 mb-2">Edit the message below, mention the user to notify them, or open Warpcast to post from your account.</p>
+                    <p className="text-sm text-gray-600 mb-2">Review the message below and post it from your account or copy it to share manually.</p>
                     <textarea
                       className="w-full h-32 p-2 border rounded mb-2 bg-gray-50"
                       value={previewText}
@@ -207,33 +200,6 @@ export default function FarcasterLookupPage() {
                       >
                         Post from my account
                       </button>
-
-                      <button
-                        className="bg-[#06b6d4] text-white px-3 py-2 rounded font-semibold"
-                        onClick={async () => {
-                          // Prefer the Web Share API so mobile users can share to Base app or other apps.
-                          try {
-                            if (navigator && typeof (navigator as any).share === 'function') {
-                              await (navigator as any).share({
-                                title: 'Triviacast Challenge',
-                                text: previewText,
-                                url: previewLink || 'https://triviacast.xyz',
-                              });
-                              return;
-                            }
-                          } catch (err) {
-                            // fallthrough to canonical share link below
-                          }
-
-                          // Use canonical share link that works across Farcaster/Base
-                          const url = buildPlatformShareUrl(previewText, [previewLink || 'https://triviacast.xyz']);
-                          await openShareUrl(url);
-                        }}
-                      >
-                        Share…
-                      </button>
-
-                      {/* Removed server-post option per request; users can post from their account or copy the text */}
 
                       <button
                         type="button"
