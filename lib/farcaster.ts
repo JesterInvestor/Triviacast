@@ -6,6 +6,14 @@ function getBaseUrl(): string {
   return 'https://triviacast.xyz';
 }
 
+// Helper to detect if text contains mentions/tagged friends
+function hasTaggedFriends(text: string): boolean {
+  // Check for Farcaster mentions: @username or @username.eth or @username.farcaster.eth
+  // Must be at start of text, after whitespace, or after newline to avoid matching emails
+  const mentionPattern = /(^|\s)@[\w-]+(?:\.(?:eth|farcaster\.eth))?/;
+  return mentionPattern.test(text);
+}
+
 // Detect which platform we're running on
 function getPlatform(): 'farcaster' | 'base' | 'web' {
   if (typeof window === 'undefined') return 'web';
@@ -55,6 +63,7 @@ export async function openShareUrl(url: string): Promise<void> {
       const embeds: string[] = [];
       
       // Extract embeds (Warpcast uses embeds[] param)
+      // Note: If the URL was built without embeds (due to tagged friends), embeds will be empty
       urlObj.searchParams.forEach((value, key) => {
         if (key === 'embeds[]' && embeds.length < 2) {
           embeds.push(value);
@@ -102,29 +111,39 @@ function buildEmbedsParams(embeds: string[] = []): string {
     .join('&');
 }
 
-export function buildWarpcastShareUrl(text: string, embeds?: string[]): string {
+export function buildWarpcastShareUrl(text: string, embeds?: string[], options?: { action?: 'cast' | 'share' }): string {
   const base = 'https://warpcast.com/~/compose';
   const textParam = `text=${encodeURIComponent(text)}`;
-  const embedsParam = buildEmbedsParams(embeds || []);
+  
+  // When composing a cast (not a share) with tagged friends, do not include embeds
+  // This prevents the large share preview from being added automatically
+  const action = options?.action || 'cast';
+  const shouldIncludeEmbeds = action === 'share' || !hasTaggedFriends(text);
+  
+  const embedsParam = shouldIncludeEmbeds ? buildEmbedsParams(embeds || []) : '';
   return embedsParam ? `${base}?${textParam}&${embedsParam}` : `${base}?${textParam}`;
 }
 
 // Build a share URL that works for both Farcaster and Base
-export function buildPlatformShareUrl(text: string, embeds?: string[]): string {
+export function buildPlatformShareUrl(text: string, embeds?: string[], options?: { action?: 'cast' | 'share' }): string {
   const platform = getPlatform();
+  const action = options?.action || 'cast';
+  
+  // When composing a cast (not a share) with tagged friends, do not include embeds
+  const shouldIncludeEmbeds = action === 'share' || !hasTaggedFriends(text);
   
   // For Base and Farcaster, return the app URL directly (first embed if available).
   // This ensures mini app hosts receive the canonical HTTPS link and can open the
   // app/share extension the same way Base does.
   if (platform === 'base' || platform === 'farcaster') {
-    if (embeds && embeds.length > 0) {
+    if (shouldIncludeEmbeds && embeds && embeds.length > 0) {
       return embeds[0];
     }
     return getBaseUrl();
   }
   
   // For web, use Warpcast compose URL (opens Warpcast composer on the web)
-  return buildWarpcastShareUrl(text, embeds);
+  return buildWarpcastShareUrl(text, embeds, options);
 }
 
 // Convenience builders
@@ -135,7 +154,7 @@ export function shareAppText(): string {
 
 export function shareAppUrl(): string {
   const url = getBaseUrl();
-  return buildPlatformShareUrl(shareAppText(), [url]);
+  return buildPlatformShareUrl(shareAppText(), [url], { action: 'share' });
 }
 
 export function shareResultsText(score: number, total: number, percent: number, tPoints: number): string {
@@ -146,7 +165,7 @@ export function shareResultsText(score: number, total: number, percent: number, 
 
 export function shareResultsUrl(score: number, total: number, percent: number, tPoints: number): string {
   const url = getBaseUrl();
-  return buildPlatformShareUrl(shareResultsText(score, total, percent, tPoints), [url]);
+  return buildPlatformShareUrl(shareResultsText(score, total, percent, tPoints), [url], { action: 'share' });
 }
 
 export function shareLeaderboardText(rank: number | null, points: number): string {
@@ -159,5 +178,5 @@ export function shareLeaderboardText(rank: number | null, points: number): strin
 
 export function shareLeaderboardUrl(rank: number | null, points: number): string {
   const site = getBaseUrl();
-  return buildPlatformShareUrl(shareLeaderboardText(rank, points), [`${site}/leaderboard`]);
+  return buildPlatformShareUrl(shareLeaderboardText(rank, points), [`${site}/leaderboard`], { action: 'share' });
 }
