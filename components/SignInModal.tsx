@@ -16,7 +16,7 @@ export default function SignInModal({ isOpen, onClose }: SignInModalProps) {
     setIsMounted(true);
     // Detect if user is on mobile
     const checkMobile = () => {
-      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+      const userAgent = navigator.userAgent || navigator.vendor || '';
       const mobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
       setIsMobile(mobile);
     };

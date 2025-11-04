@@ -20,7 +20,7 @@ const _wagmiConfig: any = {
     }),
     metaMask(),
     walletConnect({
-      projectId: 'wagmi',
+      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'wagmi',
       showQrModal: true,
     }),
   ],

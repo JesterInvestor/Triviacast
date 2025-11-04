@@ -11,18 +11,10 @@ export default function AutoConnector() {
     if (typeof window === 'undefined') return;
     if (isConnected) return;
 
-    // Only auto-connect if the user was previously connected (to restore session)
-    // Check if wagmi has stored a recent connection
-    const hasRecentConnection = sessionStorage.getItem('wagmi.recentConnectorId') || 
-                                 sessionStorage.getItem('wagmi.store') ||
-                                 localStorage.getItem('wagmi.recentConnectorId') ||
-                                 localStorage.getItem('wagmi.store');
-    
-    // Also check if we've already attempted auto-connect this session
+    // Only auto-connect if we haven't already attempted this session
+    // This allows wagmi's built-in reconnection to work while avoiding aggressive prompts
     const attempted = sessionStorage.getItem('triviacast_auto_connect_attempted');
-    
-    // Only auto-connect if there's evidence of a previous connection AND we haven't tried yet
-    if (!hasRecentConnection || attempted) return;
+    if (attempted) return;
 
     (async () => {
       try {
