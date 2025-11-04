@@ -12,7 +12,7 @@ import Image from 'next/image';
 const QUIZ_TIME_LIMIT = 60; // 1 minute in seconds
 const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
 
-export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: string; score: number; details?: any }) => void } = {}) {
+export default function Quiz({ onComplete, username }: { onComplete?: (result: { quizId: string; score: number; details?: any }) => void; username?: string } = {}) {
   const [isMuted, setIsMuted] = useState(false);
   const { address: accountAddress, isConnected } = useAccount();
   const [quizState, setQuizState] = useState<QuizState>({
@@ -221,6 +221,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         answers={quizState.answers}
         tPoints={quizState.tPoints}
         onRestart={restartQuiz}
+        username={username}
       />
     );
   }

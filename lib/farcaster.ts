@@ -157,15 +157,23 @@ export function shareAppUrl(): string {
   return buildPlatformShareUrl(shareAppText(), [url], { action: 'share' });
 }
 
-export function shareResultsText(score: number, total: number, percent: number, tPoints: number): string {
+export function shareResultsText(score: number, total: number, percent: number, tPoints: number, username?: string): string {
   const url = getBaseUrl();
   const points = tPoints.toLocaleString();
-  return `I scored ${score}/${total} (${percent}%) on Triviacast and earned ${points} T Points! 🏆\nPlay now: ${url}\n#Triviacast #Trivia #Farcaster`;
+  
+  // Build mention prefix if username is provided
+  const mentionPrefix = username ? `@${username.startsWith('@') ? username.slice(1) : username}.farcaster.eth ` : '';
+  
+  // Simplified message format as per requirements
+  return `${mentionPrefix}I scored ${score} (${points} T Points) on the Triviacast Challenge — beat my score! Play it: ${url}`;
 }
 
-export function shareResultsUrl(score: number, total: number, percent: number, tPoints: number): string {
+export function shareResultsUrl(score: number, total: number, percent: number, tPoints: number, username?: string): string {
+  const text = shareResultsText(score, total, percent, tPoints, username);
+  // When tagging friends with mentions, don't include embeds to avoid large preview
+  // The buildPlatformShareUrl function already handles this via hasTaggedFriends check
   const url = getBaseUrl();
-  return buildPlatformShareUrl(shareResultsText(score, total, percent, tPoints), [url], { action: 'share' });
+  return buildPlatformShareUrl(text, [url], { action: 'cast' });
 }
 
 export function shareLeaderboardText(rank: number | null, points: number): string {

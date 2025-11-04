@@ -40,9 +40,6 @@ export default function FarcasterLookupPage() {
   const [result, setResult] = useState<LookupResult>(null);
   const [error, setError] = useState<string | null>(null);
   const [quizOpen, setQuizOpen] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewText, setPreviewText] = useState<string>('');
-  const [previewLink, setPreviewLink] = useState<string>('');
   // NOTE: intentionally not auto-prefilling the lookup from URL params.
   // Shares should point to the canonical site only (https://triviacast.xyz).
 
@@ -78,11 +75,7 @@ export default function FarcasterLookupPage() {
     }
   };
 
-  const handleClosePreview = () => {
-    // Close both preview and quiz to return to the profile view
-    setPreviewOpen(false);
-    setQuizOpen(false);
-  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
@@ -114,10 +107,10 @@ export default function FarcasterLookupPage() {
           <div className="w-full max-w-md bg-white rounded-md border p-3 mt-3 text-sm text-gray-700">
             <strong className="block mb-1">How to challenge a friend</strong>
             <ol className="list-decimal pl-6">
-              <li>Search your friend's Farcaster handle using the field above.</li>
+              <li>Search your friend&apos;s Farcaster handle using the field above.</li>
               <li>Click <em>Lookup</em> and then <em>Play Quiz</em> on their profile.</li>
-              <li>After you finish the quiz you'll see a preview message that mentions them — edit it if you want.</li>
-              <li>Post from your account via <strong>Base</strong> or <strong>Farcaster</strong>, or copy the message to share it manually.</li>
+              <li>After you finish the quiz, click <em>Share Results</em> to challenge them.</li>
+              <li>The shared message will automatically mention your friend!</li>
             </ol>
           </div>
           <div className="flex flex-col items-center gap-2 w-full max-w-md bg-white rounded-xl border-2 border-[#F4A6B7] shadow-md px-4 py-4">
@@ -153,100 +146,17 @@ export default function FarcasterLookupPage() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                   <div className="w-11/12 max-w-3xl">
                     <Quiz
-                      onComplete={(res) => {
-                        // Open an editable preview modal so the user can edit the cast text
-                        const target = result?.profile?.username || '';
-                        // normalize handle so we don't end up with duplicate @ (some sources include '@')
-                        const cleanHandle = target.startsWith('@') ? target.slice(1) : target;
-                        const tPoints = (res.score ?? 0) * 1000; // 1 correct = 1000 T points (info page)
-                        // Use the Triviacast site link for share links (clickable HTTPS).
-                        const challengeLink = 'https://triviacast.xyz';
-                        const defaultText = cleanHandle
-                          ? `${cleanHandle}.farcaster.eth I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
-                          : `I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`;
-                        setPreviewText(defaultText);
-                        setPreviewLink(challengeLink);
-                        setPreviewOpen(true);
+                      username={result?.profile?.username}
+                      onComplete={() => {
+                        // Quiz completion now handled by QuizResults component with unified sharing
+                        setQuizOpen(false);
                       }}
                     />
                   </div>
                 </div>
               )}
 
-              {/* Preview / Compose modal: lets user edit the cast, open Warpcast to post from their account, or post via server */}
-              {previewOpen && (
-                <div
-                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-                  onClick={() => handleClosePreview()}
-                >
-                  <div className="w-11/12 max-w-2xl bg-white rounded-lg p-4 shadow-lg" onClick={(e) => e.stopPropagation()}>
-                    <h2 className="text-lg font-bold mb-2">Preview your cast</h2>
-                    <p className="text-sm text-gray-600 mb-2">Review the message below and post it from your account or copy it to share manually.</p>
-                    <textarea
-                      className="w-full h-32 p-2 border rounded mb-2 bg-gray-50"
-                      value={previewText}
-                      readOnly
-                    />
-                    <p className="text-xs text-gray-500 mb-3">To edit this message before posting, click "Post from my account" — edits should be done in Warpcast's compose box.</p>
 
-                    <div className="flex gap-2 items-center">
-                      <button
-                        className="bg-[#4F46E5] text-white px-3 py-2 rounded font-semibold"
-                        onClick={() => {
-                          // Open Warpcast compose with the text so the user can post from their account
-                          const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(previewText)}`;
-                          window.open(url, '_blank');
-                        }}
-                      >
-                        Post from my account
-                      </button>
-
-                      <button
-                        type="button"
-                        className="border px-3 py-2 rounded"
-                        onClick={async () => {
-                          const textToCopy = `${previewText}${previewLink ? ` ${previewLink}` : ''}`;
-                          // Try modern clipboard API first
-                          try {
-                            if (navigator && (navigator as any).clipboard && (navigator as any).clipboard.writeText) {
-                              await (navigator as any).clipboard.writeText(textToCopy);
-                              alert('Copied to clipboard');
-                              return;
-                            }
-                          } catch (err) {
-                            // ignore and fallback
-                          }
-
-                          // Fallback for older browsers: create a temporary textarea and execCommand
-                          try {
-                            const ta = document.createElement('textarea');
-                            ta.value = textToCopy;
-                            // Move it off-screen
-                            ta.style.position = 'fixed';
-                            ta.style.left = '-9999px';
-                            document.body.appendChild(ta);
-                            ta.select();
-                            const ok = document.execCommand('copy');
-                            document.body.removeChild(ta);
-                            if (ok) {
-                              alert('Copied to clipboard');
-                              return;
-                            }
-                          } catch (err) {
-                            // ignore
-                          }
-
-                          alert('Copy failed — please select the text manually and copy.');
-                        }}
-                      >
-                        Copy
-                      </button>
-
-                      <button type="button" className="ml-auto text-sm text-gray-600" onClick={handleClosePreview}>Close</button>
-                    </div>
-                  </div>
-                </div>
-              )}
               {/* Show recent casts if available */}
               {Array.isArray(result.profile.casts) && result.profile.casts.length > 0 && (
                 <div className="mt-4 w-full">
