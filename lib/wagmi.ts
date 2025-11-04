@@ -12,6 +12,7 @@ const _wagmiConfig: any = {
   transports: {
     [base.id]: rpcUrl ? http(rpcUrl) : http(),
   },
+  // Recognize Farcaster Mini App, MetaMask (injected), and WalletConnect (Base & others)
   connectors: [
     farcasterMiniApp(),
     metaMask(),

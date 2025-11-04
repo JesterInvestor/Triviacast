@@ -6,7 +6,7 @@ import StakingDailyClaimPrompt from './StakingDailyClaimPrompt';
 import Toaster from './Toaster';
 import ClientErrorBoundary from './ClientErrorBoundary';
 import { useActiveAccount, ConnectButton } from 'thirdweb/react';
-import { inAppWallet } from 'thirdweb/wallets';
+import { createWallet, walletConnect } from 'thirdweb/wallets';
 import { client } from '@/lib/thirdwebClient';
 
 export default function ClientOnlyWidgets() {
@@ -33,16 +33,20 @@ export default function ClientOnlyWidgets() {
     <>
       <ConnectButton 
         client={client}
-        wallets={[inAppWallet({
-          auth: {
-            options: ["farcaster"]
-          }
-        })]}
+        // WalletConnect for mobile wallets (Base Wallet) + injected wallets (MetaMask / Farcaster injected)
+        wallets={[
+          // Injected EIP-1193 wallets via MetaMask adapter
+          createWallet('io.metamask'),
+          // Coinbase/CBW extension (covers many Base users on desktop)
+          createWallet('com.coinbase.wallet'),
+          // WalletConnect QR modal for Base Wallet and others
+          walletConnect(),
+        ]}
         connectButton={{
-          label: "Sign in",
+          label: "Connect Wallet",
         }}
         connectModal={{
-          title: "Sign in to Triviacast",
+          title: "Connect your wallet",
         }}
       />
       {/* Wallet address display removed as requested */}

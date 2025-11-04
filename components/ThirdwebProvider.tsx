@@ -3,6 +3,7 @@
 import { ThirdwebProvider as Thirdweb } from 'thirdweb/react';
 import { client } from '@/lib/thirdweb';
 import { useEffect } from 'react';
+import ThirdwebAutoConnect from './ThirdwebAutoConnect';
 
 export default function ThirdwebProvider({ children }: { children: React.ReactNode }) {
   // Minimal auto-detect: if running inside a Farcaster miniapp and the SDK
@@ -36,5 +37,10 @@ export default function ThirdwebProvider({ children }: { children: React.ReactNo
   // to avoid runtime errors in environments without a thirdweb client.
   // Render Thirdweb provider as before. The Thirdweb provider's internal
   // implementation will handle absence of a configured client gracefully.
-  return <Thirdweb>{children}</Thirdweb>;
+  return (
+    <Thirdweb>
+      <ThirdwebAutoConnect />
+      {children}
+    </Thirdweb>
+  );
 }
