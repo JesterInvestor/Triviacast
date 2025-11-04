@@ -78,8 +78,8 @@ export async function openShareUrl(url: string): Promise<void> {
     console.log('Farcaster SDK not available or composeCast failed, using fallback', error);
   }
   
-  // For Base miniapp, open the app URL directly instead of Warpcast compose
-  if (platform === 'base') {
+  // For Base or Farcaster miniapp, open the app URL directly instead of Warpcast compose
+  if (platform === 'base' || platform === 'farcaster') {
     // Extract the app URL from the Warpcast compose URL if it contains embeds
     // Handle both URL-encoded (%5B%5D) and regular ([]) square brackets
     const match = url.match(/embeds(?:%5B%5D|\[\])=([^&]+)/);
@@ -113,15 +113,17 @@ export function buildWarpcastShareUrl(text: string, embeds?: string[]): string {
 export function buildPlatformShareUrl(text: string, embeds?: string[]): string {
   const platform = getPlatform();
   
-  if (platform === 'base') {
-    // For Base, return the app URL directly (first embed if available)
+  // For Base and Farcaster, return the app URL directly (first embed if available).
+  // This ensures mini app hosts receive the canonical HTTPS link and can open the
+  // app/share extension the same way Base does.
+  if (platform === 'base' || platform === 'farcaster') {
     if (embeds && embeds.length > 0) {
       return embeds[0];
     }
     return getBaseUrl();
   }
   
-  // For Farcaster and web, use Warpcast compose URL
+  // For web, use Warpcast compose URL (opens Warpcast composer on the web)
   return buildWarpcastShareUrl(text, embeds);
 }
 
