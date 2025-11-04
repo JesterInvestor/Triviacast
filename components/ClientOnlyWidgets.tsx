@@ -6,6 +6,7 @@ import StakingDailyClaimPrompt from './StakingDailyClaimPrompt';
 import Toaster from './Toaster';
 import ClientErrorBoundary from './ClientErrorBoundary';
 import { useActiveAccount, ConnectButton } from 'thirdweb/react';
+import { inAppWallet } from 'thirdweb/wallets';
 import { client } from '@/lib/thirdwebClient';
 
 export default function ClientOnlyWidgets() {
@@ -30,7 +31,20 @@ export default function ClientOnlyWidgets() {
 
   const content = (
     <>
-      <ConnectButton client={client} />
+      <ConnectButton 
+        client={client}
+        wallets={[inAppWallet({
+          auth: {
+            options: ["farcaster"]
+          }
+        })]}
+        connectButton={{
+          label: "Sign in",
+        }}
+        connectModal={{
+          title: "Sign in to Triviacast",
+        }}
+      />
       {/* Wallet address display removed as requested */}
       <AddMiniAppPrompt />
       <StakingDailyClaimPrompt />
