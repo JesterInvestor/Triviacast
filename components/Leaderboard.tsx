@@ -132,6 +132,78 @@ export default function Leaderboard() {
           <h1 className="text-2xl sm:text-4xl font-bold text-center text-[#2d1b2e]">
             Leaderboard
           </h1>
+          {/* Export CSV of usernames -> addresses */}
+          {leaderboard.length > 0 && (
+            <button
+              onClick={() => {
+                try {
+                  const sorted = leaderboard.slice().sort((a, b) => b.tPoints - a.tPoints);
+                  const rows: string[] = [];
+                  const header = [
+                    'rank',
+                    'address',
+                    't_points',
+                    'farcaster_username',
+                    'display_name',
+                    'fid',
+                    'custody_address',
+                    'verified_eth_addresses',
+                  ];
+                  rows.push(header.join(','));
+                  sorted.forEach((entry, idx) => {
+                    const addr = (entry.walletAddress || '').toLowerCase();
+                    let profile: any = profiles[addr];
+                    if (!profile) {
+                      profile = Object.values(profiles).find(
+                        (p: any) => p?.custody_address?.toLowerCase() === addr
+                      );
+                    }
+                    if (!profile) {
+                      profile = Object.values(profiles).find((p: any) => {
+                        const verified = [
+                          ...(p?.verified_addresses?.eth_addresses || []),
+                          ...(p?.verified_addresses?.sol_addresses || []),
+                        ].map((a: string) => a.toLowerCase());
+                        return verified.includes(addr);
+                      });
+                    }
+                    const username = profile?.username ?? '';
+                    const displayName = profile?.display_name ?? profile?.displayName ?? '';
+                    const fid = profile?.fid ?? '';
+                    const custody = (profile?.custody_address || '').toLowerCase();
+                    const verifiedEth: string[] = (profile?.verified_addresses?.eth_addresses || []).map((x: string) => x.toLowerCase());
+                    const csvRow = [
+                      String(idx + 1),
+                      addr,
+                      String(entry.tPoints),
+                      username,
+                      displayName,
+                      String(fid),
+                      custody,
+                      `"${verifiedEth.join(' ')}"`,
+                    ];
+                    rows.push(csvRow.join(','));
+                  });
+                  const csv = rows.join('\n');
+                  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `triviacast-leaderboard-addresses.csv`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                } catch (e) {
+                  console.error('CSV export failed', e);
+                  alert('Failed to export CSV');
+                }
+              }}
+              className="ml-2 bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg text-xs sm:text-sm transition inline-flex items-center justify-center shadow gap-2"
+            >
+              Export CSV
+            </button>
+          )}
         </div>
         {/* Address lookup removed per request */}
         <p className="text-center text-[#5a3d5c] mb-4 sm:mb-6 text-sm sm:text-lg">
