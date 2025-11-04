@@ -62,10 +62,20 @@ export async function openShareUrl(url: string): Promise<void> {
         }
       });
       
+      // Format embeds for composeCast (undefined, [string], or [string, string])
+      let formattedEmbeds: undefined | [string] | [string, string];
+      if (embeds.length === 0) {
+        formattedEmbeds = undefined;
+      } else if (embeds.length === 1) {
+        formattedEmbeds = [embeds[0]];
+      } else {
+        formattedEmbeds = [embeds[0], embeds[1]];
+      }
+      
       // Use composeCast to directly open the cast composer in Farcaster
       await sdk.actions.composeCast({
         text,
-        embeds: embeds.length === 0 ? undefined : embeds.length === 1 ? [embeds[0]] : [embeds[0], embeds[1]],
+        embeds: formattedEmbeds,
       });
       return;
     } catch (error) {
