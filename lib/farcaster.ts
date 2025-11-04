@@ -63,14 +63,9 @@ export async function openShareUrl(url: string): Promise<void> {
       });
       
       // Format embeds for composeCast (undefined, [string], or [string, string])
-      let formattedEmbeds: undefined | [string] | [string, string];
-      if (embeds.length === 0) {
-        formattedEmbeds = undefined;
-      } else if (embeds.length === 1) {
-        formattedEmbeds = [embeds[0]];
-      } else {
-        formattedEmbeds = [embeds[0], embeds[1]];
-      }
+      const formattedEmbeds = embeds.length > 0 
+        ? (embeds.slice(0, 2) as [] | [string] | [string, string])
+        : undefined;
       
       // Use composeCast to directly open the cast composer in Farcaster
       await sdk.actions.composeCast({
