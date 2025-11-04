@@ -71,7 +71,7 @@ export default function Home() {
                 ariaLabel="Share app on Farcaster"
               />
               <a
-                href="https://tip.md/JesterInvestor"
+                href="https://tip.md/jesterinvestor"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center rounded-lg border-2 border-[#F4A6B7] bg-white hover:bg-[#fff7f9] px-2 py-1 shadow min-h-[44px]"
