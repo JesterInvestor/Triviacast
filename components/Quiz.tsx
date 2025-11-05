@@ -3,6 +3,7 @@ import QuizResults from './QuizResults';
 
 type Props = {
   username?: string; // optional Farcaster username to mention
+  onComplete?: () => void; // optional callback when quiz/results are closed
 };
 
 /**
@@ -11,7 +12,7 @@ type Props = {
  *
  * This sample simulates a quiz and demonstrates passing `username` down to the results component.
  */
-export default function Quiz({ username }: Props) {
+export default function Quiz({ username, onComplete }: Props) {
   const [completed, setCompleted] = useState(false);
   const [score, setScore] = useState<number>(0);
   const [tPoints, setTPoints] = useState<number>(0);
@@ -32,7 +33,10 @@ export default function Quiz({ username }: Props) {
         tPoints={tPoints}
         username={username}
         autoOpenPreview={!!username} // auto-open preview only when there is a username (tagging friend)
-        onClose={() => setCompleted(false)}
+        onClose={() => {
+          setCompleted(false);
+          if (onComplete) onComplete();
+        }}
       />
     );
   }

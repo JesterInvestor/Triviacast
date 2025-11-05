@@ -51,3 +51,49 @@ export async function openNativeShareFallback(text: string) {
 
   return { method: 'fallback' };
 }
+
+/**
+ * Generate a share URL for the main app
+ */
+export function shareAppUrl() {
+  const text = 'Check out Triviacast - test your knowledge and earn T Points! https://triviacast.xyz';
+  return `https://warpcast.com/~/compose?text=${encodeURIComponent(text)}`;
+}
+
+/**
+ * Generate a share URL for the leaderboard
+ */
+export function shareLeaderboardUrl(rank: number | null, points: number) {
+  let text = `Check out the Triviacast Leaderboard! https://triviacast.xyz/leaderboard`;
+  if (rank !== null && points > 0) {
+    text = `I'm ranked #${rank} with ${points} T Points on the Triviacast Leaderboard! https://triviacast.xyz/leaderboard`;
+  }
+  return `https://warpcast.com/~/compose?text=${encodeURIComponent(text)}`;
+}
+
+/**
+ * Build a platform share URL with embeds and options
+ */
+export function buildPlatformShareUrl(
+  text: string,
+  embeds: string[] = [],
+  options: { action?: string } = {}
+) {
+  const params = new URLSearchParams();
+  params.set('text', text);
+  
+  embeds.forEach((embed, idx) => {
+    params.append('embeds[]', embed);
+  });
+  
+  return `https://warpcast.com/~/compose?${params.toString()}`;
+}
+
+/**
+ * Open a share URL in a new window or tab
+ */
+export function openShareUrl(url: string) {
+  if (typeof window !== 'undefined') {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+}
