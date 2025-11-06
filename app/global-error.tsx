@@ -1,6 +1,7 @@
 "use client";
 
-import * as Sentry from "@sentry/nextjs";
+// Use the React (browser) SDK on the client to avoid bundling server integrations
+import * as Sentry from "@sentry/react";
 import Error from "next/error";
 import { useEffect } from "react";
 

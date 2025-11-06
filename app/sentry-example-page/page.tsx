@@ -1,7 +1,8 @@
 "use client";
 
 import Head from "next/head";
-import * as Sentry from "@sentry/nextjs";
+// Use client-side Sentry SDK to avoid bundling server integrations
+import * as Sentry from "@sentry/react";
 import { useState, useEffect } from "react";
 
 class SentryExampleFrontendError extends Error {
@@ -17,8 +18,18 @@ export default function Page() {
   
   useEffect(() => {
     async function checkConnectivity() {
-      const result = await Sentry.diagnoseSdkConnectivity();
-      setIsConnected(result !== 'sentry-unreachable');
+      try {
+        // Not all Sentry client SDKs expose diagnoseSdkConnectivity; feature-detect
+        const anySentry: any = Sentry as unknown as any;
+        if (typeof anySentry.diagnoseSdkConnectivity === 'function') {
+          const result = await anySentry.diagnoseSdkConnectivity();
+          setIsConnected(result !== 'sentry-unreachable');
+        } else {
+          setIsConnected(true);
+        }
+      } catch {
+        setIsConnected(true);
+      }
     }
     checkConnectivity();
   }, []);
