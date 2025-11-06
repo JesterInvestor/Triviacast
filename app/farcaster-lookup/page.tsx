@@ -162,7 +162,7 @@ export default function FarcasterLookupPage() {
                         // Use the Triviacast site link for share links (clickable HTTPS).
                         const challengeLink = 'https://triviacast.xyz';
                         const defaultText = cleanHandle
-                          ? `${cleanHandle}.farcaster.eth I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
+                          ? `@${cleanHandle}.farcaster.eth I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
                           : `I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`;
                         setPreviewText(defaultText);
                         setPreviewLink(challengeLink);
