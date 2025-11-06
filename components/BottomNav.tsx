@@ -18,7 +18,7 @@ export default function BottomNav() {
       bottom: 0,
       left: 0,
       right: 0,
-      height: '64px',
+      height: '56px',
       background: '#fff',
       borderTop: '1px solid #eee',
       display: 'flex',
@@ -36,10 +36,10 @@ export default function BottomNav() {
                 color: pathname === item.href ? '#7C3AED' : '#333',
                 fontWeight: pathname === item.href ? 'bold' : 'normal',
                 textDecoration: 'none',
-                fontSize: '1.5rem',
+                fontSize: '1.25rem',
                 textAlign: 'center',
-                padding: '12px 0',
-                minWidth: '72px',
+                padding: '8px 0',
+                minWidth: '64px',
                 lineHeight: 1,
               }}
             >
@@ -62,7 +62,7 @@ export default function BottomNav() {
             borderRadius: '8px',
             padding: '4px 6px',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            minHeight: '40px',
+            minHeight: '36px',
           }}
         >
           <img src="https://tip.md/badge.svg" alt="Tip in Crypto" height={20} />
