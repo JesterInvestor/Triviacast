@@ -4,26 +4,17 @@ import {
   getLeaderboardFromChain, 
   isContractConfigured 
 } from './contract';
+import { calculateTPoints as calculatePoints } from './quizScoring';
 
+/**
+ * @deprecated Use calculateTPoints from '@/lib/quizScoring' instead
+ * This function is kept for backward compatibility
+ */
 export function calculateTPoints(
   consecutiveCorrect: number,
-  isCorrect: boolean,
-  previousConsecutive: number
+  isCorrect: boolean
 ): number {
-  if (!isCorrect) return 0;
-
-  let points = 1000; // Base points for correct answer
-
-  // Check for streak bonuses
-  if (consecutiveCorrect === 3) {
-    points += 500; // 3 in a row bonus
-  } else if (consecutiveCorrect === 5) {
-    points += 1000; // 5 in a row bonus
-  } else if (consecutiveCorrect === 10) {
-    points += 2000; // Perfect 10 bonus
-  }
-
-  return points;
+  return calculatePoints(consecutiveCorrect, isCorrect);
 }
 
 /**

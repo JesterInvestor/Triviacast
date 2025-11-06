@@ -5,7 +5,7 @@ import { Question, QuizState } from '@/types/quiz';
 import QuizQuestion from './QuizQuestion';
 import QuizResults from './QuizResults';
 import Timer from './Timer';
-import { calculateTPoints } from '@/lib/tpoints';
+import { processAnswer } from '@/lib/quizScoring';
 import { useAccount } from 'wagmi';
 import Image from 'next/image';
 
@@ -121,21 +121,20 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
 
   const handleAnswer = (answer: string) => {
     const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
-    const isCorrect = answer === currentQuestion.correct_answer;
     
     const newAnswers = [...quizState.answers];
     newAnswers[quizState.currentQuestionIndex] = answer;
     
     setQuizState(prev => {
-      const newConsecutive = isCorrect ? prev.consecutiveCorrect + 1 : 0;
-      const earnedPoints = calculateTPoints(newConsecutive, isCorrect, prev.consecutiveCorrect);
+      // Use centralized scoring logic
+      const scoringResult = processAnswer(currentQuestion, answer, prev.consecutiveCorrect);
       
       return {
         ...prev,
         answers: newAnswers,
-        score: isCorrect ? prev.score + 1 : prev.score,
-        consecutiveCorrect: newConsecutive,
-        tPoints: prev.tPoints + earnedPoints,
+        score: scoringResult.isCorrect ? prev.score + 1 : prev.score,
+        consecutiveCorrect: scoringResult.consecutiveCorrect,
+        tPoints: prev.tPoints + scoringResult.points,
       };
     });
 

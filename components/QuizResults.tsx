@@ -1,13 +1,12 @@
 'use client';
 
-import { Question } from '@/types/quiz';
+import { Question, QuizResult } from '@/types/quiz';
 import Link from 'next/link';
 import { useActiveAccount } from 'thirdweb/react';
-import { signMessage } from 'thirdweb/utils';
 import { useEffect, useState } from 'react';
-import { addPointsOnChain, isContractConfigured } from '@/lib/contract';
-import { addWalletTPoints } from '@/lib/tpoints';
+import { storeQuizResult } from '@/lib/quizStorage';
 import { shareResultsUrl, openShareUrl } from '@/lib/farcaster';
+import { isContractConfigured } from '@/lib/contract';
 import Image from 'next/image';
 
 // Distributor/claim functionality removed from this component
@@ -37,14 +36,11 @@ export default function QuizResults({
 }: QuizResultsProps) {
   const percentage = Math.round((score / totalQuestions) * 100);
   const account = useActiveAccount();
-  // Use signMessage from thirdweb/utils, not a hook
-  const [signing, setSigning] = useState(false);
-  const [signError, setSignError] = useState<Error | null>(null);
   const [savingPoints, setSavingPoints] = useState(false);
   const [pointsSaved, setPointsSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  // Save points when component mounts
+  // Save points when component mounts using unified storage service
   useEffect(() => {
     if (!account?.address || tPoints === 0 || pointsSaved) {
       console.debug('[Triviacast] Skipping savePoints:', {
@@ -54,7 +50,7 @@ export default function QuizResults({
       });
       return;
     }
-    // All async/await and try/catch must be inside this async function
+
     const savePoints = async () => {
       console.info('[Triviacast] savePoints called', {
         tPoints,
@@ -65,53 +61,42 @@ export default function QuizResults({
 
       setSavingPoints(true);
       setSaveError(null);
-      setSigning(true);
-      setSignError(null);
+
       try {
-        // Require user to sign a message before awarding T Points
-        const message = `I am claiming ${tPoints} T Points for completing the Triviacast quiz on ${new Date().toISOString()}`;
-        console.debug('[Triviacast] Requesting signature:', { address: account!.address, message });
-        let signature;
-        try {
-          signature = await signMessage({ message, account });
-        } catch (err) {
-          setSignError(err as Error);
-          setSaveError('Signature was not provided. T Points cannot be awarded.');
-          setSigning(false);
-          setSavingPoints(false);
-          return;
-        }
+        // Create quiz result object
+        const quizResult: QuizResult = {
+          quizId: 'trivia-challenge',
+          walletAddress: account!.address,
+          score,
+          totalQuestions,
+          tPoints,
+          questions,
+          answers,
+          completedAt: new Date(),
+          timeRemaining: 0, // Not tracked in current implementation
+        };
 
-        // Always save to localStorage first
-        console.debug('[Triviacast] addWalletTPoints', { address: account!.address, tPoints });
-        await addWalletTPoints(account!.address, tPoints);
+        // Use unified storage service
+        const storageResult = await storeQuizResult(quizResult, account);
 
-        // If contract is configured, also save to blockchain
-        if (isContractConfigured()) {
-          try {
-            console.debug('[Triviacast] Calling addPointsOnChain', { account, address: account!.address, tPoints, signature });
-            await addPointsOnChain(account!, account!.address, tPoints);
-            console.log('Points saved to blockchain successfully');
-          } catch (error) {
-            console.error('Failed to save points to blockchain:', error);
-            setSaveError('Open miniapp with Farcaster to get T points and $TRIV');
+        if (storageResult.success) {
+          setPointsSaved(true);
+          if (!storageResult.savedToBlockchain && storageResult.error) {
+            setSaveError(storageResult.error);
           }
         } else {
-          console.warn('[Triviacast] Contract not configured, skipping blockchain save');
+          setSaveError(storageResult.error || 'Failed to save points. Please try again.');
         }
-
-        setPointsSaved(true);
       } catch (error) {
-        console.error('Failed to save points (local or blockchain):', error);
+        console.error('[Triviacast] Failed to save points:', error);
         setSaveError('Failed to save points. Please try again and score even better this time.');
       } finally {
-        setSigning(false);
         setSavingPoints(false);
       }
     };
 
     savePoints();
-  }, [account, tPoints, pointsSaved, signMessage]);
+  }, [account, tPoints, pointsSaved, score, totalQuestions, questions, answers]);
   
   const getResultMessage = () => {
     if (percentage >= 80) return "Excellent! 🎉";
@@ -171,12 +156,7 @@ export default function QuizResults({
             </div>
             {savingPoints && (
               <div className="text-xs text-[#5a3d5c] italic mt-2">
-                {'💾 Saving points to blockchain...'}
-              </div>
-            )}
-            {signError && (
-              <div className="text-xs text-orange-600 mt-2">
-                ⚠️ Signature error: {signError.message}
+                {'💾 Saving points...'}
               </div>
             )}
             {pointsSaved && !saveError && isContractConfigured() && (
