@@ -149,7 +149,14 @@ export function buildPlatformShareUrl(text: string, embeds?: string[], options?:
 // Convenience builders
 export function shareAppText(): string {
   const url = getBaseUrl();
-  return `Play Triviacast and earn T Points! 🧠\n${url}\n#Triviacast #Trivia #Farcaster`;
+  // A few punchy variants to keep casts feeling fresh
+  const variants = [
+    (u: string) => `I’m playing Triviacast — daily crypto + pop culture trivia! 🧠⚡\nJump in: ${u}\n#Triviacast #Trivia #Farcaster`,
+    (u: string) => `Got brain power? Prove it on Triviacast and rack up T Points. 🏆\nPlay now → ${u}\n#Triviacast #Onchain`,
+    (u: string) => `Snackable trivia, real onchain flex. 🧠✨ Earn T Points and climb the board.\nStart here: ${u} #Triviacast`
+  ];
+  const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+  return pick(variants)(url);
 }
 
 export function shareAppUrl(): string {
@@ -160,7 +167,21 @@ export function shareAppUrl(): string {
 export function shareResultsText(score: number, total: number, percent: number, tPoints: number): string {
   const url = getBaseUrl();
   const points = tPoints.toLocaleString();
-  return `I scored ${score}/${total} (${percent}%) on Triviacast and earned ${points} T Points! 🏆\nPlay now: ${url}\n#Triviacast #Trivia #Farcaster`;
+  // Add a fun flair based on performance
+  const flair = percent === 100
+    ? 'PERFECT RUN 🔥'
+    : percent >= 80
+    ? 'On a hot streak 💥'
+    : percent >= 60
+    ? 'Locked in 🎯'
+    : 'Come take my crown? 👑';
+  const variants = [
+    (u: string) => `${flair} — ${score}/${total} (${percent}%) on Triviacast and banked ${points} T Points! 🧠\nBeat me: ${u} #Triviacast`,
+    (u: string) => `Just finished Triviacast: ${score}/${total} (${percent}%) • +${points} T Points 🏆\nThink you can top that? ${u} #Trivia`,
+    (u: string) => `${score}/${total} correct (${percent}%) on Triviacast. +${points} T Points.\nYour turn → ${u} 🧠`
+  ];
+  const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+  return pick(variants)(url);
 }
 
 export function shareResultsUrl(score: number, total: number, percent: number, tPoints: number): string {
@@ -171,9 +192,22 @@ export function shareResultsUrl(score: number, total: number, percent: number, t
 export function shareLeaderboardText(rank: number | null, points: number): string {
   const site = getBaseUrl();
   if (rank !== null) {
-    return `I'm #${rank} on the Triviacast leaderboard! 🏆\nCheck it out: ${site}/leaderboard\n#Triviacast #Trivia #Farcaster`;
+    const pts = points.toLocaleString();
+    const variants = [
+      (u: string) => `I’m #${rank} on the Triviacast leaderboard with ${pts} T Points 🏆\nCatch me if you can → ${u}/leaderboard #Triviacast`,
+      (u: string) => `Climbing the Triviacast ranks: #${rank} • ${pts} T Points 🚀\nSee the board: ${u}/leaderboard`,
+      (u: string) => `Brain power check: currently #${rank} on Triviacast 🧠\nLeaderboard → ${u}/leaderboard`
+    ];
+    const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+    return pick(variants)(site);
   }
-  return `Check out the Triviacast leaderboard! 🧠\n${site}/leaderboard\n#Triviacast #Trivia #Farcaster`;
+  const variants = [
+    (u: string) => `Who’s on top? 🧠 Triviacast leaderboard is live.\n${u}/leaderboard #Triviacast`,
+    (u: string) => `Leaderboard time! 🏁 See today’s brainiacs → ${u}/leaderboard`,
+    (u: string) => `Climb the Triviacast leaderboard and flex those T Points. 🧗\n${u}/leaderboard`
+  ];
+  const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+  return pick(variants)(site);
 }
 
 export function shareLeaderboardUrl(rank: number | null, points: number): string {
