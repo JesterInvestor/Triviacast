@@ -17,6 +17,7 @@ interface QuizResultsProps {
   questions: Question[];
   answers: (string | null)[];
   tPoints: number;
+  timeRemaining: number;
   onRestart: () => void;
 }
 
@@ -32,6 +33,7 @@ export default function QuizResults({
   questions, 
   answers, 
   tPoints,
+  timeRemaining,
   onRestart 
 }: QuizResultsProps) {
   const percentage = Math.round((score / totalQuestions) * 100);
@@ -73,7 +75,7 @@ export default function QuizResults({
           questions,
           answers,
           completedAt: new Date(),
-          timeRemaining: 0, // Not tracked in current implementation
+          timeRemaining,
         };
 
         // Use unified storage service
@@ -96,7 +98,7 @@ export default function QuizResults({
     };
 
     savePoints();
-  }, [account, tPoints, pointsSaved, score, totalQuestions, questions, answers]);
+  }, [account, tPoints, pointsSaved, score, totalQuestions, questions, answers, timeRemaining]);
   
   const getResultMessage = () => {
     if (percentage >= 80) return "Excellent! 🎉";

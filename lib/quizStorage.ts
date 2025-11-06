@@ -41,7 +41,8 @@ export async function storeQuizResult(
 
   try {
     // Request user signature for verification
-    const message = `I am claiming ${result.tPoints} T Points for completing the Triviacast quiz on ${result.completedAt.toISOString()}`;
+    // Include timestamp and quiz details to prevent replay attacks
+    const message = `I am claiming ${result.tPoints} T Points for completing the Triviacast quiz ${result.quizId} on ${result.completedAt.toISOString()}\nWallet: ${result.walletAddress}\nScore: ${result.score}/${result.totalQuestions}`;
     console.debug('[Triviacast] Requesting signature:', {
       address: account.address,
       message,

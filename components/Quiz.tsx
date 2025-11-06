@@ -219,6 +219,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         questions={quizState.questions}
         answers={quizState.answers}
         tPoints={quizState.tPoints}
+        timeRemaining={quizState.timeRemaining}
         onRestart={restartQuiz}
       />
     );
