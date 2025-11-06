@@ -9,6 +9,31 @@ function normalizeEthOrSolAddress(input: string): string | null {
   if (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(s)) return s;
   return null;
 }
+
+export async function GET(request: Request) {
+  try {
+    const apiKey = process.env.NEYNAR_API_KEY;
+    if (!apiKey) return NextResponse.json({ error: 'missing NEYNAR_API_KEY' }, { status: 500 });
+
+    const { searchParams } = new URL(request.url);
+    const q = searchParams.get('q');
+    const limit = parseInt(searchParams.get('limit') || '10', 10);
+
+    if (!q || q.trim() === '') {
+      return NextResponse.json({ error: 'Missing search query parameter q' }, { status: 400 });
+    }
+
+    const mod = await import('@neynar/nodejs-sdk');
+    const { NeynarAPIClient, Configuration } = mod as any;
+    const client = new NeynarAPIClient(new Configuration({ apiKey }));
+
+    const data = await client.searchUser({ q: q.trim(), limit });
+    
+    return NextResponse.json({ users: data.result.users || [] });
+  } catch (e) {
+    return NextResponse.json({ error: 'Failed to search users', details: String(e) }, { status: 500 });
+  }
+}
 export async function POST(request: Request) {
   try {
     const apiKey = process.env.NEYNAR_API_KEY;
