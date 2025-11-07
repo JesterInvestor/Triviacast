@@ -131,6 +131,24 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     };
   }, [quizState.quizStarted, quizState.quizCompleted, isMuted]);
 
+  // Call onComplete callback when quiz is completed
+  useEffect(() => {
+    if (quizState.quizCompleted && onComplete) {
+      // Generate a simple quizId (could be timestamp-based or UUID in production)
+      const quizId = `quiz-${Date.now()}`;
+      onComplete({
+        quizId,
+        score: quizState.score,
+        details: {
+          totalQuestions: quizState.questions.length,
+          tPoints: quizState.tPoints,
+          answers: quizState.answers,
+          questions: quizState.questions,
+        },
+      });
+    }
+  }, [quizState.quizCompleted, quizState.score, quizState.tPoints, quizState.answers, quizState.questions, onComplete]);
+
   const handleAnswer = (answer: string) => {
     const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
     const isCorrect = answer === currentQuestion.correct_answer;
