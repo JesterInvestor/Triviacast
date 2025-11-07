@@ -31,6 +31,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const onCompleteCalledRef = useRef(false);
 
   const startQuiz = async () => {
     setLoading(true);
@@ -133,9 +134,12 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
 
   // Call onComplete callback when quiz is completed
   useEffect(() => {
-    if (quizState.quizCompleted && onComplete) {
-      // Generate a simple quizId (could be timestamp-based or UUID in production)
-      const quizId = `quiz-${Date.now()}`;
+    if (quizState.quizCompleted && onComplete && !onCompleteCalledRef.current) {
+      onCompleteCalledRef.current = true;
+      // Generate a unique quizId using crypto.randomUUID if available, fallback to timestamp
+      const quizId = typeof crypto !== 'undefined' && crypto.randomUUID 
+        ? crypto.randomUUID() 
+        : `quiz-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       onComplete({
         quizId,
         score: quizState.score,
@@ -147,7 +151,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         },
       });
     }
-  }, [quizState.quizCompleted, quizState.score, quizState.tPoints, quizState.answers, quizState.questions, onComplete]);
+  }, [quizState.quizCompleted, onComplete]);
 
   const handleAnswer = (answer: string) => {
     const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
@@ -182,6 +186,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   };
 
   const restartQuiz = () => {
+    onCompleteCalledRef.current = false;
     setQuizState({
       questions: [],
       currentQuestionIndex: 0,
