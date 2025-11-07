@@ -115,9 +115,9 @@ export default function FarcasterLookupPage() {
             <strong className="block mb-1">How to challenge a friend</strong>
             <ol className="list-decimal pl-6">
               <li>Search your friend's Farcaster handle using the field above.</li>
-              <li>Click <em>Lookup</em> and then <em>Play Quiz</em> on their profile.</li>
-              <li>After you finish the quiz you'll see a preview message that mentions them — edit it if you want.</li>
-              <li>Post from your account via <strong>Base</strong> or <strong>Farcaster</strong>, or copy the message to share it manually.</li>
+              <li>Scroll Down - Click <em>Lookup</em> and then <em>Play Quiz</em> on their profile.</li>
+              <li>After you finish the quiz you'll see a preview message that mentions them.</li>
+              <li>Post from your account via <strong>Base</strong> or copy and paste in <strong>Farcaster</strong>.</li>
             </ol>
           </div>
           <div className="flex flex-col items-center gap-2 w-full max-w-md bg-white rounded-xl border-2 border-[#F4A6B7] shadow-md px-4 py-4">
