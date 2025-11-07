@@ -154,6 +154,8 @@ export default function FarcasterLookupPage() {
                   <div className="w-11/12 max-w-3xl">
                     <Quiz
                       onComplete={(res) => {
+                        // Close the quiz modal first
+                        setQuizOpen(false);
                         // Open an editable preview modal so the user can edit the cast text
                         const target = result?.profile?.username || '';
                         // normalize handle so we don't end up with duplicate @ (some sources include '@')
