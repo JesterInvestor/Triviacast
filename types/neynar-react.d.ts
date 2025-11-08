@@ -5,6 +5,7 @@ declare module "@neynar/react" {
   export const NeynarAuthButton: React.FC<any>;
   export const NeynarUserDropdown: React.FC<any>;
   export const NeynarCastCard: React.FC<any>;
+  export const NeynarProfileCard: React.FC<{ fid: number; className?: string }>;
   export const useNeynarContext: () => any;
   export const Theme: any;
   export const SIWN_variant: any;

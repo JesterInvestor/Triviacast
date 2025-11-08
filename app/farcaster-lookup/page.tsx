@@ -30,6 +30,7 @@ type LookupResult = {
   isFollowing?: boolean;
   isOwnProfile?: boolean;
   casts?: Cast[];
+  fid?: number;
   };
   error?: string;
 } | null;
@@ -127,18 +128,7 @@ export default function FarcasterLookupPage() {
           {error && <div className="text-red-600 mt-2">{error}</div>}
           {result && result.profile && (
             <div className="mt-4 bg-white p-4 rounded-xl shadow-md w-full max-w-md flex flex-col items-center">
-              <ProfileCard
-                avatarImgUrl={result.profile.pfpUrl || "https://i.imgur.com/naZWL9n.gif"}
-                bio={result.profile.bio || "No bio available."}
-                displayName={result.profile.displayName || result.profile.username || "Unknown"}
-                followers={result.profile.followers || 0}
-                following={result.profile.following || 0}
-                hasPowerBadge={!!result.profile.hasPowerBadge}
-                isFollowing={!!result.profile.isFollowing}
-                isOwnProfile={!!result.profile.isOwnProfile}
-                onCast={() => {}}
-                username={result.profile.username || ""}
-              />
+              <ProfileCard fid={result.profile.fid} />
               {/* Play Quiz button shown inline after a successful lookup */}
               <div className="w-full mt-3">
                 <button

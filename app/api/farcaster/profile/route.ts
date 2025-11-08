@@ -107,6 +107,7 @@ function normalizeUserToProfile(user: any, resolvedAddress: string | null) {
     followers: user.follower_count ?? user.followers ?? undefined,
     following: user.following_count ?? user.following ?? undefined,
     hasPowerBadge: !!(user.power_badge || user.hasPowerBadge || user.powerBadge),
+    fid: user.fid || user.FID || user.profile?.fid || undefined,
     raw: user,
   };
 }
@@ -121,6 +122,7 @@ function normalizeResolvedToProfile(resolved: any, resolvedAddress: string) {
     followers: resolved.followers,
     following: resolved.following,
     hasPowerBadge: resolved.hasPowerBadge,
+    fid: resolved.raw?.fid || resolved.fid || undefined,
     raw: resolved.raw || undefined,
   };
 }
