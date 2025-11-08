@@ -65,9 +65,10 @@ export default function QuizResults({
 
       setSavingPoints(true);
       setSaveError(null);
-      setSigning(true);
+      setSigning(false);
       setSignError(null);
       try {
+<<<<<<< Updated upstream
         // Require user to sign a message before awarding T Points
         const message = `I am claiming ${tPoints} T Points for completing the Triviacast quiz on ${new Date().toISOString()}`;
         console.debug('[Triviacast] Requesting signature:', { address: account!.address, message });
@@ -85,12 +86,37 @@ export default function QuizResults({
         // Always save to localStorage first
         console.debug('[Triviacast] addWalletTPoints', { address: account!.address, tPoints });
         await addWalletTPoints(account!.address, tPoints);
+=======
+        // Always save points first (local/derived), regardless of signature support
+        console.debug('[Triviacast] addWalletTPoints', { address, tPoints });
+        await addWalletTPoints(address, tPoints);
+>>>>>>> Stashed changes
 
-        // If contract is configured, also save to blockchain
+        let signature: string | undefined;
+        // If contract is configured, attempt to request a signature and save to blockchain
         if (isContractConfigured()) {
           try {
+<<<<<<< Updated upstream
             console.debug('[Triviacast] Calling addPointsOnChain', { account, address: account!.address, tPoints, signature });
             await addPointsOnChain(account!, account!.address, tPoints);
+=======
+            // Request signature only when we can post on-chain
+            const message = `I am claiming ${tPoints} T Points for completing the Triviacast quiz on ${new Date().toISOString()}`;
+            console.debug('[Triviacast] Requesting signature:', { address, message });
+            setSigning(true);
+            signature = await signMessageAsync({ message });
+            setSigning(false);
+          } catch (err) {
+            // Graceful fallback: keep local points; inform user on-chain sync needs mini app / Base
+            setSigning(false);
+            setSignError(err as Error);
+            setSaveError('Could not sign in this environment. Your T Points are saved locally. Open the Farcaster mini app or Base to sync on-chain.');
+          }
+
+          try {
+            console.debug('[Triviacast] Calling addPointsOnChain', { address, tPoints, signature });
+            await addPointsOnChain(address, tPoints);
+>>>>>>> Stashed changes
             console.log('Points saved to blockchain successfully');
           } catch (error) {
             console.error('Failed to save points to blockchain:', error);

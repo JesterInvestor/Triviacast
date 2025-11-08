@@ -84,7 +84,11 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     return () => clearInterval(timer);
   }, [quizState.quizStarted, quizState.quizCompleted]);
 
+<<<<<<< Updated upstream
   // Background music lifecycle: create audio when quiz starts, loop, allow mute toggle.
+=======
+  // Background music lifecycle: create/cleanup only on quiz lifecycle
+>>>>>>> Stashed changes
   useEffect(() => {
     // Only create/play while quiz is active
     if (quizState.quizStarted && !quizState.quizCompleted) {
