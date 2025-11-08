@@ -150,12 +150,16 @@ export default function FarcasterLookupPage() {
                         const target = result?.profile?.username || '';
                         // normalize handle so we don't end up with duplicate @ (some sources include '@')
                         const cleanHandle = target.startsWith('@') ? target.slice(1) : target;
-                        const tPoints = (res.score ?? 0) * 1000; // 1 correct = 1000 T points (info page)
+                        // Use tPoints from quiz results (includes streak bonuses); fallback to base calc
+                        const computedTPoints = typeof (res as any)?.details?.tPoints === 'number'
+                          ? (res as any).details.tPoints
+                          : (res.score ?? 0) * 1000;
                         // Use the Triviacast site link for share links (clickable HTTPS).
                         const challengeLink = 'https://triviacast.xyz';
+                        const pointsStr = Number(computedTPoints).toLocaleString();
                         const defaultText = cleanHandle
-                          ? `@${cleanHandle}.farcaster.eth I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
-                          : `I scored ${res.score} (${tPoints} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`;
+                          ? `@${cleanHandle}.farcaster.eth I scored ${res.score} (${pointsStr} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
+                          : `I scored ${res.score} (${pointsStr} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`;
                         setPreviewText(defaultText);
                         setPreviewLink(challengeLink);
                         setPreviewOpen(true);
