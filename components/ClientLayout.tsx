@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { wagmiConfig } from '@/lib/wagmi';
 import BottomNav from '@/components/BottomNav';
 import AutoConnector from '@/components/AutoConnector';
+import ButtonSoundProvider from '@/components/ButtonSoundProvider';
 
 export default function ClientLayout({
   children,
@@ -27,6 +28,7 @@ export default function ClientLayout({
             }}
           >
             <AutoConnector />
+            <ButtonSoundProvider />
             {children}
             <BottomNav />
           </Neynar.NeynarContextProvider>

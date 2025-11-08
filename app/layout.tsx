@@ -1,9 +1,10 @@
-import { Inter } from "next/font/google";
+import { Inter, Bangers } from "next/font/google";
 import "./globals.css";
 import ClientLayout from '@/components/ClientLayout';
 import { Metadata } from 'next';
 
 const inter = Inter({ subsets: ["latin"] });
+const wacky = Bangers({ subsets: ["latin"], weight: "400", variable: "--font-wacky" });
 
 // fc:miniapp / fc:frame meta tags for the site root so sharing https://triviacast.xyz
 // renders a rich embed in Farcaster clients.
@@ -44,7 +45,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode; }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={wacky.variable}>
       <body className={inter.className}>
         <ClientLayout>
           {children}
