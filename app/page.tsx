@@ -54,13 +54,13 @@ export default function Home() {
               className="drop-shadow-lg sm:w-[60px] sm:h-[60px] mx-auto"
               priority
             />
-            <div className="flex items-center gap-2 justify-center">
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] text-center">
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 justify-center">
+              <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] text-center">
                 Triviacast
               </h1>
               <ShareButton
                 url={shareAppUrl()}
-                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[40px] text-sm"
+                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[40px] text-sm shrink-0"
                 ariaLabel="Share app on Farcaster"
               />
             </div>

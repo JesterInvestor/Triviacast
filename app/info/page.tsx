@@ -1,8 +1,10 @@
 "use client";
 
 import Image from 'next/image';
+import { useSound } from '@/components/SoundContext';
 
 export default function InfoPage() {
+  const sound = useSound();
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
@@ -17,7 +19,14 @@ export default function InfoPage() {
               className="drop-shadow-lg sm:w-[56px] sm:h-[56px] mx-auto"
               style={{ marginBottom: '0.5rem' }}
             />
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] text-center">🎉 Welcome to Triviacast! 🎉</h1>
+            <h1 className="text-3xl sm:text-5xl font-extrabold text-[#2d1b2e] text-center">🎉 Welcome to Triviacast! 🎉</h1>
+            <button
+              onClick={() => sound.toggle()}
+              aria-pressed={sound.disabled}
+              className="mt-2 sm:mt-3 bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-4 rounded-lg shadow text-sm"
+            >
+              {sound.disabled ? 'Unmute All Sound' : 'Mute All Sound'}
+            </button>
             <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Your brain-powered party on Farcaster</p>
           </div>
         </div>

@@ -86,27 +86,12 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Fun wacky headings using the --font-wacky variable from next/font */
+/* Wacky heading font and wobble */
 h1, h2, h3 {
   font-family: var(--font-wacky), Arial, Helvetica, sans-serif;
-  /* Add a subtle fun treatment that stays readable */
   letter-spacing: 0.5px;
 }
 
-/* Optional: playful gradient text for primary page titles */
-h1 {
-  background: linear-gradient(90deg, var(--brain-primary), var(--brain-accent));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* Slight shadow for depth on h2/h3 without overpowering */
-h2, h3 {
-  text-shadow: 0 1px 0 rgba(0,0,0,0.03);
-}
-
-/* Wobble animation for main headings */
 @keyframes wobble {
   0% { transform: rotate(0deg) scale(1); }
   25% { transform: rotate(2deg) scale(1.02); }
@@ -117,4 +102,12 @@ h2, h3 {
 
 h1:hover, h2:hover {
   animation: wobble 0.6s ease-in-out;
+}
+
+/* Optional: a subtle gradient for main page titles (keeps readability) */
+h1 {
+  background: linear-gradient(90deg, var(--brain-primary), var(--brain-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }

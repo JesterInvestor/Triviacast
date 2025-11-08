@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Triviacast — Test your brain',
     description: 'Trivia quiz mini-game — challenge friends, earn T Points, and share your results.',
-    images: ['https://triviacast.xyz/hero-1200x630.png'],
+    images: ['https://triviacast.xyz/og-image.png'],
   },
   twitter: {
     card: 'summary_large_image',
