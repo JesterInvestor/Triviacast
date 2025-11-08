@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { wagmiConfig } from '@/lib/wagmi';
 import BottomNav from '@/components/BottomNav';
+import AutoConnector from '@/components/AutoConnector';
 
 export default function ClientLayout({
   children,
@@ -25,6 +26,7 @@ export default function ClientLayout({
               },
             }}
           >
+            <AutoConnector />
             {children}
             <BottomNav />
           </Neynar.NeynarContextProvider>
