@@ -3,6 +3,13 @@
 import { useEffect } from 'react';
 import { useConnect, useAccount } from 'wagmi';
 
+// Enhanced auto-connect logic:
+// 1. Prefer Farcaster Mini App connector when running inside a Farcaster mini app or client.
+// 2. Falls back to MetaMask / WalletConnect for Base users.
+// 3. Only attempts once per session to avoid repeated prompts/rejections.
+// 4. Defers until Farcaster sdk context is ready if sdk loads (to ensure provider injection).
+// 5. Uses a small staged attempt window so that if sdk loads slightly later we still auto-connect.
+
 export default function AutoConnector() {
   const { connectors, connect } = useConnect();
   const { isConnected } = useAccount();
@@ -11,78 +18,94 @@ export default function AutoConnector() {
     if (typeof window === 'undefined') return;
     if (isConnected) return;
 
-    // Only attempt once per session to avoid repeated prompts.
-    const attempted = sessionStorage.getItem('triviacast_auto_connect_attempted');
+    const sessionFlag = 'triviacast_auto_connect_attempted_v2';
+    const attempted = sessionStorage.getItem(sessionFlag);
     if (attempted) return;
 
-    (async () => {
+    let cancelled = false;
+
+    async function detectAndConnect(stage: 'initial' | 'postSdk') {
+      if (cancelled || isConnected) return;
       try {
-        // Detect Farcaster miniapp SDK or provider presence
-        let hasFarcasterProvider = false;
+        // ---- Detection ----
+        let farcasterContext = false;
+        let sdk: any = null;
         try {
           const mod = await import('@farcaster/miniapp-sdk');
-          hasFarcasterProvider = !!(mod?.sdk);
+          sdk = (mod as any).sdk;
+          if (sdk?.context) farcasterContext = true;
         } catch (_) {
-          // ignore
-        }
-        if (!hasFarcasterProvider && typeof (window as any).ethereum !== 'undefined') {
-          // There might still be a provider exposed by the miniapp as window.ethereum
-          hasFarcasterProvider = true;
+          // SDK not yet loaded or not available
         }
 
-        // Detect Base chain presence (chainId 8453) without prompting the user.
+        // Window.ethereum heuristics (mini app often injects a provider with markers)
+        const eth: any = (window as any).ethereum;
+        if (!farcasterContext && eth && (eth.isFarcaster || eth.isMiniApp || eth.isWarpcast)) {
+          farcasterContext = true;
+        }
+
+        // Detect Base chain (8453) for fallback connectors
         let isOnBaseChain = false;
-        try {
-          const eth = (window as any).ethereum;
-          if (eth) {
-            // Try to read chainId (may be hex string)
-            const raw = await eth.request?.({ method: 'eth_chainId' })
-              .catch(() => undefined) || eth.chainId || eth.networkVersion;
-            if (raw) {
-              const asNumber = typeof raw === 'string' && raw.startsWith('0x') ? parseInt(raw, 16) : Number(raw);
-              if (!Number.isNaN(asNumber) && asNumber === 8453) isOnBaseChain = true;
-            }
-            // Fallback heuristic: MetaMask presence indicates a user wallet we can try to restore
-            if (!isOnBaseChain && eth.isMetaMask) {
-              isOnBaseChain = true; // prefer trying MetaMask when available
-            }
-          }
-        } catch (_) {
-          // ignore detection errors
-        }
-
-        // Choose preferred connectors based on detection: farcaster first, then Base wallets
-        const preferOrder: string[] = [];
-        if (hasFarcasterProvider) preferOrder.push('farcaster', 'miniapp');
-        if (isOnBaseChain) preferOrder.push('metamask', 'walletconnect', 'walletconnectlegacy');
-
-        // Find the first connector that matches our preference list
-        let target;
-        for (const token of preferOrder) {
-          target = connectors.find(c => {
-            const id = (c.id || '')?.toString().toLowerCase();
-            const name = (c.name || '')?.toString().toLowerCase();
-            return id.includes(token) || name.includes(token);
-          });
-          if (target) break;
-        }
-
-        // If we didn't find a preferred connector, fall back to any available connector
-        if (!target) target = connectors[0];
-
-        if (target) {
+        if (eth) {
           try {
-            await connect({ connector: target });
-            sessionStorage.setItem('triviacast_auto_connect_attempted', '1');
-          } catch (e) {
-            // connecting failed (user denied or unavailable) — do not block app
-            sessionStorage.setItem('triviacast_auto_connect_attempted', '1');
+            const raw = await eth.request?.({ method: 'eth_chainId' }).catch(() => undefined) || eth.chainId || eth.networkVersion;
+            if (raw) {
+              const n = typeof raw === 'string' && raw.startsWith('0x') ? parseInt(raw, 16) : Number(raw);
+              if (!Number.isNaN(n) && n === 8453) isOnBaseChain = true;
+            }
+          } catch {}
+          if (!isOnBaseChain && eth.isMetaMask) isOnBaseChain = true; // heuristic
+        }
+
+        // ---- Connector Selection ----
+        // Prefer explicit Farcaster Mini App connector id
+        let target = connectors.find(c => c.id === 'farcasterMiniApp');
+
+        if (!target && farcasterContext) {
+          // Try fuzzy match if id changes in future versions
+            target = connectors.find(c => /farcaster|miniapp/i.test(c.id + c.name));
+        }
+
+        if (!target) {
+          // Preference order for non-farcaster contexts
+          const order = ['metamask', 'walletconnect', 'coinbase', 'injected'];
+          for (const token of order) {
+            target = connectors.find(c => (c.id + c.name).toLowerCase().includes(token));
+            if (target) break;
           }
+        }
+
+        if (!target && connectors.length) target = connectors[0];
+
+        // ---- Guard against premature attempt before sdk context (stage logic) ----
+        if (farcasterContext && !sdk?.context && stage === 'initial') {
+          // Wait briefly for sdk.context to populate
+          setTimeout(() => detectAndConnect('postSdk'), 600); // small delay
+          return;
+        }
+
+        if (!target) {
+          sessionStorage.setItem(sessionFlag, 'no-connectors');
+          return;
+        }
+
+        // ---- Connect ----
+        try {
+          await connect({ connector: target });
+        } catch (e) {
+          // swallow errors (user rejection or provider issue)
+        } finally {
+          sessionStorage.setItem(sessionFlag, '1');
         }
       } catch (e) {
-        // swallow errors — auto-connect is a best-effort enhancement
+        sessionStorage.setItem(sessionFlag, 'error');
       }
-    })();
+    }
+
+    // Kick off initial attempt after a tiny idle to let providers inject
+    const t = setTimeout(() => detectAndConnect('initial'), 50);
+
+    return () => { cancelled = true; clearTimeout(t); };
   }, [connectors, connect, isConnected]);
 
   return null;

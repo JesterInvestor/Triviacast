@@ -2,8 +2,7 @@
 
 import { Question } from '@/types/quiz';
 import Link from 'next/link';
-import { useActiveAccount } from 'thirdweb/react';
-import { signMessage } from 'thirdweb/utils';
+import { useAccount, useSignMessage } from 'wagmi';
 import { useEffect, useState } from 'react';
 import { addPointsOnChain, isContractConfigured } from '@/lib/contract';
 import { addWalletTPoints } from '@/lib/tpoints';
@@ -36,8 +35,8 @@ export default function QuizResults({
   onRestart 
 }: QuizResultsProps) {
   const percentage = Math.round((score / totalQuestions) * 100);
-  const account = useActiveAccount();
-  // Use signMessage from thirdweb/utils, not a hook
+  const { address, status } = useAccount();
+  const { signMessageAsync } = useSignMessage();
   const [signing, setSigning] = useState(false);
   const [signError, setSignError] = useState<Error | null>(null);
   const [savingPoints, setSavingPoints] = useState(false);
@@ -46,9 +45,9 @@ export default function QuizResults({
 
   // Save points when component mounts
   useEffect(() => {
-    if (!account?.address || tPoints === 0 || pointsSaved) {
+    if (!address || tPoints === 0 || pointsSaved) {
       console.debug('[Triviacast] Skipping savePoints:', {
-        account,
+        address,
         tPoints,
         pointsSaved
       });
@@ -60,7 +59,7 @@ export default function QuizResults({
         tPoints,
         pointsSaved,
         contractConfigured: isContractConfigured(),
-        activeAccount: account?.address,
+              activeAccount: address,
       });
 
       setSavingPoints(true);
@@ -70,10 +69,10 @@ export default function QuizResults({
       try {
         // Require user to sign a message before awarding T Points
         const message = `I am claiming ${tPoints} T Points for completing the Triviacast quiz on ${new Date().toISOString()}`;
-        console.debug('[Triviacast] Requesting signature:', { address: account!.address, message });
+        console.debug('[Triviacast] Requesting signature:', { address, message });
         let signature;
         try {
-          signature = await signMessage({ message, account });
+          signature = await signMessageAsync({ message });
         } catch (err) {
           setSignError(err as Error);
           setSaveError('Signature was not provided. T Points cannot be awarded.');
@@ -83,14 +82,14 @@ export default function QuizResults({
         }
 
         // Always save to localStorage first
-        console.debug('[Triviacast] addWalletTPoints', { address: account!.address, tPoints });
-        await addWalletTPoints(account!.address, tPoints);
+        console.debug('[Triviacast] addWalletTPoints', { address, tPoints });
+        await addWalletTPoints(address, tPoints);
 
         // If contract is configured, also save to blockchain
         if (isContractConfigured()) {
           try {
-            console.debug('[Triviacast] Calling addPointsOnChain', { account, address: account!.address, tPoints, signature });
-            await addPointsOnChain(account!, account!.address, tPoints);
+            console.debug('[Triviacast] Calling addPointsOnChain', { address, tPoints, signature });
+            await addPointsOnChain(address, tPoints);
             console.log('Points saved to blockchain successfully');
           } catch (error) {
             console.error('Failed to save points to blockchain:', error);
@@ -111,7 +110,7 @@ export default function QuizResults({
     };
 
     savePoints();
-  }, [account, tPoints, pointsSaved, signMessage]);
+  }, [address, tPoints, pointsSaved, signMessageAsync]);
   
   const getResultMessage = () => {
     if (percentage >= 80) return "Excellent! 🎉";

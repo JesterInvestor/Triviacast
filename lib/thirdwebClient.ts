@@ -1,5 +1,2 @@
-import { createThirdwebClient } from "thirdweb";
-
-export const client = createThirdwebClient({
-  clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID || "demo-client-id"
-});
+// Deprecated: thirdweb client removed. This module is intentionally empty.
+export {};

@@ -4,14 +4,14 @@ This document explains the wagmi integration in Triviacast following the Farcast
 
 ## Overview
 
-The app now supports wallet connection using wagmi with the `@farcaster/miniapp-wagmi-connector` package, as recommended by Farcaster for Mini Apps.
+The app now supports wallet connection using wagmi with the `@farcaster/miniapp-wagmi-connector` package and WalletConnect, as recommended by Farcaster for Mini Apps.
 
 ## Installation
 
 The following packages have been installed:
 
 ```bash
-npm install wagmi @farcaster/miniapp-wagmi-connector viem@2.x @tanstack/react-query
+npm install wagmi @wagmi/connectors @farcaster/miniapp-wagmi-connector viem@2.x @tanstack/react-query
 ```
 
 ## Configuration
@@ -62,13 +62,11 @@ export default function WagmiProvider({ children }: { children: React.ReactNode 
 
 ### Layout Integration
 
-The `WagmiProvider` is integrated in `app/layout.tsx` alongside the existing `ThirdwebProvider`:
+The `WagmiProvider` is integrated in `app/layout.tsx`:
 
 ```typescript
 <WagmiProvider>
-  <ThirdwebProvider>
-    {children}
-  </ThirdwebProvider>
+  {children}
 </WagmiProvider>
 ```
 
@@ -100,13 +98,9 @@ function MyComponent() {
 
 See `components/WagmiWalletConnect.tsx` for a complete example of a wallet connection component using wagmi.
 
-## Compatibility
+## WalletConnect
 
-The app maintains backward compatibility by keeping both wagmi and Thirdweb providers. This allows for a gradual migration:
-
-- Existing components continue to use Thirdweb
-- New components can use wagmi hooks
-- Both wallet connection methods work side-by-side
+We use WalletConnect to support QR-based connections and mobile wallets. Set `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` in your environment to enable the QR modal.
 
 ## Mini App SDK Integration
 

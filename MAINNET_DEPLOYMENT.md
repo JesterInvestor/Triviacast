@@ -61,13 +61,13 @@ NEXT_PUBLIC_CONTRACT_ADDRESS=0x781158C06D333b31a58D42DF5eBB5872B0734cD5
 NEXT_PUBLIC_CHAIN_ID=8453
 ```
 
-### 3. Configure Thirdweb Client ID
+### 3. Configure WalletConnect
 
-If you haven't already, get your Thirdweb client ID:
-1. Go to https://thirdweb.com/dashboard
-2. Create/select your project
-3. Copy the Client ID
-4. Update `.env.local` and Vercel env vars with `NEXT_PUBLIC_THIRDWEB_CLIENT_ID`
+Set your WalletConnect project ID and RPC URL (Base mainnet preferred):
+```bash
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
+NEXT_PUBLIC_RPC_URL=https://base-mainnet.infura.io/v3/your_key
+```
 
 ### 4. Deploy Your App
 

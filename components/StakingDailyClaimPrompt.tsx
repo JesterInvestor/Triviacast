@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useActiveAccount } from 'thirdweb/react';
+import { useAccount } from 'wagmi';
 import { callDailyClaim, isDistributorConfigured } from '@/lib/distributor';
 import { getDailyClaimLabel } from '@/lib/config';
 
@@ -9,7 +9,7 @@ const DISMISS_KEY = "triviacast:claim_prompt:dismissedAt";
 const DISMISS_TTL_MS = 1000 * 60 * 60 * 24; // 24 hours
 
 export default function StakingDailyClaimPrompt() {
-  const account = useActiveAccount();
+  const { address, status } = useAccount();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +17,7 @@ export default function StakingDailyClaimPrompt() {
   useEffect(() => {
     let cancelled = false;
 
-    if (!account) {
+    if (!address) {
       setOpen(false);
       return;
     }
@@ -56,7 +56,7 @@ export default function StakingDailyClaimPrompt() {
 
     setup();
     return () => { cancelled = true; };
-  }, [account]);
+  }, [address]);
 
   const dismiss = () => {
     try { localStorage.setItem(DISMISS_KEY, String(Date.now())); } catch {}
@@ -67,12 +67,8 @@ export default function StakingDailyClaimPrompt() {
     setBusy(true);
     setError(null);
     try {
-      if (!account) throw new Error('Please connect your wallet');
-
-      // Ensure `account` satisfies the `Account` type
-      // Ensure `account` satisfies the expected type for callDailyClaim
-      const accountAsAccount = account as any;
-      await callDailyClaim(accountAsAccount);
+  if (!address) throw new Error('Please connect your wallet');
+  await callDailyClaim();
 
       // Notify points updated and show success toast
       try {

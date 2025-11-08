@@ -61,7 +61,7 @@ export default function InfoPage() {
         <div className="mb-6 p-4 bg-blue-50 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-blue-700">Tech & Credits</h2>
           <ul className="list-disc pl-6 text-gray-700">
-            <li>Built with next.js, react, thirdweb, and neynar SDK</li>
+            <li>Built with Next.js, React, wagmi + viem, and Neynar SDK</li>
             <li>Smart contracts live on Base (where trivia meets blockchain)</li>
             <li>Open source: <a href="https://github.com/JesterInvestor/Triviacast" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">GitHub</a></li>
           </ul>
