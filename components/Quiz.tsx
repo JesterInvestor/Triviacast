@@ -90,6 +90,25 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     return () => clearInterval(timer);
   }, [quizState.quizStarted, quizState.quizCompleted]);
 
+  // Notify parent when quiz completes so callers can show a share/preview flow
+  useEffect(() => {
+    if (!quizState.quizCompleted) return;
+    try {
+      onComplete?.({
+        quizId: 'triviacast',
+        score: quizState.score,
+        details: {
+          total: quizState.questions.length,
+          tPoints: quizState.tPoints,
+        },
+      });
+    } catch (_) {
+      // ignore downstream errors from consumer
+    }
+    // Only fire when completion state flips to true
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quizState.quizCompleted]);
+
   // Background music lifecycle: create/cleanup only on quiz lifecycle
   useEffect(() => {
     if (quizState.quizStarted && !quizState.quizCompleted) {
