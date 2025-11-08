@@ -1,7 +1,7 @@
 [![Tip in Crypto](https://tip.md/badge.svg)](https://tip.md/jesterinvestor)
 # Quiz Challenge - Farcaster Trivia App
 
-A Next.js-based trivia quiz mini-game that encourages users to answer questions in a timed format. Built for Farcaster with wallet connection support via Thirdweb.
+A Next.js-based trivia quiz mini-game that encourages users to answer questions in a timed format. Built for Farcaster with wallet connection via WalletConnect and wagmi.
 
 ## Features
 
@@ -10,7 +10,7 @@ A Next.js-based trivia quiz mini-game that encourages users to answer questions 
 - **Real-time Scoring**: Instant feedback on answers with score tracking
 - **T Points & Leaderboard**: Earn points for correct answers with streak bonuses
 - **Smart Contract Integration**: Optional blockchain storage for T points (Base Sepolia)
-- **Dual Wallet Integration**: Supports both wagmi (with Farcaster Mini App connector) and Thirdweb
+- **Wallet Integration**: wagmi + WalletConnect (with Farcaster Mini App connector)
 - **Responsive Design**: Beautiful UI with Tailwind CSS
 - **Farcaster Mini App**: Full Mini App SDK integration with ready() call
 - **Vercel Deployment**: Optimized for deployment on Vercel
@@ -23,7 +23,7 @@ Note: The platform's native coin is $TRIV (contract: `0x73385Ee7392C105d5898048F
 
 - Node.js 18.x or higher
 - npm or yarn
-- A Thirdweb Client ID (get one at [thirdweb.com](https://thirdweb.com))
+- A WalletConnect Project ID (get one at https://cloud.walletconnect.com)
 
 ### Installation
 
@@ -43,9 +43,10 @@ npm install
 cp .env.example .env.local
 ```
 
-4. Add your Thirdweb Client ID to `.env.local`:
+4. Add your environment variables to `.env.local`:
 ```
-NEXT_PUBLIC_THIRDWEB_CLIENT_ID=your_actual_client_id
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id
+NEXT_PUBLIC_RPC_URL=https://base-sepolia.infura.io/v3/...
 
 # Optional: Add smart contract configuration for blockchain storage
 # NEXT_PUBLIC_CONTRACT_ADDRESS=0x...
@@ -87,7 +88,7 @@ npm run dev
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **Wallet Integration**: wagmi v2 with Farcaster Mini App connector + Thirdweb SDK v5
+- **Wallet Integration**: wagmi v2 with Farcaster Mini App connector + WalletConnect
 - **Blockchain**: Solidity 0.8.27 (Base Sepolia)
 - **API**: Open Trivia Database
 - **Farcaster SDK**: @farcaster/miniapp-sdk
@@ -111,7 +112,8 @@ See [SMART_CONTRACT_INTEGRATION.md](./SMART_CONTRACT_INTEGRATION.md) for detaile
 1. Push your code to GitHub
 2. Import the repository in Vercel
 3. Add environment variables in Vercel project settings:
-   - `NEXT_PUBLIC_THIRDWEB_CLIENT_ID` (required)
+   - `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` (required)
+   - `NEXT_PUBLIC_RPC_URL` (recommended)
    - `NEXT_PUBLIC_CONTRACT_ADDRESS` (optional - for blockchain storage)
    - `NEXT_PUBLIC_CHAIN_ID` (optional - default: 84532 for Base Sepolia)
 4. Deploy!
@@ -168,10 +170,9 @@ Triviacast/
 │   ├── Timer.tsx                 # Timer component
 │   ├── Leaderboard.tsx           # Leaderboard display
 │   ├── WalletPoints.tsx          # Wallet points display
-│   ├── ThirdwebProvider.tsx      # Thirdweb provider wrapper
 │   ├── WagmiProvider.tsx         # wagmi provider wrapper
-│   ├── WalletConnect.tsx         # Thirdweb wallet connection button
-│   ├── WagmiWalletConnect.tsx    # wagmi wallet connection component
+│   ├── WagmiProvider.tsx         # wagmi provider wrapper
+│   ├── WagmiWalletConnect.tsx    # wagmi + WalletConnect connection component
 │   └── FarcasterMiniAppReady.tsx # Mini App SDK ready() caller
 ├── contracts/
 │   ├── TriviaPoints.sol          # Smart contract for T points
@@ -179,8 +180,7 @@ Triviacast/
 ├── lib/
 │   ├── contract.ts               # Blockchain interaction functions
 │   ├── tpoints.ts                # T points calculation and storage
-│   ├── thirdweb.ts               # Thirdweb client configuration
-│   └── wagmi.ts                  # wagmi configuration with Farcaster connector
+│   └── wagmi.ts                  # wagmi configuration with Farcaster & WalletConnect
 ├── types/
 │   └── quiz.ts                   # TypeScript type definitions
 ├── public/

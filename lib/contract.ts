@@ -1,7 +1,6 @@
-import { getContract, prepareContractCall, readContract, sendTransaction } from "thirdweb";
-import { base, baseSepolia } from "thirdweb/chains";
-import { client } from "./thirdweb";
-import type { Account } from "thirdweb/wallets";
+import { readContract, writeContract, waitForTransactionReceipt, simulateContract, getAccount } from "@wagmi/core";
+import { base, baseSepolia } from "viem/chains";
+import { wagmiConfig } from "./wagmi";
 
 // Contract ABI - only the functions we need
 // We include the standard Solidity error types so libraries like viem can
@@ -77,33 +76,18 @@ const activeChain = CHAIN_ID === 8453 ? base : baseSepolia;
 
 // Check if contract is configured
 export function isContractConfigured(): boolean {
-  const configured = !!(CONTRACT_ADDRESS && client);
+  const configured = !!CONTRACT_ADDRESS;
   // Helpful debug for runtime checks
   if (!configured) {
     try {
-      console.info('[Triviacast] contract not configured', { CONTRACT_ADDRESS, clientPresent: !!client });
+      console.info('[Triviacast] contract not configured', { CONTRACT_ADDRESS });
     } catch (_e) {}
   }
   return configured;
 }
 
-// Get contract instance
-function getContractInstance() {
-  if (!CONTRACT_ADDRESS) {
-    throw new Error("Contract address not configured");
-  }
-  if (!client) {
-    throw new Error("Thirdweb client not initialized");
-  }
-
-  const abiWithErrors = extendAbiWithErrors(CONTRACT_ABI as any);
-  return getContract({
-    client,
-    address: CONTRACT_ADDRESS,
-    chain: activeChain,
-    abi: abiWithErrors,
-  });
-}
+// Contract helpers (address/abi)
+const CONTRACT_ABI_WITH_ERRORS = extendAbiWithErrors(CONTRACT_ABI as any);
 
 /**
  * Add T points to a wallet address on the blockchain
@@ -113,14 +97,12 @@ function getContractInstance() {
  * @returns Transaction receipt
  */
 export async function addPointsOnChain(
-  account: Account,
   walletAddress: string,
   points: number
-): Promise<any> {
+): Promise<`0x${string}`> {
   if (!isContractConfigured()) {
     throw new Error("Smart contract not configured");
   }
-  const contract = getContractInstance();
   console.info('[Triviacast] addPointsOnChain', {
     contract: CONTRACT_ADDRESS,
     chainId: CHAIN_ID,
@@ -129,7 +111,8 @@ export async function addPointsOnChain(
   });
   // Sanity check: ensure the connected account address matches the target wallet
   try {
-    const activeAddress = (account as any)?.address;
+    const acc = getAccount(wagmiConfig);
+    const activeAddress = acc?.address;
     if (!activeAddress) {
       throw new Error('No active account address available for signing');
     }
@@ -141,33 +124,25 @@ export async function addPointsOnChain(
     console.error('[Triviacast] addPointsOnChain pre-check failed', e);
     throw e;
   }
-
-  const transaction = prepareContractCall({
-    contract,
-    method: "addPoints",
-    params: [walletAddress as `0x${string}`, BigInt(points)],
-  });
-
   try {
-    const result = await sendTransaction({
-      transaction,
-      account,
+    // Simulate to estimate gas, then write and wait for receipt
+    const { request } = await simulateContract(wagmiConfig, {
+      address: CONTRACT_ADDRESS as `0x${string}`,
+      abi: CONTRACT_ABI_WITH_ERRORS as any,
+      functionName: 'addPoints',
+      args: [walletAddress as `0x${string}`, BigInt(points)],
+      chainId: activeChain.id,
+      account: walletAddress as `0x${string}`,
     });
-    return result;
+    const hash = await writeContract(wagmiConfig, request);
+    await waitForTransactionReceipt(wagmiConfig, { hash, chainId: activeChain.id });
+    return hash;
   } catch (error: any) {
     // Try to surface a revert reason if available
     console.error('[Triviacast] addPointsOnChain transaction failed', {
       error: error?.message || error,
       details: error
     });
-    // Detect Thirdweb cloud authorization errors (401/403 / "not authorized")
-    try {
-      const msg = String(error?.message || JSON.stringify(error || '')).toLowerCase();
-      if (msg.includes('not been authorized') || msg.includes('not authorized') || msg.includes('401') || msg.includes('403') || msg.includes('has not been authorized')) {
-        (error as any).thirdwebUnauthorized = true;
-      }
-    } catch (_) {}
-
     throw error;
   }
 }
@@ -183,15 +158,14 @@ export async function getPointsFromChain(walletAddress: string): Promise<number>
   }
 
   try {
-    const contract = getContractInstance();
-    
-    const result = await readContract({
-      contract,
-      method: "getPoints",
-      params: [walletAddress as `0x${string}`],
+    const result = await readContract(wagmiConfig, {
+      address: CONTRACT_ADDRESS as `0x${string}`,
+      abi: CONTRACT_ABI_WITH_ERRORS as any,
+      functionName: 'getPoints',
+      args: [walletAddress as `0x${string}`],
+      chainId: activeChain.id,
     });
-
-    return Number(result);
+    return Number(result as unknown as bigint);
   } catch (error) {
     console.error("Error fetching points from chain:", error);
     return 0;
@@ -209,16 +183,17 @@ export async function getLeaderboardFromChain(limit: number = 100): Promise<Arra
   }
 
   try {
-    const contract = getContractInstance();
     console.info('[Triviacast] getLeaderboardFromChain calling', {
       contract: CONTRACT_ADDRESS,
       chainId: CHAIN_ID,
       limit
     });
-    const result = await readContract({
-      contract,
-      method: "getLeaderboard",
-      params: [BigInt(limit)],
+    const result = await readContract(wagmiConfig, {
+      address: CONTRACT_ADDRESS as `0x${string}`,
+      abi: CONTRACT_ABI_WITH_ERRORS as any,
+      functionName: 'getLeaderboard',
+      args: [BigInt(limit)],
+      chainId: activeChain.id,
     });
 
     const [addresses, points] = result as [string[], bigint[]];
@@ -246,17 +221,18 @@ export async function getTotalWalletsFromChain(): Promise<number> {
   }
 
   try {
-    const contract = getContractInstance();
     console.info('[Triviacast] getTotalWalletsFromChain calling', {
       contract: CONTRACT_ADDRESS,
       chainId: CHAIN_ID,
     });
-    const result = await readContract({
-      contract,
-      method: "getTotalWallets",
-      params: [],
+    const result = await readContract(wagmiConfig, {
+      address: CONTRACT_ADDRESS as `0x${string}`,
+      abi: CONTRACT_ABI_WITH_ERRORS as any,
+      functionName: 'getTotalWallets',
+      args: [],
+      chainId: activeChain.id,
     });
-    const total = Number(result);
+    const total = Number(result as unknown as bigint);
     console.info('[Triviacast] getTotalWalletsFromChain result', { total });
     return total;
   } catch (error) {

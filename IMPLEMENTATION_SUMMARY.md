@@ -70,7 +70,7 @@ This implementation adds blockchain functionality to the Triviacast trivia app f
 - `contracts/README.md` - Contract documentation
 
 ### Integration Layer
-- `lib/contract.ts` - Blockchain interaction functions using thirdweb SDK
+- `lib/contract.ts` - Blockchain interaction functions using wagmi/viem
 
 ### Documentation
 - `SMART_CONTRACT_INTEGRATION.md` - Complete integration guide
@@ -134,8 +134,9 @@ transferOwnership(address newOwner)
 ### Environment Variables
 
 ```bash
-# Required for wallet connection
-NEXT_PUBLIC_THIRDWEB_CLIENT_ID=your_client_id
+# Required for wallet connection (WalletConnect)
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
+NEXT_PUBLIC_RPC_URL=https://base-sepolia.infura.io/v3/...
 
 # Optional - for blockchain functionality
 NEXT_PUBLIC_CONTRACT_ADDRESS=0x...  # Deployed contract
@@ -206,7 +207,7 @@ NEXT_PUBLIC_CHAIN_ID=84532          # Base Sepolia
 ### 1. Deploy Smart Contract
 Choose one method:
 - **Remix IDE** (easiest for testing)
-- **thirdweb** (user-friendly interface)
+- **Hardhat** (scriptable developer workflow)
 - **Hardhat** (advanced developer workflow)
 
 See `scripts/deploy-instructions.md` for detailed steps.
@@ -301,7 +302,7 @@ Potential improvements for the smart contract system:
 - **Deployment Guide**: [scripts/deploy-instructions.md](./scripts/deploy-instructions.md)
 - **Base Sepolia Explorer**: https://sepolia.basescan.org
 - **Base Sepolia Faucet**: https://sepoliafaucet.com/
-- **thirdweb Docs**: https://portal.thirdweb.com/
+- **wagmi Docs**: https://wagmi.sh/
 
 ## Summary
 

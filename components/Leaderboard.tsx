@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { LeaderboardEntry } from '@/types/quiz';
 import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
 import Link from 'next/link';
-import { useActiveAccount } from 'thirdweb/react';
+import { useAccount } from 'wagmi';
 
 import { shareLeaderboardUrl, openShareUrl } from '@/lib/farcaster';
 import { base } from 'viem/chains';
@@ -73,15 +73,15 @@ export default function Leaderboard() {
   const [profiles, setProfiles] = useState<Record<string, any>>({});
   const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
-  const account = useActiveAccount();
+  const { address } = useAccount();
 
 
 
   const myRank = useMemo(() => {
-    if (!account?.address) return null;
-    const idx = leaderboard.findIndex(l => l.walletAddress.toLowerCase() === account.address!.toLowerCase());
+    if (!address) return null;
+    const idx = leaderboard.findIndex(l => l.walletAddress.toLowerCase() === address.toLowerCase());
     return idx >= 0 ? idx + 1 : null;
-  }, [account?.address, leaderboard]);
+  }, [address, leaderboard]);
 
   useEffect(() => {
     async function fetchData() {
@@ -113,8 +113,8 @@ export default function Leaderboard() {
           setProfileErrors({ api: String(err) });
         }
 
-        if (account?.address) {
-          const points = await getWalletTotalPoints(account.address);
+        if (address) {
+          const points = await getWalletTotalPoints(address);
           setWalletTotal(points);
         }
       } finally {
@@ -122,7 +122,7 @@ export default function Leaderboard() {
       }
     }
     fetchData();
-  }, [account?.address]);
+  }, [address]);
 
   return (
     <div className="w-full px-0 sm:px-6">
@@ -211,7 +211,7 @@ export default function Leaderboard() {
           and some losers 😭😩😞
         </p>
 
-        {walletTotal > 0 && account?.address && (
+        {walletTotal > 0 && address && (
           <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gradient-to-r from-[#FFE4EC] to-[#FFC4D1] rounded-lg border-2 border-[#F4A6B7] shadow-md">
             <div className="text-center">
               <div className="text-xs sm:text-sm text-[#5a3d5c] mb-1 font-semibold">Your Wallet T Points</div>

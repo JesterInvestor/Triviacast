@@ -64,20 +64,21 @@ Choose one of these methods:
 6. Deploy the contract
 7. Copy the deployed contract address
 
-#### Option B: Deploy via thirdweb
+#### Option B: Deploy via Hardhat (script based)
 
-1. Go to [thirdweb Deploy](https://thirdweb.com/deploy)
-2. Upload `contracts/TriviaPoints.sol`
-3. Select Base Sepolia (Chain ID: 84532)
-4. Deploy and copy the address
+1. Use the Hardhat project in `hardhat/`
+2. Add your private key & RPC URL to `hardhat/.env`
+3. Run an existing deployment script (or create one) to deploy TriviaPoints
+4. Copy the deployed contract address from the console output
 
 ### Step 2: Configure Environment Variables
 
 Create a `.env.local` file (or update existing one):
 
 ```bash
-# Required for wallet connection
-NEXT_PUBLIC_THIRDWEB_CLIENT_ID=your_thirdweb_client_id
+# Required for wallet connection (WalletConnect + wagmi)
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id
+NEXT_PUBLIC_RPC_URL=https://base-sepolia.infura.io/v3/your_key
 
 # Smart contract configuration
 NEXT_PUBLIC_CONTRACT_ADDRESS=0x... # Your deployed contract address

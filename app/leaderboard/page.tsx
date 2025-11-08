@@ -7,14 +7,14 @@ import Image from 'next/image';
 import { shareLeaderboardUrl } from '@/lib/farcaster';
 import React, { useEffect } from 'react';
 import { FarcasterProfile } from '@/components/FarcasterProfile';
-import { useActiveAccount } from 'thirdweb/react';
+import { useAccount } from 'wagmi';
 import { sdk } from '@farcaster/miniapp-sdk';
 
 export const dynamic = 'force-dynamic';
 
 
 export default function LeaderboardPage() {
-  const account = useActiveAccount();
+  const { address } = useAccount();
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
       <div className="w-full max-w-3xl px-2 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
@@ -46,9 +46,9 @@ export default function LeaderboardPage() {
               <Image src="/brain-small.svg" alt="Brain icon" width={16} height={16} aria-hidden="true" />
               <span>Play Quiz</span>
             </Link>
-            {account?.address && (
+            {address && (
               <div className="w-full sm:w-auto flex flex-col items-center justify-center">
-                <FarcasterProfile address={account.address} className="mt-2 sm:mt-0" />
+                <FarcasterProfile address={address} className="mt-2 sm:mt-0" />
               </div>
             )}
           </div>

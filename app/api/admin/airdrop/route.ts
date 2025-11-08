@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { getContract, prepareContractCall, sendTransaction } from "thirdweb";
-import { base, baseSepolia } from "thirdweb/chains";
-import { privateKeyToAccount } from "thirdweb/wallets";
-import { client } from "@/lib/thirdweb";
+import { base, baseSepolia } from "viem/chains";
+import { createWalletClient, createPublicClient, http } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
 import crypto from "crypto";
 
 // Rate limiting store (in production, use Redis or similar)
@@ -75,10 +74,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!client) {
-      return NextResponse.json({ error: "Thirdweb client not configured" }, { status: 500 });
-    }
-
     const distributor = process.env.NEXT_PUBLIC_DISTRIBUTOR_ADDRESS;
     if (!distributor) {
       return NextResponse.json({ error: "Distributor address not set" }, { status: 500 });
@@ -92,22 +87,37 @@ export async function POST(req: Request) {
     const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "84532", 10);
     const chain = chainId === 8453 ? base : baseSepolia;
 
-  const normalizedPk = pk.startsWith("0x") ? pk : `0x${pk}`;
-  const account = privateKeyToAccount({ client, privateKey: normalizedPk });
+    const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || chain.rpcUrls.default.http[0];
+    const normalizedPk = pk.startsWith("0x") ? pk : `0x${pk}`;
+    const account = privateKeyToAccount(normalizedPk as `0x${string}`);
 
-    const contract = getContract({
-      client,
-      address: distributor,
+    const walletClient = createWalletClient({
+      account,
       chain,
-      abi: [
-        { inputs: [], name: "airdropTop5", outputs: [], stateMutability: "nonpayable", type: "function" },
-      ] as const,
+      transport: http(rpcUrl),
+    });
+    const publicClient = createPublicClient({
+      chain,
+      transport: http(rpcUrl),
     });
 
-    const tx = prepareContractCall({ contract, method: "airdropTop5", params: [] });
-    const receipt = await sendTransaction({ transaction: tx, account });
+    // Minimal ABI for airdropTop5()
+    const ABI = [
+      { inputs: [], name: "airdropTop5", outputs: [], stateMutability: "nonpayable", type: "function" },
+    ] as const;
 
-    return NextResponse.json({ ok: true, tx: receipt.transactionHash || receipt }, { status: 200 });
+    const hash = await walletClient.writeContract({
+      address: distributor as `0x${string}`,
+      abi: ABI,
+      functionName: "airdropTop5",
+      args: [],
+      chain,
+      account,
+    });
+
+    const receipt = await publicClient.waitForTransactionReceipt({ hash });
+
+    return NextResponse.json({ ok: true, tx: receipt.transactionHash }, { status: 200 });
   } catch (error: unknown) {
     const err = error as { message?: string };
     console.error("/api/admin/airdrop error", err?.message || "Unknown error");

@@ -1,7 +1,6 @@
-import { getContract, prepareContractCall, readContract, sendTransaction } from "thirdweb";
-import { base, baseSepolia } from "thirdweb/chains";
-import { client } from "./thirdweb";
-import type { Account } from "thirdweb/wallets";
+import { readContract, simulateContract, writeContract, waitForTransactionReceipt, getAccount } from '@wagmi/core';
+import { base, baseSepolia } from 'viem/chains';
+import { wagmiConfig } from './wagmi';
 import { extendAbiWithErrors } from './contract';
 
 const DISTRIBUTOR_ABI = [
@@ -33,43 +32,62 @@ const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "84532", 10);
 const activeChain = CHAIN_ID === 8453 ? base : baseSepolia;
 
 export function isDistributorConfigured(): boolean {
-  return !!(DISTRIBUTOR_ADDRESS && client);
+  return !!DISTRIBUTOR_ADDRESS;
 }
 
 export function hasDistributorAddress(): boolean {
   return !!DISTRIBUTOR_ADDRESS;
 }
 
-function getDistributorContract() {
-  if (!DISTRIBUTOR_ADDRESS) throw new Error("Distributor address not configured");
-  if (!client) throw new Error("Thirdweb client not initialized");
-  // Merge in standard error ABI entries so viem/thirdweb can decode revert reasons
-  const abiWithErrors = extendAbiWithErrors(DISTRIBUTOR_ABI as any);
-  return getContract({ client, address: DISTRIBUTOR_ADDRESS, chain: activeChain, abi: abiWithErrors });
-}
+const DISTRIBUTOR_ABI_WITH_ERRORS = extendAbiWithErrors(DISTRIBUTOR_ABI as any);
 
 export async function getDistributorOwner(): Promise<string | null> {
   if (!isDistributorConfigured()) return null;
   try {
-    const contract = getDistributorContract();
-    const owner = await readContract({ contract, method: "owner", params: [] });
-    return owner as string;
+    const owner = await readContract(wagmiConfig, {
+      address: DISTRIBUTOR_ADDRESS as `0x${string}`,
+      abi: DISTRIBUTOR_ABI_WITH_ERRORS as any,
+      functionName: 'owner',
+      args: [],
+      chainId: activeChain.id,
+    });
+    return owner as unknown as string;
   } catch (e) {
     console.error("getDistributorOwner error", e);
     return null;
   }
 }
 
-export async function callDailyClaim(account: Account): Promise<any> {
+export async function callDailyClaim(): Promise<`0x${string}`> {
   if (!isDistributorConfigured()) throw new Error("Distributor not configured");
-  const contract = getDistributorContract();
-  const tx = prepareContractCall({ contract, method: "dailyClaim", params: [] });
-  return await sendTransaction({ transaction: tx, account });
+  const acc = getAccount(wagmiConfig);
+  if (!acc?.address) throw new Error('No active account');
+  const { request } = await simulateContract(wagmiConfig, {
+    address: DISTRIBUTOR_ADDRESS as `0x${string}`,
+    abi: DISTRIBUTOR_ABI_WITH_ERRORS as any,
+    functionName: 'dailyClaim',
+    args: [],
+    account: acc.address,
+    chainId: activeChain.id,
+  });
+  const hash = await writeContract(wagmiConfig, request);
+  await waitForTransactionReceipt(wagmiConfig, { hash, chainId: activeChain.id });
+  return hash;
 }
 
-export async function callAirdropTop5(account: Account): Promise<any> {
+export async function callAirdropTop5(): Promise<`0x${string}`> {
   if (!isDistributorConfigured()) throw new Error("Distributor not configured");
-  const contract = getDistributorContract();
-  const tx = prepareContractCall({ contract, method: "airdropTop5", params: [] });
-  return await sendTransaction({ transaction: tx, account });
+  const acc = getAccount(wagmiConfig);
+  if (!acc?.address) throw new Error('No active account');
+  const { request } = await simulateContract(wagmiConfig, {
+    address: DISTRIBUTOR_ADDRESS as `0x${string}`,
+    abi: DISTRIBUTOR_ABI_WITH_ERRORS as any,
+    functionName: 'airdropTop5',
+    args: [],
+    account: acc.address,
+    chainId: activeChain.id,
+  });
+  const hash = await writeContract(wagmiConfig, request);
+  await waitForTransactionReceipt(wagmiConfig, { hash, chainId: activeChain.id });
+  return hash;
 }

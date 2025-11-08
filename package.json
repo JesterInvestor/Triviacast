@@ -9,7 +9,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "node --loader ts-node/esm index.ts",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest"
   },
   "dependencies": {
     "@farcaster/auth-kit": "^0.1.4",
@@ -31,7 +32,6 @@
     "react-dom": "19.1.0",
     "react-redux": "^9.2.0",
     "swr": "^2.3.6",
-    "thirdweb": "^5.108.12",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3",
     "viem": "^2.38.3",
@@ -48,6 +48,7 @@
     "eslint-config-next": "15.5.4",
     "ethers": "^6.15.0",
     "tailwindcss": "^4",
+    "vitest": "^2.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5"
   },
