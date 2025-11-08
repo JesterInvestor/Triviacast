@@ -25,6 +25,7 @@ export default function BottomNav() {
       justifyContent: 'space-between',
       alignItems: 'center',
       zIndex: 100,
+      paddingBottom: 'env(safe-area-inset-bottom)'
     }}>
       <div style={{ display: 'flex', flex: 1, justifyContent: 'space-around' }}>
         {navItems.map(item => (

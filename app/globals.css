@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #2d1b2e;
+  --bottom-nav-height: 64px;
   
   /* Brain-themed pink/coral palette */
   --brain-primary: #F4A6B7;
@@ -59,6 +60,8 @@ body {
   -webkit-text-size-adjust: 100%;
   /* Improve tap highlight */
   -webkit-tap-highlight-color: rgba(244, 166, 183, 0.2);
+  /* Keep content above fixed BottomNav (height + safe area) */
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
 }
 
 /* Mobile-first: Ensure touch targets meet minimum size */
