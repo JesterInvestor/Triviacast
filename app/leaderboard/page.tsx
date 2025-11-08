@@ -29,7 +29,7 @@ export default function LeaderboardPage() {
               className="drop-shadow-lg sm:w-[60px] sm:h-[60px] mx-auto"
               priority
             />
-            <h1 className="text-3xl sm:text-5xl font-extrabold text-[#2d1b2e] text-center">Leaderboard</h1>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#2d1b2e] text-center">Leaderboard</h1>
             <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Top Brain Power Rankings</p>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full mt-4">

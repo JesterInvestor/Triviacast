@@ -11,6 +11,7 @@ export const dynamic = 'force-dynamic';
 // ...existing code...
 import ClientOnlyWidgets from '@/components/ClientOnlyWidgets';
 import ShareButton from '@/components/ShareButton';
+import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 
 export default function Home() {
   // Wallet connect handled by WagmiWalletConnect
@@ -44,6 +45,15 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
+        {/* Top bar: wallet connect + share side-by-side */}
+        <div className="w-full flex items-center justify-end gap-2 mb-2 sm:mb-4">
+          <WagmiWalletConnect />
+          <ShareButton
+            url={shareAppUrl()}
+            className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[40px] text-sm shrink-0"
+            ariaLabel="Share app on Farcaster"
+          />
+        </div>
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
           <div className="flex flex-col items-center gap-3 sm:gap-4 w-full">
             <Image 
@@ -55,14 +65,9 @@ export default function Home() {
               priority
             />
             <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 justify-center">
-              <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] text-center">
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-[#2d1b2e] text-center">
                 Triviacast
               </h1>
-              <ShareButton
-                url={shareAppUrl()}
-                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[40px] text-sm shrink-0"
-                ariaLabel="Share app on Farcaster"
-              />
             </div>
             {/* subtitle removed per request */}
           </div>

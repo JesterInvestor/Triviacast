@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useDisconnect } from 'wagmi';
 
 export default function WagmiWalletConnect() {
   const { address, isConnected, connector: activeConnector } = useAccount();
+  const { disconnect } = useDisconnect();
   const [profile, setProfile] = useState<{ username?: string | null; displayName?: string | null } | null>(null);
 
   useEffect(() => {
@@ -32,25 +33,29 @@ export default function WagmiWalletConnect() {
 
   // Only show connected state if Farcaster MiniApp or Base wallet is active
   if (isConnected && address && activeConnector && (activeConnector.id === 'farcasterMiniApp' || activeConnector.id === 'base')) {
-    const label = profile?.username || profile?.displayName || `${address.slice(0,6)}…${address.slice(-4)}`;
+    const label = profile?.username || profile?.displayName || null; // do not fall back to 0x… address
     return (
-      <div className="flex justify-end flex-1 sm:flex-initial">
-        <div className="flex items-center gap-2">
-          {/* Base avatar */}
-          <img
-            src={`https://cdn.stamp.fyi/avatar/${address}?s=44`}
-            alt="Base Avatar"
-            className="rounded-full border-2 border-[#F4A6B7] w-11 h-11"
-            style={{ marginRight: '8px' }}
-          />
-          <div className="px-3 py-2 bg-[#FFE4EC] text-[#5a3d5c] rounded-lg text-sm border-2 border-[#F4A6B7] font-medium min-h-[44px] flex items-center">
-            <span className="font-semibold mr-2">{label}</span>
-            <span className="ml-2 text-[10px] bg-white text-black px-2 rounded">
-              {activeConnector.id === 'farcasterMiniApp' ? 'Farcaster' : 'Base'}
-            </span>
-            <span className="ml-2 text-green-600 font-bold">Wallet Connected</span>
+      <div className="flex items-center gap-2">
+        {/* Show avatar + profile label only if profile is available */}
+        {label && (
+          <div className="flex items-center gap-2">
+            <img
+              src={`https://cdn.stamp.fyi/avatar/${address}?s=44`}
+              alt="Avatar"
+              className="rounded-full border-2 border-[#F4A6B7] w-10 h-10"
+            />
+            <div className="px-3 py-2 bg-[#FFE4EC] text-[#5a3d5c] rounded-lg text-sm border-2 border-[#F4A6B7] font-medium min-h-[40px] flex items-center">
+              <span className="font-semibold">{label}</span>
+            </div>
           </div>
-        </div>
+        )}
+        <button
+          type="button"
+          onClick={() => disconnect()}
+          className="px-3 py-2 rounded-lg border-2 border-[#F4A6B7] bg-white text-[#5a3d5c] text-sm font-semibold shadow-sm hover:bg-[#FFF5F7] min-h-[40px]"
+        >
+          Disconnect
+        </button>
       </div>
     );
   }

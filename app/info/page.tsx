@@ -19,7 +19,7 @@ export default function InfoPage() {
               className="drop-shadow-lg sm:w-[56px] sm:h-[56px] mx-auto"
               style={{ marginBottom: '0.5rem' }}
             />
-            <h1 className="text-3xl sm:text-5xl font-extrabold text-[#2d1b2e] text-center">🎉 Welcome to Triviacast! 🎉</h1>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#2d1b2e] text-center">🎉 Welcome to Triviacast! 🎉</h1>
             <button
               onClick={() => sound.toggle()}
               aria-pressed={sound.disabled}

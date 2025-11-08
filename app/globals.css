@@ -92,6 +92,13 @@ h1, h2, h3 {
   letter-spacing: 0.5px;
 }
 
+/* Avoid right-edge clipping on large headings due to letter-spacing/gradient */
+h1, h2 {
+  display: inline-block;
+  padding-inline-end: 0.12em; /* tiny breathing room for last glyph */
+  overflow: visible; /* ensure wobble/scale and glyphs aren't clipped */
+}
+
 @keyframes wobble {
   0% { transform: rotate(0deg) scale(1); }
   25% { transform: rotate(2deg) scale(1.02); }
@@ -110,4 +117,5 @@ h1 {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  -webkit-text-fill-color: transparent; /* improve WebKit rendering */
 }
