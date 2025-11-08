@@ -21,7 +21,7 @@ export default function InfoPage() {
             />
             <h1 className="text-3xl sm:text-4xl font-extrabold text-[#2d1b2e] text-center">🎉 Welcome to Triviacast! 🎉</h1>
             <button
-              onClick={() => sound.toggle()}
+              onPointerUp={() => sound.toggle()}
               aria-pressed={sound.disabled}
               className="mt-2 sm:mt-3 bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-4 rounded-lg shadow text-sm"
             >
