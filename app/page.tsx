@@ -54,34 +54,22 @@ export default function Home() {
               className="drop-shadow-lg sm:w-[60px] sm:h-[60px] mx-auto"
               priority
             />
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] flex items-center gap-2 justify-center text-center">
-              Triviacast
-            </h1>
+            <div className="flex items-center gap-2 justify-center">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#2d1b2e] text-center">
+                Triviacast
+              </h1>
+              <ShareButton
+                url={shareAppUrl()}
+                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[40px] text-sm"
+                ariaLabel="Share app on Farcaster"
+              />
+            </div>
             {/* subtitle removed per request */}
           </div>
           {/* Wallet connect, then share + tip buttons below */}
           <div className="flex flex-col items-center justify-center gap-3 sm:gap-4 w-full mt-4">
             <div className="w-full sm:w-auto flex flex-col items-center">
               <ClientOnlyWidgets />
-            </div>
-            <div className="flex items-center gap-2">
-              <ShareButton
-                url={shareAppUrl()}
-                className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[44px]"
-                ariaLabel="Share app on Farcaster"
-              />
-              <a
-                href="https://tip.md/jesterinvestor"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center rounded-lg border-2 border-[#F4A6B7] bg-white hover:bg-[#fff7f9] px-2 py-1 shadow min-h-[44px]"
-              >
-                <img
-                  src="https://tip.md/badge.svg"
-                  alt="Tip in Crypto"
-                  height={28}
-                />
-              </a>
             </div>
           </div>
         </div>
