@@ -87,6 +87,10 @@ export default function StakingDailyClaimPrompt() {
     } catch (err: unknown) {
       const e = err as { message?: string } | null;
       let msg = e?.message || 'Unable to claim. Try again later.';
+      // Friendly remapping for common revert reasons
+      if (msg?.toLowerCase().includes('no t points')) {
+        msg = 'Play the quiz, sign for T points, and try again tomorrow........';
+      } else
       if (msg?.toLowerCase().includes('cooldown')) {
         msg = 'Try again tomorrow.............';
       }
