@@ -3,14 +3,14 @@ import { Metadata } from 'next';
 // fc:miniapp meta for leaderboard page — used by Farcaster clients to render embeds
 const miniappObj = {
   version: '1',
-  imageUrl: 'https://triviacast.xyz/og-image-1200x630.png',
+  imageUrl: 'https://triviacast.xyz/og-image.png',
   button: {
     title: 'View Leaderboard',
     action: {
       type: 'launch_frame',
       url: 'https://triviacast.xyz/leaderboard',
       name: 'Triviacast',
-      splashImageUrl: 'https://triviacast.xyz/splash-200.png',
+      splashImageUrl: 'https://triviacast.xyz/R11.png',
       splashBackgroundColor: '#FFE4EC',
     },
   },
