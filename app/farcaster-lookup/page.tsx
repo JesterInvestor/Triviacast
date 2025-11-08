@@ -1,4 +1,3 @@
-
 "use client";
 import React from 'react';
 import WagmiWalletConnect from '@/components/WagmiWalletConnect';
@@ -22,15 +21,14 @@ type LookupResult = {
     username?: string;
     pfpUrl?: string;
     bio?: string;
-// ...existing code...
-  displayName?: string;
-  followers?: number;
-  following?: number;
-  hasPowerBadge?: boolean;
-  isFollowing?: boolean;
-  isOwnProfile?: boolean;
-  casts?: Cast[];
-  fid?: number;
+    displayName?: string;
+    followers?: number;
+    following?: number;
+    hasPowerBadge?: boolean;
+    isFollowing?: boolean;
+    isOwnProfile?: boolean;
+    casts?: Cast[];
+    fid?: number;
   };
   error?: string;
 } | null;
@@ -87,28 +85,24 @@ export default function FarcasterLookupPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
-      {/* Wallet connect at top */}
-      <div className="w-full flex flex-col items-center justify-center pt-4 pb-2">
-
-  <WagmiWalletConnect />
+      {/* Top bar: wallet connect + share aligned like home page */}
+      <div className="w-full flex items-center justify-end gap-2 mb-2 sm:mb-4 px-3 sm:px-4 pt-4">
+        <WagmiWalletConnect />
+        <ShareButton
+          url={buildPlatformShareUrl(
+            'Come check out our Farcaster lookup page powered by neynar!! https://triviacast.xyz/farcaster-lookup',
+            ['https://triviacast.xyz/farcaster-lookup'],
+            { action: 'share' }
+          )}
+          className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[40px] text-sm shrink-0"
+          ariaLabel="Share Farcaster Lookup"
+        />
       </div>
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
-          <div className="mb-2 flex justify-center">
-            <ShareButton
-              url={buildPlatformShareUrl(
-                'Come check out our Farcaster lookup page powered by neynar!! https://triviacast.xyz/farcaster-lookup',
-                ['https://triviacast.xyz/farcaster-lookup'],
-                { action: 'share' }
-              )}
-              className="bg-[#DC8291] hover:bg-[#C86D7D] text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 shadow"
-              ariaLabel="Share Farcaster Lookup"
-            >
-              <span>Share on Farcaster</span>
-            </ShareButton>
-          </div>
+          
             <div className="flex flex-col items-center">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#2d1b2e] text-center">Challenge Friend</h1>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#2d1b2e] text-center">Challenge</h1>
             <span className="text-xs text-[#5a3d5c] mt-1">powered by <strong className="text-[#2d1b2e]">neynar</strong></span>
             </div>
           <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Enter a Farcaster username to fetch the Farcaster profile.</p>
