@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useSound } from '@/components/SoundContext';
 import Image from 'next/image';
 import { useAccount } from 'wagmi';
 
@@ -15,7 +16,7 @@ const QUIZ_TIME_LIMIT = 60; // 1 minute in seconds
 const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
 
 export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: string; score: number; details?: any }) => void } = {}) {
-  const [isMuted, setIsMuted] = useState(false);
+  const sound = useSound();
   const { address: accountAddress, isConnected } = useAccount();
   const [quizState, setQuizState] = useState<QuizState>({
     questions: [],
@@ -31,7 +32,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const onCompleteCalledRef = useRef(false);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
 
   const startQuiz = async () => {
     setLoading(true);
@@ -89,38 +90,40 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     return () => clearInterval(timer);
   }, [quizState.quizStarted, quizState.quizCompleted]);
 
-  // Background music lifecycle: create audio when quiz starts, loop, allow mute toggle.
+  // Background music lifecycle: create/cleanup only on quiz lifecycle
   useEffect(() => {
-    // Only create/play while quiz is active
     if (quizState.quizStarted && !quizState.quizCompleted) {
       if (!audioRef.current) {
         const audio = new Audio('/giggly-bubbles-222533.mp3');
         audio.loop = true;
-        audio.volume = isMuted ? 0 : 0.14; // lower background volume
+        audio.volume = sound.disabled ? 0 : 0.14;
+        audio.muted = !!sound.disabled;
         audioRef.current = audio;
-      } else {
-        audioRef.current.volume = isMuted ? 0 : 0.14;
-      }
 
-      // Attempt to play; if autoplay is blocked, ignore the error (user can start via interaction)
-      const playPromise = audioRef.current.play();
-      if (playPromise && typeof playPromise.then === 'function') {
-        playPromise.catch(() => {
-          // Autoplay prevented; do nothing (mute control available)
-        });
+        if (!audio.muted) {
+          const playPromise = audio.play();
+          if (playPromise && typeof playPromise.then === 'function') {
+            playPromise
+              .then(() => setIsMusicPlaying(true))
+              .catch(() => setIsMusicPlaying(false));
+          } else {
+            setIsMusicPlaying(!audio.paused);
+          }
+        } else {
+          setIsMusicPlaying(false);
+        }
       }
     }
 
-    // Pause/cleanup when quiz ends
     if (quizState.quizCompleted && audioRef.current) {
       try {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       } catch (_) {}
+      setIsMusicPlaying(false);
     }
 
     return () => {
-      // If component unmounts, stop audio
       if (audioRef.current) {
         try {
           audioRef.current.pause();
@@ -130,28 +133,36 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         }
       }
     };
-  }, [quizState.quizStarted, quizState.quizCompleted, isMuted]);
+  }, [quizState.quizStarted, quizState.quizCompleted]);
 
-  // Call onComplete callback when quiz is completed
+  // React to mute/unmute without recreating the audio element
   useEffect(() => {
-    if (quizState.quizCompleted && onComplete && !onCompleteCalledRef.current) {
-      onCompleteCalledRef.current = true;
-      // Generate a unique quizId using crypto.randomUUID if available, fallback to timestamp
-      const quizId = typeof crypto !== 'undefined' && crypto.randomUUID 
-        ? crypto.randomUUID() 
-        : `quiz-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      onComplete({
-        quizId,
-        score: quizState.score,
-        details: {
-          totalQuestions: quizState.questions.length,
-          tPoints: quizState.tPoints,
-          answers: quizState.answers,
-          questions: quizState.questions,
-        },
-      });
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (sound.disabled) {
+      try {
+        audio.muted = true;
+        audio.pause();
+        audio.volume = 0;
+      } catch (_) {}
+      setIsMusicPlaying(false);
+    } else {
+      try {
+        audio.muted = false;
+        audio.volume = 0.14;
+        if (audio.paused) {
+          const playPromise = audio.play();
+          if (playPromise && typeof playPromise.then === 'function') {
+            playPromise
+              .then(() => setIsMusicPlaying(true))
+              .catch(() => setIsMusicPlaying(false));
+          } else {
+            setIsMusicPlaying(!audio.paused);
+          }
+        }
+      } catch (_) {}
     }
-  }, [quizState.quizCompleted, onComplete]);
+  }, [sound.disabled]);
 
   const handleAnswer = (answer: string) => {
     const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
@@ -186,7 +197,6 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   };
 
   const restartQuiz = () => {
-    onCompleteCalledRef.current = false;
     setQuizState({
       questions: [],
       currentQuestionIndex: 0,
@@ -200,6 +210,19 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     });
     setError(null);
   };
+
+  // Require wallet connection before showing any quiz UI
+  if (!isConnected || !accountAddress) {
+    return (
+      <div className="max-w-2xl mx-auto px-2 sm:px-6">
+        <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 text-center border-4 border-[#F4A6B7]">
+          <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#F4A6B7] text-[#5a3d5c] rounded-lg text-sm sm:text-base">
+            🔒 Connect your wallet silly
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Pre-start state
   if (!quizState.quizStarted) {
@@ -216,11 +239,6 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
             😎🤓 Endless bragging rights 😎🤓<br />
             🧠 Ready to prove you're a genius? 🧠
           </p>
-          {!isConnected || !accountAddress ? (
-            <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#F4A6B7] text-[#5a3d5c] rounded-lg text-sm sm:text-base">
-              🔒 Connect your wallet silly
-            </div>
-          ) : null}
           {error && (
             <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#DC8291] text-[#C86D7D] rounded-lg text-sm sm:text-base">
               {error}
@@ -228,8 +246,8 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
           )}
           <button
             onClick={startQuiz}
-            disabled={loading || !isConnected || !accountAddress}
-            aria-disabled={loading || !isConnected || !accountAddress}
+            disabled={loading}
+            aria-disabled={loading}
             className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-lg transition disabled:opacity-50 shadow-lg w-full sm:w-auto min-h-[56px]"
           >
             {loading ? 'Loading...' : 'Start Quiz'}
@@ -266,11 +284,35 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         <div className="flex items-center gap-2">
           <Timer timeRemaining={quizState.timeRemaining} />
           <button
-            onClick={() => setIsMuted((m) => !m)}
-            className="px-3 py-2 text-sm rounded-lg bg-white border-2 border-[#F4A6B7] text-[#5a3d5c] shadow"
-            aria-pressed={isMuted}
+            onPointerUp={() => {
+              const audio = audioRef.current;
+              if (!audio) return;
+              if (!audio.paused) {
+                try { audio.pause(); } catch (_) {}
+                setIsMusicPlaying(false);
+              } else {
+                if (sound.disabled) {
+                  try { sound.set(false); } catch (_) {}
+                }
+                try {
+                  audio.muted = false;
+                  audio.volume = 0.14;
+                  const p = audio.play();
+                  if (p && typeof p.then === 'function') {
+                    p.then(() => setIsMusicPlaying(true)).catch(() => setIsMusicPlaying(false));
+                  } else {
+                    setIsMusicPlaying(!audio.paused);
+                  }
+                } catch (_) {
+                  setIsMusicPlaying(false);
+                }
+              }
+            }}
+            aria-pressed={isMusicPlaying}
+            className="ml-2 bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-1.5 px-3 rounded-md text-xs shadow"
+            type="button"
           >
-            {isMuted ? 'Unmute' : 'Mute'}
+            {isMusicPlaying ? 'Pause Music' : 'Play Music'}
           </button>
         </div>
       </div>
