@@ -40,7 +40,6 @@ export default function LeaderboardPage() {
               priority
             />
             <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e] text-center">Leaderboard</h1>
-            <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Top Brain Power Rankings</p>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full mt-4">
             <Link

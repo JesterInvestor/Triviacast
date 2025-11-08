@@ -102,10 +102,16 @@ export default function FarcasterLookupPage() {
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
           
             <div className="flex flex-col items-center">
+            {/* Small brain icon above header for visual consistency with other pages */}
+            <img
+              src="/brain-small.svg"
+              alt="Brain icon"
+              className="w-10 h-10 sm:w-12 sm:h-12 mb-2 drop-shadow"
+              loading="lazy"
+            />
             <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e] text-center">Challenge</h1>
             <span className="text-xs text-[#5a3d5c] mt-1">powered by <strong className="text-[#2d1b2e]">neynar</strong></span>
             </div>
-          <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Enter a Farcaster username to fetch the Farcaster profile.</p>
           <div className="w-full max-w-md bg-white rounded-md border p-3 mt-3 text-sm text-gray-700">
             <strong className="block mb-1">How to challenge a friend</strong>
             <ol className="list-decimal pl-6">
