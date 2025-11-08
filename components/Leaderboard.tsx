@@ -83,6 +83,10 @@ export default function Leaderboard() {
     return idx >= 0 ? idx + 1 : null;
   }, [address, leaderboard]);
 
+  const totalTPoints = useMemo(() => {
+    return leaderboard.reduce((sum, entry) => sum + (entry?.tPoints || 0), 0);
+  }, [leaderboard]);
+
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
@@ -312,7 +316,15 @@ export default function Leaderboard() {
               </table>
             </div>
 
-            <div className="mt-6 sm:mt-8 text-center flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+            {/* Total T Points summary */}
+            <div className="mt-6 sm:mt-8 text-center w-full">
+              <div className="bg-[#FFF4F6] border-2 border-[#F4A6B7] rounded-lg p-3 sm:p-4 mb-4 inline-block w-full">
+                <div className="text-sm text-[#5a3d5c]">Total T Points (all players)</div>
+                <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">{totalTPoints.toLocaleString()}</div>
+              </div>
+            </div>
+
+            <div className="mt-2 sm:mt-0 text-center flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <Link
                 href="/"
                 className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-base sm:text-lg transition inline-block shadow-lg w-full sm:w-auto min-h-[52px]"
