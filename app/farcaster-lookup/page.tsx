@@ -111,7 +111,16 @@ export default function FarcasterLookupPage() {
             />
             <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e] text-center">Challenge</h1>
             <span className="text-xs text-[#5a3d5c] mt-1 inline-flex items-center gap-1">
-              powered by <strong className="text-[#2d1b2e]">neynar</strong>
+              powered by
+              <a
+                href="https://farcaster.xyz/neynar"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#2d1b2e] underline decoration-dotted underline-offset-2 hover:decoration-solid"
+                aria-label="Neynar on Farcaster"
+              >
+                neynar
+              </a>
               <img src="/neynar.svg" alt="Neynar" className="w-3 h-3 opacity-90" />
             </span>
             </div>
