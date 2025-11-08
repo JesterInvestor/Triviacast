@@ -102,7 +102,7 @@ export default function FarcasterLookupPage() {
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
           
             <div className="flex flex-col items-center">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#2d1b2e] text-center">Challenge</h1>
+            <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e] text-center">Challenge</h1>
             <span className="text-xs text-[#5a3d5c] mt-1">powered by <strong className="text-[#2d1b2e]">neynar</strong></span>
             </div>
           <p className="text-xs sm:text-sm text-[#5a3d5c] text-center">Enter a Farcaster username to fetch the Farcaster profile.</p>

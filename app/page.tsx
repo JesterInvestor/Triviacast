@@ -65,7 +65,7 @@ export default function Home() {
               priority
             />
             <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 justify-center">
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-[#2d1b2e] text-center">
+              <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e] text-center">
                 Triviacast
               </h1>
             </div>
