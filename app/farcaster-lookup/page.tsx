@@ -110,7 +110,10 @@ export default function FarcasterLookupPage() {
               loading="lazy"
             />
             <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e] text-center">Challenge</h1>
-            <span className="text-xs text-[#5a3d5c] mt-1">powered by <strong className="text-[#2d1b2e]">neynar</strong></span>
+            <span className="text-xs text-[#5a3d5c] mt-1 inline-flex items-center gap-1">
+              powered by <strong className="text-[#2d1b2e]">neynar</strong>
+              <img src="/neynar.svg" alt="Neynar" className="w-3 h-3 opacity-90" />
+            </span>
             </div>
           <div className="w-full max-w-md bg-white rounded-md border p-3 mt-3 text-sm text-gray-700">
             <strong className="block mb-1">How to challenge a friend</strong>
