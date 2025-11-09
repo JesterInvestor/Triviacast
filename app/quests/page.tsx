@@ -3,53 +3,15 @@
 import { useAccount, useChainId, useSwitchChain } from 'wagmi';
 import { useIQPoints } from '@/lib/hooks/useIQPoints';
 import { useQuestIQ } from '@/lib/hooks/useQuestIQ';
-import { getFriendSearchedDay, getQuizPlayedDay } from '@/lib/iq';
+// Gating reads removed (we no longer rely on backend relayer to mark quiz/friend searches)
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
+// import Link from 'next/link';
 import { base } from 'wagmi/chains';
 
 // Minimal client-side flag: set localStorage 'triviacast:lastQuizCompletedDay' when quiz finishes.
 // We'll read it here to decide if Daily Quiz Play claim is enabled.
 
-function useQuizCompletedTodayOnChain(user?: `0x${string}`) {
-  const [completed, setCompleted] = useState(false);
-  useEffect(() => {
-    if (!user) { setCompleted(false); return }
-    let cancelled = false
-    const refresh = async () => {
-      try {
-        const day = await getQuizPlayedDay(user)
-        const today = BigInt(Math.floor(Date.now()/86400_000))
-        if (!cancelled) setCompleted(day === today)
-      } catch { if (!cancelled) setCompleted(false) }
-    }
-    refresh()
-    const listener = () => refresh()
-    window.addEventListener('triviacast:quizCompleted', listener)
-    return () => { cancelled = true; window.removeEventListener('triviacast:quizCompleted', listener) }
-  }, [user])
-  return completed
-}
-
-function useFriendSearchedTodayOnChain(user?: `0x${string}`) {
-  const [completed, setCompleted] = useState(false);
-  useEffect(() => {
-    if (!user) { setCompleted(false); return }
-    let cancelled = false
-    const refresh = async () => {
-      try {
-        const day = await getFriendSearchedDay(user)
-        const today = BigInt(Math.floor(Date.now()/86400_000))
-        if (!cancelled) setCompleted(day === today)
-      } catch { if (!cancelled) setCompleted(false) }
-    }
-    refresh()
-    const listener = () => refresh()
-    window.addEventListener('triviacast:friendSearched', listener)
-    return () => { cancelled = true; window.removeEventListener('triviacast:friendSearched', listener) }
-  }, [user])
-  return completed
-}
+// Removed on-chain day marker hooks; quiz & challenge quests disabled without relayer.
 
 interface QuestCardProps {
   title: string; emoji: string; description: string; reward: string; claimed: boolean; disabled: boolean; onClaim: ()=>void; loading: boolean;
@@ -96,12 +58,10 @@ export default function QuestsPage() {
     return `Chain ${chainId}`;
   }, [chainId]);
   const { iqPoints } = useIQPoints(address as `0x${string}` | undefined);
-  const gasless = process.env.NEXT_PUBLIC_QUEST_GASLESS === 'true';
-  const requiresBase = !gasless;
+  // Always require Base network for direct on-chain user claims (no gasless backend).
+  const requiresBase = true;
   const [inlineError, setInlineError] = useState<string | null>(null);
-  const { claimedShare, claimedQuizPlay, claimedChallenge, claimedFollowJester, claimShare, claimDailyQuizPlay, claimDailyChallenge, claimFollowJester, loading, error, secondsUntilReset } = useQuestIQ(address as `0x${string}` | undefined);
-  const quizCompletedToday = useQuizCompletedTodayOnChain(address as `0x${string}` | undefined);
-  const friendSearchedToday = useFriendSearchedTodayOnChain(address as `0x${string}` | undefined);
+  const { claimedFollowJester, claimFollowJester, loading, error, secondsUntilReset } = useQuestIQ(address as `0x${string}` | undefined);
   const resetHours = Math.floor(secondsUntilReset / 3600);
   const resetMinutes = Math.floor((secondsUntilReset % 3600) / 60);
   const resetSeconds = secondsUntilReset % 60;
@@ -124,18 +84,7 @@ export default function QuestsPage() {
     return false;
   }, [isOnBase, requiresBase, setInlineError, switchChainAsync]);
 
-  async function claimGasless(questId: number, user: `0x${string}`) {
-    const res = await fetch('/api/quests/claim', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ questId, address: user })
-    });
-    if (!res.ok) {
-      const j = await res.json().catch(() => ({}));
-      throw new Error(j.error || `gasless claim failed (${res.status})`);
-    }
-    return res.json();
-  }
+  // Gasless claim removed.
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] py-6 sm:py-10">
@@ -173,53 +122,7 @@ export default function QuestsPage() {
         )}
 
         <div className="space-y-4">
-          <QuestCard
-            title="Daily Quiz Play"
-            emoji="🧠"
-            description="Play the quiz today, then claim your reward."
-            reward="1,000 iQ"
-            claimed={claimedQuizPlay}
-            disabled={claimedQuizPlay || !address || !quizCompletedToday || !!error || switchingChain}
-            onClaim={async () => {
-              setInlineError(null);
-              const ok = await ensureOnBase();
-              if (!ok) return;
-              if (gasless && address) {
-                try { await claimGasless(2, address as `0x${string}`); } catch (e: any) { setInlineError(e.message); return; }
-              } else {
-                await claimDailyQuizPlay();
-              }
-            }}
-            loading={loading}
-          />
-
-          <QuestCard
-            title="Daily Challenge"
-            emoji="🔥"
-            description="Search a friend and play a quiz today, then claim your reward."
-            reward="10,000 iQ"
-            claimed={claimedChallenge}
-            disabled={claimedChallenge || !address || !!error || !(friendSearchedToday && quizCompletedToday) || switchingChain}
-            onClaim={async () => {
-              setInlineError(null);
-              const ok = await ensureOnBase();
-              if (!ok) return;
-              if (gasless && address) {
-                try { await claimGasless(3, address as `0x${string}`); } catch (e: any) { setInlineError(e.message); return; }
-              } else {
-                await claimDailyChallenge();
-              }
-            }}
-            loading={loading}
-          />
-          {/* Helper links for completing the challenge steps */}
-          <div className="-mt-2 mb-2 text-xs text-[#5a3d5c] flex items-center gap-3">
-            <Link href="/farcaster-lookup" className="underline decoration-dotted underline-offset-2 hover:decoration-solid">Find a Friend</Link>
-            <span>•</span>
-            <Link href="/" className="underline decoration-dotted underline-offset-2 hover:decoration-solid">Play Quiz</Link>
-            {!friendSearchedToday && <span className="text-red-600">(friend not searched yet)</span>}
-            {!quizCompletedToday && <span className="text-red-600">(quiz not completed yet)</span>}
-          </div>
+          {/* Only quests that can be claimed directly by user without relayer are shown. */}
 
           <QuestCard
             title="Follow @jesterinvestor"
@@ -232,9 +135,7 @@ export default function QuestsPage() {
               setInlineError(null);
               const ok = await ensureOnBase();
               if (!ok) return;
-              if (gasless && address) {
-                try { await claimGasless(4, address as `0x${string}`); } catch (e: any) { setInlineError(e.message); return; }
-              } else { await claimFollowJester(); }
+              await claimFollowJester();
               try {
                 window.dispatchEvent(new Event('triviacast:questClaimed'));
                 window.dispatchEvent(new Event('triviacast:iqUpdated'));
@@ -256,7 +157,7 @@ export default function QuestsPage() {
         )}
 
         <div className="mt-8 text-center text-xs text-[#5a3d5c]">
-          Quests: quiz & challenge depend on on-chain day markers; follow requires manual verification. {gasless ? 'Gasless claims enabled.' : 'Gasless claims not configured.'}
+          Simplified quests: Daily Quiz Play & Challenge disabled (require relayer). Follow quest uses direct on-chain claim.
         </div>
       </div>
     </div>

@@ -72,17 +72,7 @@ export default function FarcasterLookupPage() {
         setResult(data);
       }
 
-      // Mark friend search on-chain (relayer API)
-      try {
-        if (address) {
-          fetch('/api/quests/mark-friend-searched', {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ address })
-          }).catch(() => {});
-        }
-        window.dispatchEvent(new Event('triviacast:friendSearched'));
-      } catch {}
+      // Backend relayer disabled; skip on-chain mark.
     } catch (err: unknown) {
       const e = err as { message?: string } | null;
       setError(e?.message || 'unknown error');

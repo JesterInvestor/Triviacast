@@ -5,19 +5,6 @@ import { validateOrigin, createRelayerWallet, parseUserAddress } from '@/lib/ser
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
-  try {
-    const { address } = await req.json()
-    const originErr = validateOrigin(req)
-    if (originErr) return NextResponse.json({ error: originErr }, { status: 403 })
-    const user = parseUserAddress(address)
-    if (!user) return NextResponse.json({ error: 'invalid address' }, { status: 400 })
-    const relayer = createRelayerWallet()
-    if ('error' in relayer) return NextResponse.json({ error: 'not configured' }, { status: 501 })
-    const { wallet, account, questManager } = relayer
-    const abi = parseAbi(['function markFriendSearchedForToday(address user) external'])
-    const hash = await wallet.writeContract({ account, address: questManager, abi, functionName: 'markFriendSearchedForToday', args: [user] })
-    return NextResponse.json({ hash })
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'failed' }, { status: 500 })
-  }
+  // Disabled: relayer not used. Frontend does not call this.
+  return NextResponse.json({ error: 'mark friend relayer disabled' }, { status: 501 })
 }
