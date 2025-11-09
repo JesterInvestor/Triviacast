@@ -18,5 +18,17 @@ export function useIQPoints(address?: `0x${string}`) {
     return () => { cancelled = true }
   }, [address])
 
+  // Auto-refresh on global iqUpdated event
+  useEffect(() => {
+    const handler = () => {
+      if (!address) return
+      getIQPoints(address).then(v => setPoints(v)).catch(() => {})
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('triviacast:iqUpdated', handler)
+      return () => window.removeEventListener('triviacast:iqUpdated', handler)
+    }
+  }, [address])
+
   return { iqPoints: points, iqError: error }
 }

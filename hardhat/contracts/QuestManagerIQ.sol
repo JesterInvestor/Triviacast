@@ -14,6 +14,7 @@ contract QuestManagerIQ {
     address public owner;
     IIQPoints public iqPoints;
     bool public paused;
+    uint256 public dayAnchor; // optional anchor to align UTC day boundaries (seconds since epoch)
 
     // quest ids examples: 1=Daily Share (+5000), 2=Daily Quiz Play (+1000), 3=Daily Challenge (+10000)
     mapping(uint8 => QuestConfig) public quest;
@@ -35,6 +36,10 @@ contract QuestManagerIQ {
         quest[1] = QuestConfig(5000, true);
         quest[2] = QuestConfig(1000, true);
         quest[3] = QuestConfig(10000, true);
+        // New quests
+        quest[4] = QuestConfig(5, true);      // Follow @jesterinvestor (+5 iQ)
+        quest[5] = QuestConfig(1, true);      // Daily +1 iQ
+        dayAnchor = 0; // 0 means use UNIX epoch for day boundaries (default behavior)
     }
 
     function transferOwnership(address newOwner) external onlyOwner {
@@ -60,8 +65,18 @@ contract QuestManagerIQ {
         emit Paused(status);
     }
 
+    function setDayAnchor(uint256 anchor) external onlyOwner {
+        // anchor should be a fixed timestamp representing a 00:00:00 UTC boundary (optional)
+        dayAnchor = anchor;
+    }
+
     function currentDay() public view returns (uint256) {
-        return block.timestamp / 86400;
+        if (dayAnchor == 0) {
+            return block.timestamp / 86400;
+        }
+        // avoid underflow if chain timestamp < anchor
+        if (block.timestamp <= dayAnchor) return 0;
+        return (block.timestamp - dayAnchor) / 86400;
     }
 
     function claim(uint8 id) public notPaused {
@@ -78,6 +93,8 @@ contract QuestManagerIQ {
     function claimShare() external { claim(1); }
     function claimDailyQuizPlay() external { claim(2); }
     function claimDailyChallenge() external { claim(3); }
+    function claimFollowJester() external { claim(4); }
+    function claimDailyOneIQ() external { claim(5); }
 
     /**
      * @notice Owner-awarded claim on behalf of a user. Enables gasless UX via backend/relayer.

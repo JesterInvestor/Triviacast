@@ -69,7 +69,7 @@ export default function QuestsPage() {
   const { iqPoints } = useIQPoints(address as `0x${string}` | undefined);
   const gasless = process.env.NEXT_PUBLIC_QUEST_GASLESS === 'true';
   const [inlineError, setInlineError] = useState<string | null>(null);
-  const { claimedShare, claimedQuizPlay, claimedChallenge, claimShare, claimDailyQuizPlay, claimDailyChallenge, loading, error, secondsUntilReset } = useQuestIQ(address as `0x${string}` | undefined);
+  const { claimedShare, claimedQuizPlay, claimedChallenge, claimedFollowJester, claimedOneIQ, claimShare, claimDailyQuizPlay, claimDailyChallenge, claimFollowJester, claimDailyOneIQ, loading, error, secondsUntilReset } = useQuestIQ(address as `0x${string}` | undefined);
   const quizCompletedToday = useQuizCompletedToday();
   const resetHours = Math.floor(secondsUntilReset/3600);
   const resetMinutes = Math.floor((secondsUntilReset%3600)/60);
@@ -157,6 +157,39 @@ export default function QuestsPage() {
               } else {
                 await claimDailyChallenge();
               }
+            }}
+            loading={loading}
+          />
+          <QuestCard
+            title="Follow @jesterinvestor"
+            emoji="👤"
+            description="Follow @jesterinvestor on Farcaster (manual trust now)."
+            reward="5 iQ"
+            claimed={claimedFollowJester}
+            disabled={claimedFollowJester || !address || !!error}
+            onClaim={async () => {
+              setInlineError(null);
+              if (gasless && address) {
+                try { await claimGasless(4, address as `0x${string}`); } catch (e:any) { setInlineError(e.message); return; }
+              } else { await claimFollowJester(); }
+              // dispatch events and toast
+              try { window.dispatchEvent(new Event('triviacast:questClaimed')); window.dispatchEvent(new Event('triviacast:iqUpdated')); window.dispatchEvent(new CustomEvent('triviacast:toast',{detail:{type:'success',message:'+5 iQ claimed'}})); } catch {}
+            }}
+            loading={loading}
+          />
+          <QuestCard
+            title="Daily +1 iQ"
+            emoji="✨"
+            description="Login bonus — claim 1 iQ each day."
+            reward="1 iQ"
+            claimed={claimedOneIQ}
+            disabled={claimedOneIQ || !address || !!error}
+            onClaim={async () => {
+              setInlineError(null);
+              if (gasless && address) {
+                try { await claimGasless(5, address as `0x${string}`); } catch (e:any) { setInlineError(e.message); return; }
+              } else { await claimDailyOneIQ(); }
+              try { window.dispatchEvent(new Event('triviacast:questClaimed')); window.dispatchEvent(new Event('triviacast:iqUpdated')); window.dispatchEvent(new CustomEvent('triviacast:toast',{detail:{type:'success',message:'+1 iQ claimed'}})); } catch {}
             }}
             loading={loading}
           />

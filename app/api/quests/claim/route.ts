@@ -12,6 +12,26 @@ export const dynamic = 'force-dynamic'
 export async function POST(req: NextRequest) {
   try {
     const { address, questId } = await req.json()
+    // Basic origin check (CSRF protection)
+    const allowedOrigin = process.env.NEXT_PUBLIC_SITE_ORIGIN
+    const origin = req.headers.get('origin') || ''
+    if (allowedOrigin && origin && origin !== allowedOrigin) {
+      return NextResponse.json({ error: 'invalid origin' }, { status: 403 })
+    }
+
+    // Simple in-memory rate limit per IP+day+quest
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'unknown'
+    const today = Math.floor(Date.now()/86400000)
+    const key = `${ip}:${address}:${questId}:${today}`
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ;(globalThis as any).__questLimiter = (globalThis as any).__questLimiter || new Map<string, number>()
+    const limiter: Map<string, number> = (globalThis as any).__questLimiter
+    const now = Date.now()
+    const last = limiter.get(key) || 0
+    if (now - last < 5_000) { // 5s cooldown for same IP/address/quest
+      return NextResponse.json({ error: 'rate limited' }, { status: 429 })
+    }
+    limiter.set(key, now)
     if (!address || typeof address !== 'string' || !address.startsWith('0x')) {
       return NextResponse.json({ error: 'invalid address' }, { status: 400 })
     }

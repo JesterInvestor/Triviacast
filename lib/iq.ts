@@ -13,6 +13,8 @@ export const QUEST_MANAGER_ABI = [
   { name: 'claimShare', type: 'function', stateMutability: 'nonpayable', inputs: [], outputs: [] },
   { name: 'claimDailyQuizPlay', type: 'function', stateMutability: 'nonpayable', inputs: [], outputs: [] },
   { name: 'claimDailyChallenge', type: 'function', stateMutability: 'nonpayable', inputs: [], outputs: [] },
+  { name: 'claimFollowJester', type: 'function', stateMutability: 'nonpayable', inputs: [], outputs: [] },
+  { name: 'claimDailyOneIQ', type: 'function', stateMutability: 'nonpayable', inputs: [], outputs: [] },
 ] as const
 
 export async function getIQPoints(user: `0x${string}`) {
@@ -35,7 +37,7 @@ export async function getLastClaimDay(user: `0x${string}`, questId: number) {
   }) as Promise<bigint>
 }
 
-async function writeQuest(functionName: 'claimShare' | 'claimDailyQuizPlay' | 'claimDailyChallenge') {
+async function writeQuest(functionName: 'claimShare' | 'claimDailyQuizPlay' | 'claimDailyChallenge' | 'claimFollowJester' | 'claimDailyOneIQ') {
   if (!QUEST_MANAGER_ADDRESS) throw new Error('QuestManager address not set')
   const hash = await writeContract(wagmiConfig, {
     address: QUEST_MANAGER_ADDRESS,
@@ -52,3 +54,5 @@ async function writeQuest(functionName: 'claimShare' | 'claimDailyQuizPlay' | 'c
 export const claimShare = () => writeQuest('claimShare')
 export const claimDailyQuizPlay = () => writeQuest('claimDailyQuizPlay')
 export const claimDailyChallenge = () => writeQuest('claimDailyChallenge')
+export const claimFollowJester = () => writeQuest('claimFollowJester')
+export const claimDailyOneIQ = () => writeQuest('claimDailyOneIQ')

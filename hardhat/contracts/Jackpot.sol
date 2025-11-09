@@ -28,6 +28,12 @@ interface ITriviaPoints {
     function getPoints(address wallet) external view returns (uint256);
 }
 
+// Optional extended interface check: if future TriviaPoints / IQPoints exposes a name or version, we can verify.
+// interface IExtendedPoints is intentionally minimal to avoid breaking existing deployments.
+interface IExtendedPoints is ITriviaPoints {
+    // function version() external view returns (string memory); // example for future-proofing
+}
+
 contract Jackpot is VRFConsumerBaseV2Plus {
     struct Tier { uint256 amount; uint16 bp; } // amount in TRIV token units, basis points out of 10_000 for odds
     struct PendingSpin { address player; bool settled; uint256 prize; }
@@ -82,6 +88,8 @@ contract Jackpot is VRFConsumerBaseV2Plus {
         uint256 _pointsThreshold
     ) VRFConsumerBaseV2Plus(_vrfCoordinator) {
         require(_vrfCoordinator != address(0) && _usdc != address(0) && _triv != address(0) && _triviaPoints != address(0) && _feeReceiver != address(0), "zero addr");
+        require(_price > 0, "price=0");
+        require(_pointsThreshold > 0, "threshold=0");
         subscriptionId = _subscriptionId;
         keyHash = _keyHash;
         usdc = IERC20(_usdc);
@@ -122,13 +130,15 @@ contract Jackpot is VRFConsumerBaseV2Plus {
 
     // Purchase spins upfront (USDC -> feeReceiver). Player must approve this contract to spend USDC.
     function buySpins(uint256 count) external {
-        require(count > 0, "count=0");
-        uint256 total = price * count;
+        // Restrict to exactly one spin per purchase to simplify UX and accounting
+        require(count == 1, "count must be 1");
+        require(price > 0, "price=0");
+        uint256 total = price; // exactly one
         bool ok = usdc.transferFrom(msg.sender, feeReceiver, total);
         if (!ok) revert PaymentFailed();
-        spinCredits[msg.sender] += count;
+        unchecked { spinCredits[msg.sender] += 1; }
         emit Paid(msg.sender, address(usdc), total);
-        emit SpinPurchased(msg.sender, count, total);
+        emit SpinPurchased(msg.sender, 1, total);
     }
 
     // Option A: Pay inside spin (no credits). Requires prior ERC20 approve at least `price`.
@@ -137,6 +147,8 @@ contract Jackpot is VRFConsumerBaseV2Plus {
         uint256 points = triviaPoints.getPoints(msg.sender);
         if (points < pointsThreshold) revert NotEligible();
         if (block.timestamp - lastSpinAt[msg.sender] < 1 days) revert TooSoon();
+        require(price > 0, "price=0");
+        require(pointsThreshold > 0, "threshold=0");
 
         // Payment per spin
         bool ok = usdc.transferFrom(msg.sender, feeReceiver, price);
@@ -167,6 +179,7 @@ contract Jackpot is VRFConsumerBaseV2Plus {
         uint256 points = triviaPoints.getPoints(msg.sender);
         if (points < pointsThreshold) revert NotEligible();
         if (block.timestamp - lastSpinAt[msg.sender] < 1 days) revert TooSoon();
+        require(pointsThreshold > 0, "threshold=0");
 
         // Consume one pre-paid credit
         uint256 credits = spinCredits[msg.sender];
