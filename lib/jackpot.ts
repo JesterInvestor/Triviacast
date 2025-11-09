@@ -236,6 +236,21 @@ export async function getUsdcToken() {
   }) as Promise<`0x${string}`>
 }
 
+// Preflight: simulate the USDC transferFrom as if called by the Jackpot contract.
+// This checks whether allowance/balance conditions are satisfied at the token level.
+export async function simulateUsdcPayment(usdc: `0x${string}`, owner: `0x${string}`, to: `0x${string}`, amount: bigint) {
+  // Note: This is an eth_call simulation; it does not change state.
+  // account is set to the Jackpot contract address, which is the spender in allowance[from][spender].
+  const { result } = await simulateContract(wagmiConfig, {
+    address: getAddress(usdc) as `0x${string}`,
+    abi: ERC20_ABI as any,
+    functionName: 'transferFrom',
+    args: [getAddress(owner) as `0x${string}`, getAddress(to) as `0x${string}`, amount],
+    account: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+  }) as unknown as { result: boolean }
+  return result
+}
+
 export function onSpinResult(cb: (args: { requestId: bigint; player: `0x${string}`; prize: bigint }) => void) {
   return watchContractEvent(wagmiConfig, {
     address: JACKPOT_ADDRESS,

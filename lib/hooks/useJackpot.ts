@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAccount, useChainId } from 'wagmi'
 import { getAddress } from 'viem'
 import { wagmiConfig } from '@/lib/wagmi'
-import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, buySpinNoSim, buySpinWithSim, getLastSpinAt, getPrice, getFeeReceiver, getUsdcToken } from '@/lib/jackpot'
+import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, buySpinNoSim, buySpinWithSim, getLastSpinAt, getPrice, getFeeReceiver, getUsdcToken, simulateUsdcPayment } from '@/lib/jackpot'
 import { readContract } from '@wagmi/core'
 
 export type JackpotState = {
@@ -59,6 +59,8 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
   const [contractUsdc, setContractUsdc] = useState<`0x${string}` | null>(null)
   const simulateDisabled = String(process.env.NEXT_PUBLIC_DISABLE_SIMULATE || '').toLowerCase() === 'true'
   const [usdcDecimals, setUsdcDecimals] = useState<number | null>(null)
+  const [preflightOk, setPreflightOk] = useState<boolean | null>(null)
+  const [preflightError, setPreflightError] = useState<string | null>(null)
   const unwatchRef = useRef<(() => void) | null>(null)
 
   // balances
@@ -146,6 +148,22 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     load();
     return () => { cancelled = true }
   }, [address])
+
+  // Preflight USDC transferFrom simulation (best-effort)
+  useEffect(() => {
+    let cancelled = false
+    async function run() {
+      if (!address || !feeReceiver || !contractPrice || !contractUsdc) { setPreflightOk(null); setPreflightError(null); return }
+      try {
+        const ok = await simulateUsdcPayment(contractUsdc, address, feeReceiver, contractPrice)
+        if (!cancelled) { setPreflightOk(ok); setPreflightError(null) }
+      } catch (e: any) {
+        if (!cancelled) { setPreflightOk(null); setPreflightError(e?.message || 'preflight failed') }
+      }
+    }
+    run()
+    return () => { cancelled = true }
+  }, [address, feeReceiver, contractPrice, contractUsdc])
 
   // on-chain lastSpinAt (for authoritative cooldown display)
   useEffect(() => {
@@ -312,6 +330,10 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
         if (/over rate limit|429|HTTP request failed|estimate/i.test(m)) {
           throw new Error('Preview not available right now (RPC rate-limited). You can still complete the purchase using the normal Buy button or Force Buy (no sim).')
         }
+        if (/execution reverted/i.test(m) && !/NotEligible|TooSoon|PaymentFailed|NoSubscription/.test(m)) {
+          // Likely low-level token transfer simulation quirk or non-decoded custom error
+          throw new Error('Preview reverted (unknown). This can happen when simulating USDC transferFrom. Actual transaction may still succeed; use Buy 1 or Force Buy to send.')
+        }
         throw e
       }
       setBuyTxHash(hash)
@@ -398,5 +420,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     contractUsdc,
     usdcDecimals,
     simulateDisabled,
+    preflightOk,
+    preflightError,
   }
 }

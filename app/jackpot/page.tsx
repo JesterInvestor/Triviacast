@@ -147,6 +147,7 @@ export default function JackpotPage() {
     contractUsdc,
     simulateDisabled,
   } = jackpot as any;
+    const { preflightOk, preflightError } = (jackpot as any);
   const priceUsdcDisplay = useMemo(() => {
     const units = contractPriceUnits ?? priceUnits;
     return (Number(units) / 10**USDC_DECIMALS).toFixed(2)
@@ -504,6 +505,8 @@ export default function JackpotPage() {
               <span>On-chain Last Spin:</span><span>{lastSpinAt ? new Date(Number(lastSpinAt)*1000).toLocaleTimeString() : '—'}</span>
               <span>Cooldown Active:</span><span>{String(spunWithin24h)}</span>
               <span>Next Spin:</span><span>{nextSpinAt ? new Date(nextSpinAt).toLocaleTimeString() : '—'}</span>
+              <span>Preflight USDC:</span><span>{preflightOk === null ? '—' : String(preflightOk)}</span>
+              <span>Preflight Error:</span><span className="truncate max-w-[140px]">{preflightError || '—'}</span>
             </div>
             <button onClick={()=>{localStorage.removeItem(LAST_SPIN_KEY_PREFIX + address); setLastSpinTs(null);}} className="mt-2 bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded">Reset Local Cooldown</button>
           </div>
