@@ -1,139 +1,215 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useAccount } from "wagmi";
-import dynamic from "next/dynamic";
 import { getWalletTotalPoints } from "@/lib/tpoints";
 
-// Dynamically import to ensure client-side only (library references window.innerWidth)
-const WheelComponent = dynamic<any>(
-  () => import("react-wheel-of-prizes").then((m: any) => m.default || m),
-  { ssr: false }
-);
-
-// Threshold to be eligible to spin
+// Config
 const REQUIRED_T_POINTS = 100_000;
-// LocalStorage key prefix
 const LAST_SPIN_KEY_PREFIX = "jackpot:lastSpin:";
 
-// Visual segments to render on the wheel (odds are enforced separately via winningSegment)
-const buildSegments = (): string[] => {
-  return [
-    "Better luck", "100 $TRIV", "1,000 $TRIV", "Better luck", "10,000 $TRIV", "Better luck",
-    "100 $TRIV", "Better luck", "1,000 $TRIV", "Better luck", "10,000 $TRIV", "Better luck",
-    "100 $TRIV", "Better luck", "1,000 $TRIV", "Better luck", "10,000,000 $TRIV JACKPOT", "Better luck",
-    "100 $TRIV", "Better luck", "1,000 $TRIV", "Better luck", "10,000 $TRIV", "Better luck"
-  ];
-};
-
-// Color palette repeated; length need not match segments exactly; mod applied in component
-const SEGMENT_COLORS = [
-  "#EE4040",
-  "#F0CF50",
-  "#815CD1",
-  "#3DA5E0",
-  "#34A24F",
-  "#F9AA1F",
-  "#EC3F3F",
-  "#FF9000"
+// Weighted prize table (basis points out of 10,000)
+const PRIZE_WEIGHTS: Array<{ label: string; value: number; bp: number }> = [
+  { label: "10,000,000 $TRIV JACKPOT", value: 10_000_000, bp: 1 },      // 0.01%
+  { label: "10,000 $TRIV", value: 10_000, bp: 49 },                    // 0.49%
+  { label: "1,000 $TRIV", value: 1_000, bp: 950 },                     // 9.5%
+  { label: "100 $TRIV", value: 100, bp: 3000 },                        // 30%
+  { label: "Better luck", value: 0, bp: 6000 }                         // 60%
 ];
 
-// Utility parse numeric prize value from segment text
-function parsePrizeValue(segment: string): number {
-  if (!segment.includes("$TRIV")) return 0;
-  const cleaned = segment.replace(/[^0-9,]/g, "").replace(/,/g, "");
-  return Number(cleaned) || 0;
+// Visual wheel slices (does not need to reflect weights exactly; winner forced)
+const WHEEL_SEGMENTS = [
+  "Better luck", "100 $TRIV", "1,000 $TRIV", "Better luck", "10,000 $TRIV", "Better luck",
+  "100 $TRIV", "Better luck", "1,000 $TRIV", "Better luck", "10,000 $TRIV", "Better luck",
+  "100 $TRIV", "Better luck", "1,000 $TRIV", "Better luck", "10,000,000 $TRIV JACKPOT", "Better luck"
+];
+
+// Colors repeated
+const SEGMENT_COLORS = ["#EE4040", "#F0CF50", "#815CD1", "#3DA5E0", "#34A24F", "#F9AA1F", "#EC3F3F", "#FF9000"]; // will mod index
+
+function pickWeightedPrize(): { label: string; value: number } {
+  const total = 10_000; // basis points
+  let r = Math.floor(Math.random() * total) + 1;
+  for (const p of PRIZE_WEIGHTS) {
+    if (r <= p.bp) return { label: p.label, value: p.value };
+    r -= p.bp;
+  }
+  return { label: "Better luck", value: 0 }; // fallback
 }
 
 export default function JackpotPage() {
   const { address } = useAccount();
   const [walletPoints, setWalletPoints] = useState<number | null>(null);
   const [lastSpinTs, setLastSpinTs] = useState<number | null>(null);
-  const [winner, setWinner] = useState<string | null>(null);
-  const [awarded, setAwarded] = useState<number>(0);
-  const [loadingPoints, setLoadingPoints] = useState(false);
-  const [forcedWinner, setForcedWinner] = useState<string | undefined>(undefined);
+  const [result, setResult] = useState<{ label: string; value: number } | null>(null);
+  const [forcedPrize, setForcedPrize] = useState<{ label: string; value: number } | null>(null);
+  const [spinning, setSpinning] = useState(false);
+  const [angle, setAngle] = useState(0); // radians current
+  const [startAngle] = useState(0);
+  const [spinStart, setSpinStart] = useState<number | null>(null);
+  const [finished, setFinished] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const size = 300; // radius
+  const upDuration = 1200; // ms accel
+  const downDuration = 4000; // ms decel
 
-  // Load wallet points
+  // Load points
   useEffect(() => {
     let cancelled = false;
-    async function loadPoints() {
-      if (!address) {
-        setWalletPoints(null);
-        return;
-      }
-      setLoadingPoints(true);
-      try {
-        const pts = await getWalletTotalPoints(address);
-        if (!cancelled) setWalletPoints(pts);
-      } finally {
-        if (!cancelled) setLoadingPoints(false);
-      }
+    async function load() {
+      if (!address) { setWalletPoints(null); return; }
+      const pts = await getWalletTotalPoints(address);
+      if (!cancelled) setWalletPoints(pts);
     }
-    loadPoints();
+    load();
     return () => { cancelled = true; };
   }, [address]);
 
-  // Load last spin timestamp from localStorage
+  // Load last spin ts
   useEffect(() => {
-    if (!address) {
-      setLastSpinTs(null);
-      return;
-    }
-    const raw = typeof window !== 'undefined' ? localStorage.getItem(LAST_SPIN_KEY_PREFIX + address) : null;
+    if (!address) { setLastSpinTs(null); return; }
+    const raw = localStorage.getItem(LAST_SPIN_KEY_PREFIX + address);
     setLastSpinTs(raw ? Number(raw) : null);
   }, [address]);
 
-  const now = Date.now();
-  const spunWithin24h = useMemo(() => {
-    if (!lastSpinTs) return false;
-    return now - lastSpinTs < 24 * 60 * 60 * 1000; // 24h
-  }, [lastSpinTs, now]);
+  const spunWithin24h = useMemo(() => lastSpinTs ? (Date.now() - lastSpinTs) < 24*60*60*1000 : false, [lastSpinTs]);
+  const hasEnough = (walletPoints || 0) >= REQUIRED_T_POINTS;
+  const eligible = !!address && hasEnough && !spunWithin24h;
 
-  const segments = useMemo(() => buildSegments(), []);
-
-  // Eligibility gating logic
-  const hasEnoughPoints = (walletPoints || 0) >= REQUIRED_T_POINTS;
-  const eligibleToSpin = !!address && hasEnoughPoints && !spunWithin24h;
-
-  // Weighted winner selection (per session/day, before spin)
+  // Pre-pick weighted prize when eligible (once per day)
   useEffect(() => {
-    if (!eligibleToSpin || forcedWinner) return;
-    // weights out of 10,000
-    const weights: Array<{ label: string; weight: number }> = [
-      { label: "10,000,000 $TRIV JACKPOT", weight: 1 }, // 0.01%
-      { label: "10,000 $TRIV", weight: 49 },            // 0.49%
-      { label: "1,000 $TRIV", weight: 950 },            // 9.5%
-      { label: "100 $TRIV", weight: 3000 },             // 30%
-      { label: "Better luck", weight: 6000 }            // 60%
-    ];
-    const total = weights.reduce((s, w) => s + w.weight, 0);
-    let r = Math.floor(Math.random() * total) + 1;
-    let chosen = weights[weights.length - 1].label;
-    for (const w of weights) {
-      if (r <= w.weight) { chosen = w.label; break; }
-      r -= w.weight;
+    if (eligible && !forcedPrize) {
+      setForcedPrize(pickWeightedPrize());
     }
-    setForcedWinner(chosen);
-  }, [eligibleToSpin, forcedWinner]);
+  }, [eligible, forcedPrize]);
 
-  const handleFinished = useCallback((segment: string) => {
-    setWinner(segment);
-    const prizeValue = parsePrizeValue(segment);
-    setAwarded(prizeValue);
-    // Record spin timestamp
-    if (address && typeof window !== 'undefined') {
+  // Draw wheel
+  const drawWheel = useCallback((ctx: CanvasRenderingContext2D, currentAngle: number) => {
+    const segments = WHEEL_SEGMENTS.length;
+    const centerX = size;
+    const centerY = size;
+    ctx.clearRect(0, 0, size*2, size*2);
+    ctx.lineWidth = 1;
+    const sliceAngle = (Math.PI * 2) / segments;
+    for (let i=0;i<segments;i++) {
+      const start = currentAngle + i*sliceAngle;
+      const end = start + sliceAngle;
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, size, start, end);
+      ctx.closePath();
+      ctx.fillStyle = SEGMENT_COLORS[i % SEGMENT_COLORS.length];
+      ctx.fill();
+      ctx.strokeStyle = "#2d1b2e";
+      ctx.stroke();
+      // Text
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(start + sliceAngle/2);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 14px Arial';
+      const label = WHEEL_SEGMENTS[i];
+      ctx.fillText(label.substring(0,20), size*0.55, 0);
+      ctx.restore();
+    }
+    // Center button circle
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 50, 0, Math.PI*2);
+    ctx.closePath();
+    ctx.fillStyle = '#2d1b2e';
+    ctx.fill();
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#FFE4EC';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(spinning ? 'Spinning' : eligible ? 'Spin' : 'Locked', centerX, centerY);
+    // Needle
+    ctx.beginPath();
+    ctx.moveTo(centerX - 20, centerY - size - 10);
+    ctx.lineTo(centerX + 20, centerY - size - 10);
+    ctx.lineTo(centerX, centerY - size - 50);
+    ctx.closePath();
+    ctx.fillStyle = '#2d1b2e';
+    ctx.fill();
+  }, [eligible, size, spinning]);
+
+  // Animation loop
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    let frame: number;
+    const startTs = spinStart;
+    const animate = (ts: number) => {
+      if (spinning && startTs) {
+        const elapsed = ts - startTs;
+        let localAngle = angle;
+        // Accel phase
+        if (elapsed < upDuration) {
+          const progress = elapsed / upDuration;
+          const speed = progress * 0.4; // radians per frame approx
+          localAngle += speed;
+        } else {
+          // Decel phase
+          const downElapsed = elapsed - upDuration;
+          if (downElapsed < downDuration) {
+            const progress = downElapsed / downDuration;
+            const speed = (1 - progress) * 0.4;
+            localAngle += speed;
+          } else {
+            // Finish: snap to forced prize
+            const finalIndex = WHEEL_SEGMENTS.findIndex(s => s === forcedPrize?.label);
+            if (finalIndex >= 0) {
+              const sliceAngle = (Math.PI*2)/WHEEL_SEGMENTS.length;
+              // Needle at top => angle offset so that selected segment center aligns with needle
+              const targetAngle = (Math.PI/2) - (finalIndex * sliceAngle + sliceAngle/2);
+              localAngle = targetAngle;
+            }
+            setSpinning(false);
+            setFinished(true);
+            setResult(forcedPrize || { label: 'Better luck', value: 0 });
+          }
+        }
+        setAngle(localAngle);
+        drawWheel(ctx, localAngle);
+      } else {
+        drawWheel(ctx, angle);
+      }
+      frame = requestAnimationFrame(animate);
+    };
+    drawWheel(ctx, angle);
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [angle, spinning, spinStart, drawWheel, forcedPrize]);
+
+  // Spin handler
+  const startSpin = useCallback(() => {
+    if (!eligible || spinning || finished) return;
+    setResult(null);
+    setFinished(false);
+    setSpinning(true);
+    setSpinStart(performance.now());
+    if (address) {
       localStorage.setItem(LAST_SPIN_KEY_PREFIX + address, String(Date.now()));
       setLastSpinTs(Date.now());
     }
-    // Dispatch custom event so other components could refresh points if on-chain awarding implemented later
-    if (prizeValue > 0) {
-      window.dispatchEvent(new CustomEvent('triviacast:jackpotWon', { detail: { address, prizeValue, segment } }));
-    }
-  }, [address]);
+  }, [eligible, spinning, finished, address]);
 
-  // Expected value comment (approximate): duplicates heavily favor small / no prize outcomes.
-  // NOTE: Actual awarding must be secured via a backend / smart contract to prevent client-side tampering.
+  // Click detection on center button
+  const handleCanvasClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = size;
+    const centerY = size;
+    const dist = Math.hypot(x - centerX, y - centerY);
+    if (dist <= 50) {
+      startSpin();
+    }
+  }, [startSpin]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center py-8">
@@ -141,76 +217,38 @@ export default function JackpotPage() {
         <div className="flex flex-col items-center gap-2 text-center">
           <img src="/brain-small.svg" alt="Brain" className="w-12 h-12 mb-1 drop-shadow" />
           <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e]">Jackpot</h1>
-          <p className="text-base sm:text-lg text-[#5a3d5c]">Spin the wheel for a chance at the 10,000,000 $TRIV JACKPOT!</p>
-          <p className="text-xs sm:text-sm text-[#7a567c]">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points. One spin per 24h per wallet.</p>
+          <p className="text-base sm:text-lg text-[#5a3d5c]">Spin for a chance at the 10,000,000 $TRIV JACKPOT!</p>
+          <p className="text-xs sm:text-sm text-[#7a567c]">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points. One spin per 24h.</p>
         </div>
-
-        <div className="relative flex flex-col items-center justify-center">
-          {/* Wheel */}
-          <div className={`transition filter ${eligibleToSpin ? '' : 'blur-sm'} `}>
-            <WheelComponent
-              segments={segments}
-              segColors={SEGMENT_COLORS}
-              winningSegment={forcedWinner || ""} // force odds via precomputed winner
-              onFinished={handleFinished}
-              primaryColor="#2d1b2e"
-              contrastColor="#FFE4EC"
-              buttonText={eligibleToSpin ? 'Spin' : 'Locked'}
-              isOnlyOnce={true}
-              size={290}
-              upDuration={100}
-              downDuration={1200}
-              fontFamily="Arial"
-            />
-          </div>
-
-          {/* Overlay messages when ineligible */}
-          {!eligibleToSpin && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-              {!address && (
-                <div className="bg-white/70 backdrop-blur-md rounded-lg p-4 border border-[#DC8291] shadow text-[#2d1b2e]">
-                  <p className="font-semibold">Connect a wallet to spin.</p>
-                </div>
-              )}
-              {address && !hasEnoughPoints && (
-                <div className="bg-white/70 backdrop-blur-md rounded-lg p-4 border border-[#DC8291] shadow text-[#2d1b2e] max-w-xs">
-                  <p className="font-semibold mb-1">Need {REQUIRED_T_POINTS.toLocaleString()} T Points.</p>
-                  <p>You have {(walletPoints || 0).toLocaleString()}.</p>
-                </div>
-              )}
-              {address && hasEnoughPoints && spunWithin24h && (
-                <div className="bg-white/70 backdrop-blur-md rounded-lg p-4 border border-[#DC8291] shadow text-[#2d1b2e] max-w-xs">
-                  <p className="font-semibold mb-1">Already spun today 🎡</p>
-                  {lastSpinTs && (
-                    <p className="text-xs">Next spin after {new Date(lastSpinTs + 24*60*60*1000).toLocaleTimeString()}</p>
-                  )}
-                </div>
-              )}
-              {loadingPoints && (
-                <div className="mt-4 text-xs text-[#5a3d5c]">Loading points...</div>
-              )}
+        <div className="relative">
+          <canvas
+            ref={canvasRef}
+            width={size*2}
+            height={size*2}
+            onClick={handleCanvasClick}
+            className={`rounded-full ${eligible ? '' : 'blur-sm'} transition`}
+          />
+          {!eligible && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              {!address && <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e]">Connect a wallet to spin.</div>}
+              {address && !hasEnough && <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e]">Need {REQUIRED_T_POINTS.toLocaleString()} T Points. You have {(walletPoints||0).toLocaleString()}.</div>}
+              {address && hasEnough && spunWithin24h && <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e]">Already spun. Next: {lastSpinTs && new Date(lastSpinTs + 24*60*60*1000).toLocaleTimeString()}</div>}
             </div>
           )}
         </div>
-
-        {/* Result */}
-        {winner && (
-          <div className="mt-4 w-full max-w-md bg-gradient-to-r from-[#FFE4EC] to-[#FFC4D1] rounded-lg p-4 border border-[#F4A6B7] shadow">
+        {result && (
+          <div className="mt-2 w-full max-w-md bg-gradient-to-r from-[#FFE4EC] to-[#FFC4D1] rounded-lg p-4 border border-[#F4A6B7] shadow">
             <h2 className="text-xl font-bold text-[#2d1b2e] mb-1">Result</h2>
-            {awarded > 0 ? (
-              <p className="text-[#5a3d5c]">You won <span className="font-bold text-[#DC8291]">{awarded.toLocaleString()} $TRIV</span> 🎉 (Front-end preview only)</p>
+            {result.value > 0 ? (
+              <p className="text-[#5a3d5c]">You won <span className="font-bold text-[#DC8291]">{result.value.toLocaleString()} $TRIV</span> 🎉 (UI only)</p>
             ) : (
-              <p className="text-[#5a3d5c]">{winner} — no prize this time.</p>
+              <p className="text-[#5a3d5c]">{result.label} — no prize this time.</p>
             )}
-            <p className="mt-2 text-xs text-[#7a567c]">Prizes must be issued by secure on-chain / backend logic (not implemented here).</p>
+            <p className="mt-2 text-xs text-[#7a567c]">Secure awarding not implemented. Use a contract call or backend signature flow.</p>
           </div>
         )}
-
-        <div className="mt-6 text-xs text-center text-[#7a567c] max-w-xl">
-          <p>
-            Odds are weighted by segment duplication. Jackpot is intentionally very rare. This UI does not perform any on-chain distribution yet. Implement a
-            trusted flow (e.g. contract function or signed backend grant) before production use.
-          </p>
+        <div className="mt-4 text-xs text-center text-[#7a567c] max-w-xl">
+          <p>Jackpot odds are enforced client-side by weighted selection before animation. For production, move selection + award on-chain or server-side and verify eligibility to prevent tampering.</p>
         </div>
       </div>
     </div>
