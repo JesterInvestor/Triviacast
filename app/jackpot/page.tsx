@@ -38,6 +38,7 @@ export default function JackpotPage() {
   const { address } = useAccount();
   const [walletPoints, setWalletPoints] = useState<number | null>(null);
   const [lastSpinTs, setLastSpinTs] = useState<number | null>(null);
+  const [showDebug, setShowDebug] = useState<boolean>(false);
   const [result, setResult] = useState<{ label: string; value: number } | null>(null);
   // forcedPrize is provided by hook now
   const [spinning, setSpinning] = useState(false);
@@ -83,6 +84,8 @@ export default function JackpotPage() {
     buySpins,
     jackpotAddrValid,
     lastSpinAt,
+    balanceError,
+    allowanceError,
   } = jackpot as any;
   const approveLink = useExplorerTxUrl(approveTxHash);
   const spinLink = useExplorerTxUrl(spinTxHash);
@@ -295,6 +298,10 @@ export default function JackpotPage() {
               disabled={!canRequestSpin || spinning}
             >{spinning ? 'Spinning…' : 'Spin Now'}</button>
           )}
+          <button
+            onClick={(e)=>{e.stopPropagation(); setShowDebug(d=>!d);}}
+            className="bg-[#2d1b2e]/70 text-[#FFE4EC] px-3 py-1 rounded text-[11px]"
+          >Debug</button>
         </div>
       )}
       {/* Persistent credits badge */}
@@ -328,6 +335,32 @@ export default function JackpotPage() {
         </div>
       )}
       <div className="container mx-auto px-3 sm:px-4 flex flex-col items-center gap-6 w-full">
+        {showDebug && (
+          <div className="w-full max-w-xl text-[10px] bg-white/70 backdrop-blur border border-[#DC8291] rounded p-2 text-[#2d1b2e] flex flex-col gap-1">
+            <div className="font-semibold text-[11px]">Debug State</div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+              <span>Jackpot Addr Valid:</span><span>{String(jackpotAddrValid)}</span>
+              <span>USDC Balance:</span><span>{usdcBalance !== null ? usdcBalance.toString() : 'null'} {balanceError && '(err)'}</span>
+              <span>Balance Error:</span><span className="truncate max-w-[140px]">{balanceError||'—'}</span>
+              <span>Allowance:</span><span>{usdcAllowance !== null ? usdcAllowance.toString() : 'null'} {allowanceError && '(err)'}</span>
+              <span>Allowance Error:</span><span className="truncate max-w-[140px]">{allowanceError||'—'}</span>
+              <span>Has Allowance:</span><span>{String(hasAllowanceForSpin)}</span>
+              <span>Can Approve:</span><span>{String(canApprove)}</span>
+              <span>Can Request Spin:</span><span>{String(canRequestSpin)}</span>
+              <span>Credits:</span><span>{credits !== null ? credits.toString() : 'null'}</span>
+              <span>Approving:</span><span>{String(approving)}</span>
+              <span>Buying:</span><span>{String(buying)}</span>
+              <span>SpinConfirming:</span><span>{String(spinConfirming)}</span>
+              <span>WaitingVRF:</span><span>{String(waitingVRF)}</span>
+              <span>Forced Prize:</span><span>{forcedPrize ? forcedPrize.label : '—'}</span>
+              <span>Local Last Spin:</span><span>{lastSpinTs ? new Date(lastSpinTs).toLocaleTimeString() : '—'}</span>
+              <span>On-chain Last Spin:</span><span>{lastSpinAt ? new Date(Number(lastSpinAt)*1000).toLocaleTimeString() : '—'}</span>
+              <span>Cooldown Active:</span><span>{String(spunWithin24h)}</span>
+              <span>Next Spin:</span><span>{nextSpinAt ? new Date(nextSpinAt).toLocaleTimeString() : '—'}</span>
+            </div>
+            <button onClick={()=>{localStorage.removeItem(LAST_SPIN_KEY_PREFIX + address); setLastSpinTs(null);}} className="mt-2 bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded">Reset Local Cooldown</button>
+          </div>
+        )}
         <div className="flex flex-col items-center gap-2 text-center">
           <img src="/brain-small.svg" alt="Brain" className="w-12 h-12 mb-1 drop-shadow" />
           <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e]">Jackpot</h1>

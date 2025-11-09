@@ -8,6 +8,8 @@ export type JackpotState = {
   address?: `0x${string}`
   usdcBalance: bigint | null
   usdcAllowance: bigint | null
+  balanceError: string | null
+  allowanceError: string | null
   approving: boolean
   approveError: string | null
   approveTxHash: `0x${string}` | null
@@ -40,6 +42,8 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
   const { address } = useAccount()
   const [usdcBalance, setUsdcBalance] = useState<bigint | null>(null)
   const [usdcAllowance, setUsdcAllowance] = useState<bigint | null>(null)
+  const [balanceError, setBalanceError] = useState<string | null>(null)
+  const [allowanceError, setAllowanceError] = useState<string | null>(null)
   const [approving, setApproving] = useState(false)
   const [approveError, setApproveError] = useState<string | null>(null)
   const [approveTxHash, setApproveTxHash] = useState<`0x${string}` | null>(null)
@@ -67,8 +71,8 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
           functionName: 'balanceOf',
           args: [address]
         }) as bigint
-        if (!cancelled) setUsdcBalance(bal)
-      } catch { if (!cancelled) setUsdcBalance(null) }
+        if (!cancelled) { setUsdcBalance(bal); setBalanceError(null) }
+      } catch (e: any) { if (!cancelled) { setUsdcBalance(null); setBalanceError(e?.message || 'Balance fetch failed') } }
     }
     load();
     return () => { cancelled = true }
@@ -81,8 +85,8 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
       if (!address) { setUsdcAllowance(null); return }
       try {
         const alw = await getUsdcAllowance(params.usdcAddress, address)
-        if (!cancelled) setUsdcAllowance(alw)
-      } catch { if (!cancelled) setUsdcAllowance(null) }
+        if (!cancelled) { setUsdcAllowance(alw); setAllowanceError(null) }
+      } catch (e: any) { if (!cancelled) { setUsdcAllowance(null); setAllowanceError(e?.message || 'Allowance fetch failed') } }
     }
     load();
     return () => { cancelled = true }
@@ -234,5 +238,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     buySpins,
     jackpotAddrValid,
     lastSpinAt,
+    balanceError,
+    allowanceError,
   }
 }
