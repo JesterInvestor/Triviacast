@@ -93,7 +93,8 @@ export default function JackpotPage() {
     doApprove,
     requestSpin,
     buyOneSpin,
-    buySpins,
+  buySpins,
+  approveAmount,
     jackpotAddrValid,
     lastSpinAt,
     balanceError,
@@ -307,13 +308,29 @@ export default function JackpotPage() {
       {/* Action bar for accessibility / alternative to center click */}
       {eligible && (
         <div className="mb-4 flex flex-wrap gap-2 items-center justify-center w-full px-4">
-          {!hasAllowanceForSpin && !approving && (
-            <button
-              onClick={(e)=>{e.stopPropagation(); if (!approving) doApprove();}}
-              className="bg-[#2d1b2e] text-[#FFE4EC] px-4 py-2 rounded shadow disabled:opacity-50 text-sm"
-              disabled={approving || !canApprove}
-            >{approving ? 'Approving…' : 'Approve USDC'}</button>
-          )}
+              {!hasAllowanceForSpin && !approving && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e)=>{e.stopPropagation(); if (!approving) doApprove();}}
+                    className="bg-[#2d1b2e] text-[#FFE4EC] px-4 py-2 rounded shadow disabled:opacity-50 text-sm"
+                    disabled={approving || !canApprove}
+                  >{approving ? 'Approving…' : `Approve ${priceUsdcDisplay} USDC`}</button>
+                  <div className="flex gap-1 flex-wrap">
+                    {[0.5,2.5,5,10,25,50].map(v => {
+                      const units = BigInt(Math.round(v * 10 ** USDC_DECIMALS))
+                      return (
+                        <button
+                          key={v}
+                          disabled={approving}
+                          onClick={(e)=>{e.stopPropagation(); approveAmount(units);}}
+                          className="text-[10px] bg-[#DC8291] hover:bg-[#c86e7c] disabled:opacity-50 px-2 py-1 rounded"
+                          title={`Approve ${v.toFixed(2)} USDC`}
+                        >{v}</button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
           {!jackpotAddrValid && (
             <span className="text-[11px] text-red-600">Missing NEXT_PUBLIC_JACKPOT_ADDRESS</span>
           )}
@@ -403,20 +420,10 @@ export default function JackpotPage() {
           <img src="/brain-small.svg" alt="Brain" className="w-12 h-12 mb-1 drop-shadow" />
           <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e]">Jackpot</h1>
           <p className="text-base sm:text-lg text-[#5a3d5c]">Spin for a chance at the 10,000,000 $TRIV JACKPOT!</p>
-          <p className="text-xs sm:text-sm text-[#7a567c]">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points + pays {priceUsdcDisplay} USDC (approve then spin). One spin per 24h.
-            <span
-              className="ml-1 align-middle inline-flex items-center relative group cursor-help"
-              aria-label="One spin every 24 hours per wallet; cooldown starts when VRF fulfills. Credits persist until used."
-            >
-              <span className="w-4 h-4 flex items-center justify-center rounded-full bg-[#DC8291] text-[#FFE4EC] text-[10px] font-bold select-none">?</span>
-              <span
-                role="tooltip"
-                className="hidden group-hover:block group-focus:block absolute left-1/2 -translate-x-1/2 mt-2 w-60 bg-[#2d1b2e] text-[#FFE4EC] text-[10px] leading-snug px-2 py-2 rounded shadow-lg z-20"
-              >
-                You can spin once every 24h per wallet. The cooldown resets when your last spin’s VRF result arrives (SpinResult).<br/><br/>Buy multiple spin credits anytime; unused credits remain until you use them.
-              </span>
-            </span>
-          </p>
+          <p className="text-xs sm:text-sm text-[#7a567c]">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points + pays {priceUsdcDisplay} USDC (approve then spin).</p>
+          <div className="text-[11px] sm:text-xs text-[#2d1b2e] bg-white/70 backdrop-blur px-3 py-2 rounded border border-[#F4A6B7] max-w-[640px]">
+            <span className="font-semibold">Note:</span> One spin every 24 hours per wallet. The cooldown resets when your last spin’s VRF result arrives. Unused spin credits persist until you use them.
+          </div>
           {spunWithin24h && nextSpinAt && (
             <p className="text-[11px] text-[#DC8291]">Cooldown active · Next spin: {new Date(nextSpinAt).toLocaleTimeString()}</p>
           )}
@@ -456,11 +463,12 @@ export default function JackpotPage() {
           )}
           {eligible && !approving && !hasAllowanceForSpin && (
             <div className="absolute inset-0 flex items-start justify-end p-2 pointer-events-none">
-              <div className="bg-white/80 backdrop-blur px-3 py-2 rounded border border-[#DC8291] text-[#2d1b2e] max-w-[220px] shadow">
-                <p className="font-semibold text-sm">Approve {priceUsdcDisplay} USDC</p>
+              <div className="bg-white/80 backdrop-blur px-3 py-2 rounded border border-[#DC8291] text-[#2d1b2e] max-w-[260px] shadow">
+                <p className="font-semibold text-sm">Approve USDC for spins</p>
+                <p className="text-[11px]">Current needed: {priceUsdcDisplay} USDC (per spin)</p>
                 <p className="text-[11px]">Balance: {usdcBalance !== null ? (Number(usdcBalance) / 10**USDC_DECIMALS).toFixed(2) : '…'} USDC</p>
                 {approveError && <p className="mt-1 text-[11px] text-red-600">{approveError}</p>}
-                <p className="mt-1 text-[10px] text-[#7a567c]">Tap the center to approve, then tap again to spin.</p>
+                <p className="mt-1 text-[10px] text-[#7a567c]">Use quick approve buttons above to set higher allowance (0.5–50 USDC) then buy spins.</p>
               </div>
             </div>
           )}

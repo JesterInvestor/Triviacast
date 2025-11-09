@@ -181,6 +181,27 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     } finally { setApproving(false) }
   }, [canApprove, address, params.usdcAddress, effectivePrice])
 
+  // Custom approve arbitrary amount (in USDC smallest units) for multi-buy convenience
+  const approveAmount = useCallback(async (amount: bigint) => {
+    if (!address) return
+    setApproveError(null)
+    setApproving(true)
+    try {
+      const usdcAddr = getAddress(params.usdcAddress)
+      const ownerAddr = getAddress(address)
+      const hash = await approveUsdc(usdcAddr as `0x${string}`, ownerAddr as `0x${string}`, amount)
+      setApproveTxHash(hash)
+      try {
+        const { waitForTransactionReceipt } = await import('@wagmi/core')
+        await waitForTransactionReceipt(wagmiConfig, { hash })
+      } catch {}
+      const alw = await getUsdcAllowance(usdcAddr as `0x${string}`, ownerAddr as `0x${string}`)
+      setUsdcAllowance(alw)
+    } catch (e: any) {
+      setApproveError(e?.message || 'Approve failed')
+    } finally { setApproving(false) }
+  }, [address, params.usdcAddress])
+
   const buyOneSpin = useCallback(async () => {
     return buySpins(1n)
   }, [])
@@ -282,6 +303,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     requestSpin,
     buyOneSpin,
     buySpins,
+  approveAmount,
     jackpotAddrValid,
     lastSpinAt,
     balanceError,
