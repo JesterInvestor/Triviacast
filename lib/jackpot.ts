@@ -126,7 +126,7 @@ export async function approveUsdc(usdc: `0x${string}`, owner: `0x${string}`, amo
       functionName: 'approve',
       args: [getAddress(JACKPOT_ADDRESS) as `0x${string}`, amount],
       account: ownerAddr as `0x${string}`,
-      chain: base,
+      chainId: base.id,
       ...await getBumpedFees()
     })
   }
@@ -136,7 +136,7 @@ export async function approveUsdc(usdc: `0x${string}`, owner: `0x${string}`, amo
     functionName: 'approve',
     args: [getAddress(JACKPOT_ADDRESS) as `0x${string}`, amount],
     account: ownerAddr as `0x${string}`,
-    chain: base
+    chainId: base.id
   })
   const fees = await getBumpedFees()
   return writeContract(wagmiConfig, {
@@ -145,7 +145,7 @@ export async function approveUsdc(usdc: `0x${string}`, owner: `0x${string}`, amo
     functionName: 'approve',
     args: [getAddress(JACKPOT_ADDRESS) as `0x${string}`, amount],
     account: ownerAddr as `0x${string}`,
-    chain: base,
+    chainId: base.id,
     ...(request && (request as any).gas ? { gas: (request as any).gas as bigint } : {}),
     ...fees
   } as any)
@@ -171,7 +171,7 @@ export async function spinJackpot(owner: `0x${string}`) {
       functionName: 'spin',
       args: [],
       account: ownerAddr as `0x${string}`,
-      chain: base,
+      chainId: base.id,
       ...await getBumpedFees()
     })
   }
@@ -181,7 +181,7 @@ export async function spinJackpot(owner: `0x${string}`) {
     functionName: 'spin',
     args: [],
     account: ownerAddr as `0x${string}`,
-    chain: base
+    chainId: base.id
   })
   const fees = await getBumpedFees()
   return writeContract(wagmiConfig, {
@@ -190,7 +190,7 @@ export async function spinJackpot(owner: `0x${string}`) {
     functionName: 'spin',
     args: [],
     account: ownerAddr as `0x${string}`,
-    chain: base,
+    chainId: base.id,
     ...(request && (request as any).gas ? { gas: (request as any).gas as bigint } : {}),
     ...fees
   } as any)
@@ -205,7 +205,7 @@ export async function spinPaying(owner: `0x${string}`) {
       functionName: 'spinPaying',
       args: [],
       account: ownerAddr as `0x${string}`,
-      chain: base,
+      chainId: base.id,
       ...await getBumpedFees()
     })
   }
@@ -215,7 +215,7 @@ export async function spinPaying(owner: `0x${string}`) {
     functionName: 'spinPaying',
     args: [],
     account: ownerAddr as `0x${string}`,
-    chain: base
+    chainId: base.id
   })
   const fees = await getBumpedFees()
   return writeContract(wagmiConfig, {
@@ -224,7 +224,7 @@ export async function spinPaying(owner: `0x${string}`) {
     functionName: 'spinPaying',
     args: [],
     account: ownerAddr as `0x${string}`,
-    chain: base,
+    chainId: base.id,
     ...(request && (request as any).gas ? { gas: (request as any).gas as bigint } : {}),
     ...fees
   } as any)
@@ -239,7 +239,7 @@ export async function buySpin(owner: `0x${string}`, count: bigint = 1n) {
       functionName: 'buySpins',
       args: [count],
       account: ownerAddr as `0x${string}`,
-      chain: base,
+      chainId: base.id,
       ...await getBumpedFees()
     })
   }
@@ -249,7 +249,7 @@ export async function buySpin(owner: `0x${string}`, count: bigint = 1n) {
     functionName: 'buySpins',
     args: [count],
     account: ownerAddr as `0x${string}`,
-    chain: base
+    chainId: base.id
   })
   const fees = await getBumpedFees()
   return writeContract(wagmiConfig, {
@@ -258,7 +258,7 @@ export async function buySpin(owner: `0x${string}`, count: bigint = 1n) {
     functionName: 'buySpins',
     args: [count],
     account: ownerAddr as `0x${string}`,
-    chain: base,
+    chainId: base.id,
     ...(request && (request as any).gas ? { gas: (request as any).gas as bigint } : {}),
     ...fees
   } as any)
@@ -273,7 +273,7 @@ export async function buySpinNoSim(owner: `0x${string}`, count: bigint = 1n) {
     functionName: 'buySpins',
     args: [count],
     account: ownerAddr as `0x${string}`,
-    chain: base,
+    chainId: base.id,
     ...await getBumpedFees()
   })
 }
@@ -287,7 +287,7 @@ export async function buySpinWithSim(owner: `0x${string}`, count: bigint = 1n) {
     functionName: 'buySpins',
     args: [count],
     account: ownerAddr as `0x${string}`,
-    chain: base
+    chainId: base.id
   })
   const fees = await getBumpedFees()
   return writeContract(wagmiConfig, {
@@ -296,7 +296,7 @@ export async function buySpinWithSim(owner: `0x${string}`, count: bigint = 1n) {
     functionName: 'buySpins',
     args: [count],
     account: ownerAddr as `0x${string}`,
-    chain: base,
+    chainId: base.id,
     ...(request && (request as any).gas ? { gas: (request as any).gas as bigint } : {}),
     ...fees
   } as any)
@@ -309,7 +309,7 @@ export async function getSpinCredits(user: `0x${string}`) {
     abi: JACKPOT_ABI as any,
     functionName: 'spinCredits',
     args: [userAddr as `0x${string}`],
-    chain: base
+    chainId: base.id
   }) as Promise<bigint>
 }
 
@@ -320,7 +320,7 @@ export async function getLastSpinAt(user: `0x${string}`) {
     abi: JACKPOT_ABI as any,
     functionName: 'lastSpinAt',
     args: [userAddr as `0x${string}`],
-    chain: base
+    chainId: base.id
   }) as Promise<bigint>
 }
 
@@ -330,7 +330,7 @@ export async function getPrice() {
     abi: JACKPOT_ABI as any,
     functionName: 'price',
     args: [],
-    chain: base
+    chainId: base.id
   }) as Promise<bigint>
 }
 
@@ -340,7 +340,7 @@ export async function getFeeReceiver() {
     abi: JACKPOT_ABI as any,
     functionName: 'feeReceiver',
     args: [],
-    chain: base
+    chainId: base.id
   }) as Promise<`0x${string}`>
 }
 
@@ -350,7 +350,7 @@ export async function getUsdcToken() {
     abi: JACKPOT_ABI as any,
     functionName: 'usdc',
     args: [],
-    chain: base
+    chainId: base.id
   }) as Promise<`0x${string}`>
 }
 
@@ -365,7 +365,7 @@ export async function simulateUsdcPayment(usdc: `0x${string}`, owner: `0x${strin
     functionName: 'transferFrom',
     args: [getAddress(owner) as `0x${string}`, getAddress(to) as `0x${string}`, amount],
     account: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
-    chain: base,
+    chainId: base.id,
   }) as unknown as { result: boolean }
   return result
 }
@@ -375,7 +375,7 @@ export function onSpinResult(cb: (args: { requestId: bigint; player: `0x${string
     address: JACKPOT_ADDRESS,
     abi: JACKPOT_ABI as any,
     eventName: 'SpinResult',
-    chain: base,
+    chainId: base.id,
     onLogs: (logs) => {
       for (const log of logs as any[]) {
         const [requestId, player, prize] = log.args as [bigint, `0x${string}`, bigint]

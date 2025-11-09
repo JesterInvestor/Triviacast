@@ -32,7 +32,7 @@ export async function getIQPoints(user: `0x${string}`) {
     abi: IQPOINTS_ABI as any,
     functionName: 'getPoints',
     args: [user],
-    chain: base
+    chainId: base.id
   }) as Promise<bigint>
 }
 
@@ -47,7 +47,7 @@ export async function getLastClaimDay(user: `0x${string}`, questId: number) {
     abi: QUEST_MANAGER_ABI as any,
     functionName: 'lastClaimDay',
     args: [user, questId],
-    chain: base
+    chainId: base.id
   }) as Promise<bigint>
   _cache.set(key, { v: await v, t: now })
   return v
@@ -64,7 +64,7 @@ export async function getQuizPlayedDay(user: `0x${string}`) {
     abi: QUEST_MANAGER_ABI as any,
     functionName: 'quizPlayedDay',
     args: [user],
-    chain: base
+    chainId: base.id
   }) as Promise<bigint>
   _cache.set(key, { v: await v, t: now })
   return v
@@ -81,7 +81,7 @@ export async function getFriendSearchedDay(user: `0x${string}`) {
     abi: QUEST_MANAGER_ABI as any,
     functionName: 'friendSearchedDay',
     args: [user],
-    chain: base
+    chainId: base.id
   }) as Promise<bigint>
   _cache.set(key, { v: await v, t: now })
   return v
@@ -94,7 +94,7 @@ export async function markQuizPlayedForToday(user: `0x${string}`) {
     abi: QUEST_MANAGER_ABI as any,
     functionName: 'markQuizPlayedForToday',
     args: [user],
-    chain: base
+    chainId: base.id
   })
   try { await waitForTransactionReceipt(wagmiConfig, { hash }) } catch {}
   // Invalidate cache entries related to this user
@@ -109,7 +109,7 @@ export async function markFriendSearchedForToday(user: `0x${string}`) {
     abi: QUEST_MANAGER_ABI as any,
     functionName: 'markFriendSearchedForToday',
     args: [user],
-    chain: base
+    chainId: base.id
   })
   try { await waitForTransactionReceipt(wagmiConfig, { hash }) } catch {}
   _cache.delete(`fsd:${QUEST_MANAGER_ADDRESS}:${user}`)
@@ -123,7 +123,7 @@ async function writeQuest(functionName: 'claimShare' | 'claimDailyQuizPlay' | 'c
     abi: QUEST_MANAGER_ABI as any,
     functionName,
     args: [],
-    chain: base
+    chainId: base.id
   })
   try {
     await waitForTransactionReceipt(wagmiConfig, { hash })
