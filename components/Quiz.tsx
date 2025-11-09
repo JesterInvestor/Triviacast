@@ -95,8 +95,14 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     if (!quizState.quizCompleted) return;
     // Minimal client-side completion flag for quests gating
     try {
-      const today = Math.floor(Date.now()/86400_000);
-      localStorage.setItem('triviacast:lastQuizCompletedDay', String(today));
+      if (accountAddress) {
+        // Call server endpoint to mark quiz played on-chain (relayer)
+        fetch('/api/quests/mark-quiz-played', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ address: accountAddress })
+        }).catch(() => {});
+      }
       window.dispatchEvent(new Event('triviacast:quizCompleted'));
     } catch {}
     try {

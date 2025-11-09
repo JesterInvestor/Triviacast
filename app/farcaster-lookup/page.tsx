@@ -5,6 +5,7 @@ import ShareButton from '@/components/ShareButton';
 import { buildPlatformShareUrl } from '@/lib/farcaster';
 import { useState } from 'react';
 import Quiz from '@/components/Quiz';
+import { useAccount } from 'wagmi';
 import { ProfileCard } from '@/components/ProfileCard';
 import { NeynarCastCard } from '@/components/NeynarCastCard';
 import NeynarUserDropdown from '@/components/NeynarUserDropdown';
@@ -34,6 +35,7 @@ type LookupResult = {
 } | null;
 
 export default function FarcasterLookupPage() {
+  const { address } = useAccount();
   const [username, setUsername] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<LookupResult>(null);
@@ -69,6 +71,18 @@ export default function FarcasterLookupPage() {
       } else {
         setResult(data);
       }
+
+      // Mark friend search on-chain (relayer API)
+      try {
+        if (address) {
+          fetch('/api/quests/mark-friend-searched', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ address })
+          }).catch(() => {});
+        }
+        window.dispatchEvent(new Event('triviacast:friendSearched'));
+      } catch {}
     } catch (err: unknown) {
       const e = err as { message?: string } | null;
       setError(e?.message || 'unknown error');

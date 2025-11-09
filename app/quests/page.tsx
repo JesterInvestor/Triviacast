@@ -3,31 +3,50 @@
 import { useAccount } from 'wagmi';
 import { useIQPoints } from '@/lib/hooks/useIQPoints';
 import { useQuestIQ } from '@/lib/hooks/useQuestIQ';
+import { getFriendSearchedDay, getQuizPlayedDay } from '@/lib/iq';
 import { useEffect, useState } from 'react';
 
 // Minimal client-side flag: set localStorage 'triviacast:lastQuizCompletedDay' when quiz finishes.
 // We'll read it here to decide if Daily Quiz Play claim is enabled.
 
-function useQuizCompletedToday() {
+function useQuizCompletedTodayOnChain(user?: `0x${string}`) {
   const [completed, setCompleted] = useState(false);
   useEffect(() => {
-    const today = Math.floor(Date.now()/86400_000); // ms -> days
-    try {
-      const v = localStorage.getItem('triviacast:lastQuizCompletedDay');
-      if (!v) { setCompleted(false); return; }
-      setCompleted(parseInt(v,10) === today);
-    } catch { setCompleted(false); }
-    const listener = () => {
-      const t = Math.floor(Date.now()/86400_000);
+    if (!user) { setCompleted(false); return }
+    let cancelled = false
+    const refresh = async () => {
       try {
-        const vv = localStorage.getItem('triviacast:lastQuizCompletedDay');
-        setCompleted(!!vv && parseInt(vv,10) === t);
-      } catch {}
-    };
-    window.addEventListener('triviacast:quizCompleted', listener);
-    return () => window.removeEventListener('triviacast:quizCompleted', listener);
-  }, []);
-  return completed;
+        const day = await getQuizPlayedDay(user)
+        const today = BigInt(Math.floor(Date.now()/86400_000))
+        if (!cancelled) setCompleted(day === today)
+      } catch { if (!cancelled) setCompleted(false) }
+    }
+    refresh()
+    const listener = () => refresh()
+    window.addEventListener('triviacast:quizCompleted', listener)
+    return () => { cancelled = true; window.removeEventListener('triviacast:quizCompleted', listener) }
+  }, [user])
+  return completed
+}
+
+function useFriendSearchedTodayOnChain(user?: `0x${string}`) {
+  const [completed, setCompleted] = useState(false);
+  useEffect(() => {
+    if (!user) { setCompleted(false); return }
+    let cancelled = false
+    const refresh = async () => {
+      try {
+        const day = await getFriendSearchedDay(user)
+        const today = BigInt(Math.floor(Date.now()/86400_000))
+        if (!cancelled) setCompleted(day === today)
+      } catch { if (!cancelled) setCompleted(false) }
+    }
+    refresh()
+    const listener = () => refresh()
+    window.addEventListener('triviacast:friendSearched', listener)
+    return () => { cancelled = true; window.removeEventListener('triviacast:friendSearched', listener) }
+  }, [user])
+  return completed
 }
 
 interface QuestCardProps {
@@ -70,7 +89,8 @@ export default function QuestsPage() {
   const gasless = process.env.NEXT_PUBLIC_QUEST_GASLESS === 'true';
   const [inlineError, setInlineError] = useState<string | null>(null);
   const { claimedShare, claimedQuizPlay, claimedChallenge, claimedFollowJester, claimedOneIQ, claimShare, claimDailyQuizPlay, claimDailyChallenge, claimFollowJester, claimDailyOneIQ, loading, error, secondsUntilReset } = useQuestIQ(address as `0x${string}` | undefined);
-  const quizCompletedToday = useQuizCompletedToday();
+  const quizCompletedToday = useQuizCompletedTodayOnChain(address as `0x${string}` | undefined);
+  const friendSearchedToday = useFriendSearchedTodayOnChain(address as `0x${string}` | undefined);
   const resetHours = Math.floor(secondsUntilReset / 3600);
   const resetMinutes = Math.floor((secondsUntilReset % 3600) / 60);
   const resetSeconds = secondsUntilReset % 60;
@@ -124,10 +144,10 @@ export default function QuestsPage() {
           <QuestCard
             title="Daily Challenge"
             emoji="🔥"
-            description="Harder multi-step task (placeholder)."
+            description="Search a friend and play a quiz today, then claim your reward."
             reward="10,000 iQ"
             claimed={claimedChallenge}
-            disabled={claimedChallenge || !address || !!error}
+            disabled={claimedChallenge || !address || !!error || !(friendSearchedToday && quizCompletedToday)}
             onClaim={async () => {
               setInlineError(null);
               if (gasless && address) {
@@ -138,12 +158,20 @@ export default function QuestsPage() {
             }}
             loading={loading}
           />
+          {/* Helper links for completing the challenge steps */}
+          <div className="-mt-2 mb-2 text-xs text-[#5a3d5c] flex items-center gap-3">
+            <a href="/farcaster-lookup" className="underline decoration-dotted underline-offset-2 hover:decoration-solid">Find a Friend</a>
+            <span>•</span>
+            <a href="/" className="underline decoration-dotted underline-offset-2 hover:decoration-solid">Play Quiz</a>
+            {!friendSearchedToday && <span className="text-red-600">(friend not searched yet)</span>}
+            {!quizCompletedToday && <span className="text-red-600">(quiz not completed yet)</span>}
+          </div>
 
           <QuestCard
             title="Follow @jesterinvestor"
             emoji="👤"
             description="Follow @jesterinvestor on Farcaster (manual trust now)."
-            reward="5 iQ"
+            reward="5,000 iQ"
             claimed={claimedFollowJester}
             disabled={claimedFollowJester || !address || !!error}
             onClaim={async () => {
@@ -154,11 +182,14 @@ export default function QuestsPage() {
               try {
                 window.dispatchEvent(new Event('triviacast:questClaimed'));
                 window.dispatchEvent(new Event('triviacast:iqUpdated'));
-                window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+5 iQ claimed' } }));
+                window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+5,000 iQ claimed' } }));
               } catch {}
             }}
             loading={loading}
           />
+          <div className="text-xs -mt-3 mb-4 text-[#5a3d5c]">
+            <a href="https://farcaster.xyz/jesterinvestor" target="_blank" rel="noopener noreferrer" className="underline decoration-dotted underline-offset-2 hover:decoration-solid">Follow @jesterinvestor</a> to enable this quest.
+          </div>
 
           <QuestCard
             title="Daily +1 iQ"

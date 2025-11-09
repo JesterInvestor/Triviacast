@@ -10,11 +10,15 @@ export const IQPOINTS_ABI = [
 
 export const QUEST_MANAGER_ABI = [
   { name: 'lastClaimDay', type: 'function', stateMutability: 'view', inputs: [{ name:'user', type:'address' }, { name:'id', type:'uint8' }], outputs: [{ type:'uint256' }] },
+  { name: 'quizPlayedDay', type: 'function', stateMutability: 'view', inputs: [{ name:'user', type:'address' }], outputs: [{ type:'uint256' }] },
+  { name: 'friendSearchedDay', type: 'function', stateMutability: 'view', inputs: [{ name:'user', type:'address' }], outputs: [{ type:'uint256' }] },
   { name: 'claimShare', type: 'function', stateMutability: 'nonpayable', inputs: [], outputs: [] },
   { name: 'claimDailyQuizPlay', type: 'function', stateMutability: 'nonpayable', inputs: [], outputs: [] },
   { name: 'claimDailyChallenge', type: 'function', stateMutability: 'nonpayable', inputs: [], outputs: [] },
   { name: 'claimFollowJester', type: 'function', stateMutability: 'nonpayable', inputs: [], outputs: [] },
   { name: 'claimDailyOneIQ', type: 'function', stateMutability: 'nonpayable', inputs: [], outputs: [] },
+  { name: 'markQuizPlayedForToday', type: 'function', stateMutability: 'nonpayable', inputs: [{ name:'user', type:'address' }], outputs: [] },
+  { name: 'markFriendSearchedForToday', type: 'function', stateMutability: 'nonpayable', inputs: [{ name:'user', type:'address' }], outputs: [] },
 ] as const
 
 export async function getIQPoints(user: `0x${string}`) {
@@ -35,6 +39,50 @@ export async function getLastClaimDay(user: `0x${string}`, questId: number) {
     functionName: 'lastClaimDay',
     args: [user, questId]
   }) as Promise<bigint>
+}
+
+export async function getQuizPlayedDay(user: `0x${string}`) {
+  if (!QUEST_MANAGER_ADDRESS) throw new Error('QuestManager address not set')
+  return readContract(wagmiConfig, {
+    address: QUEST_MANAGER_ADDRESS,
+    abi: QUEST_MANAGER_ABI as any,
+    functionName: 'quizPlayedDay',
+    args: [user]
+  }) as Promise<bigint>
+}
+
+export async function getFriendSearchedDay(user: `0x${string}`) {
+  if (!QUEST_MANAGER_ADDRESS) throw new Error('QuestManager address not set')
+  return readContract(wagmiConfig, {
+    address: QUEST_MANAGER_ADDRESS,
+    abi: QUEST_MANAGER_ABI as any,
+    functionName: 'friendSearchedDay',
+    args: [user]
+  }) as Promise<bigint>
+}
+
+export async function markQuizPlayedForToday(user: `0x${string}`) {
+  if (!QUEST_MANAGER_ADDRESS) throw new Error('QuestManager address not set')
+  const hash = await writeContract(wagmiConfig, {
+    address: QUEST_MANAGER_ADDRESS,
+    abi: QUEST_MANAGER_ABI as any,
+    functionName: 'markQuizPlayedForToday',
+    args: [user]
+  })
+  try { await waitForTransactionReceipt(wagmiConfig, { hash }) } catch {}
+  return hash
+}
+
+export async function markFriendSearchedForToday(user: `0x${string}`) {
+  if (!QUEST_MANAGER_ADDRESS) throw new Error('QuestManager address not set')
+  const hash = await writeContract(wagmiConfig, {
+    address: QUEST_MANAGER_ADDRESS,
+    abi: QUEST_MANAGER_ABI as any,
+    functionName: 'markFriendSearchedForToday',
+    args: [user]
+  })
+  try { await waitForTransactionReceipt(wagmiConfig, { hash }) } catch {}
+  return hash
 }
 
 async function writeQuest(functionName: 'claimShare' | 'claimDailyQuizPlay' | 'claimDailyChallenge' | 'claimFollowJester' | 'claimDailyOneIQ') {
