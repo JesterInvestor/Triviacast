@@ -106,9 +106,11 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     return () => { if (unwatchRef.current) { unwatchRef.current(); unwatchRef.current = null } }
   }, [])
 
+  // Validate jackpot address presence (empty if NEXT_PUBLIC_JACKPOT_ADDRESS not set at build/runtime)
+  const jackpotAddrValid = JACKPOT_ADDRESS && JACKPOT_ADDRESS.length === 42
   const hasBalanceForSpin = (usdcBalance || 0n) >= params.priceUnits
   const hasAllowanceForSpin = (usdcAllowance || 0n) >= params.priceUnits
-  const canApprove = !!address && !approving && hasBalanceForSpin && !hasAllowanceForSpin && params.eligible
+  const canApprove = !!address && jackpotAddrValid && !approving && hasBalanceForSpin && !hasAllowanceForSpin && params.eligible
   const canRequestSpin = !!address && hasAllowanceForSpin && params.eligible && !waitingVRF && !spinConfirming
 
   const doApprove = useCallback(async () => {
@@ -215,5 +217,6 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     requestSpin,
     buyOneSpin,
     buySpins,
+    jackpotAddrValid,
   }
 }

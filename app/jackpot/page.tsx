@@ -77,6 +77,7 @@ export default function JackpotPage() {
     requestSpin,
     buyOneSpin,
     buySpins,
+    jackpotAddrValid,
   } = jackpot as any;
   const approveLink = useExplorerTxUrl(approveTxHash);
   const spinLink = useExplorerTxUrl(spinTxHash);
@@ -262,6 +263,9 @@ export default function JackpotPage() {
               className="bg-[#2d1b2e] text-[#FFE4EC] px-4 py-2 rounded shadow disabled:opacity-50 text-sm"
               disabled={approving || !canApprove}
             >{approving ? 'Approving…' : 'Approve USDC'}</button>
+          )}
+          {!jackpotAddrValid && (
+            <span className="text-[11px] text-red-600">Missing NEXT_PUBLIC_JACKPOT_ADDRESS</span>
           )}
           {hasAllowanceForSpin && (credits||0n)===0n && !buying && (
             <button
