@@ -131,8 +131,10 @@ export default function JackpotPage() {
     hasAllowanceForSpin,
     canApprove,
     canRequestSpin,
+  canRequestSpinPaying,
     doApprove,
     requestSpin,
+  requestSpinPaying,
     buyOneSpin,
     buySpins,
     approveAmount,
@@ -439,6 +441,14 @@ export default function JackpotPage() {
               disabled={!canRequestSpin || spinning}
             >{spinning ? 'Spinning…' : 'Spin Now'}</button>
           )}
+          {hasAllowanceForSpin && (credits||0n)===0n && !spinConfirming && !waitingVRF && (
+            <button
+              onClick={(e)=>{e.stopPropagation(); requestSpinPaying();}}
+              className="bg-[#34A24F]/80 hover:bg-[#34A24F] text-white px-4 py-2 rounded shadow text-sm disabled:opacity-50"
+              disabled={!canRequestSpinPaying || spinning}
+            >{spinning ? 'Spinning…' : 'Spin & Pay (no credit)'}
+            </button>
+          )}
           <button
             onClick={(e)=>{e.stopPropagation(); setShowDebug(d=>!d);}}
             className="bg-[#2d1b2e]/70 text-[#FFE4EC] px-3 py-1 rounded text-[11px]"
@@ -595,6 +605,16 @@ export default function JackpotPage() {
                   <button onClick={(e)=>{e.stopPropagation(); buySpins(5n);}} className="text-[10px] bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded">+5</button>
                   <button onClick={(e)=>{e.stopPropagation(); buySpins(10n);}} className="text-[10px] bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded">+10</button>
                   <button onClick={(e)=>{e.stopPropagation(); buySpins(100n);}} className="text-[10px] bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded">+100</button>
+                </div>
+              </div>
+            </div>
+          )}
+          {eligible && hasAllowanceForSpin && (credits||0n)===0n && !spinConfirming && !waitingVRF && !spinning && !finished && (
+            <div className="absolute inset-0 flex items-start justify-end p-2">
+              <div className="flex flex-col gap-1 items-end">
+                <span className="text-[10px] bg-[#2d1b2e] text-[#FFE4EC] px-2 py-1 rounded">No credits · Use Spin & Pay</span>
+                <div className="flex gap-1 flex-wrap max-w-[140px]">
+                  <button onClick={(e)=>{e.stopPropagation(); requestSpinPaying();}} className="text-[10px] bg-[#34A24F] text-white px-2 py-1 rounded">Spin & Pay</button>
                 </div>
               </div>
             </div>

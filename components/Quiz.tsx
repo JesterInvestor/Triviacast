@@ -93,6 +93,12 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   // Notify parent when quiz completes so callers can show a share/preview flow
   useEffect(() => {
     if (!quizState.quizCompleted) return;
+    // Minimal client-side completion flag for quests gating
+    try {
+      const today = Math.floor(Date.now()/86400_000);
+      localStorage.setItem('triviacast:lastQuizCompletedDay', String(today));
+      window.dispatchEvent(new Event('triviacast:quizCompleted'));
+    } catch {}
     try {
       onComplete?.({
         quizId: 'triviacast',

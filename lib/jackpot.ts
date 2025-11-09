@@ -62,6 +62,13 @@ export const JACKPOT_ABI = [
     outputs: [{ name: 'requestId', type: 'uint256' }]
   },
   {
+    type: 'function',
+    name: 'spinPaying',
+    stateMutability: 'nonpayable',
+    inputs: [],
+    outputs: [{ name: 'requestId', type: 'uint256' }]
+  },
+  {
     type: 'event',
     name: 'SpinRequested',
     inputs: [
@@ -137,6 +144,27 @@ export async function spinJackpot(owner: `0x${string}`) {
     address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
     abi: JACKPOT_ABI as any,
     functionName: 'spin',
+    args: [],
+    account: ownerAddr as `0x${string}`
+  })
+  return writeContract(wagmiConfig, request)
+}
+
+export async function spinPaying(owner: `0x${string}`) {
+  const ownerAddr = getAddress(owner)
+  if (DISABLE_SIMULATE) {
+    return writeContract(wagmiConfig, {
+      address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+      abi: JACKPOT_ABI as any,
+      functionName: 'spinPaying',
+      args: [],
+      account: ownerAddr as `0x${string}`
+    })
+  }
+  const { request } = await simulateContract(wagmiConfig, {
+    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+    abi: JACKPOT_ABI as any,
+    functionName: 'spinPaying',
     args: [],
     account: ownerAddr as `0x${string}`
   })

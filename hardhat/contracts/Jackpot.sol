@@ -131,6 +131,36 @@ contract Jackpot is VRFConsumerBaseV2Plus {
         emit SpinPurchased(msg.sender, count, total);
     }
 
+    // Option A: Pay inside spin (no credits). Requires prior ERC20 approve at least `price`.
+    function spinPaying() external returns (uint256 requestId) {
+        // Eligibility
+        uint256 points = triviaPoints.getPoints(msg.sender);
+        if (points < pointsThreshold) revert NotEligible();
+        if (block.timestamp - lastSpinAt[msg.sender] < 1 days) revert TooSoon();
+
+        // Payment per spin
+        bool ok = usdc.transferFrom(msg.sender, feeReceiver, price);
+        if (!ok) revert PaymentFailed();
+        emit Paid(msg.sender, address(usdc), price);
+
+        // Request randomness
+        if (subscriptionId == 0) revert NoSubscription();
+        requestId = s_vrfCoordinator.requestRandomWords(
+            VRFV2PlusClient.RandomWordsRequest({
+                keyHash: keyHash,
+                subId: subscriptionId,
+                requestConfirmations: requestConfirmations,
+                callbackGasLimit: callbackGasLimit,
+                numWords: numWords,
+                extraArgs: VRFV2PlusClient._argsToBytes(
+                    VRFV2PlusClient.ExtraArgsV1({ nativePayment: false })
+                )
+            })
+        );
+        pending[requestId] = PendingSpin({player: msg.sender, settled: false, prize: 0});
+        emit SpinRequested(requestId, msg.sender);
+    }
+
     // Spin entry point: now consumes 1 credit, checks eligibility and 24h cooldown
     function spin() external returns (uint256 requestId) {
         // Eligibility

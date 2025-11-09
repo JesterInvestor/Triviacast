@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAccount, useChainId } from 'wagmi'
 import { getAddress } from 'viem'
 import { wagmiConfig } from '@/lib/wagmi'
-import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, buySpinNoSim, buySpinWithSim, getLastSpinAt, getPrice, getFeeReceiver, getUsdcToken, simulateUsdcPayment } from '@/lib/jackpot'
+import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, spinPaying, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, buySpinNoSim, buySpinWithSim, getLastSpinAt, getPrice, getFeeReceiver, getUsdcToken, simulateUsdcPayment } from '@/lib/jackpot'
 import { readContract } from '@wagmi/core'
 
 export type JackpotState = {
@@ -191,6 +191,8 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
   const hasAllowanceForSpin = (usdcAllowance || 0n) >= effectivePrice
   const canApprove = !!address && jackpotAddrValid && !approving && hasBalanceForSpin && !hasAllowanceForSpin && params.eligible
   const canRequestSpin = !!address && hasAllowanceForSpin && params.eligible && !waitingVRF && !spinConfirming
+  // New pathway: spinPaying does not consume credits; only requires allowance >= price and eligibility
+  const canRequestSpinPaying = !!address && hasAllowanceForSpin && params.eligible && !waitingVRF && !spinConfirming
 
   const doApprove = useCallback(async () => {
     if (!canApprove || !address) return
@@ -384,6 +386,43 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     }
   }, [canRequestSpin, address, spinConfirming, waitingVRF])
 
+  const requestSpinPaying = useCallback(async () => {
+    if (!canRequestSpinPaying || !address || spinConfirming || waitingVRF) return
+    setSpinError(null)
+    setSpinTxHash(null)
+    if (unwatchRef.current) unwatchRef.current()
+    unwatchRef.current = onSpinResult(({ player, prize }) => {
+      if (player?.toLowerCase() !== (address as string).toLowerCase()) return
+      const label = prizeToLabel(prize)
+      setForcedPrize({ label, value: Number(prize) })
+      setWaitingVRF(false)
+      if (unwatchRef.current) unwatchRef.current();
+      unwatchRef.current = null
+    })
+    try {
+      const hash = await spinPaying(address)
+      setSpinTxHash(hash)
+      setSpinConfirming(true)
+      try {
+        const { waitForTransactionReceipt } = await import('@wagmi/core')
+        await waitForTransactionReceipt(wagmiConfig, { hash })
+      } catch {}
+      setSpinConfirming(false)
+      setWaitingVRF(true)
+    } catch (e: any) {
+      if (unwatchRef.current) { unwatchRef.current(); unwatchRef.current = null }
+      setSpinConfirming(false)
+      setWaitingVRF(false)
+      const msg: string = e?.message || 'Spin & Pay failed'
+      let friendly = msg
+      if (/TooSoon\(/.test(msg)) friendly = 'Cooldown active: one spin per 24h.'
+      else if (/NotEligible\(/.test(msg)) friendly = 'Not eligible: insufficient Trivia Points.'
+      else if (/PaymentFailed\(/.test(msg)) friendly = 'Payment failed: USDC transferFrom did not succeed.'
+      else if (/NoSubscription\(/.test(msg)) friendly = 'VRF subscription missing.'
+      setSpinError(friendly)
+    }
+  }, [canRequestSpinPaying, address, spinConfirming, waitingVRF])
+
   return {
     address,
     usdcBalance,
@@ -404,8 +443,10 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     hasAllowanceForSpin,
     canApprove,
     canRequestSpin,
+  canRequestSpinPaying,
     doApprove,
     requestSpin,
+  requestSpinPaying,
     buyOneSpin,
     buySpins,
   forceBuySpins,
