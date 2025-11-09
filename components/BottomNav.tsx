@@ -7,7 +7,9 @@ const navItems = [
   { label: 'Home', href: '/', icon: '🏠' },
   { label: 'Leaderboard', href: '/leaderboard', icon: '🏆' },
   { label: 'Challenge', href: '/farcaster-lookup', icon: '🎯' },
-  { label: 'Info', href: '/info', icon: 'ℹ️' },
+  { label: 'Quests', href: '/quests', icon: '🗺️' },
+  { label: 'Jackpot', href: '/jackpot', icon: '💰' },
+  { label: 'Info', href: '/info', icon: 'ℹ️' }, // keep Info at far right by ordering last
 ];
 
 export default function BottomNav() {
@@ -49,26 +51,7 @@ export default function BottomNav() {
           </Link>
         ))}
       </div>
-      <div style={{ display: 'flex', gap: '8px', paddingRight: '8px' }}>
-        <a
-          href="https://tip.md/jesterinvestor"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Tip in Crypto"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            border: '2px solid #F4A6B7',
-            background: '#fff',
-            borderRadius: '8px',
-            padding: '4px 6px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            minHeight: '40px',
-          }}
-        >
-          <img src="https://tip.md/badge.svg" alt="Tip in Crypto" height={20} />
-        </a>
-      </div>
+      {/* No right-side buttons; nav items include all routes and Info is on far right */}
     </nav>
   );
 }

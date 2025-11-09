@@ -11,7 +11,7 @@ const miniappObj = {
       type: 'launch_frame',
       url: 'https://triviacast.xyz/farcaster-lookup',
       name: 'Triviacast',
-      splashImageUrl: 'https://triviacast.xyz/R11.png',
+  splashImageUrl: 'https://triviacast.xyz/splash.png',
       splashBackgroundColor: '#FFE4EC',
     },
   },

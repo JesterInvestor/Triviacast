@@ -106,6 +106,21 @@ export default function InfoPage() {
           <p className="text-gray-700">Cast to <a href="https://warpcast.com/jesterinvestor" className="text-fuchsia-600 underline" target="_blank" rel="noopener noreferrer">@jesterinvestor</a> with errors and feedback</p>
           <p className="mt-2 text-gray-700">Got a trivia fact, feature idea, or meme? Cast it our way!</p>
         </div>
+        <div className="mb-6 p-4 bg-white rounded-xl shadow w-full max-w-2xl border flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-bold mb-1 text-[#2d1b2e]">Support Triviacast</h2>
+            <p className="text-sm text-[#5a3d5c]">If you enjoy the game, you can tip in crypto to help us build more features.</p>
+          </div>
+          <a
+            href="https://tip.md/jesterinvestor"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Tip in Crypto"
+            className="inline-flex items-center border-2 border-[#F4A6B7] rounded-lg p-1.5 bg-white shadow min-h-[40px]"
+          >
+            <img src="https://tip.md/badge.svg" alt="Tip in Crypto" height={24} />
+          </a>
+        </div>
         <footer className="mt-8 text-center text-xs text-gray-400">Triviacast &copy; 2025. May your answers be quick and your points be plenty! 🚀</footer>
       </div>
     </div>
