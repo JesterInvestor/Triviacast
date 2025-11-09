@@ -238,8 +238,9 @@ export default function JackpotPage() {
     const y = e.clientY - rect.top;
     const centerX = size;
     const centerY = size;
-    const dist = Math.hypot(x - centerX, y - centerY);
-    if (dist <= 50) {
+  const dist = Math.hypot(x - centerX, y - centerY);
+  // Expand clickable radius for accessibility (visual center button is 50px)
+  if (dist <= 85) {
       if (!hasAllowanceForSpin && !approving) {
         doApprove();
       } else if (hasAllowanceForSpin && (credits || 0n) === 0n && !buying) {
@@ -252,6 +253,32 @@ export default function JackpotPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center py-8 relative">
+      {/* Action bar for accessibility / alternative to center click */}
+      {eligible && (
+        <div className="mb-4 flex flex-wrap gap-2 items-center justify-center w-full px-4">
+          {!hasAllowanceForSpin && !approving && (
+            <button
+              onClick={(e)=>{e.stopPropagation(); if (!approving) doApprove();}}
+              className="bg-[#2d1b2e] text-[#FFE4EC] px-4 py-2 rounded shadow disabled:opacity-50 text-sm"
+              disabled={approving || !canApprove}
+            >{approving ? 'Approving…' : 'Approve USDC'}</button>
+          )}
+          {hasAllowanceForSpin && (credits||0n)===0n && !buying && (
+            <button
+              onClick={(e)=>{e.stopPropagation(); buyOneSpin();}}
+              className="bg-[#DC8291] text-[#FFE4EC] px-4 py-2 rounded shadow text-sm disabled:opacity-50"
+              disabled={buying}
+            >Buy 1 Spin</button>
+          )}
+          {hasAllowanceForSpin && (credits||0n)>0n && !spinConfirming && !waitingVRF && (
+            <button
+              onClick={(e)=>{e.stopPropagation(); requestSpin();}}
+              className="bg-[#34A24F] text-white px-4 py-2 rounded shadow text-sm disabled:opacity-50"
+              disabled={!canRequestSpin || spinning}
+            >{spinning ? 'Spinning…' : 'Spin Now'}</button>
+          )}
+        </div>
+      )}
       {/* Persistent credits badge */}
       {address && hasAllowanceForSpin && (
         <div className="fixed top-2 right-2 z-50 flex flex-col items-end gap-1">
@@ -314,12 +341,12 @@ export default function JackpotPage() {
             </div>
           )}
           {eligible && !approving && !hasAllowanceForSpin && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e] max-w-xs">
-                <p className="font-semibold mb-1">Approve {SPIN_PRICE_USDC} USDC for Jackpot.</p>
-                <p className="text-xs">USDC Balance: {usdcBalance !== null ? (Number(usdcBalance) / 10**USDC_DECIMALS).toFixed(2) : '…'} USDC</p>
-                {approveError && <p className="mt-1 text-xs text-red-600">{approveError}</p>}
-                <p className="mt-1 text-[10px] text-[#7a567c]">Click center to approve, then click again to spin.</p>
+            <div className="absolute inset-0 flex items-start justify-end p-2 pointer-events-none">
+              <div className="bg-white/80 backdrop-blur px-3 py-2 rounded border border-[#DC8291] text-[#2d1b2e] max-w-[220px] shadow">
+                <p className="font-semibold text-sm">Approve {SPIN_PRICE_USDC} USDC</p>
+                <p className="text-[11px]">Balance: {usdcBalance !== null ? (Number(usdcBalance) / 10**USDC_DECIMALS).toFixed(2) : '…'} USDC</p>
+                {approveError && <p className="mt-1 text-[11px] text-red-600">{approveError}</p>}
+                <p className="mt-1 text-[10px] text-[#7a567c]">Tap the center to approve, then tap again to spin.</p>
               </div>
             </div>
           )}
@@ -386,7 +413,7 @@ export default function JackpotPage() {
           </div>
         )}
         <div className="mt-4 text-xs text-center text-[#7a567c] max-w-xl">
-          <p>Flow: approve USDC → request spin (VRF) → wait for SpinResult event → wheel animates to the returned prize. Fund contract with $TRIV; monitor events for analytics.</p>
+          <p>Flow: approve USDC → request spin (VRF) → wait for SpinResult event → wheel animates to the returned prize.</p>
         </div>
       </div>
     </div>
