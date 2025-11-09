@@ -41,12 +41,14 @@ contract QuestManagerIQ {
     constructor(address iqPointsAddress) {
         owner = msg.sender;
         iqPoints = IIQPoints(iqPointsAddress);
-        quest[1] = QuestConfig(5000, true);
+        // Cast claim (share): +2 iQ
+        quest[1] = QuestConfig(2, true);
         quest[2] = QuestConfig(1000, true);
         quest[3] = QuestConfig(10000, true);
         // New quests
-    quest[4] = QuestConfig(5000, true);      // Follow @jesterinvestor (+5000 iQ)
-        quest[5] = QuestConfig(1, true);      // Daily +1 iQ
+    quest[4] = QuestConfig(50, true);        // Follow @jesterinvestor (+50 iQ)
+        // Daily claim: +1 iQ
+        quest[5] = QuestConfig(1, true);
         dayAnchor = 0; // 0 means use UNIX epoch for day boundaries (default behavior)
     }
 

@@ -3,6 +3,7 @@
 import { useAccount, useChainId, useSwitchChain } from 'wagmi';
 import { useIQPoints } from '@/lib/hooks/useIQPoints';
 import { useQuestIQ } from '@/lib/hooks/useQuestIQ';
+import { shareAppUrl, openShareUrl } from '@/lib/farcaster';
 // Gating reads removed (we no longer rely on backend relayer to mark quiz/friend searches)
 import { useCallback, useEffect, useMemo, useState } from 'react';
 // import Link from 'next/link';
@@ -61,7 +62,17 @@ export default function QuestsPage() {
   // Always require Base network for direct on-chain user claims (no gasless backend).
   const requiresBase = true;
   const [inlineError, setInlineError] = useState<string | null>(null);
-  const { claimedFollowJester, claimFollowJester, loading, error, secondsUntilReset } = useQuestIQ(address as `0x${string}` | undefined);
+  const {
+    claimedFollowJester,
+    claimFollowJester,
+    claimedShare,
+    claimShare,
+    claimedOneIQ,
+    claimDailyOneIQ,
+    loading,
+    error,
+    secondsUntilReset,
+  } = useQuestIQ(address as `0x${string}` | undefined);
   const resetHours = Math.floor(secondsUntilReset / 3600);
   const resetMinutes = Math.floor((secondsUntilReset % 3600) / 60);
   const resetSeconds = secondsUntilReset % 60;
@@ -122,13 +133,43 @@ export default function QuestsPage() {
         )}
 
         <div className="space-y-4">
-          {/* Only quests that can be claimed directly by user without relayer are shown. */}
+          {/* Quests that can be claimed directly by user without relayer. */}
+
+          {/* Cast quest: +2 iQ */}
+          <QuestCard
+            title="Cast about Triviacast"
+            emoji="📣"
+            description="Post a quick cast about Triviacast. You can use the cast shortcut, then claim."
+            reward="+2 iQ"
+            claimed={claimedShare}
+            disabled={claimedShare || !address || !!error || switchingChain}
+            onClaim={async () => {
+              setInlineError(null);
+              const ok = await ensureOnBase();
+              if (!ok) return;
+              await claimShare();
+              try {
+                window.dispatchEvent(new Event('triviacast:questClaimed'));
+                window.dispatchEvent(new Event('triviacast:iqUpdated'));
+                window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+2 iQ claimed' } }));
+              } catch {}
+            }}
+            loading={loading}
+          />
+          <div className="-mt-3 mb-2 flex items-center gap-2 text-xs text-[#5a3d5c]">
+            <button
+              type="button"
+              className="px-2 py-1 rounded bg-white border border-[#7BC3EC] text-[#1b3d5c] hover:bg-[#E3F5FF]"
+              onClick={() => openShareUrl(shareAppUrl())}
+            >Cast now</button>
+            <span className="opacity-80">Use the button to open Warpcast, then come back and claim.</span>
+          </div>
 
           <QuestCard
             title="Follow @jesterinvestor"
             emoji="👤"
             description="Follow @jesterinvestor on Farcaster (manual trust now)."
-            reward="5,000 iQ"
+            reward="+50 iQ"
             claimed={claimedFollowJester}
             disabled={claimedFollowJester || !address || !!error || switchingChain}
             onClaim={async () => {
@@ -139,7 +180,7 @@ export default function QuestsPage() {
               try {
                 window.dispatchEvent(new Event('triviacast:questClaimed'));
                 window.dispatchEvent(new Event('triviacast:iqUpdated'));
-                window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+5,000 iQ claimed' } }));
+                window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+50 iQ claimed' } }));
               } catch {}
             }}
             loading={loading}
@@ -147,6 +188,28 @@ export default function QuestsPage() {
           <div className="text-xs -mt-3 mb-4 text-[#5a3d5c]">
             <a href="https://farcaster.xyz/jesterinvestor" target="_blank" rel="noopener noreferrer" className="underline decoration-dotted underline-offset-2 hover:decoration-solid">Follow @jesterinvestor</a> to enable this quest.
           </div>
+
+          {/* Daily claim: +1 iQ */}
+          <QuestCard
+            title="Daily claim"
+            emoji="🗓️"
+            description="Come back daily to claim your micro iQ bonus."
+            reward="+1 iQ"
+            claimed={claimedOneIQ}
+            disabled={claimedOneIQ || !address || !!error || switchingChain}
+            onClaim={async () => {
+              setInlineError(null);
+              const ok = await ensureOnBase();
+              if (!ok) return;
+              await claimDailyOneIQ();
+              try {
+                window.dispatchEvent(new Event('triviacast:questClaimed'));
+                window.dispatchEvent(new Event('triviacast:iqUpdated'));
+                window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+1 iQ claimed' } }));
+              } catch {}
+            }}
+            loading={loading}
+          />
 
         </div>
 
@@ -157,7 +220,7 @@ export default function QuestsPage() {
         )}
 
         <div className="mt-8 text-center text-xs text-[#5a3d5c]">
-          Simplified quests: Daily Quiz Play & Challenge disabled (require relayer). Follow quest uses direct on-chain claim.
+          Simplified quests: Cast (+2 iQ), Follow (+50 iQ), Daily Claim (+1 iQ). Quiz/Challenge remain disabled (require relayer).
         </div>
       </div>
     </div>
