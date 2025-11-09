@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAccount, useChainId } from 'wagmi'
 import { getAddress } from 'viem'
 import { wagmiConfig } from '@/lib/wagmi'
-import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, buySpinNoSim, getLastSpinAt, getPrice, getFeeReceiver, getUsdcToken } from '@/lib/jackpot'
+import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, buySpinNoSim, buySpinWithSim, getLastSpinAt, getPrice, getFeeReceiver, getUsdcToken } from '@/lib/jackpot'
 import { readContract } from '@wagmi/core'
 
 export type JackpotState = {
@@ -297,6 +297,39 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     }
   }, [address])
 
+  // Try a previewed buy (forces a simulate even if globally disabled). If RPC rejects sim (429), surface a helpful error.
+  const previewBuySpins = useCallback(async (count: bigint) => {
+    if (!address) return
+    setBuyError(null)
+    setBuying(true)
+    setBuyTxHash(null)
+    try {
+      let hash: `0x${string}`
+      try {
+        hash = await buySpinWithSim(address, count)
+      } catch (e: any) {
+        const m = e?.message || ''
+        if (/over rate limit|429|HTTP request failed|estimate/i.test(m)) {
+          throw new Error('Preview not available right now (RPC rate-limited). You can still complete the purchase using the normal Buy button or Force Buy (no sim).')
+        }
+        throw e
+      }
+      setBuyTxHash(hash)
+      try {
+        const { waitForTransactionReceipt } = await import('@wagmi/core')
+        await waitForTransactionReceipt(wagmiConfig, { hash })
+      } catch {}
+      try {
+        const c = await getSpinCredits(address)
+        setCredits(c)
+      } catch {}
+    } catch (e: any) {
+      setBuyError(e?.message || 'Preview buy failed')
+    } finally {
+      setBuying(false)
+    }
+  }, [address])
+
   const requestSpin = useCallback(async () => {
     if (!canRequestSpin || !address || spinConfirming || waitingVRF) return
     setSpinError(null)
@@ -354,6 +387,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     buyOneSpin,
     buySpins,
   forceBuySpins,
+  previewBuySpins,
   approveAmount,
     jackpotAddrValid,
     lastSpinAt,

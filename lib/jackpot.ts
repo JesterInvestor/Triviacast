@@ -176,6 +176,19 @@ export async function buySpinNoSim(owner: `0x${string}`, count: bigint = 1n) {
   })
 }
 
+// Explicit simulate path regardless of the global DISABLE_SIMULATE flag (for users who want a wallet preview)
+export async function buySpinWithSim(owner: `0x${string}`, count: bigint = 1n) {
+  const ownerAddr = getAddress(owner)
+  const { request } = await simulateContract(wagmiConfig, {
+    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+    abi: JACKPOT_ABI as any,
+    functionName: 'buySpins',
+    args: [count],
+    account: ownerAddr as `0x${string}`
+  })
+  return writeContract(wagmiConfig, request)
+}
+
 export async function getSpinCredits(user: `0x${string}`) {
   const userAddr = getAddress(user)
   return readContract(wagmiConfig, {

@@ -137,6 +137,7 @@ export default function JackpotPage() {
     buySpins,
     approveAmount,
     forceBuySpins,
+  previewBuySpins,
     jackpotAddrValid,
     lastSpinAt,
     balanceError,
@@ -416,6 +417,12 @@ export default function JackpotPage() {
                 className="bg-[#DC8291] text-[#FFE4EC] px-4 py-2 rounded shadow text-sm disabled:opacity-50"
                 disabled={buying}
               >Buy 1 Spin</button>
+              <button
+                onClick={(e)=>{e.stopPropagation(); if (confirm('Attempt preview (simulate) even though global simulate disabled? May fail if RPC rate-limited.')) previewBuySpins(1n);}}
+                className="bg-[#2d1b2e] text-[#FFE4EC] px-3 py-2 rounded shadow text-sm disabled:opacity-50"
+                disabled={buying}
+                title="Preview buy (force simulate)"
+              >Preview Buy 1</button>
               <button
                 onClick={(e)=>{e.stopPropagation(); if (confirm('Send without simulate? This may reveal revert only after wallet signs.')) forceBuySpins(1n);}}
                 className="bg-[#7a567c] text-white px-3 py-2 rounded shadow text-sm disabled:opacity-50"
