@@ -1,11 +1,12 @@
 "use client";
 
-import { useAccount } from 'wagmi';
+import { useAccount, useChainId, useSwitchChain } from 'wagmi';
 import { useIQPoints } from '@/lib/hooks/useIQPoints';
 import { useQuestIQ } from '@/lib/hooks/useQuestIQ';
 import { getFriendSearchedDay, getQuizPlayedDay } from '@/lib/iq';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { base } from 'wagmi/chains';
 
 // Minimal client-side flag: set localStorage 'triviacast:lastQuizCompletedDay' when quiz finishes.
 // We'll read it here to decide if Daily Quiz Play claim is enabled.
@@ -86,8 +87,17 @@ function QuestCard({ title, emoji, description, reward, claimed, disabled, onCla
 
 export default function QuestsPage() {
   const { address } = useAccount();
+  const chainId = useChainId();
+  const { switchChain, switchChainAsync, isPending: switchingChain, error: switchError } = useSwitchChain();
+  const isOnBase = chainId === base.id;
+  const chainLabel = useMemo(() => {
+    if (!chainId) return 'Unknown';
+    if (chainId === base.id) return `Base mainnet (${base.id})`;
+    return `Chain ${chainId}`;
+  }, [chainId]);
   const { iqPoints } = useIQPoints(address as `0x${string}` | undefined);
   const gasless = process.env.NEXT_PUBLIC_QUEST_GASLESS === 'true';
+  const requiresBase = !gasless;
   const [inlineError, setInlineError] = useState<string | null>(null);
   const { claimedShare, claimedQuizPlay, claimedChallenge, claimedFollowJester, claimedOneIQ, claimShare, claimDailyQuizPlay, claimDailyChallenge, claimFollowJester, claimDailyOneIQ, loading, error, secondsUntilReset } = useQuestIQ(address as `0x${string}` | undefined);
   const quizCompletedToday = useQuizCompletedTodayOnChain(address as `0x${string}` | undefined);
@@ -95,6 +105,24 @@ export default function QuestsPage() {
   const resetHours = Math.floor(secondsUntilReset / 3600);
   const resetMinutes = Math.floor((secondsUntilReset % 3600) / 60);
   const resetSeconds = secondsUntilReset % 60;
+  const networkGateActive = requiresBase && !!address && !isOnBase;
+
+  const ensureOnBase = useCallback(async () => {
+    if (!requiresBase) return true;
+    if (isOnBase) return true;
+    try {
+      if (switchChainAsync) {
+        await switchChainAsync({ chainId: base.id });
+        return true;
+      }
+    } catch (err: any) {
+      console.error('[Triviacast] switchChain to Base failed', err);
+      setInlineError(err?.message ? `Switch network: ${err.message}` : 'Switch to Base to claim quests.');
+      return false;
+    }
+    setInlineError('Switch to Base network in your wallet to claim quests.');
+    return false;
+  }, [isOnBase, requiresBase, setInlineError, switchChainAsync]);
 
   async function claimGasless(questId: number, user: `0x${string}`) {
     const res = await fetch('/api/quests/claim', {
@@ -123,6 +151,27 @@ export default function QuestsPage() {
           )}
         </div>
 
+        {requiresBase && address && (
+          <div className="mb-4 flex justify-center">
+            <div className={`flex items-center gap-3 px-3 py-2 rounded-lg border text-sm shadow ${isOnBase ? 'bg-[#E3F5FF]/70 border-[#7BC3EC]' : 'bg-white border-[#DC8291]'}`}>
+              <span>Network: <span className={`font-semibold ${isOnBase ? 'text-[#1b3d5c]' : 'text-[#b14f5f]'}`}>{chainLabel}</span></span>
+              {!isOnBase && (
+                <button
+                  onClick={() => switchChain?.({ chainId: base.id })}
+                  disabled={switchingChain}
+                  className="bg-[#2d1b2e] text-[#FFE4EC] px-3 py-1 rounded disabled:opacity-50"
+                >{switchingChain ? 'Switching…' : 'Switch to Base'}</button>
+              )}
+            </div>
+          </div>
+        )}
+        {requiresBase && address && switchError && (
+          <div className="mb-4 text-center text-sm text-red-600">Switch failed: {switchError.message}</div>
+        )}
+        {networkGateActive && (
+          <div className="mb-4 text-center text-sm text-[#b14f5f]">Switch to Base mainnet to claim quest rewards.</div>
+        )}
+
         <div className="space-y-4">
           <QuestCard
             title="Daily Quiz Play"
@@ -130,9 +179,11 @@ export default function QuestsPage() {
             description="Play the quiz today, then claim your reward."
             reward="1,000 iQ"
             claimed={claimedQuizPlay}
-            disabled={claimedQuizPlay || !address || !quizCompletedToday || !!error}
+            disabled={claimedQuizPlay || !address || !quizCompletedToday || !!error || switchingChain}
             onClaim={async () => {
               setInlineError(null);
+              const ok = await ensureOnBase();
+              if (!ok) return;
               if (gasless && address) {
                 try { await claimGasless(2, address as `0x${string}`); } catch (e: any) { setInlineError(e.message); return; }
               } else {
@@ -148,9 +199,11 @@ export default function QuestsPage() {
             description="Search a friend and play a quiz today, then claim your reward."
             reward="10,000 iQ"
             claimed={claimedChallenge}
-            disabled={claimedChallenge || !address || !!error || !(friendSearchedToday && quizCompletedToday)}
+            disabled={claimedChallenge || !address || !!error || !(friendSearchedToday && quizCompletedToday) || switchingChain}
             onClaim={async () => {
               setInlineError(null);
+              const ok = await ensureOnBase();
+              if (!ok) return;
               if (gasless && address) {
                 try { await claimGasless(3, address as `0x${string}`); } catch (e: any) { setInlineError(e.message); return; }
               } else {
@@ -174,9 +227,11 @@ export default function QuestsPage() {
             description="Follow @jesterinvestor on Farcaster (manual trust now)."
             reward="5,000 iQ"
             claimed={claimedFollowJester}
-            disabled={claimedFollowJester || !address || !!error}
+            disabled={claimedFollowJester || !address || !!error || switchingChain}
             onClaim={async () => {
               setInlineError(null);
+              const ok = await ensureOnBase();
+              if (!ok) return;
               if (gasless && address) {
                 try { await claimGasless(4, address as `0x${string}`); } catch (e: any) { setInlineError(e.message); return; }
               } else { await claimFollowJester(); }
@@ -198,9 +253,11 @@ export default function QuestsPage() {
             description="Login bonus — claim 1 iQ each day."
             reward="1 iQ"
             claimed={claimedOneIQ}
-            disabled={claimedOneIQ || !address || !!error}
+            disabled={claimedOneIQ || !address || !!error || switchingChain}
             onClaim={async () => {
               setInlineError(null);
+              const ok = await ensureOnBase();
+              if (!ok) return;
               if (gasless && address) {
                 try { await claimGasless(5, address as `0x${string}`); } catch (e: any) { setInlineError(e.message); return; }
               } else { await claimDailyOneIQ(); }
