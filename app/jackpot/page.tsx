@@ -51,6 +51,7 @@ export default function JackpotPage() {
   const [walletPoints, setWalletPoints] = useState<number | null>(null);
   const [lastSpinTs, setLastSpinTs] = useState<number | null>(null);
   const [showDebug, setShowDebug] = useState<boolean>(false);
+  const [approveCustom, setApproveCustom] = useState<string>("");
   const [result, setResult] = useState<{ label: string; value: number } | null>(null);
   // forcedPrize is provided by hook now
   const [spinning, setSpinning] = useState(false);
@@ -328,6 +329,34 @@ export default function JackpotPage() {
                         >{v}</button>
                       )
                     })}
+                  </div>
+                  {/* Custom approve input */}
+                  <div className="flex items-center gap-1">
+                    <label htmlFor="approveCustom" className="sr-only">Custom approve (USDC)</label>
+                    <input
+                      id="approveCustom"
+                      type="number"
+                      inputMode="decimal"
+                      step="0.01"
+                      min={0.01}
+                      placeholder="USDC"
+                      value={approveCustom}
+                      onChange={(e)=> setApproveCustom(e.target.value)}
+                      className="w-20 text-[12px] px-2 py-1 rounded border border-[#DC8291] bg-white/80 text-[#2d1b2e]"
+                    />
+                    <button
+                      disabled={approving || !approveCustom}
+                      onClick={(e)=>{
+                        e.stopPropagation();
+                        const v = Number(approveCustom);
+                        if (isNaN(v) || v <= 0) return;
+                        // Clamp to a reasonable max; allow up to 50 by default
+                        const clamped = Math.max(0.01, Math.min(50, v));
+                        const units = BigInt(Math.round(clamped * 10 ** USDC_DECIMALS));
+                        approveAmount(units);
+                      }}
+                      className="text-[12px] bg-[#2d1b2e] text-[#FFE4EC] px-2 py-1 rounded disabled:opacity-50"
+                    >Approve</button>
                   </div>
                 </div>
               )}
