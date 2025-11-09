@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 // Example popular Farcaster usernames
 const popularAccounts = [
-  "dwr", "v", "rish", "jacob", "farcaster", "neynar", "triviacast", "farcasterxyz", "farcasterbot", "0xkofi"
+  "dwr", "overtheraa.eth", "xcz", "alibrarising", "farcaster", "neynar", "jadmak", "farcasterxyz", "shooterlily", "hdr"
 ];
 
 export interface NeynarUserDropdownProps {
