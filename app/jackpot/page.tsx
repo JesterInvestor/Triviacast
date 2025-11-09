@@ -460,26 +460,8 @@ export default function JackpotPage() {
         <div className="fixed top-2 right-2 z-50 flex flex-col items-end gap-1">
           <div className="bg-[#2d1b2e]/80 text-[#FFE4EC] px-3 py-2 rounded shadow flex items-center gap-2">
             <span className="text-xs font-semibold">Credits: {(credits||0n).toString()}</span>
-            <div className="flex gap-1">
-              <button
-                disabled={buying}
-                onClick={(e)=>{e.stopPropagation(); buySpins(5n);}}
-                className="text-[10px] bg-[#DC8291] hover:bg-[#c86e7c] disabled:opacity-50 px-2 py-1 rounded"
-                title="Buy 5 spins"
-              >+5</button>
-              <button
-                disabled={buying}
-                onClick={(e)=>{e.stopPropagation(); buySpins(10n);}}
-                className="text-[10px] bg-[#DC8291] hover:bg-[#c86e7c] disabled:opacity-50 px-2 py-1 rounded"
-                title="Buy 10 spins"
-              >+10</button>
-              <button
-                disabled={buying}
-                onClick={(e)=>{e.stopPropagation(); buySpins(100n);}}
-                className="text-[10px] bg-[#DC8291] hover:bg-[#c86e7c] disabled:opacity-50 px-2 py-1 rounded"
-                title="Buy 100 spins"
-              >+100</button>
-            </div>
+            {/* Contract enforces count==1; hide multi-buy shortcuts */}
+            <div className="flex gap-1"></div>
           </div>
           {buying && <div className="text-[10px] text-[#2d1b2e] bg-white/70 backdrop-blur px-2 py-1 rounded shadow">Purchasing…</div>}
           {buyError && <div className="text-[10px] text-red-600 bg-white/80 px-2 py-1 rounded shadow max-w-[180px] break-words">{buyError}</div>}
@@ -582,9 +564,6 @@ export default function JackpotPage() {
               <span className="text-[10px] bg-[#2d1b2e] text-[#FFE4EC] px-2 py-1 rounded">Approved ✓ Buy spins</span>
               <div className="flex flex-col gap-1 text-[10px]">
                 <button onClick={(e)=>{e.stopPropagation(); buySpins(1n);}} className="bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded shadow">Buy 1</button>
-                <button onClick={(e)=>{e.stopPropagation(); buySpins(5n);}} className="bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded shadow">Buy 5</button>
-                <button onClick={(e)=>{e.stopPropagation(); buySpins(10n);}} className="bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded shadow">Buy 10</button>
-                <button onClick={(e)=>{e.stopPropagation(); buySpins(100n);}} className="bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded shadow">Buy 100</button>
               </div>
             </div>
           )}
@@ -602,9 +581,7 @@ export default function JackpotPage() {
               <div className="flex flex-col gap-1 items-end">
                 <span className="text-[10px] bg-[#2d1b2e] text-[#FFE4EC] px-2 py-1 rounded">Credits: {(credits||0n).toString()}</span>
                 <div className="flex gap-1 flex-wrap max-w-[140px]">
-                  <button onClick={(e)=>{e.stopPropagation(); buySpins(5n);}} className="text-[10px] bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded">+5</button>
-                  <button onClick={(e)=>{e.stopPropagation(); buySpins(10n);}} className="text-[10px] bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded">+10</button>
-                  <button onClick={(e)=>{e.stopPropagation(); buySpins(100n);}} className="text-[10px] bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded">+100</button>
+                  {/* Multi-buy removed */}
                 </div>
               </div>
             </div>

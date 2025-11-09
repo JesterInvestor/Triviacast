@@ -1,9 +1,28 @@
-import { readContract, simulateContract, writeContract, watchContractEvent } from '@wagmi/core'
+import { readContract, simulateContract, writeContract, watchContractEvent, getFeeHistory } from '@wagmi/core'
 import { getAddress } from 'viem'
 import { wagmiConfig } from './wagmi'
 
 export const JACKPOT_ADDRESS = (process.env.NEXT_PUBLIC_JACKPOT_ADDRESS || '') as `0x${string}`
 const DISABLE_SIMULATE = String(process.env.NEXT_PUBLIC_DISABLE_SIMULATE || '').toLowerCase() === 'true'
+
+// Fee helpers: bump base fees to improve success when estimation is flaky
+async function getBumpedFees() {
+  try {
+    // getFeeHistory is supported by many RPCs; fallback to static bump below if it fails
+    const hist = await getFeeHistory(wagmiConfig, { blockCount: 4, rewardPercentiles: [5, 50, 95] }) as any
+    const base = BigInt(hist?.baseFeePerGas?.slice(-1)?.[0] ?? 0n)
+    const tip = BigInt((hist?.reward?.slice(-1)?.[0]?.[1] || 0))
+    const bump = (v: bigint) => ((v * 125n) / 100n) + 1n
+    const maxFeePerGas = bump(base > 0n ? base : 1_000_000_000n)
+    const maxPriorityFeePerGas = bump(tip > 0n ? tip : 1n)
+    return { maxFeePerGas, maxPriorityFeePerGas }
+  } catch {
+    const bump = (v: bigint) => ((v * 125n) / 100n) + 1n
+    const maxFeePerGas = bump(1_000_000_000n)
+    const maxPriorityFeePerGas = bump(1n)
+    return { maxFeePerGas, maxPriorityFeePerGas }
+  }
+}
 
 export const JACKPOT_ABI = [
   // Custom errors (for nicer revert decoding)
@@ -105,7 +124,8 @@ export async function approveUsdc(usdc: `0x${string}`, owner: `0x${string}`, amo
       abi: ERC20_ABI as any,
       functionName: 'approve',
       args: [getAddress(JACKPOT_ADDRESS) as `0x${string}`, amount],
-      account: ownerAddr as `0x${string}`
+      account: ownerAddr as `0x${string}`,
+      ...await getBumpedFees()
     })
   }
   const { request } = await simulateContract(wagmiConfig, {
@@ -115,7 +135,7 @@ export async function approveUsdc(usdc: `0x${string}`, owner: `0x${string}`, amo
     args: [getAddress(JACKPOT_ADDRESS) as `0x${string}`, amount],
     account: ownerAddr as `0x${string}`
   })
-  return writeContract(wagmiConfig, request)
+  return writeContract(wagmiConfig, { ...request, ...(await getBumpedFees()) })
 }
 
 export async function getUsdcAllowance(usdc: `0x${string}`, owner: `0x${string}`) {
@@ -137,7 +157,8 @@ export async function spinJackpot(owner: `0x${string}`) {
       abi: JACKPOT_ABI as any,
       functionName: 'spin',
       args: [],
-      account: ownerAddr as `0x${string}`
+      account: ownerAddr as `0x${string}`,
+      ...await getBumpedFees()
     })
   }
   const { request } = await simulateContract(wagmiConfig, {
@@ -147,7 +168,7 @@ export async function spinJackpot(owner: `0x${string}`) {
     args: [],
     account: ownerAddr as `0x${string}`
   })
-  return writeContract(wagmiConfig, request)
+  return writeContract(wagmiConfig, { ...request, ...(await getBumpedFees()) })
 }
 
 export async function spinPaying(owner: `0x${string}`) {
@@ -158,7 +179,8 @@ export async function spinPaying(owner: `0x${string}`) {
       abi: JACKPOT_ABI as any,
       functionName: 'spinPaying',
       args: [],
-      account: ownerAddr as `0x${string}`
+      account: ownerAddr as `0x${string}`,
+      ...await getBumpedFees()
     })
   }
   const { request } = await simulateContract(wagmiConfig, {
@@ -168,7 +190,7 @@ export async function spinPaying(owner: `0x${string}`) {
     args: [],
     account: ownerAddr as `0x${string}`
   })
-  return writeContract(wagmiConfig, request)
+  return writeContract(wagmiConfig, { ...request, ...(await getBumpedFees()) })
 }
 
 export async function buySpin(owner: `0x${string}`, count: bigint = 1n) {
@@ -179,7 +201,8 @@ export async function buySpin(owner: `0x${string}`, count: bigint = 1n) {
       abi: JACKPOT_ABI as any,
       functionName: 'buySpins',
       args: [count],
-      account: ownerAddr as `0x${string}`
+      account: ownerAddr as `0x${string}`,
+      ...await getBumpedFees()
     })
   }
   const { request } = await simulateContract(wagmiConfig, {
@@ -189,7 +212,7 @@ export async function buySpin(owner: `0x${string}`, count: bigint = 1n) {
     args: [count],
     account: ownerAddr as `0x${string}`
   })
-  return writeContract(wagmiConfig, request)
+  return writeContract(wagmiConfig, { ...request, ...(await getBumpedFees()) })
 }
 
 // Optional: write without simulate to bypass RPC sim quirks in some environments
@@ -200,7 +223,8 @@ export async function buySpinNoSim(owner: `0x${string}`, count: bigint = 1n) {
     abi: JACKPOT_ABI as any,
     functionName: 'buySpins',
     args: [count],
-    account: ownerAddr as `0x${string}`
+    account: ownerAddr as `0x${string}`,
+    ...await getBumpedFees()
   })
 }
 
@@ -214,7 +238,7 @@ export async function buySpinWithSim(owner: `0x${string}`, count: bigint = 1n) {
     args: [count],
     account: ownerAddr as `0x${string}`
   })
-  return writeContract(wagmiConfig, request)
+  return writeContract(wagmiConfig, { ...request, ...(await getBumpedFees()) })
 }
 
 export async function getSpinCredits(user: `0x${string}`) {
