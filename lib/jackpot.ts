@@ -13,6 +13,13 @@ export const JACKPOT_ABI = [
   },
   {
     type: 'function',
+    name: 'lastSpinAt',
+    stateMutability: 'view',
+    inputs: [{ name: '', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }]
+  },
+  {
+    type: 'function',
     name: 'spinCredits',
     stateMutability: 'view',
     inputs: [{ name: '', type: 'address' }],
@@ -99,6 +106,15 @@ export async function getSpinCredits(user: `0x${string}`) {
     address: JACKPOT_ADDRESS,
     abi: JACKPOT_ABI as any,
     functionName: 'spinCredits',
+    args: [user]
+  }) as Promise<bigint>
+}
+
+export async function getLastSpinAt(user: `0x${string}`) {
+  return readContract(wagmiConfig, {
+    address: JACKPOT_ADDRESS,
+    abi: JACKPOT_ABI as any,
+    functionName: 'lastSpinAt',
     args: [user]
   }) as Promise<bigint>
 }

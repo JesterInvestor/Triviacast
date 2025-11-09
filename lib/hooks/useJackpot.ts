@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAccount, useChainId } from 'wagmi'
 import { wagmiConfig } from '@/lib/wagmi'
-import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin } from '@/lib/jackpot'
+import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, getLastSpinAt } from '@/lib/jackpot'
 import { readContract } from '@wagmi/core'
 
 export type JackpotState = {
@@ -49,6 +49,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
   const [spinTxHash, setSpinTxHash] = useState<`0x${string}` | null>(null)
   const [forcedPrize, setForcedPrize] = useState<{ label: string; value: number } | null>(null)
   const [credits, setCredits] = useState<bigint | null>(null)
+  const [lastSpinAt, setLastSpinAt] = useState<bigint | null>(null)
   const [buying, setBuying] = useState(false)
   const [buyError, setBuyError] = useState<string | null>(null)
   const [buyTxHash, setBuyTxHash] = useState<`0x${string}` | null>(null)
@@ -96,6 +97,20 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
         const c = await getSpinCredits(address)
         if (!cancelled) setCredits(c)
       } catch { if (!cancelled) setCredits(null) }
+    }
+    load();
+    return () => { cancelled = true }
+  }, [address])
+
+  // on-chain lastSpinAt (for authoritative cooldown display)
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      if (!address || !JACKPOT_ADDRESS) { setLastSpinAt(null); return }
+      try {
+        const ts = await getLastSpinAt(address)
+        if (!cancelled) setLastSpinAt(ts)
+      } catch { if (!cancelled) setLastSpinAt(null) }
     }
     load();
     return () => { cancelled = true }
@@ -218,5 +233,6 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     buyOneSpin,
     buySpins,
     jackpotAddrValid,
+    lastSpinAt,
   }
 }

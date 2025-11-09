@@ -50,9 +50,13 @@ export default function JackpotPage() {
   const upDuration = 1200; // ms accel
   const downDuration = 4000; // ms decel
   // Eligibility and hook for blockchain interactions
+  // Cooldown (local storage only for now); TODO: integrate on-chain lastSpinAt mapping for authoritative timestamp
   const spunWithin24h = useMemo(() => lastSpinTs ? (Date.now() - lastSpinTs) < 24*60*60*1000 : false, [lastSpinTs]);
+  const nextSpinAt = useMemo(() => lastSpinTs ? lastSpinTs + 24*60*60*1000 : null, [lastSpinTs]);
+  const pointsKnown = walletPoints !== null;
   const hasEnough = (walletPoints || 0) >= REQUIRED_T_POINTS;
-  const eligible = !!address && hasEnough && !spunWithin24h;
+  // If points are unknown (API/contract not configured), don't block; on-chain will enforce
+  const eligible = !!address && (!pointsKnown || hasEnough) && !spunWithin24h;
   const priceUnits = useMemo(() => BigInt(Math.round(SPIN_PRICE_USDC * 10 ** USDC_DECIMALS)), []);
   const jackpot = useJackpot({ usdcAddress: USDC_ADDRESS, priceUnits, eligible });
   const {
@@ -78,6 +82,7 @@ export default function JackpotPage() {
     buyOneSpin,
     buySpins,
     jackpotAddrValid,
+    lastSpinAt,
   } = jackpot as any;
   const approveLink = useExplorerTxUrl(approveTxHash);
   const spinLink = useExplorerTxUrl(spinTxHash);
@@ -103,6 +108,15 @@ export default function JackpotPage() {
     const raw = localStorage.getItem(LAST_SPIN_KEY_PREFIX + address);
     setLastSpinTs(raw ? Number(raw) : null);
   }, [address]);
+
+  // Reconcile with on-chain cooldown if available (seconds -> ms)
+  useEffect(() => {
+    if (!address || !lastSpinAt) return;
+    const chainMs = Number(lastSpinAt) * 1000;
+    if (!lastSpinTs || chainMs > lastSpinTs) {
+      setLastSpinTs(chainMs);
+    }
+  }, [address, lastSpinAt]);
 
   // (moved above)
 
@@ -319,6 +333,9 @@ export default function JackpotPage() {
           <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e]">Jackpot</h1>
           <p className="text-base sm:text-lg text-[#5a3d5c]">Spin for a chance at the 10,000,000 $TRIV JACKPOT!</p>
           <p className="text-xs sm:text-sm text-[#7a567c]">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points + pays {SPIN_PRICE_USDC} USDC (approve then spin). One spin per 24h.</p>
+          {spunWithin24h && nextSpinAt && (
+            <p className="text-[11px] text-[#DC8291]">Cooldown active · Next spin: {new Date(nextSpinAt).toLocaleTimeString()}</p>
+          )}
         </div>
         <div className="relative">
           <canvas
@@ -331,8 +348,17 @@ export default function JackpotPage() {
           {!eligible && (
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               {!address && <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e]">Connect a wallet to spin.</div>}
-              {address && !hasEnough && <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e]">Need {REQUIRED_T_POINTS.toLocaleString()} T Points. You have {(walletPoints||0).toLocaleString()}.</div>}
-              {address && hasEnough && spunWithin24h && <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e]">Already spun. Next: {lastSpinTs && new Date(lastSpinTs + 24*60*60*1000).toLocaleTimeString()}</div>}
+              {address && pointsKnown && !hasEnough && (
+                <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e]">
+                  Need {REQUIRED_T_POINTS.toLocaleString()} T Points. You have {(walletPoints||0).toLocaleString()}.
+                </div>
+              )}
+              {address && !pointsKnown && (
+                <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e] text-center max-w-xs">
+                  Couldn’t verify T Points right now. You can still try to spin; eligibility is enforced on-chain.
+                </div>
+              )}
+              {address && hasEnough && spunWithin24h && <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e]">Already spun. Next: {nextSpinAt && new Date(nextSpinAt).toLocaleTimeString()}</div>}
             </div>
           )}
           {eligible && approving && (
