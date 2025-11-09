@@ -1,4 +1,8 @@
 import { readContract, writeContract, waitForTransactionReceipt } from '@wagmi/core'
+import { base } from 'wagmi/chains'
+// Simple in-memory read cache to mitigate RPC rate limits on repetitive daily quest reads
+const _cache: Map<string, { v: bigint; t: number }> = new Map()
+const TTL_MS = 15_000 // 15s is enough; values only change after a claim or mark action
 import { wagmiConfig } from '@/lib/wagmi'
 
 export const IQPOINTS_ADDRESS = process.env.NEXT_PUBLIC_IQPOINTS_ADDRESS as `0x${string}` | undefined
@@ -27,38 +31,60 @@ export async function getIQPoints(user: `0x${string}`) {
     address: IQPOINTS_ADDRESS,
     abi: IQPOINTS_ABI as any,
     functionName: 'getPoints',
-    args: [user]
+    args: [user],
+    chain: base
   }) as Promise<bigint>
 }
 
 export async function getLastClaimDay(user: `0x${string}`, questId: number) {
   if (!QUEST_MANAGER_ADDRESS) throw new Error('QuestManager address not set')
-  return readContract(wagmiConfig, {
+  const key = `lcd:${QUEST_MANAGER_ADDRESS}:${user}:${questId}`
+  const now = Date.now()
+  const hit = _cache.get(key)
+  if (hit && (now - hit.t) < TTL_MS) return hit.v
+  const v = await readContract(wagmiConfig, {
     address: QUEST_MANAGER_ADDRESS,
     abi: QUEST_MANAGER_ABI as any,
     functionName: 'lastClaimDay',
-    args: [user, questId]
+    args: [user, questId],
+    chain: base
   }) as Promise<bigint>
+  _cache.set(key, { v: await v, t: now })
+  return v
 }
 
 export async function getQuizPlayedDay(user: `0x${string}`) {
   if (!QUEST_MANAGER_ADDRESS) throw new Error('QuestManager address not set')
-  return readContract(wagmiConfig, {
+  const key = `qpd:${QUEST_MANAGER_ADDRESS}:${user}`
+  const now = Date.now()
+  const hit = _cache.get(key)
+  if (hit && (now - hit.t) < TTL_MS) return hit.v
+  const v = await readContract(wagmiConfig, {
     address: QUEST_MANAGER_ADDRESS,
     abi: QUEST_MANAGER_ABI as any,
     functionName: 'quizPlayedDay',
-    args: [user]
+    args: [user],
+    chain: base
   }) as Promise<bigint>
+  _cache.set(key, { v: await v, t: now })
+  return v
 }
 
 export async function getFriendSearchedDay(user: `0x${string}`) {
   if (!QUEST_MANAGER_ADDRESS) throw new Error('QuestManager address not set')
-  return readContract(wagmiConfig, {
+  const key = `fsd:${QUEST_MANAGER_ADDRESS}:${user}`
+  const now = Date.now()
+  const hit = _cache.get(key)
+  if (hit && (now - hit.t) < TTL_MS) return hit.v
+  const v = await readContract(wagmiConfig, {
     address: QUEST_MANAGER_ADDRESS,
     abi: QUEST_MANAGER_ABI as any,
     functionName: 'friendSearchedDay',
-    args: [user]
+    args: [user],
+    chain: base
   }) as Promise<bigint>
+  _cache.set(key, { v: await v, t: now })
+  return v
 }
 
 export async function markQuizPlayedForToday(user: `0x${string}`) {
@@ -67,9 +93,12 @@ export async function markQuizPlayedForToday(user: `0x${string}`) {
     address: QUEST_MANAGER_ADDRESS,
     abi: QUEST_MANAGER_ABI as any,
     functionName: 'markQuizPlayedForToday',
-    args: [user]
+    args: [user],
+    chain: base
   })
   try { await waitForTransactionReceipt(wagmiConfig, { hash }) } catch {}
+  // Invalidate cache entries related to this user
+  _cache.delete(`qpd:${QUEST_MANAGER_ADDRESS}:${user}`)
   return hash
 }
 
@@ -79,9 +108,11 @@ export async function markFriendSearchedForToday(user: `0x${string}`) {
     address: QUEST_MANAGER_ADDRESS,
     abi: QUEST_MANAGER_ABI as any,
     functionName: 'markFriendSearchedForToday',
-    args: [user]
+    args: [user],
+    chain: base
   })
   try { await waitForTransactionReceipt(wagmiConfig, { hash }) } catch {}
+  _cache.delete(`fsd:${QUEST_MANAGER_ADDRESS}:${user}`)
   return hash
 }
 
@@ -91,11 +122,14 @@ async function writeQuest(functionName: 'claimShare' | 'claimDailyQuizPlay' | 'c
     address: QUEST_MANAGER_ADDRESS,
     abi: QUEST_MANAGER_ABI as any,
     functionName,
-    args: []
+    args: [],
+    chain: base
   })
   try {
     await waitForTransactionReceipt(wagmiConfig, { hash })
   } catch {}
+  // Invalidate lastClaimDay for this quest for any consumer refreshing soon
+  // (Exact user not known here; caller updates local state)
   return hash
 }
 

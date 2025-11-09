@@ -18,7 +18,13 @@ export async function POST(req: NextRequest) {
     }
     const pk = process.env.BACKEND_PRIVATE_KEY
     const questManager = process.env.NEXT_PUBLIC_QUEST_MANAGER_ADDRESS as `0x${string}` | undefined
-    const rpc = process.env.BASE_RPC_URL || 'https://mainnet.base.org'
+    const rpc =
+      process.env.BASE_RPC_URL
+      || process.env.BASE_MAINNET_RPC_URL
+      || process.env.NEXT_PUBLIC_RPC_URL
+      || (process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ? `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}` : undefined)
+      || (process.env.NEXT_PUBLIC_INFURA_PROJECT_ID ? `https://base-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_PROJECT_ID}` : undefined)
+      || 'https://mainnet.base.org'
     if (!pk || !questManager) return NextResponse.json({ error: 'not configured' }, { status: 501 })
 
     const account = privateKeyToAccount(`0x${pk.replace(/^0x/, '')}` as `0x${string}`)
