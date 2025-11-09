@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAccount, useChainId } from 'wagmi'
 import { getAddress } from 'viem'
 import { wagmiConfig } from '@/lib/wagmi'
-import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, getLastSpinAt, getPrice } from '@/lib/jackpot'
+import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, getLastSpinAt, getPrice, getFeeReceiver, getUsdcToken } from '@/lib/jackpot'
 import { readContract } from '@wagmi/core'
 
 export type JackpotState = {
@@ -59,6 +59,8 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
   const [buyError, setBuyError] = useState<string | null>(null)
   const [buyTxHash, setBuyTxHash] = useState<`0x${string}` | null>(null)
   const [contractPrice, setContractPrice] = useState<bigint | null>(null)
+  const [feeReceiver, setFeeReceiver] = useState<`0x${string}` | null>(null)
+  const [contractUsdc, setContractUsdc] = useState<`0x${string}` | null>(null)
   const unwatchRef = useRef<(() => void) | null>(null)
 
   // balances
@@ -102,6 +104,14 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
         const p = await getPrice()
         if (!cancelled) setContractPrice(p)
       } catch { if (!cancelled) setContractPrice(null) }
+      try {
+        const fr = await getFeeReceiver()
+        if (!cancelled) setFeeReceiver(fr)
+      } catch { if (!cancelled) setFeeReceiver(null) }
+      try {
+        const u = await getUsdcToken()
+        if (!cancelled) setContractUsdc(u)
+      } catch { if (!cancelled) setContractUsdc(null) }
     }
     load()
     return () => { cancelled = true }
@@ -203,7 +213,14 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
         setCredits(c)
       } catch {}
     } catch (e: any) {
-      setBuyError(e?.message || 'Buy spin failed')
+      // Attempt friendly mapping for common custom errors
+      const msg: string = e?.message || 'Buy spin failed'
+      let friendly = msg
+      if (/TooSoon\(/.test(msg)) friendly = 'Cooldown active: one spin per 24h.'
+      else if (/NotEligible\(/.test(msg)) friendly = 'Not eligible: insufficient Trivia Points.'
+      else if (/PaymentFailed\(/.test(msg)) friendly = 'Payment failed: USDC transferFrom did not succeed (check approval, balance, or feeReceiver).'
+      else if (/NoSubscription\(/.test(msg)) friendly = 'VRF subscription missing: contract not added as consumer or subId=0.'
+      setBuyError(friendly)
     } finally {
       setBuying(false)
     }
@@ -270,5 +287,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     balanceError,
     allowanceError,
     priceUnits: effectivePrice,
+    feeReceiver,
+    contractUsdc,
   }
 }

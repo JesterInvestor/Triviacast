@@ -5,12 +5,32 @@ import { wagmiConfig } from './wagmi'
 export const JACKPOT_ADDRESS = (process.env.NEXT_PUBLIC_JACKPOT_ADDRESS || '') as `0x${string}`
 
 export const JACKPOT_ABI = [
+  // Custom errors (for nicer revert decoding)
+  { type: 'error', name: 'NotEligible', inputs: [] },
+  { type: 'error', name: 'TooSoon', inputs: [] },
+  { type: 'error', name: 'PaymentFailed', inputs: [] },
+  { type: 'error', name: 'NoSubscription', inputs: [] },
+  { type: 'error', name: 'InvalidConfig', inputs: [] },
   {
     type: 'function',
     name: 'buySpins',
     stateMutability: 'nonpayable',
     inputs: [{ name: 'count', type: 'uint256' }],
     outputs: []
+  },
+  {
+    type: 'function',
+    name: 'feeReceiver',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }]
+  },
+  {
+    type: 'function',
+    name: 'usdc',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }]
   },
   {
     type: 'function',
@@ -142,6 +162,24 @@ export async function getPrice() {
     functionName: 'price',
     args: []
   }) as Promise<bigint>
+}
+
+export async function getFeeReceiver() {
+  return readContract(wagmiConfig, {
+    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+    abi: JACKPOT_ABI as any,
+    functionName: 'feeReceiver',
+    args: []
+  }) as Promise<`0x${string}`>
+}
+
+export async function getUsdcToken() {
+  return readContract(wagmiConfig, {
+    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+    abi: JACKPOT_ABI as any,
+    functionName: 'usdc',
+    args: []
+  }) as Promise<`0x${string}`>
 }
 
 export function onSpinResult(cb: (args: { requestId: bigint; player: `0x${string}`; prize: bigint }) => void) {

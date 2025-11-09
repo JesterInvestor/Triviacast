@@ -99,6 +99,8 @@ export default function JackpotPage() {
     balanceError,
     allowanceError,
     priceUnits: contractPriceUnits,
+    feeReceiver,
+    contractUsdc,
   } = jackpot as any;
   const priceUsdcDisplay = useMemo(() => {
     const units = contractPriceUnits ?? priceUnits;
@@ -371,8 +373,11 @@ export default function JackpotPage() {
             <div className="font-semibold text-[11px]">Debug State</div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
               <span>Jackpot Addr Valid:</span><span>{String(jackpotAddrValid)}</span>
+              <span>Jackpot Address:</span><span className="truncate max-w-[180px]">{process.env.NEXT_PUBLIC_JACKPOT_ADDRESS || '—'}</span>
               <span>Price (units):</span><span>{contractPriceUnits ? contractPriceUnits.toString() : '—'}</span>
               <span>Price (USDC):</span><span>{priceUsdcDisplay}</span>
+              <span>Contract USDC:</span><span className="truncate max-w-[180px]">{contractUsdc || '—'}</span>
+              <span>Fee Receiver:</span><span className="truncate max-w-[180px]">{feeReceiver || '—'}</span>
               <span>USDC Balance:</span><span>{usdcBalance !== null ? usdcBalance.toString() : 'null'} {balanceError && '(err)'}</span>
               <span>Balance Error:</span><span className="truncate max-w-[140px]">{balanceError||'—'}</span>
               <span>Allowance:</span><span>{usdcAllowance !== null ? usdcAllowance.toString() : 'null'} {allowanceError && '(err)'}</span>
@@ -398,7 +403,20 @@ export default function JackpotPage() {
           <img src="/brain-small.svg" alt="Brain" className="w-12 h-12 mb-1 drop-shadow" />
           <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e]">Jackpot</h1>
           <p className="text-base sm:text-lg text-[#5a3d5c]">Spin for a chance at the 10,000,000 $TRIV JACKPOT!</p>
-          <p className="text-xs sm:text-sm text-[#7a567c]">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points + pays {priceUsdcDisplay} USDC (approve then spin). One spin per 24h.</p>
+          <p className="text-xs sm:text-sm text-[#7a567c]">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points + pays {priceUsdcDisplay} USDC (approve then spin). One spin per 24h.
+            <span
+              className="ml-1 align-middle inline-flex items-center relative group cursor-help"
+              aria-label="One spin every 24 hours per wallet; cooldown starts when VRF fulfills. Credits persist until used."
+            >
+              <span className="w-4 h-4 flex items-center justify-center rounded-full bg-[#DC8291] text-[#FFE4EC] text-[10px] font-bold select-none">?</span>
+              <span
+                role="tooltip"
+                className="hidden group-hover:block group-focus:block absolute left-1/2 -translate-x-1/2 mt-2 w-60 bg-[#2d1b2e] text-[#FFE4EC] text-[10px] leading-snug px-2 py-2 rounded shadow-lg z-20"
+              >
+                You can spin once every 24h per wallet. The cooldown resets when your last spin’s VRF result arrives (SpinResult).<br/><br/>Buy multiple spin credits anytime; unused credits remain until you use them.
+              </span>
+            </span>
+          </p>
           {spunWithin24h && nextSpinAt && (
             <p className="text-[11px] text-[#DC8291]">Cooldown active · Next spin: {new Date(nextSpinAt).toLocaleTimeString()}</p>
           )}
