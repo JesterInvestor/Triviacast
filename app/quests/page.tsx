@@ -5,6 +5,7 @@ import { useIQPoints } from '@/lib/hooks/useIQPoints';
 import { useQuestIQ } from '@/lib/hooks/useQuestIQ';
 import { getFriendSearchedDay, getQuizPlayedDay } from '@/lib/iq';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 // Minimal client-side flag: set localStorage 'triviacast:lastQuizCompletedDay' when quiz finishes.
 // We'll read it here to decide if Daily Quiz Play claim is enabled.
@@ -160,9 +161,9 @@ export default function QuestsPage() {
           />
           {/* Helper links for completing the challenge steps */}
           <div className="-mt-2 mb-2 text-xs text-[#5a3d5c] flex items-center gap-3">
-            <a href="/farcaster-lookup" className="underline decoration-dotted underline-offset-2 hover:decoration-solid">Find a Friend</a>
+            <Link href="/farcaster-lookup" className="underline decoration-dotted underline-offset-2 hover:decoration-solid">Find a Friend</Link>
             <span>•</span>
-            <a href="/" className="underline decoration-dotted underline-offset-2 hover:decoration-solid">Play Quiz</a>
+            <Link href="/" className="underline decoration-dotted underline-offset-2 hover:decoration-solid">Play Quiz</Link>
             {!friendSearchedToday && <span className="text-red-600">(friend not searched yet)</span>}
             {!quizCompletedToday && <span className="text-red-600">(quiz not completed yet)</span>}
           </div>
