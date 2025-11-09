@@ -4,40 +4,6 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { base, mainnet } from "wagmi/chains";
 import { useJackpot, useExplorerTxUrl } from '@/lib/hooks/useJackpot';
-
-// Inline component for custom approve input (decimal USDC -> units)
-function CustomApproveInput({ onApprove }: { onApprove: (units: bigint) => void }) {
-  const [val, setVal] = useState<string>('');
-  const [err, setErr] = useState<string | null>(null);
-  const parseAndApprove = () => {
-    setErr(null);
-    if (!val.trim()) return;
-    const num = Number(val);
-    if (!isFinite(num) || num <= 0) { setErr('Enter a positive number'); return; }
-    if (num > 500) { setErr('Limit 500 USDC for safety'); return; }
-    const units = BigInt(Math.round(num * 10 ** USDC_DECIMALS));
-    onApprove(units);
-  };
-  return (
-    <div className="flex items-center gap-1 mt-1">
-      <input
-        type="number"
-        min="0"
-        step="0.01"
-        placeholder="Custom"
-        value={val}
-        onChange={e=>setVal(e.target.value)}
-        className="w-16 px-1 py-0.5 rounded border border-[#DC8291] text-[10px] bg-white/80 focus:outline-none"
-      />
-      <button
-        onClick={parseAndApprove}
-        className="text-[10px] bg-[#2d1b2e] text-[#FFE4EC] px-2 py-1 rounded"
-        type="button"
-      >Approve</button>
-      {err && <span className="text-[9px] text-red-600 ml-1 max-w-[90px] truncate" title={err}>{err}</span>}
-    </div>
-  );
-}
 import { getWalletTotalPoints } from "@/lib/tpoints";
 
 // Config
@@ -159,7 +125,7 @@ export default function JackpotPage() {
   const spinLink = useExplorerTxUrl(spinTxHash);
   const buyLink = useExplorerTxUrl(buyTxHash);
 
-  const ensureOnBase = useCallback(async () => {
+  const requireBase = useCallback(async () => {
     if (!address) {
       setNetworkError('Connect your wallet to continue.');
       return false;
@@ -177,21 +143,23 @@ export default function JackpotPage() {
       if (switchChain) {
         switchChain({ chainId: base.id });
         setNetworkError('Approve the Base network switch in your wallet to continue.');
+      } else {
+        setNetworkError('Switch to Base mainnet in your wallet to continue.');
       }
     } catch (err: any) {
       const message = err?.shortMessage || err?.message || 'Switch to Base mainnet to continue.';
       setNetworkError(message);
-      return false;
     }
     return false;
   }, [address, isOnBase, switchChain, switchChainAsync]);
 
-  const runWithBase = useCallback(async (action: () => Promise<void> | void) => {
-    const ok = await ensureOnBase();
-    if (!ok) return false;
-    await action();
-    return true;
-  }, [ensureOnBase]);
+  const runWithBase = useCallback(
+    async (action: () => Promise<void> | void) => {
+      if (!(await requireBase())) return;
+      await action();
+    },
+    [requireBase],
+  );
 
   useEffect(() => {
     if (isOnBase) {
@@ -367,15 +335,17 @@ export default function JackpotPage() {
   const dist = Math.hypot(x - centerX, y - centerY);
   // Expand clickable radius for accessibility (visual center button is 50px)
   if (dist <= 85) {
-      if (!hasAllowanceForSpin && !approving) {
-        await runWithBase(() => doApprove());
-      } else if (hasAllowanceForSpin && (credits || 0n) === 0n && !buying) {
-        await runWithBase(() => buyOneSpin());
-      } else if (hasAllowanceForSpin && (credits || 0n) > 0n && !spinConfirming && !waitingVRF) {
-        await runWithBase(() => requestSpin());
-      }
+      await runWithBase(async () => {
+        if (!hasAllowanceForSpin && !approving) {
+          await doApprove();
+        } else if (hasAllowanceForSpin && (credits || 0n) === 0n && !buying) {
+          await buyOneSpin();
+        } else if (hasAllowanceForSpin && (credits || 0n) > 0n && !spinConfirming && !waitingVRF) {
+          await requestSpin();
+        }
+      });
     }
-  }, [runWithBase, doApprove, hasAllowanceForSpin, approving, credits, buying, spinConfirming, waitingVRF, requestSpin, buyOneSpin]);
+  }, [requireBase, doApprove, hasAllowanceForSpin, approving, credits, buying, spinConfirming, waitingVRF, requestSpin, buyOneSpin]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center py-8 relative">
