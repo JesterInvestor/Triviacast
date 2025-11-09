@@ -30,14 +30,63 @@ function useQuizCompletedToday() {
   return completed;
 }
 
+interface QuestCardProps {
+  title: string; emoji: string; description: string; reward: string; claimed: boolean; disabled: boolean; onClaim: ()=>void; loading: boolean;
+}
+
+function QuestCard({ title, emoji, description, reward, claimed, disabled, onClaim, loading }: QuestCardProps) {
+  return (
+    <div className="p-4 sm:p-5 bg-white rounded-lg border-4 border-[#F4A6B7] shadow relative overflow-hidden">
+      <div className="flex items-start gap-3">
+        <div className="text-3xl sm:text-4xl leading-none drop-shadow-sm">{emoji}</div>
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-3 mb-1">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-[#2d1b2e]">{title}</h2>
+            <span className="px-2 py-1 bg-[#FFE4EC] border border-[#F4A6B7] rounded text-xs font-semibold text-[#5a3d5c]">{reward}</span>
+          </div>
+          <p className="text-sm text-[#5a3d5c] mb-3 leading-relaxed">{description}</p>
+          <div className="flex items-center gap-3">
+            {claimed ? (
+              <div className="text-green-700 text-sm font-semibold">✅ Claimed</div>
+            ) : (
+              <button
+                disabled={disabled || loading}
+                onClick={() => !disabled && onClaim()}
+                className={`px-4 py-2 rounded-lg text-sm font-bold shadow transition min-w-[120px] ${disabled || loading ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white'}`}
+              >
+                {loading ? 'Processing…' : 'Claim'}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function QuestsPage() {
   const { address } = useAccount();
   const { iqPoints } = useIQPoints(address as `0x${string}` | undefined);
+  const gasless = process.env.NEXT_PUBLIC_QUEST_GASLESS === 'true';
+  const [inlineError, setInlineError] = useState<string | null>(null);
   const { claimedShare, claimedQuizPlay, claimedChallenge, claimShare, claimDailyQuizPlay, claimDailyChallenge, loading, error, secondsUntilReset } = useQuestIQ(address as `0x${string}` | undefined);
   const quizCompletedToday = useQuizCompletedToday();
   const resetHours = Math.floor(secondsUntilReset/3600);
   const resetMinutes = Math.floor((secondsUntilReset%3600)/60);
   const resetSeconds = secondsUntilReset%60;
+
+  async function claimGasless(questId: number, user: `0x${string}`) {
+    const res = await fetch('/api/quests/claim', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ questId, address: user })
+    });
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      throw new Error(j.error || `gasless claim failed (${res.status})`);
+    }
+    return res.json();
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] py-6 sm:py-10">
@@ -60,7 +109,6 @@ export default function QuestsPage() {
         )}
 
         <div className="grid gap-4 sm:gap-6">
-          {/* Share Quest */}
           <QuestCard
             title="Daily Share"
             emoji="📣"
@@ -68,11 +116,16 @@ export default function QuestsPage() {
             reward="5,000 iQ"
             claimed={claimedShare}
             disabled={claimedShare || !address || !!error}
-            onClaim={claimShare}
+            onClaim={async () => {
+              setInlineError(null);
+              if (gasless && address) {
+                try { await claimGasless(1, address as `0x${string}`); } catch (e:any) { setInlineError(e.message); return; }
+              } else {
+                await claimShare();
+              }
+            }}
             loading={loading}
           />
-
-            {/* Daily Quiz Play Quest */}
           <QuestCard
             title="Daily Quiz Play"
             emoji="🧠"
@@ -80,11 +133,16 @@ export default function QuestsPage() {
             reward="1,000 iQ"
             claimed={claimedQuizPlay}
             disabled={claimedQuizPlay || !address || !quizCompletedToday || !!error}
-            onClaim={claimDailyQuizPlay}
+            onClaim={async () => {
+              setInlineError(null);
+              if (gasless && address) {
+                try { await claimGasless(2, address as `0x${string}`); } catch (e:any) { setInlineError(e.message); return; }
+              } else {
+                await claimDailyQuizPlay();
+              }
+            }}
             loading={loading}
           />
-
-          {/* Daily Challenge placeholder */}
           <QuestCard
             title="Daily Challenge"
             emoji="🔥"
@@ -92,23 +150,29 @@ export default function QuestsPage() {
             reward="10,000 iQ"
             claimed={claimedChallenge}
             disabled={claimedChallenge || !address || !!error}
-            onClaim={claimDailyChallenge}
+            onClaim={async () => {
+              setInlineError(null);
+              if (gasless && address) {
+                try { await claimGasless(3, address as `0x${string}`); } catch (e:any) { setInlineError(e.message); return; }
+              } else {
+                await claimDailyChallenge();
+              }
+            }}
             loading={loading}
           />
         </div>
 
-        {error && (
+        {(error || inlineError) && (
           <div className="mt-6 p-4 bg-white border-2 border-red-300 text-red-700 rounded-lg text-sm">
-            Error: {error}
+            Error: {inlineError || error}
           </div>
         )}
         <div className="mt-8 text-center text-xs text-[#5a3d5c]">
-          Minimal gating: quiz completion is a local flag today; on-chain or attestation gating planned.
+          Minimal gating: quiz completion is a local flag today; on-chain or attestation gating planned. {gasless ? 'Gasless claims are enabled.' : 'Gasless claims not configured.'}
         </div>
       </div>
     </div>
   );
-}
 
 interface QuestCardProps {
   title: string; emoji: string; description: string; reward: string; claimed: boolean; disabled: boolean; onClaim: ()=>void; loading: boolean;

@@ -78,4 +78,20 @@ contract QuestManagerIQ {
     function claimShare() external { claim(1); }
     function claimDailyQuizPlay() external { claim(2); }
     function claimDailyChallenge() external { claim(3); }
+
+    /**
+     * @notice Owner-awarded claim on behalf of a user. Enables gasless UX via backend/relayer.
+     * @dev Preserves the same daily gating and quest config checks.
+     */
+    function claimFor(address user, uint8 id) external onlyOwner notPaused {
+        require(user != address(0), "Quest: zero user");
+        QuestConfig memory qc = quest[id];
+        require(qc.enabled, "Quest: disabled");
+        require(qc.amount > 0, "Quest: zero amount");
+        uint256 day = currentDay();
+        require(lastClaimDay[user][id] < day, "Quest: already claimed");
+        lastClaimDay[user][id] = day;
+        iqPoints.award(user, qc.amount);
+        emit QuestClaimed(user, id, qc.amount, day);
+    }
 }
