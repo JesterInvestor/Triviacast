@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAccount, useChainId } from 'wagmi'
 import { getAddress } from 'viem'
 import { wagmiConfig } from '@/lib/wagmi'
-import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, getLastSpinAt, getPrice, getFeeReceiver, getUsdcToken } from '@/lib/jackpot'
+import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, buySpinNoSim, getLastSpinAt, getPrice, getFeeReceiver, getUsdcToken } from '@/lib/jackpot'
 import { readContract } from '@wagmi/core'
 
 export type JackpotState = {
@@ -247,6 +247,29 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     }
   }, [address, contractPrice, params.priceUnits, usdcAllowance, usdcBalance])
 
+  const forceBuySpins = useCallback(async (count: bigint) => {
+    if (!address) return
+    setBuyError(null)
+    setBuying(true)
+    setBuyTxHash(null)
+    try {
+      const hash = await buySpinNoSim(address, count)
+      setBuyTxHash(hash)
+      try {
+        const { waitForTransactionReceipt } = await import('@wagmi/core')
+        await waitForTransactionReceipt(wagmiConfig, { hash })
+      } catch {}
+      try {
+        const c = await getSpinCredits(address)
+        setCredits(c)
+      } catch {}
+    } catch (e: any) {
+      setBuyError(e?.message || 'Buy spin failed (no simulate)')
+    } finally {
+      setBuying(false)
+    }
+  }, [address])
+
   const requestSpin = useCallback(async () => {
     if (!canRequestSpin || !address || spinConfirming || waitingVRF) return
     setSpinError(null)
@@ -303,6 +326,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     requestSpin,
     buyOneSpin,
     buySpins,
+  forceBuySpins,
   approveAmount,
     jackpotAddrValid,
     lastSpinAt,

@@ -135,6 +135,18 @@ export async function buySpin(owner: `0x${string}`, count: bigint = 1n) {
   return writeContract(wagmiConfig, request)
 }
 
+// Optional: write without simulate to bypass RPC sim quirks in some environments
+export async function buySpinNoSim(owner: `0x${string}`, count: bigint = 1n) {
+  const ownerAddr = getAddress(owner)
+  return writeContract(wagmiConfig, {
+    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+    abi: JACKPOT_ABI as any,
+    functionName: 'buySpins',
+    args: [count],
+    account: ownerAddr as `0x${string}`
+  })
+}
+
 export async function getSpinCredits(user: `0x${string}`) {
   const userAddr = getAddress(user)
   return readContract(wagmiConfig, {
