@@ -1,4 +1,5 @@
 import { readContract, simulateContract, writeContract, watchContractEvent } from '@wagmi/core'
+import { getAddress } from 'viem'
 import { wagmiConfig } from './wagmi'
 
 export const JACKPOT_ADDRESS = (process.env.NEXT_PUBLIC_JACKPOT_ADDRESS || '') as `0x${string}`
@@ -60,62 +61,70 @@ export const ERC20_ABI = [
 ] as const
 
 export async function approveUsdc(usdc: `0x${string}`, owner: `0x${string}`, amount: bigint) {
+  const usdcAddr = getAddress(usdc)
+  const ownerAddr = getAddress(owner)
   const { request } = await simulateContract(wagmiConfig, {
-    address: usdc,
+    address: usdcAddr as `0x${string}`,
     abi: ERC20_ABI as any,
     functionName: 'approve',
-    args: [JACKPOT_ADDRESS, amount],
-    account: owner
+    args: [getAddress(JACKPOT_ADDRESS) as `0x${string}`, amount],
+    account: ownerAddr as `0x${string}`
   })
   return writeContract(wagmiConfig, request)
 }
 
 export async function getUsdcAllowance(usdc: `0x${string}`, owner: `0x${string}`) {
+  const usdcAddr = getAddress(usdc)
+  const ownerAddr = getAddress(owner)
   return readContract(wagmiConfig, {
-    address: usdc,
+    address: usdcAddr as `0x${string}`,
     abi: ERC20_ABI as any,
     functionName: 'allowance',
-    args: [owner, JACKPOT_ADDRESS]
+    args: [ownerAddr as `0x${string}`, getAddress(JACKPOT_ADDRESS) as `0x${string}`]
   }) as Promise<bigint>
 }
 
 export async function spinJackpot(owner: `0x${string}`) {
+  const ownerAddr = getAddress(owner)
   const { request } = await simulateContract(wagmiConfig, {
-    address: JACKPOT_ADDRESS,
+    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
     abi: JACKPOT_ABI as any,
     functionName: 'spin',
     args: [],
-    account: owner
+    account: ownerAddr as `0x${string}`
   })
   return writeContract(wagmiConfig, request)
 }
 
 export async function buySpin(owner: `0x${string}`, count: bigint = 1n) {
+  const ownerAddr = getAddress(owner)
   const { request } = await simulateContract(wagmiConfig, {
-    address: JACKPOT_ADDRESS,
+    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
     abi: JACKPOT_ABI as any,
     functionName: 'buySpins',
     args: [count],
-    account: owner
+    account: ownerAddr as `0x${string}`
   })
   return writeContract(wagmiConfig, request)
 }
 
 export async function getSpinCredits(user: `0x${string}`) {
+  const userAddr = getAddress(user)
   return readContract(wagmiConfig, {
-    address: JACKPOT_ADDRESS,
+    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
     abi: JACKPOT_ABI as any,
     functionName: 'spinCredits',
-    args: [user]
+    args: [userAddr as `0x${string}`]
   }) as Promise<bigint>
 }
 
 export async function getLastSpinAt(user: `0x${string}`) {
+  const userAddr = getAddress(user)
   return readContract(wagmiConfig, {
-    address: JACKPOT_ADDRESS,
+    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
     abi: JACKPOT_ABI as any,
     functionName: 'lastSpinAt',
-    args: [user]
+    args: [userAddr as `0x${string}`]
   }) as Promise<bigint>
 }
 

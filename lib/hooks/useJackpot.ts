@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAccount, useChainId } from 'wagmi'
+import { getAddress } from 'viem'
 import { wagmiConfig } from '@/lib/wagmi'
 import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, getLastSpinAt } from '@/lib/jackpot'
 import { readContract } from '@wagmi/core'
@@ -137,7 +138,10 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     setApproveError(null)
     setApproving(true)
     try {
-      const hash = await approveUsdc(params.usdcAddress, address, params.priceUnits)
+      // Normalize addresses before calls to avoid checksum errors
+      const usdcAddr = getAddress(params.usdcAddress)
+      const ownerAddr = getAddress(address)
+      const hash = await approveUsdc(usdcAddr as `0x${string}`, ownerAddr as `0x${string}`, params.priceUnits)
       setApproveTxHash(hash)
       // wait for confirmation (best effort)
       try {
@@ -145,7 +149,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
         await waitForTransactionReceipt(wagmiConfig, { hash })
       } catch {}
       // refresh allowance
-      const alw = await getUsdcAllowance(params.usdcAddress, address)
+      const alw = await getUsdcAllowance(usdcAddr as `0x${string}`, ownerAddr as `0x${string}`)
       setUsdcAllowance(alw)
     } catch (e: any) {
       setApproveError(e?.message || 'Approve failed')

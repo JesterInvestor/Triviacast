@@ -9,8 +9,16 @@ import { getWalletTotalPoints } from "@/lib/tpoints";
 const REQUIRED_T_POINTS = 100_000;
 const USDC_DECIMALS = 6;
 const SPIN_PRICE_USDC = 0.5; // $0.5 USDC per spin
-// Provide USDC address via env for flexibility (Base mainnet: 0x833589fCDd4FfD38E7aF5aD01D50e4d60C2d8bC7)
-const USDC_ADDRESS = (process.env.NEXT_PUBLIC_USDC_ADDRESS || '0x833589fCDd4FfD38E7aF5aD01D50e4d60C2d8bC7') as `0x${string}`;
+// Provide USDC address via env; normalize checksum to satisfy viem strict address validation
+import { getAddress } from 'viem';
+const RAW_USDC_ADDRESS = process.env.NEXT_PUBLIC_USDC_ADDRESS || '0x833589fCDd4FfD38E7aF5aD01D50e4d60C2d8bC7';
+let USDC_ADDRESS: `0x${string}`;
+try {
+  USDC_ADDRESS = getAddress(RAW_USDC_ADDRESS) as `0x${string}`;
+} catch {
+  // Fallback: lowercase; operations will still fail but we surface debug state
+  USDC_ADDRESS = RAW_USDC_ADDRESS.toLowerCase() as `0x${string}`;
+}
 const LAST_SPIN_KEY_PREFIX = "jackpot:lastSpin:";
 
 // Weighted prize table (basis points out of 10,000)
