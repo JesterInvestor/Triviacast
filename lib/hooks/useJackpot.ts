@@ -222,7 +222,18 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
         setBuyError(`Insufficient USDC balance: have ${usdcBalance.toString()} < required ${required.toString()} for ${count.toString()} spins.`)
         return
       }
-      const hash = await buySpin(address, count)
+      let hash: `0x${string}`
+      try {
+        hash = await buySpin(address, count)
+      } catch (e: any) {
+        const m = e?.message || ''
+        // Auto-fallback if simulate is rate-limited or preview RPC rejects sim
+        if (/over rate limit|429|HTTP request failed/i.test(m)) {
+          hash = await buySpinNoSim(address, count)
+        } else {
+          throw e
+        }
+      }
       setBuyTxHash(hash)
       try {
         const { waitForTransactionReceipt } = await import('@wagmi/core')

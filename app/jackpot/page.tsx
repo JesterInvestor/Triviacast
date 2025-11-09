@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
-import { base } from "wagmi/chains";
+import { base, mainnet } from "wagmi/chains";
 import { useJackpot, useExplorerTxUrl } from '@/lib/hooks/useJackpot';
 
 // Inline component for custom approve input (decimal USDC -> units)
@@ -82,6 +82,12 @@ export default function JackpotPage() {
   const chainId = useChainId();
   const { switchChain, isPending: switchingChain, error: switchError } = useSwitchChain();
   const isOnBase = chainId === base.id;
+  const chainLabel = useMemo(() => {
+    if (!chainId) return 'Unknown';
+    if (chainId === base.id) return `Base mainnet (${base.id})`;
+    if (chainId === mainnet.id) return `Ethereum mainnet (${mainnet.id})`;
+    return `Chain ${chainId}`;
+  }, [chainId]);
   const [walletPoints, setWalletPoints] = useState<number | null>(null);
   const [lastSpinTs, setLastSpinTs] = useState<number | null>(null);
   const [showDebug, setShowDebug] = useState<boolean>(false);
@@ -327,19 +333,19 @@ export default function JackpotPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center py-8 relative">
-      {/* Network switch helper */}
-      {!isOnBase && (
-        <div className="mb-3 w-full flex items-center justify-center px-4">
-          <div className="flex items-center gap-2 bg-white/80 backdrop-blur border border-[#DC8291] text-[#2d1b2e] rounded px-3 py-2 shadow">
-            <span className="text-sm">You are not on Base mainnet.</span>
+      {/* Network indicator + switch */}
+      <div className="mb-3 w-full flex items-center justify-center px-4">
+        <div className={`flex items-center gap-2 ${isOnBase ? 'bg-[#34A24F]/15 border-[#34A24F]' : 'bg-white/80 border-[#DC8291]'} backdrop-blur border text-[#2d1b2e] rounded px-3 py-2 shadow`}> 
+          <span className="text-sm">Network: <span className={`font-semibold ${isOnBase ? 'text-[#1f7e38]' : 'text-[#b14f5f]'}`}>{chainLabel}</span></span>
+          {!isOnBase && (
             <button
               onClick={() => switchChain({ chainId: base.id })}
               disabled={switchingChain}
               className="bg-[#2d1b2e] text-[#FFE4EC] px-3 py-1 rounded text-sm disabled:opacity-50"
             >{switchingChain ? 'Switching…' : 'Switch to Base'}</button>
-          </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Action bar for accessibility / alternative to center click */}
       {eligible && (
@@ -454,6 +460,7 @@ export default function JackpotPage() {
             <div className="font-semibold text-[11px]">Debug State</div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
               <span>Jackpot Addr Valid:</span><span>{String(jackpotAddrValid)}</span>
+              <span>Chain ID:</span><span>{chainId}</span>
               <span>Jackpot Address:</span><span className="truncate max-w-[180px]">{process.env.NEXT_PUBLIC_JACKPOT_ADDRESS || '—'}</span>
               <span>Price (units):</span><span>{contractPriceUnits ? contractPriceUnits.toString() : '—'}</span>
               <span>Price (USDC):</span><span>{priceUsdcDisplay}</span>
