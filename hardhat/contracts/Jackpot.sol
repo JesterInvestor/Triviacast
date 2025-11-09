@@ -119,9 +119,11 @@ contract Jackpot is VRFConsumerBaseV2Plus {
     function setNumWords(uint32 _n) external onlyOwner { numWords = _n; }
 
     function setTiers(Tier[] calldata newTiers) external onlyOwner {
+        require(newTiers.length > 0, "no tiers");
         delete tiers;
         uint256 sum;
         for (uint256 i = 0; i < newTiers.length; i++) {
+            require(newTiers[i].bp > 0, "bp=0");
             tiers.push(newTiers[i]);
             sum += newTiers[i].bp;
         }
@@ -182,9 +184,9 @@ contract Jackpot is VRFConsumerBaseV2Plus {
         require(pointsThreshold > 0, "threshold=0");
 
         // Consume one pre-paid credit
-        uint256 credits = spinCredits[msg.sender];
-        require(credits > 0, "no credits");
-        unchecked { spinCredits[msg.sender] = credits - 1; }
+    uint256 credits = spinCredits[msg.sender];
+    require(credits > 0, "no credits");
+    spinCredits[msg.sender] = credits - 1;
 
         // Request randomness
         if (subscriptionId == 0) revert NoSubscription();
@@ -225,8 +227,9 @@ contract Jackpot is VRFConsumerBaseV2Plus {
         if (prize > 0) {
             uint256 bal = triv.balanceOf(address(this));
             if (bal >= prize) {
-                // best-effort transfer; ignore return value if token non-standard
-                triv.transfer(p.player, prize);
+                // best-effort transfer; check return without reverting to avoid breaking VRF callback
+                bool ok = triv.transfer(p.player, prize);
+                ok; // no-op to silence warnings; non-standard tokens may return false
             }
         }
 
@@ -242,6 +245,8 @@ contract Jackpot is VRFConsumerBaseV2Plus {
     // Admin rescues
     function rescueTokens(address token, address to, uint256 amount) external onlyOwner {
         require(to != address(0), "bad to");
+        // Prevent accidental drain of core tokens via generic rescue
+        require(token != address(usdc) && token != address(triv), "restricted token");
         IERC20(token).transfer(to, amount);
     }
 }
