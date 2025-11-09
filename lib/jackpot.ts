@@ -253,28 +253,38 @@ export async function buySpin(owner: `0x${string}`, count: bigint = 1n) {
       args: [count],
       account: ownerAddr as `0x${string}`,
       chainId: base.id,
+      gas: 200_000n,
       ...await getBumpedFees()
     })
   }
-  const { request } = await simulateContract(wagmiConfig, {
-    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
-    abi: JACKPOT_ABI as any,
-    functionName: 'buySpins',
-    args: [count],
-    account: ownerAddr as `0x${string}`,
-    chainId: base.id
-  })
-  const fees = await getBumpedFees()
-  return writeContract(wagmiConfig, {
-    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
-    abi: JACKPOT_ABI as any,
-    functionName: 'buySpins',
-    args: [count],
-    account: ownerAddr as `0x${string}`,
-    chainId: base.id,
-    ...(request && (request as any).gas ? { gas: (request as any).gas as bigint } : {}),
-    ...fees
-  } as any)
+  try {
+    const { request } = await simulateContract(wagmiConfig, {
+      address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+      abi: JACKPOT_ABI as any,
+      functionName: 'buySpins',
+      args: [count],
+      account: ownerAddr as `0x${string}`,
+      chainId: base.id
+    })
+    const fees = await getBumpedFees()
+    return writeContract(wagmiConfig, {
+      address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+      abi: JACKPOT_ABI as any,
+      functionName: 'buySpins',
+      args: [count],
+      account: ownerAddr as `0x${string}`,
+      chainId: base.id,
+      ...(request && (request as any).gas ? { gas: (request as any).gas as bigint } : {}),
+      ...fees
+    } as any)
+  } catch (e: any) {
+    const m = String(e?.message || '')
+    // If simulation fails due to token simulation quirks or preview unavailability, fall back to sending with a safe gas limit.
+    if (/returned no data|execution reverted|preview|estimate|simulation/i.test(m) && !/NotEligible\(|TooSoon\(|PaymentFailed\(|NoSubscription\(/.test(m)) {
+      return buySpinNoSim(ownerAddr as `0x${string}`, count)
+    }
+    throw e
+  }
 }
 
 // Optional: write without simulate to bypass RPC sim quirks in some environments
@@ -287,6 +297,7 @@ export async function buySpinNoSim(owner: `0x${string}`, count: bigint = 1n) {
     args: [count],
     account: ownerAddr as `0x${string}`,
     chainId: base.id,
+    gas: 200_000n,
     ...await getBumpedFees()
   })
 }
@@ -372,15 +383,41 @@ export async function getUsdcToken() {
 export async function simulateUsdcPayment(usdc: `0x${string}`, owner: `0x${string}`, to: `0x${string}`, amount: bigint) {
   // Note: This is an eth_call simulation; it does not change state.
   // account is set to the Jackpot contract address, which is the spender in allowance[from][spender].
-  const { result } = await simulateContract(wagmiConfig, {
-    address: getAddress(usdc) as `0x${string}`,
-    abi: ERC20_ABI as any,
-    functionName: 'transferFrom',
-    args: [getAddress(owner) as `0x${string}`, getAddress(to) as `0x${string}`, amount],
-    account: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
-    chainId: base.id,
-  }) as unknown as { result: boolean }
-  return result
+  try {
+    const { result } = await simulateContract(wagmiConfig, {
+      address: getAddress(usdc) as `0x${string}`,
+      abi: ERC20_ABI as any,
+      functionName: 'transferFrom',
+      args: [getAddress(owner) as `0x${string}`, getAddress(to) as `0x${string}`, amount],
+      account: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+      chainId: base.id,
+    }) as unknown as { result: boolean }
+    return result
+  } catch (e: any) {
+    // Some tokens (USDT/older variants) return no data on success; treat no-data as inconclusive but not blocking.
+    const m = String(e?.message || '')
+    if (/returned no data/i.test(m)) {
+      // Try a no-return ABI variant once; if it still fails, surface as inconclusive.
+      const NORET_ABI = [
+        { name: 'transferFrom', type: 'function', stateMutability: 'nonpayable', inputs: [
+          { name: 'from', type: 'address' }, { name: 'to', type: 'address' }, { name: 'amount', type: 'uint256' }
+        ], outputs: [] },
+      ] as const
+      try {
+        await simulateContract(wagmiConfig, {
+          address: getAddress(usdc) as `0x${string}`,
+          abi: NORET_ABI as any,
+          functionName: 'transferFrom',
+          args: [getAddress(owner) as `0x${string}`, getAddress(to) as `0x${string}`, amount],
+          account: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+          chainId: base.id,
+        })
+        // If the call doesn't revert, consider it OK.
+        return true
+      } catch {}
+    }
+    throw e
+  }
 }
 
 export function onSpinResult(cb: (args: { requestId: bigint; player: `0x${string}`; prize: bigint }) => void) {

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createWalletClient, http, parseAbi } from 'viem'
-import { base } from 'viem/chains'
-import { privateKeyToAccount } from 'viem/accounts'
+import { parseAbi } from 'viem'
+import { validateOrigin, parseQuestId, parseUserAddress, createRelayerWallet } from '@/lib/server/quests'
 
 // Minimal server-side relayer to award iQ without a wallet transaction from the user.
 // SECURITY: This endpoint should be protected before production use.
@@ -12,15 +11,11 @@ export const dynamic = 'force-dynamic'
 export async function POST(req: NextRequest) {
   try {
     const { address, questId } = await req.json()
-    // Basic origin check (CSRF protection)
-    const allowedOrigin = process.env.NEXT_PUBLIC_SITE_ORIGIN
-    const origin = req.headers.get('origin') || ''
-    if (allowedOrigin && origin && origin !== allowedOrigin) {
-      return NextResponse.json({ error: 'invalid origin' }, { status: 403 })
-    }
+    const originErr = validateOrigin(req)
+    if (originErr) return NextResponse.json({ error: originErr }, { status: 403 })
 
     // Simple in-memory rate limit per IP+day+quest
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'unknown'
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'unknown'
     const today = Math.floor(Date.now()/86400000)
     const key = `${ip}:${address}:${questId}:${today}`
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -32,35 +27,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'rate limited' }, { status: 429 })
     }
     limiter.set(key, now)
-    if (!address || typeof address !== 'string' || !address.startsWith('0x')) {
-      return NextResponse.json({ error: 'invalid address' }, { status: 400 })
-    }
-    const idNum = Number(questId)
-    if (!Number.isInteger(idNum) || idNum <= 0) {
-      return NextResponse.json({ error: 'invalid quest id' }, { status: 400 })
-    }
+    const user = parseUserAddress(address)
+    if (!user) return NextResponse.json({ error: 'invalid address' }, { status: 400 })
+    const idNum = parseQuestId(questId)
+    if (!idNum) return NextResponse.json({ error: 'invalid quest id' }, { status: 400 })
 
-    const pk = process.env.BACKEND_PRIVATE_KEY
-    const questManager = process.env.NEXT_PUBLIC_QUEST_MANAGER_ADDRESS as `0x${string}` | undefined
-    const rpc =
-      process.env.BASE_RPC_URL
-      || process.env.BASE_MAINNET_RPC_URL
-      || process.env.NEXT_PUBLIC_RPC_URL
-      || (process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ? `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}` : undefined)
-      || (process.env.NEXT_PUBLIC_INFURA_PROJECT_ID ? `https://base-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_PROJECT_ID}` : undefined)
-      || 'https://mainnet.base.org'
-    if (!pk || !questManager) {
-      return NextResponse.json({ error: 'gasless not configured' }, { status: 501 })
-    }
-
-    // Create a wallet client with the relayer key
-    const client = createWalletClient({ chain: base, transport: http(rpc) })
-      .extend((c) => ({ account: (c as any).account })) as any
-
-    // viem requires the private key to be set as account; use built-in support via environment in production
-    // Here we reconstruct a client with the PK; in many setups you would use viem/accounts fromPrivateKey
-  const account = privateKeyToAccount(`0x${pk.replace(/^0x/, '')}` as `0x${string}`)
-  const wallet = createWalletClient({ account, chain: base, transport: http(rpc) })
+    const relayer = createRelayerWallet()
+    if ('error' in relayer) return NextResponse.json({ error: 'gasless not configured' }, { status: 501 })
+    const { wallet, account, questManager } = relayer
 
     const abi = parseAbi([
       'function claimFor(address user, uint8 id) external',
@@ -71,7 +45,7 @@ export async function POST(req: NextRequest) {
       address: questManager,
       abi,
       functionName: 'claimFor',
-      args: [address as `0x${string}`, idNum],
+      args: [user, idNum],
     })
 
     return NextResponse.json({ hash })

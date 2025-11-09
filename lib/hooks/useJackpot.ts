@@ -265,8 +265,8 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
         hash = await buySpin(address, count)
       } catch (e: any) {
         const m = e?.message || ''
-        // Auto-fallback if simulate is rate-limited or preview RPC rejects sim
-        if (/over rate limit|429|HTTP request failed/i.test(m)) {
+        // Auto-fallback if simulate is rate-limited, preview unavailable, or token simulation quirk detected
+        if (/over rate limit|429|HTTP request failed|returned no data|execution reverted|estimate|preview/i.test(m)) {
           hash = await buySpinNoSim(address, count)
         } else {
           throw e
