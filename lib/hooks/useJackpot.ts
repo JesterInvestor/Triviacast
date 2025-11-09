@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAccount, useChainId } from 'wagmi'
+import { base } from 'wagmi/chains'
 import { getAddress } from 'viem'
 import { wagmiConfig } from '@/lib/wagmi'
 import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, spinPaying, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, buySpinNoSim, buySpinWithSim, getLastSpinAt, getPrice, getFeeReceiver, getUsdcToken, simulateUsdcPayment } from '@/lib/jackpot'
@@ -62,6 +63,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
   const [preflightOk, setPreflightOk] = useState<boolean | null>(null)
   const [preflightError, setPreflightError] = useState<string | null>(null)
   const unwatchRef = useRef<(() => void) | null>(null)
+  const chainId = useChainId()
 
   // balances
   useEffect(() => {
@@ -198,6 +200,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
 
   const doApprove = useCallback(async () => {
     if (!canApprove || !address) return
+    if (chainId !== base.id) { setApproveError('Switch to Base to approve.'); return }
     setApproveError(null)
     setApproving(true)
     try {
@@ -217,11 +220,12 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     } catch (e: any) {
       setApproveError(e?.message || 'Approve failed')
     } finally { setApproving(false) }
-  }, [canApprove, address, params.usdcAddress, effectivePrice])
+  }, [canApprove, address, params.usdcAddress, effectivePrice, chainId])
 
   // Custom approve arbitrary amount (in USDC smallest units) for multi-buy convenience
   const approveAmount = useCallback(async (amount: bigint) => {
     if (!address) return
+    if (chainId !== base.id) { setApproveError('Switch to Base to approve.'); return }
     setApproveError(null)
     setApproving(true)
     try {
@@ -238,10 +242,11 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     } catch (e: any) {
       setApproveError(e?.message || 'Approve failed')
     } finally { setApproving(false) }
-  }, [address, params.usdcAddress])
+  }, [address, params.usdcAddress, chainId])
 
   const buySpins = useCallback(async (count: bigint) => {
     if (!address) return
+    if (chainId !== base.id) { setBuyError('Switch to Base to buy spins.'); return }
     setBuyError(null)
     setBuying(true)
     setBuyTxHash(null)
@@ -296,7 +301,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     } finally {
       setBuying(false)
     }
-  }, [address, contractPrice, params.priceUnits, usdcAllowance, usdcBalance])
+  }, [address, contractPrice, params.priceUnits, usdcAllowance, usdcBalance, chainId])
 
   const buyOneSpin = useCallback(async () => {
     return buySpins(1n)
@@ -304,6 +309,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
 
   const forceBuySpins = useCallback(async (count: bigint) => {
     if (!address) return
+    if (chainId !== base.id) { setBuyError('Switch to Base to buy spins.'); return }
     setBuyError(null)
     setBuying(true)
     setBuyTxHash(null)
@@ -328,11 +334,12 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     } finally {
       setBuying(false)
     }
-  }, [address])
+  }, [address, chainId])
 
   // Try a previewed buy (forces a simulate even if globally disabled). If RPC rejects sim (429), surface a helpful error.
   const previewBuySpins = useCallback(async (count: bigint) => {
     if (!address) return
+    if (chainId !== base.id) { setBuyError('Switch to Base to preview buy.'); return }
     setBuyError(null)
     setBuying(true)
     setBuyTxHash(null)
@@ -370,10 +377,11 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     } finally {
       setBuying(false)
     }
-  }, [address])
+  }, [address, chainId])
 
   const requestSpin = useCallback(async () => {
     if (!canRequestSpin || !address || spinConfirming || waitingVRF) return
+    if (chainId !== base.id) { setSpinError('Switch to Base to spin.'); return }
     setSpinError(null)
     setSpinTxHash(null)
     // subscribe before sending tx
@@ -402,10 +410,11 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
       setWaitingVRF(false)
       setSpinError(e?.message || 'Spin failed')
     }
-  }, [canRequestSpin, address, spinConfirming, waitingVRF])
+  }, [canRequestSpin, address, spinConfirming, waitingVRF, chainId])
 
   const requestSpinPaying = useCallback(async () => {
     if (!canRequestSpinPaying || !address || spinConfirming || waitingVRF) return
+    if (chainId !== base.id) { setSpinError('Switch to Base to spin.'); return }
     setSpinError(null)
     setSpinTxHash(null)
     if (unwatchRef.current) unwatchRef.current()
@@ -439,7 +448,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
       else if (/NoSubscription\(/.test(msg)) friendly = 'VRF subscription missing.'
       setSpinError(friendly)
     }
-  }, [canRequestSpinPaying, address, spinConfirming, waitingVRF])
+  }, [canRequestSpinPaying, address, spinConfirming, waitingVRF, chainId])
 
   return {
     address,
