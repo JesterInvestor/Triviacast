@@ -240,10 +240,6 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     } finally { setApproving(false) }
   }, [address, params.usdcAddress])
 
-  const buyOneSpin = useCallback(async () => {
-    return buySpins(1n)
-  }, [])
-
   const buySpins = useCallback(async (count: bigint) => {
     if (!address) return
     setBuyError(null)
@@ -275,8 +271,14 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
       setBuyTxHash(hash)
       try {
         const { waitForTransactionReceipt } = await import('@wagmi/core')
-        await waitForTransactionReceipt(wagmiConfig, { hash })
-      } catch {}
+        const receipt = await waitForTransactionReceipt(wagmiConfig, { hash }) as any
+        if (receipt?.status !== 'success' && receipt?.status !== 1) {
+          throw new Error('Transaction failed (buySpins)')
+        }
+      } catch (e: any) {
+        // surface tx failure
+        throw e
+      }
       // refresh credits
       try {
         const c = await getSpinCredits(address)
@@ -296,6 +298,10 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     }
   }, [address, contractPrice, params.priceUnits, usdcAllowance, usdcBalance])
 
+  const buyOneSpin = useCallback(async () => {
+    return buySpins(1n)
+  }, [buySpins])
+
   const forceBuySpins = useCallback(async (count: bigint) => {
     if (!address) return
     setBuyError(null)
@@ -306,8 +312,13 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
       setBuyTxHash(hash)
       try {
         const { waitForTransactionReceipt } = await import('@wagmi/core')
-        await waitForTransactionReceipt(wagmiConfig, { hash })
-      } catch {}
+        const receipt = await waitForTransactionReceipt(wagmiConfig, { hash }) as any
+        if (receipt?.status !== 'success' && receipt?.status !== 1) {
+          throw new Error('Transaction failed (force buy)')
+        }
+      } catch (e: any) {
+        throw e
+      }
       try {
         const c = await getSpinCredits(address)
         setCredits(c)
@@ -343,8 +354,13 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
       setBuyTxHash(hash)
       try {
         const { waitForTransactionReceipt } = await import('@wagmi/core')
-        await waitForTransactionReceipt(wagmiConfig, { hash })
-      } catch {}
+        const receipt = await waitForTransactionReceipt(wagmiConfig, { hash }) as any
+        if (receipt?.status !== 'success' && receipt?.status !== 1) {
+          throw new Error('Transaction failed (preview buy)')
+        }
+      } catch (e: any) {
+        throw e
+      }
       try {
         const c = await getSpinCredits(address)
         setCredits(c)
