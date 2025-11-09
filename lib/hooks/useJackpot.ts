@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useAccount } from 'wagmi'
+import { useAccount, useNetwork } from 'wagmi'
 import { getAddress } from 'viem'
 import { wagmiConfig } from '@/lib/wagmi'
 import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, spinPaying, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, buySpinNoSim, buySpinWithSim, getLastSpinAt, getPrice, getFeeReceiver, getUsdcToken, simulateUsdcPayment } from '@/lib/jackpot'
@@ -26,7 +26,8 @@ export type JackpotState = {
 }
 
 export function useExplorerTxUrl(hash?: `0x${string}` | null) {
-  const chainId = useChainId()
+  const { chain } = useNetwork()
+  const chainId = chain?.id ?? null
   return useMemo(() => {
     if (!hash) return null
     // Base mainnet only
