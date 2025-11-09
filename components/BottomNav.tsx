@@ -27,9 +27,11 @@ export default function BottomNav() {
       justifyContent: 'space-between',
       alignItems: 'center',
       zIndex: 100,
-      paddingBottom: 'env(safe-area-inset-bottom)'
+      paddingBottom: 'env(safe-area-inset-bottom)',
+      paddingLeft: '12px',
+      paddingRight: '12px'
     }}>
-      <div style={{ display: 'flex', flex: 1, justifyContent: 'space-around' }}>
+      <div style={{ display: 'flex', flex: 1, justifyContent: 'space-between', gap: '8px' }}>
         {navItems.map(item => (
           <Link key={item.href} href={item.href} legacyBehavior>
             <a
@@ -41,8 +43,8 @@ export default function BottomNav() {
                 textDecoration: 'none',
                 fontSize: '1.5rem',
                 textAlign: 'center',
-                padding: '12px 0',
-                minWidth: '72px',
+                padding: '12px 8px',
+                minWidth: '64px',
                 lineHeight: 1,
               }}
             >
