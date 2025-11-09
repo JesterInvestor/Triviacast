@@ -14,7 +14,7 @@ export default function ShareButton({ url, className, ariaLabel }: ShareButtonPr
     <button
       onClick={() => openShareUrl(url)}
       className={className}
-      aria-label={ariaLabel || 'Share on Farcaster'}
+      aria-label={ariaLabel || 'Share with Cast'}
       type="button"
     >
       <img
