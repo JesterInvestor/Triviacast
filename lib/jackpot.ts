@@ -11,16 +11,28 @@ async function getBumpedFees() {
   try {
     // getFeeHistory is supported by many RPCs; fallback to static bump below if it fails
     const hist = await getFeeHistory(wagmiConfig, { blockCount: 4, rewardPercentiles: [5, 50, 95] }) as any
-    const base = BigInt(hist?.baseFeePerGas?.slice(-1)?.[0] ?? 0n)
-    const tip = BigInt((hist?.reward?.slice(-1)?.[0]?.[1] || 0))
+    const baseRaw = BigInt(hist?.baseFeePerGas?.slice(-1)?.[0] ?? 0n)
+    const tipRaw = BigInt((hist?.reward?.slice(-1)?.[0]?.[1] || 0))
+  const fallbackBase = 1_000_000_000n // 1 gwei
+  const baseFee = baseRaw > 0n ? baseRaw : fallbackBase
+  const fallbackTip = baseFee / 10n
+  const tipFee = tipRaw > 0n ? tipRaw : (fallbackTip > 0n ? fallbackTip : 1n)
     const bump = (v: bigint) => ((v * 125n) / 100n) + 1n
-    const maxFeePerGas = bump(base > 0n ? base : 1_000_000_000n)
-    const maxPriorityFeePerGas = bump(tip > 0n ? tip : 1n)
+    let maxPriorityFeePerGas = bump(tipFee)
+    let maxFeePerGas = bump(baseFee + tipFee)
+    if (maxFeePerGas <= maxPriorityFeePerGas) {
+      maxFeePerGas = maxPriorityFeePerGas + baseFee
+    }
     return { maxFeePerGas, maxPriorityFeePerGas }
   } catch {
+  const fallbackBase = 1_000_000_000n
+  const fallbackTip = 100_000_000n // 0.1 gwei
     const bump = (v: bigint) => ((v * 125n) / 100n) + 1n
-    const maxFeePerGas = bump(1_000_000_000n)
-    const maxPriorityFeePerGas = bump(1n)
+    let maxPriorityFeePerGas = bump(fallbackTip)
+    let maxFeePerGas = bump(fallbackBase + fallbackTip)
+    if (maxFeePerGas <= maxPriorityFeePerGas) {
+      maxFeePerGas = maxPriorityFeePerGas + fallbackBase
+    }
     return { maxFeePerGas, maxPriorityFeePerGas }
   }
 }
