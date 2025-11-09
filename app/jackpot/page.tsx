@@ -80,7 +80,7 @@ const SEGMENT_COLORS = ["#EE4040", "#F0CF50", "#815CD1", "#3DA5E0", "#34A24F", "
 export default function JackpotPage() {
   const { address } = useAccount();
   const chainId = useChainId();
-  const { switchChain, isPending: switchingChain, error: switchError } = useSwitchChain();
+  const { switchChain, switchChainAsync, isPending: switchingChain, error: switchError } = useSwitchChain();
   const isOnBase = chainId === base.id;
   const chainLabel = useMemo(() => {
     if (!chainId) return 'Unknown';
@@ -93,6 +93,7 @@ export default function JackpotPage() {
   const [showDebug, setShowDebug] = useState<boolean>(false);
   const [approveCustom, setApproveCustom] = useState<string>("");
   const [result, setResult] = useState<{ label: string; value: number } | null>(null);
+  const [networkError, setNetworkError] = useState<string | null>(null);
   // forcedPrize is provided by hook now
   const [spinning, setSpinning] = useState(false);
   const [angle, setAngle] = useState(0); // radians current
@@ -157,6 +158,46 @@ export default function JackpotPage() {
   const approveLink = useExplorerTxUrl(approveTxHash);
   const spinLink = useExplorerTxUrl(spinTxHash);
   const buyLink = useExplorerTxUrl(buyTxHash);
+
+  const ensureOnBase = useCallback(async () => {
+    if (!address) {
+      setNetworkError('Connect your wallet to continue.');
+      return false;
+    }
+    if (isOnBase) {
+      setNetworkError(null);
+      return true;
+    }
+    try {
+      if (switchChainAsync) {
+        await switchChainAsync({ chainId: base.id });
+        setNetworkError(null);
+        return true;
+      }
+      if (switchChain) {
+        switchChain({ chainId: base.id });
+        setNetworkError('Approve the Base network switch in your wallet to continue.');
+      }
+    } catch (err: any) {
+      const message = err?.shortMessage || err?.message || 'Switch to Base mainnet to continue.';
+      setNetworkError(message);
+      return false;
+    }
+    return false;
+  }, [address, isOnBase, switchChain, switchChainAsync]);
+
+  const runWithBase = useCallback(async (action: () => Promise<void> | void) => {
+    const ok = await ensureOnBase();
+    if (!ok) return false;
+    await action();
+    return true;
+  }, [ensureOnBase]);
+
+  useEffect(() => {
+    if (isOnBase) {
+      setNetworkError(null);
+    }
+  }, [isOnBase]);
 
   // (balance, allowance, credits managed by hook)
 
@@ -317,7 +358,7 @@ export default function JackpotPage() {
   // (startSpin defined earlier)
 
   // Click detection on center button
-  const handleCanvasClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleCanvasClick = useCallback(async (e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -327,14 +368,14 @@ export default function JackpotPage() {
   // Expand clickable radius for accessibility (visual center button is 50px)
   if (dist <= 85) {
       if (!hasAllowanceForSpin && !approving) {
-        doApprove();
+        await runWithBase(() => doApprove());
       } else if (hasAllowanceForSpin && (credits || 0n) === 0n && !buying) {
-        buyOneSpin();
+        await runWithBase(() => buyOneSpin());
       } else if (hasAllowanceForSpin && (credits || 0n) > 0n && !spinConfirming && !waitingVRF) {
-        requestSpin();
+        await runWithBase(() => requestSpin());
       }
     }
-  }, [doApprove, hasAllowanceForSpin, approving, credits, buying, spinConfirming, waitingVRF, requestSpin, buyOneSpin]);
+  }, [runWithBase, doApprove, hasAllowanceForSpin, approving, credits, buying, spinConfirming, waitingVRF, requestSpin, buyOneSpin]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center py-8 relative">
@@ -344,13 +385,16 @@ export default function JackpotPage() {
           <span className="text-sm">Network: <span className={`font-semibold ${isOnBase ? 'text-[#1f7e38]' : 'text-[#b14f5f]'}`}>{chainLabel}</span></span>
           {!isOnBase && (
             <button
-              onClick={() => switchChain({ chainId: base.id })}
+              onClick={() => switchChain?.({ chainId: base.id })}
               disabled={switchingChain}
               className="bg-[#2d1b2e] text-[#FFE4EC] px-3 py-1 rounded text-sm disabled:opacity-50"
             >{switchingChain ? 'Switching…' : 'Switch to Base'}</button>
           )}
         </div>
       </div>
+      {networkError && (
+        <div className="-mt-2 mb-3 text-xs text-center text-red-600 px-4">{networkError}</div>
+      )}
 
       {/* Action bar for accessibility / alternative to center click */}
       {eligible && (
@@ -358,7 +402,11 @@ export default function JackpotPage() {
           {!hasAllowanceForSpin && !approving && (
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
               <button
-                onClick={(e)=>{e.stopPropagation(); if (!approving) doApprove();}}
+                onClick={async (e)=>{
+                  e.stopPropagation();
+                  if (approving) return;
+                  await runWithBase(() => doApprove());
+                }}
                 className="bg-[#2d1b2e] text-[#FFE4EC] px-4 py-2 rounded shadow disabled:opacity-50 text-sm"
                 disabled={approving || !canApprove}
               >{approving ? 'Approving…' : `Approve ${priceUsdcDisplay} USDC`}</button>
@@ -369,7 +417,10 @@ export default function JackpotPage() {
                     <button
                       key={v}
                       disabled={approving}
-                      onClick={(e)=>{e.stopPropagation(); approveAmount(units);}}
+                      onClick={async (e)=>{
+                        e.stopPropagation();
+                        await runWithBase(() => approveAmount(units));
+                      }}
                       className="text-[10px] bg-[#DC8291] hover:bg-[#c86e7c] disabled:opacity-50 px-2 py-1 rounded"
                       title={`Approve ${v.toFixed(2)} USDC`}
                     >{v}</button>
@@ -377,7 +428,10 @@ export default function JackpotPage() {
                 })}
                 <button
                   disabled={approving}
-                  onClick={(e)=>{e.stopPropagation(); approveAmount(0n);}}
+                  onClick={async (e)=>{
+                    e.stopPropagation();
+                    await runWithBase(() => approveAmount(0n));
+                  }}
                   className="text-[10px] bg-[#7a567c] hover:bg-[#6a4e70] disabled:opacity-50 px-2 py-1 rounded"
                   title="Reset allowance to 0"
                 >0</button>
@@ -397,13 +451,13 @@ export default function JackpotPage() {
                 />
                 <button
                   disabled={approving || !approveCustom}
-                  onClick={(e)=>{
+                  onClick={async (e)=>{
                     e.stopPropagation();
                     const v = Number(approveCustom);
                     if (isNaN(v) || v <= 0) return;
                     const clamped = Math.max(0.01, Math.min(500, v));
                     const units = BigInt(Math.round(clamped * 10 ** USDC_DECIMALS));
-                    approveAmount(units);
+                    await runWithBase(() => approveAmount(units));
                   }}
                   className="text-[12px] bg-[#2d1b2e] text-[#FFE4EC] px-2 py-1 rounded disabled:opacity-50"
                 >Approve</button>
@@ -416,18 +470,30 @@ export default function JackpotPage() {
           {hasAllowanceForSpin && (credits||0n)===0n && !buying && (
             <div className="flex items-center gap-2">
               <button
-                onClick={(e)=>{e.stopPropagation(); buyOneSpin();}}
+                onClick={async (e)=>{
+                  e.stopPropagation();
+                  if (buying) return;
+                  await runWithBase(() => buyOneSpin());
+                }}
                 className="bg-[#DC8291] text-[#FFE4EC] px-4 py-2 rounded shadow text-sm disabled:opacity-50"
                 disabled={buying}
               >Buy 1 Spin</button>
               <button
-                onClick={(e)=>{e.stopPropagation(); if (confirm('Attempt preview (simulate) even though global simulate disabled? May fail if RPC rate-limited.')) previewBuySpins(1n);}}
+                onClick={async (e)=>{
+                  e.stopPropagation();
+                  if (!confirm('Attempt preview (simulate) even though global simulate disabled? May fail if RPC rate-limited.')) return;
+                  await runWithBase(() => previewBuySpins(1n));
+                }}
                 className="bg-[#2d1b2e] text-[#FFE4EC] px-3 py-2 rounded shadow text-sm disabled:opacity-50"
                 disabled={buying}
                 title="Preview buy (force simulate)"
               >Preview Buy 1</button>
               <button
-                onClick={(e)=>{e.stopPropagation(); if (confirm('Send without simulate? This may reveal revert only after wallet signs.')) forceBuySpins(1n);}}
+                onClick={async (e)=>{
+                  e.stopPropagation();
+                  if (!confirm('Send without simulate? This may reveal revert only after wallet signs.')) return;
+                  await runWithBase(() => forceBuySpins(1n));
+                }}
                 className="bg-[#7a567c] text-white px-3 py-2 rounded shadow text-sm disabled:opacity-50"
                 disabled={buying}
                 title="Force send without simulate (debug)"
@@ -436,14 +502,20 @@ export default function JackpotPage() {
           )}
           {hasAllowanceForSpin && (credits||0n)>0n && !spinConfirming && !waitingVRF && (
             <button
-              onClick={(e)=>{e.stopPropagation(); requestSpin();}}
+              onClick={async (e)=>{
+                e.stopPropagation();
+                await runWithBase(() => requestSpin());
+              }}
               className="bg-[#34A24F] text-white px-4 py-2 rounded shadow text-sm disabled:opacity-50"
               disabled={!canRequestSpin || spinning}
             >{spinning ? 'Spinning…' : 'Spin Now'}</button>
           )}
           {hasAllowanceForSpin && (credits||0n)===0n && !spinConfirming && !waitingVRF && (
             <button
-              onClick={(e)=>{e.stopPropagation(); requestSpinPaying();}}
+              onClick={async (e)=>{
+                e.stopPropagation();
+                await runWithBase(() => requestSpinPaying());
+              }}
               className="bg-[#34A24F]/80 hover:bg-[#34A24F] text-white px-4 py-2 rounded shadow text-sm disabled:opacity-50"
               disabled={!canRequestSpinPaying || spinning}
             >{spinning ? 'Spinning…' : 'Spin & Pay (no credit)'}
@@ -465,6 +537,7 @@ export default function JackpotPage() {
           </div>
           {buying && <div className="text-[10px] text-[#2d1b2e] bg-white/70 backdrop-blur px-2 py-1 rounded shadow">Purchasing…</div>}
           {buyError && <div className="text-[10px] text-red-600 bg-white/80 px-2 py-1 rounded shadow max-w-[180px] break-words">{buyError}</div>}
+          {!buyError && networkError && <div className="text-[10px] text-red-600 bg-white/80 px-2 py-1 rounded shadow max-w-[180px] break-words">{networkError}</div>}
         </div>
       )}
       <div className="container mx-auto px-3 sm:px-4 flex flex-col items-center gap-6 w-full">
@@ -563,7 +636,7 @@ export default function JackpotPage() {
             <div className="absolute inset-0 flex flex-col items-end justify-start p-2 gap-1">
               <span className="text-[10px] bg-[#2d1b2e] text-[#FFE4EC] px-2 py-1 rounded">Approved ✓ Buy spins</span>
               <div className="flex flex-col gap-1 text-[10px]">
-                <button onClick={(e)=>{e.stopPropagation(); buySpins(1n);}} className="bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded shadow">Buy 1</button>
+                <button onClick={async (e)=>{e.stopPropagation(); await runWithBase(() => buySpins(1n));}} className="bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded shadow">Buy 1</button>
               </div>
             </div>
           )}
@@ -591,7 +664,7 @@ export default function JackpotPage() {
               <div className="flex flex-col gap-1 items-end">
                 <span className="text-[10px] bg-[#2d1b2e] text-[#FFE4EC] px-2 py-1 rounded">No credits · Use Spin & Pay</span>
                 <div className="flex gap-1 flex-wrap max-w-[140px]">
-                  <button onClick={(e)=>{e.stopPropagation(); requestSpinPaying();}} className="text-[10px] bg-[#34A24F] text-white px-2 py-1 rounded">Spin & Pay</button>
+                  <button onClick={async (e)=>{e.stopPropagation(); await runWithBase(() => requestSpinPaying());}} className="text-[10px] bg-[#34A24F] text-white px-2 py-1 rounded">Spin & Pay</button>
                 </div>
               </div>
             </div>
