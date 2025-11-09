@@ -14,6 +14,13 @@ export const JACKPOT_ABI = [
   },
   {
     type: 'function',
+    name: 'price',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }]
+  },
+  {
+    type: 'function',
     name: 'lastSpinAt',
     stateMutability: 'view',
     inputs: [{ name: '', type: 'address' }],
@@ -125,6 +132,15 @@ export async function getLastSpinAt(user: `0x${string}`) {
     abi: JACKPOT_ABI as any,
     functionName: 'lastSpinAt',
     args: [userAddr as `0x${string}`]
+  }) as Promise<bigint>
+}
+
+export async function getPrice() {
+  return readContract(wagmiConfig, {
+    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+    abi: JACKPOT_ABI as any,
+    functionName: 'price',
+    args: []
   }) as Promise<bigint>
 }
 

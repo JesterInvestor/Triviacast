@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAccount, useChainId } from 'wagmi'
 import { getAddress } from 'viem'
 import { wagmiConfig } from '@/lib/wagmi'
-import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, getLastSpinAt } from '@/lib/jackpot'
+import { JACKPOT_ADDRESS, approveUsdc, getUsdcAllowance, spinJackpot, onSpinResult, prizeToLabel, ERC20_ABI, getSpinCredits, buySpin, getLastSpinAt, getPrice } from '@/lib/jackpot'
 import { readContract } from '@wagmi/core'
 
 export type JackpotState = {
@@ -58,6 +58,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
   const [buying, setBuying] = useState(false)
   const [buyError, setBuyError] = useState<string | null>(null)
   const [buyTxHash, setBuyTxHash] = useState<`0x${string}` | null>(null)
+  const [contractPrice, setContractPrice] = useState<bigint | null>(null)
   const unwatchRef = useRef<(() => void) | null>(null)
 
   // balances
@@ -92,6 +93,19 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     load();
     return () => { cancelled = true }
   }, [address, params.usdcAddress])
+
+  // contract price
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      try {
+        const p = await getPrice()
+        if (!cancelled) setContractPrice(p)
+      } catch { if (!cancelled) setContractPrice(null) }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [])
 
   // credits
   useEffect(() => {
@@ -128,8 +142,9 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
 
   // Validate jackpot address presence (empty if NEXT_PUBLIC_JACKPOT_ADDRESS not set at build/runtime)
   const jackpotAddrValid = JACKPOT_ADDRESS && JACKPOT_ADDRESS.length === 42
-  const hasBalanceForSpin = (usdcBalance || 0n) >= params.priceUnits
-  const hasAllowanceForSpin = (usdcAllowance || 0n) >= params.priceUnits
+  const effectivePrice = contractPrice ?? params.priceUnits
+  const hasBalanceForSpin = (usdcBalance || 0n) >= effectivePrice
+  const hasAllowanceForSpin = (usdcAllowance || 0n) >= effectivePrice
   const canApprove = !!address && jackpotAddrValid && !approving && hasBalanceForSpin && !hasAllowanceForSpin && params.eligible
   const canRequestSpin = !!address && hasAllowanceForSpin && params.eligible && !waitingVRF && !spinConfirming
 
@@ -139,9 +154,9 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     setApproving(true)
     try {
       // Normalize addresses before calls to avoid checksum errors
-      const usdcAddr = getAddress(params.usdcAddress)
-      const ownerAddr = getAddress(address)
-      const hash = await approveUsdc(usdcAddr as `0x${string}`, ownerAddr as `0x${string}`, params.priceUnits)
+  const usdcAddr = getAddress(params.usdcAddress)
+  const ownerAddr = getAddress(address)
+  const hash = await approveUsdc(usdcAddr as `0x${string}`, ownerAddr as `0x${string}`, effectivePrice)
       setApproveTxHash(hash)
       // wait for confirmation (best effort)
       try {
@@ -154,7 +169,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     } catch (e: any) {
       setApproveError(e?.message || 'Approve failed')
     } finally { setApproving(false) }
-  }, [canApprove, address, params.usdcAddress, params.priceUnits])
+  }, [canApprove, address, params.usdcAddress, effectivePrice])
 
   const buyOneSpin = useCallback(async () => {
     return buySpins(1n)
@@ -166,6 +181,16 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     setBuying(true)
     setBuyTxHash(null)
     try {
+      // Pre-check allowance/balance for multi-buy
+      const required = (contractPrice ?? params.priceUnits) * count
+      if (usdcAllowance !== null && usdcAllowance < required) {
+        setBuyError(`Insufficient allowance: approved ${usdcAllowance.toString()} < required ${required.toString()} for ${count.toString()} spins. Approve more USDC to continue.`)
+        return
+      }
+      if (usdcBalance !== null && usdcBalance < required) {
+        setBuyError(`Insufficient USDC balance: have ${usdcBalance.toString()} < required ${required.toString()} for ${count.toString()} spins.`)
+        return
+      }
       const hash = await buySpin(address, count)
       setBuyTxHash(hash)
       try {
@@ -182,7 +207,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     } finally {
       setBuying(false)
     }
-  }, [address])
+  }, [address, contractPrice, params.priceUnits, usdcAllowance, usdcBalance])
 
   const requestSpin = useCallback(async () => {
     if (!canRequestSpin || !address || spinConfirming || waitingVRF) return
@@ -244,5 +269,6 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     lastSpinAt,
     balanceError,
     allowanceError,
+    priceUnits: effectivePrice,
   }
 }

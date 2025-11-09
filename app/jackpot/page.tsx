@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { useAccount, useChainId } from "wagmi";
+import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { base } from "wagmi/chains";
 import { useJackpot, useExplorerTxUrl } from '@/lib/hooks/useJackpot';
 import { getWalletTotalPoints } from "@/lib/tpoints";
 
@@ -44,6 +45,9 @@ const SEGMENT_COLORS = ["#EE4040", "#F0CF50", "#815CD1", "#3DA5E0", "#34A24F", "
 
 export default function JackpotPage() {
   const { address } = useAccount();
+  const chainId = useChainId();
+  const { switchChain, isPending: switchingChain, error: switchError } = useSwitchChain();
+  const isOnBase = chainId === base.id;
   const [walletPoints, setWalletPoints] = useState<number | null>(null);
   const [lastSpinTs, setLastSpinTs] = useState<number | null>(null);
   const [showDebug, setShowDebug] = useState<boolean>(false);
@@ -94,7 +98,12 @@ export default function JackpotPage() {
     lastSpinAt,
     balanceError,
     allowanceError,
+    priceUnits: contractPriceUnits,
   } = jackpot as any;
+  const priceUsdcDisplay = useMemo(() => {
+    const units = contractPriceUnits ?? priceUnits;
+    return (Number(units) / 10**USDC_DECIMALS).toFixed(2)
+  }, [contractPriceUnits, priceUnits]);
   const approveLink = useExplorerTxUrl(approveTxHash);
   const spinLink = useExplorerTxUrl(spinTxHash);
   const buyLink = useExplorerTxUrl(buyTxHash);
@@ -279,6 +288,20 @@ export default function JackpotPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center py-8 relative">
+      {/* Network switch helper */}
+      {!isOnBase && (
+        <div className="mb-3 w-full flex items-center justify-center px-4">
+          <div className="flex items-center gap-2 bg-white/80 backdrop-blur border border-[#DC8291] text-[#2d1b2e] rounded px-3 py-2 shadow">
+            <span className="text-sm">You are not on Base mainnet.</span>
+            <button
+              onClick={() => switchChain({ chainId: base.id })}
+              disabled={switchingChain}
+              className="bg-[#2d1b2e] text-[#FFE4EC] px-3 py-1 rounded text-sm disabled:opacity-50"
+            >{switchingChain ? 'Switching…' : 'Switch to Base'}</button>
+          </div>
+        </div>
+      )}
+
       {/* Action bar for accessibility / alternative to center click */}
       {eligible && (
         <div className="mb-4 flex flex-wrap gap-2 items-center justify-center w-full px-4">
@@ -348,6 +371,8 @@ export default function JackpotPage() {
             <div className="font-semibold text-[11px]">Debug State</div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
               <span>Jackpot Addr Valid:</span><span>{String(jackpotAddrValid)}</span>
+              <span>Price (units):</span><span>{contractPriceUnits ? contractPriceUnits.toString() : '—'}</span>
+              <span>Price (USDC):</span><span>{priceUsdcDisplay}</span>
               <span>USDC Balance:</span><span>{usdcBalance !== null ? usdcBalance.toString() : 'null'} {balanceError && '(err)'}</span>
               <span>Balance Error:</span><span className="truncate max-w-[140px]">{balanceError||'—'}</span>
               <span>Allowance:</span><span>{usdcAllowance !== null ? usdcAllowance.toString() : 'null'} {allowanceError && '(err)'}</span>
@@ -373,7 +398,7 @@ export default function JackpotPage() {
           <img src="/brain-small.svg" alt="Brain" className="w-12 h-12 mb-1 drop-shadow" />
           <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e]">Jackpot</h1>
           <p className="text-base sm:text-lg text-[#5a3d5c]">Spin for a chance at the 10,000,000 $TRIV JACKPOT!</p>
-          <p className="text-xs sm:text-sm text-[#7a567c]">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points + pays {SPIN_PRICE_USDC} USDC (approve then spin). One spin per 24h.</p>
+          <p className="text-xs sm:text-sm text-[#7a567c]">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points + pays {priceUsdcDisplay} USDC (approve then spin). One spin per 24h.</p>
           {spunWithin24h && nextSpinAt && (
             <p className="text-[11px] text-[#DC8291]">Cooldown active · Next spin: {new Date(nextSpinAt).toLocaleTimeString()}</p>
           )}
@@ -414,7 +439,7 @@ export default function JackpotPage() {
           {eligible && !approving && !hasAllowanceForSpin && (
             <div className="absolute inset-0 flex items-start justify-end p-2 pointer-events-none">
               <div className="bg-white/80 backdrop-blur px-3 py-2 rounded border border-[#DC8291] text-[#2d1b2e] max-w-[220px] shadow">
-                <p className="font-semibold text-sm">Approve {SPIN_PRICE_USDC} USDC</p>
+                <p className="font-semibold text-sm">Approve {priceUsdcDisplay} USDC</p>
                 <p className="text-[11px]">Balance: {usdcBalance !== null ? (Number(usdcBalance) / 10**USDC_DECIMALS).toFixed(2) : '…'} USDC</p>
                 {approveError && <p className="mt-1 text-[11px] text-red-600">{approveError}</p>}
                 <p className="mt-1 text-[10px] text-[#7a567c]">Tap the center to approve, then tap again to spin.</p>
