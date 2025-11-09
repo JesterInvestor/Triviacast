@@ -1,7 +1,7 @@
 export function getDailyClaimLabel(): string {
   // Prefer a combined env var first
   const combined = process.env.NEXT_PUBLIC_DAILY_CLAIM_AMOUNT;
-  if (combined && combined.trim().length > 0) return combined.trim();
+  if (combined && combined.trim().length > 0) return combined;
 
   // Otherwise allow separate value + units
   const value = process.env.NEXT_PUBLIC_DAILY_CLAIM_AMOUNT_VALUE;
@@ -11,5 +11,5 @@ export function getDailyClaimLabel(): string {
   }
 
   // Default fallback
-  return '100,000 $TRIV';
+  return '50,000 $TRIV';
 }

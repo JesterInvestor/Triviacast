@@ -202,3 +202,23 @@ MIT License - feel free to use this project for your own purposes.
 ## Support
 
 For issues, questions, or suggestions, please open an issue on GitHub.
+
+## Environment Configuration
+
+### Daily Claim Amount
+
+You can customize the daily claim display text via environment variables:
+
+1. Preferred: set a single combined label
+```
+NEXT_PUBLIC_DAILY_CLAIM_AMOUNT=50,000 $TRIV
+```
+2. Or set value + units separately (they are concatenated):
+```
+NEXT_PUBLIC_DAILY_CLAIM_AMOUNT_VALUE=50000
+NEXT_PUBLIC_DAILY_CLAIM_AMOUNT_UNITS=$TRIV
+```
+Format the value exactly as you want it to appear (e.g. include commas). Leading/trailing spaces are trimmed automatically.
+
+If none are set the UI falls back to `100,000 $TRIV`.
+
