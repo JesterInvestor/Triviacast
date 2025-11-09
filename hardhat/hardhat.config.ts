@@ -67,7 +67,6 @@ export default config;
 
 // Custom task to deploy Jackpot contract quickly
 task("jackpot:deploy", "Deploy Jackpot contract")
-  .addOptionalParam("network", "Network (base or baseSepolia)")
   .setAction(async (_, hre) => {
     const env = process.env as Record<string,string>;
     const required = [

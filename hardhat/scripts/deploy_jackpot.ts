@@ -29,18 +29,26 @@ async function main() {
   if (!VRF_COORDINATOR || !VRF_SUBSCRIPTION_ID || !VRF_KEYHASH) throw new Error("Missing VRF config env vars");
   if (!USDC_ADDRESS || !TRIV_TOKEN_ADDRESS || !TRIVIAPOINTS_ADDRESS || !FEE_RECEIVER_ADDRESS) throw new Error("Missing contract address env vars");
 
+  // Normalize and sanitize addresses to avoid checksum errors (ethers v6 strict by default)
+  const normAddr = (s: string) => {
+    const t = s.trim();
+    const hex = t.startsWith('0x') ? t.slice(2) : t;
+    return ('0x' + hex).toLowerCase();
+  };
+
   const price = SPIN_PRICE_USDC ? BigInt(SPIN_PRICE_USDC) : 500000n; // default 0.5 USDC (6 decimals)
   const threshold = POINTS_THRESHOLD ? BigInt(POINTS_THRESHOLD) : 100000n;
+  const subId = VRF_SUBSCRIPTION_ID ? BigInt(VRF_SUBSCRIPTION_ID) : 0n; // VRF v2.5 uses uint256
 
   const Jackpot = await ethers.getContractFactory("Jackpot");
   const contract = await Jackpot.deploy(
-    VRF_COORDINATOR,
-    Number(VRF_SUBSCRIPTION_ID),
+    normAddr(VRF_COORDINATOR),
+    subId,
     VRF_KEYHASH as `0x${string}`,
-    USDC_ADDRESS,
-    TRIV_TOKEN_ADDRESS,
-    TRIVIAPOINTS_ADDRESS,
-    FEE_RECEIVER_ADDRESS,
+    normAddr(USDC_ADDRESS),
+    normAddr(TRIV_TOKEN_ADDRESS),
+    normAddr(TRIVIAPOINTS_ADDRESS),
+    normAddr(FEE_RECEIVER_ADDRESS),
     price,
     threshold
   );

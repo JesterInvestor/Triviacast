@@ -6,15 +6,16 @@ pragma solidity ^0.8.27;
  * - Requires a USDC payment per spin (transferFrom to feeReceiver / distributor)
  * - Verifies player eligibility via TriviaPoints (>= threshold)
  * - Enforces 1 spin per 24h per wallet
- * - Uses Chainlink VRF v2 for provable randomness
+ * - Uses Chainlink VRF v2.5 for provable randomness
  * - Selects prize tier on-chain and pays TRIV tokens from the contract balance (if available)
  *
  * NOTE: Contract must be added as a consumer to the VRF subscription and funded with LINK as required by Chainlink.
  * Prize distribution assumes this contract holds enough TRIV to cover payouts.
  */
 
-import {VRFCoordinatorV2Interface} from "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
-import {VRFConsumerBaseV2} from "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+// Chainlink VRF v2.5 imports
+import {VRFConsumerBaseV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
+import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 
 interface IERC20 {
     function transfer(address to, uint256 amount) external returns (bool);
@@ -27,7 +28,7 @@ interface ITriviaPoints {
     function getPoints(address wallet) external view returns (uint256);
 }
 
-contract Jackpot is VRFConsumerBaseV2 {
+contract Jackpot is VRFConsumerBaseV2Plus {
     struct Tier { uint256 amount; uint16 bp; } // amount in TRIV token units, basis points out of 10_000 for odds
     struct PendingSpin { address player; bool settled; uint256 prize; }
 
@@ -43,12 +44,11 @@ contract Jackpot is VRFConsumerBaseV2 {
     error InvalidConfig();
 
     // Immutable / core config
-    VRFCoordinatorV2Interface public immutable COORDINATOR;
-    uint64 public immutable subscriptionId;
+    // VRF v2.5 uses uint256 subscription id and exposes s_vrfCoordinator in the base
+    uint256 public immutable subscriptionId;
     bytes32 public immutable keyHash; // gas lane
 
     // Admin
-    address public owner;
     address public feeReceiver; // Distributor / treasury receiving USDC payments
 
     // External contracts
@@ -70,11 +70,9 @@ contract Jackpot is VRFConsumerBaseV2 {
     uint16 public requestConfirmations = 3;
     uint32 public numWords = 1;
 
-    modifier onlyOwner() { require(msg.sender == owner, "only owner"); _; }
-
     constructor(
         address _vrfCoordinator,
-        uint64 _subscriptionId,
+        uint256 _subscriptionId,
         bytes32 _keyHash,
         address _usdc,
         address _triv,
@@ -82,9 +80,8 @@ contract Jackpot is VRFConsumerBaseV2 {
         address _feeReceiver,
         uint256 _price,
         uint256 _pointsThreshold
-    ) VRFConsumerBaseV2(_vrfCoordinator) {
+    ) VRFConsumerBaseV2Plus(_vrfCoordinator) {
         require(_vrfCoordinator != address(0) && _usdc != address(0) && _triv != address(0) && _triviaPoints != address(0) && _feeReceiver != address(0), "zero addr");
-        COORDINATOR = VRFCoordinatorV2Interface(_vrfCoordinator);
         subscriptionId = _subscriptionId;
         keyHash = _keyHash;
         usdc = IERC20(_usdc);
@@ -93,7 +90,7 @@ contract Jackpot is VRFConsumerBaseV2 {
         feeReceiver = _feeReceiver;
         price = _price;
         pointsThreshold = _pointsThreshold;
-        owner = msg.sender;
+    // owner is managed by VRFConsumerBaseV2Plus' ConfirmedOwner machinery
 
         // Default tiers example (can be updated by owner):
         // 0.01% 10,000,000; 0.49% 10,000; 9.5% 1,000; 30% 100; 60% 0
@@ -105,7 +102,7 @@ contract Jackpot is VRFConsumerBaseV2 {
     }
 
     // Admin setters
-    function setOwner(address _owner) external onlyOwner { require(_owner != address(0), "zero owner"); owner = _owner; }
+    // Ownership is managed by inherited ConfirmedOwner; use transferOwnership/acceptOwnership
     function setFeeReceiver(address _to) external onlyOwner { require(_to != address(0), "zero receiver"); feeReceiver = _to; }
     function setPrice(uint256 _price) external onlyOwner { price = _price; }
     function setPointsThreshold(uint256 _threshold) external onlyOwner { pointsThreshold = _threshold; }
@@ -148,18 +145,24 @@ contract Jackpot is VRFConsumerBaseV2 {
 
         // Request randomness
         if (subscriptionId == 0) revert NoSubscription();
-        requestId = COORDINATOR.requestRandomWords(
-            keyHash,
-            subscriptionId,
-            requestConfirmations,
-            callbackGasLimit,
-            numWords
+        // VRF v2.5 request format with extra args; set nativePayment=false to pay in LINK via subscription
+        requestId = s_vrfCoordinator.requestRandomWords(
+            VRFV2PlusClient.RandomWordsRequest({
+                keyHash: keyHash,
+                subId: subscriptionId,
+                requestConfirmations: requestConfirmations,
+                callbackGasLimit: callbackGasLimit,
+                numWords: numWords,
+                extraArgs: VRFV2PlusClient._argsToBytes(
+                    VRFV2PlusClient.ExtraArgsV1({ nativePayment: false })
+                )
+            })
         );
         pending[requestId] = PendingSpin({player: msg.sender, settled: false, prize: 0});
         emit SpinRequested(requestId, msg.sender);
     }
 
-    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
+    function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) internal override {
         PendingSpin storage p = pending[requestId];
         // If unknown request (should not happen), ignore
         if (p.player == address(0) || p.settled) return;
