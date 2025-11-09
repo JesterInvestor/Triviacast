@@ -135,7 +135,16 @@ export async function approveUsdc(usdc: `0x${string}`, owner: `0x${string}`, amo
     args: [getAddress(JACKPOT_ADDRESS) as `0x${string}`, amount],
     account: ownerAddr as `0x${string}`
   })
-  return writeContract(wagmiConfig, { ...request, ...(await getBumpedFees()) })
+  const fees = await getBumpedFees()
+  return writeContract(wagmiConfig, {
+    address: usdcAddr as `0x${string}`,
+    abi: ERC20_ABI as any,
+    functionName: 'approve',
+    args: [getAddress(JACKPOT_ADDRESS) as `0x${string}`, amount],
+    account: ownerAddr as `0x${string}`,
+    ...(request && (request as any).gas ? { gas: (request as any).gas as bigint } : {}),
+    ...fees
+  } as any)
 }
 
 export async function getUsdcAllowance(usdc: `0x${string}`, owner: `0x${string}`) {
@@ -168,7 +177,16 @@ export async function spinJackpot(owner: `0x${string}`) {
     args: [],
     account: ownerAddr as `0x${string}`
   })
-  return writeContract(wagmiConfig, { ...request, ...(await getBumpedFees()) })
+  const fees = await getBumpedFees()
+  return writeContract(wagmiConfig, {
+    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+    abi: JACKPOT_ABI as any,
+    functionName: 'spin',
+    args: [],
+    account: ownerAddr as `0x${string}`,
+    ...(request && (request as any).gas ? { gas: (request as any).gas as bigint } : {}),
+    ...fees
+  } as any)
 }
 
 export async function spinPaying(owner: `0x${string}`) {
@@ -190,7 +208,16 @@ export async function spinPaying(owner: `0x${string}`) {
     args: [],
     account: ownerAddr as `0x${string}`
   })
-  return writeContract(wagmiConfig, { ...request, ...(await getBumpedFees()) })
+  const fees = await getBumpedFees()
+  return writeContract(wagmiConfig, {
+    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+    abi: JACKPOT_ABI as any,
+    functionName: 'spinPaying',
+    args: [],
+    account: ownerAddr as `0x${string}`,
+    ...(request && (request as any).gas ? { gas: (request as any).gas as bigint } : {}),
+    ...fees
+  } as any)
 }
 
 export async function buySpin(owner: `0x${string}`, count: bigint = 1n) {
@@ -212,7 +239,16 @@ export async function buySpin(owner: `0x${string}`, count: bigint = 1n) {
     args: [count],
     account: ownerAddr as `0x${string}`
   })
-  return writeContract(wagmiConfig, { ...request, ...(await getBumpedFees()) })
+  const fees = await getBumpedFees()
+  return writeContract(wagmiConfig, {
+    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+    abi: JACKPOT_ABI as any,
+    functionName: 'buySpins',
+    args: [count],
+    account: ownerAddr as `0x${string}`,
+    ...(request && (request as any).gas ? { gas: (request as any).gas as bigint } : {}),
+    ...fees
+  } as any)
 }
 
 // Optional: write without simulate to bypass RPC sim quirks in some environments
@@ -238,7 +274,16 @@ export async function buySpinWithSim(owner: `0x${string}`, count: bigint = 1n) {
     args: [count],
     account: ownerAddr as `0x${string}`
   })
-  return writeContract(wagmiConfig, { ...request, ...(await getBumpedFees()) })
+  const fees = await getBumpedFees()
+  return writeContract(wagmiConfig, {
+    address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+    abi: JACKPOT_ABI as any,
+    functionName: 'buySpins',
+    args: [count],
+    account: ownerAddr as `0x${string}`,
+    ...(request && (request as any).gas ? { gas: (request as any).gas as bigint } : {}),
+    ...fees
+  } as any)
 }
 
 export async function getSpinCredits(user: `0x${string}`) {
