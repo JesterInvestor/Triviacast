@@ -189,7 +189,9 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
   const effectivePrice = contractPrice ?? params.priceUnits
   const hasBalanceForSpin = (usdcBalance || 0n) >= effectivePrice
   const hasAllowanceForSpin = (usdcAllowance || 0n) >= effectivePrice
-  const canApprove = !!address && jackpotAddrValid && !approving && hasBalanceForSpin && !hasAllowanceForSpin && params.eligible
+  // Allow approving USDC even if user isn't yet eligible or doesn't currently hold full price balance.
+  // Approval just sets allowance and doesn't spend; reducing friction helps users prep in advance.
+  const canApprove = !!address && jackpotAddrValid && !approving && !hasAllowanceForSpin
   const canRequestSpin = !!address && hasAllowanceForSpin && params.eligible && !waitingVRF && !spinConfirming
   // New pathway: spinPaying does not consume credits; only requires allowance >= price and eligibility
   const canRequestSpinPaying = !!address && hasAllowanceForSpin && params.eligible && !waitingVRF && !spinConfirming
