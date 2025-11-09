@@ -75,16 +75,28 @@ task("jackpot:deploy", "Deploy Jackpot contract")
     const price = env.SPIN_PRICE_USDC ? BigInt(env.SPIN_PRICE_USDC) : 500000n;
     const threshold = env.POINTS_THRESHOLD ? BigInt(env.POINTS_THRESHOLD) : 100000n;
     const Jackpot = await hre.ethers.getContractFactory('Jackpot');
+    const norm = (s: string) => {
+      const t = s.trim();
+      const hex = t.startsWith('0x') ? t.slice(2) : t;
+      return ('0x' + hex).toLowerCase();
+    };
+    // Bump fees similar to other deploy script to avoid Base replacement underpriced errors
+    const fee = await hre.ethers.provider.getFeeData();
+    const bump = (v: bigint) => ((v * 125n) / 100n) + 1n;
+    const maxFeePerGas = bump(fee.maxFeePerGas ?? fee.gasPrice ?? 0n);
+    const maxPriorityFeePerGas = bump(fee.maxPriorityFeePerGas ?? 0n);
+    let nonce = await hre.ethers.provider.getTransactionCount((await hre.ethers.getSigners())[0].address, 'pending');
     const contract = await Jackpot.deploy(
-      env.VRF_COORDINATOR,
-      Number(env.VRF_SUBSCRIPTION_ID),
+      norm(env.VRF_COORDINATOR),
+      BigInt(env.VRF_SUBSCRIPTION_ID),
       env.VRF_KEYHASH as `0x${string}`,
-      env.USDC_ADDRESS,
-      env.TRIV_TOKEN_ADDRESS,
-      env.TRIVIAPOINTS_ADDRESS,
-      env.FEE_RECEIVER_ADDRESS,
+      norm(env.USDC_ADDRESS),
+      norm(env.TRIV_TOKEN_ADDRESS),
+      norm(env.TRIVIAPOINTS_ADDRESS),
+      norm(env.FEE_RECEIVER_ADDRESS),
       price,
-      threshold
+      threshold,
+      { maxFeePerGas, maxPriorityFeePerGas, nonce }
     );
     await contract.waitForDeployment();
     const addr = await contract.getAddress();
