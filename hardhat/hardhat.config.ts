@@ -1,4 +1,4 @@
-import { HardhatUserConfig } from "hardhat/config";
+import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import * as dotenv from "dotenv";
 import path from "path";
@@ -64,3 +64,32 @@ const config: HardhatUserConfig = {
 };
 
 export default config;
+
+// Custom task to deploy Jackpot contract quickly
+task("jackpot:deploy", "Deploy Jackpot contract")
+  .addOptionalParam("network", "Network (base or baseSepolia)")
+  .setAction(async (_, hre) => {
+    const env = process.env as Record<string,string>;
+    const required = [
+      'VRF_COORDINATOR', 'VRF_SUBSCRIPTION_ID', 'VRF_KEYHASH',
+      'USDC_ADDRESS', 'TRIV_TOKEN_ADDRESS', 'TRIVIAPOINTS_ADDRESS', 'FEE_RECEIVER_ADDRESS'
+    ];
+    for (const k of required) if (!env[k]) throw new Error(`Missing env var ${k}`);
+    const price = env.SPIN_PRICE_USDC ? BigInt(env.SPIN_PRICE_USDC) : 500000n;
+    const threshold = env.POINTS_THRESHOLD ? BigInt(env.POINTS_THRESHOLD) : 100000n;
+    const Jackpot = await hre.ethers.getContractFactory('Jackpot');
+    const contract = await Jackpot.deploy(
+      env.VRF_COORDINATOR,
+      Number(env.VRF_SUBSCRIPTION_ID),
+      env.VRF_KEYHASH as `0x${string}`,
+      env.USDC_ADDRESS,
+      env.TRIV_TOKEN_ADDRESS,
+      env.TRIVIAPOINTS_ADDRESS,
+      env.FEE_RECEIVER_ADDRESS,
+      price,
+      threshold
+    );
+    await contract.waitForDeployment();
+    const addr = await contract.getAddress();
+    console.log('Jackpot deployed at', addr);
+  });

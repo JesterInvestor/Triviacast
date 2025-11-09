@@ -1,11 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
+import { useJackpot, useExplorerTxUrl } from '@/lib/hooks/useJackpot';
 import { getWalletTotalPoints } from "@/lib/tpoints";
 
 // Config
 const REQUIRED_T_POINTS = 100_000;
+const USDC_DECIMALS = 6;
+const SPIN_PRICE_USDC = 0.5; // $0.5 USDC per spin
+// Provide USDC address via env for flexibility (Base mainnet: 0x833589fCDd4FfD38E7aF5aD01D50e4d60C2d8bC7)
+const USDC_ADDRESS = (process.env.NEXT_PUBLIC_USDC_ADDRESS || '0x833589fCDd4FfD38E7aF5aD01D50e4d60C2d8bC7') as `0x${string}`;
 const LAST_SPIN_KEY_PREFIX = "jackpot:lastSpin:";
 
 // Weighted prize table (basis points out of 10,000)
@@ -27,22 +32,14 @@ const WHEEL_SEGMENTS = [
 // Colors repeated
 const SEGMENT_COLORS = ["#EE4040", "#F0CF50", "#815CD1", "#3DA5E0", "#34A24F", "#F9AA1F", "#EC3F3F", "#FF9000"]; // will mod index
 
-function pickWeightedPrize(): { label: string; value: number } {
-  const total = 10_000; // basis points
-  let r = Math.floor(Math.random() * total) + 1;
-  for (const p of PRIZE_WEIGHTS) {
-    if (r <= p.bp) return { label: p.label, value: p.value };
-    r -= p.bp;
-  }
-  return { label: "Better luck", value: 0 }; // fallback
-}
+// On-chain randomness now determines the prize (forcedPrize comes from SpinResult event).
 
 export default function JackpotPage() {
   const { address } = useAccount();
   const [walletPoints, setWalletPoints] = useState<number | null>(null);
   const [lastSpinTs, setLastSpinTs] = useState<number | null>(null);
   const [result, setResult] = useState<{ label: string; value: number } | null>(null);
-  const [forcedPrize, setForcedPrize] = useState<{ label: string; value: number } | null>(null);
+  // forcedPrize is provided by hook now
   const [spinning, setSpinning] = useState(false);
   const [angle, setAngle] = useState(0); // radians current
   const [startAngle] = useState(0);
@@ -52,16 +49,50 @@ export default function JackpotPage() {
   const size = 300; // radius
   const upDuration = 1200; // ms accel
   const downDuration = 4000; // ms decel
+  // Eligibility and hook for blockchain interactions
+  const spunWithin24h = useMemo(() => lastSpinTs ? (Date.now() - lastSpinTs) < 24*60*60*1000 : false, [lastSpinTs]);
+  const hasEnough = (walletPoints || 0) >= REQUIRED_T_POINTS;
+  const eligible = !!address && hasEnough && !spunWithin24h;
+  const priceUnits = useMemo(() => BigInt(Math.round(SPIN_PRICE_USDC * 10 ** USDC_DECIMALS)), []);
+  const jackpot = useJackpot({ usdcAddress: USDC_ADDRESS, priceUnits, eligible });
+  const {
+    usdcBalance,
+    usdcAllowance,
+    approving,
+    approveError,
+    approveTxHash,
+    spinConfirming,
+    waitingVRF,
+    spinError,
+    spinTxHash,
+    forcedPrize,
+    credits,
+    buying,
+    buyError,
+    buyTxHash,
+    hasAllowanceForSpin,
+    canApprove,
+    canRequestSpin,
+    doApprove,
+    requestSpin,
+    buyOneSpin,
+    buySpins,
+  } = jackpot as any;
+  const approveLink = useExplorerTxUrl(approveTxHash);
+  const spinLink = useExplorerTxUrl(spinTxHash);
+  const buyLink = useExplorerTxUrl(buyTxHash);
 
-  // Load points
+  // (balance, allowance, credits managed by hook)
+
+  // Load wallet trivia points
   useEffect(() => {
     let cancelled = false;
-    async function load() {
+    async function loadPoints() {
       if (!address) { setWalletPoints(null); return; }
       const pts = await getWalletTotalPoints(address);
       if (!cancelled) setWalletPoints(pts);
     }
-    load();
+    loadPoints();
     return () => { cancelled = true; };
   }, [address]);
 
@@ -72,16 +103,29 @@ export default function JackpotPage() {
     setLastSpinTs(raw ? Number(raw) : null);
   }, [address]);
 
-  const spunWithin24h = useMemo(() => lastSpinTs ? (Date.now() - lastSpinTs) < 24*60*60*1000 : false, [lastSpinTs]);
-  const hasEnough = (walletPoints || 0) >= REQUIRED_T_POINTS;
-  const eligible = !!address && hasEnough && !spunWithin24h;
+  // (moved above)
 
-  // Pre-pick weighted prize when eligible (once per day)
-  useEffect(() => {
-    if (eligible && !forcedPrize) {
-      setForcedPrize(pickWeightedPrize());
+  // Start the visual spin once we have a forcedPrize from VRF
+  const startSpin = useCallback(() => {
+    if (!eligible || spinning || finished || !forcedPrize) return;
+    setResult(null);
+    setFinished(false);
+    setSpinning(true);
+    setSpinStart(performance.now());
+    if (address) {
+      localStorage.setItem(LAST_SPIN_KEY_PREFIX + address, String(Date.now()));
+      setLastSpinTs(Date.now());
     }
-  }, [eligible, forcedPrize]);
+  }, [eligible, spinning, finished, address, forcedPrize]);
+
+  // Start animation when prize arrives
+  useEffect(() => {
+    if (forcedPrize && eligible && !spinning && !finished) {
+      startSpin();
+    }
+  }, [forcedPrize, eligible, spinning, finished, startSpin]);
+
+  // No pre-pick: prize waits for VRF event.
 
   // Draw wheel
   const drawWheel = useCallback((ctx: CanvasRenderingContext2D, currentAngle: number) => {
@@ -185,18 +229,7 @@ export default function JackpotPage() {
     return () => cancelAnimationFrame(frame);
   }, [angle, spinning, spinStart, drawWheel, forcedPrize]);
 
-  // Spin handler
-  const startSpin = useCallback(() => {
-    if (!eligible || spinning || finished) return;
-    setResult(null);
-    setFinished(false);
-    setSpinning(true);
-    setSpinStart(performance.now());
-    if (address) {
-      localStorage.setItem(LAST_SPIN_KEY_PREFIX + address, String(Date.now()));
-      setLastSpinTs(Date.now());
-    }
-  }, [eligible, spinning, finished, address]);
+  // (startSpin defined earlier)
 
   // Click detection on center button
   const handleCanvasClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -207,18 +240,54 @@ export default function JackpotPage() {
     const centerY = size;
     const dist = Math.hypot(x - centerX, y - centerY);
     if (dist <= 50) {
-      startSpin();
+      if (!hasAllowanceForSpin && !approving) {
+        doApprove();
+      } else if (hasAllowanceForSpin && (credits || 0n) === 0n && !buying) {
+        buyOneSpin();
+      } else if (hasAllowanceForSpin && (credits || 0n) > 0n && !spinConfirming && !waitingVRF) {
+        requestSpin();
+      }
     }
-  }, [startSpin]);
+  }, [doApprove, hasAllowanceForSpin, approving, credits, buying, spinConfirming, waitingVRF, requestSpin, buyOneSpin]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center py-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center py-8 relative">
+      {/* Persistent credits badge */}
+      {address && hasAllowanceForSpin && (
+        <div className="fixed top-2 right-2 z-50 flex flex-col items-end gap-1">
+          <div className="bg-[#2d1b2e]/80 text-[#FFE4EC] px-3 py-2 rounded shadow flex items-center gap-2">
+            <span className="text-xs font-semibold">Credits: {(credits||0n).toString()}</span>
+            <div className="flex gap-1">
+              <button
+                disabled={buying}
+                onClick={(e)=>{e.stopPropagation(); buySpins(5n);}}
+                className="text-[10px] bg-[#DC8291] hover:bg-[#c86e7c] disabled:opacity-50 px-2 py-1 rounded"
+                title="Buy 5 spins"
+              >+5</button>
+              <button
+                disabled={buying}
+                onClick={(e)=>{e.stopPropagation(); buySpins(10n);}}
+                className="text-[10px] bg-[#DC8291] hover:bg-[#c86e7c] disabled:opacity-50 px-2 py-1 rounded"
+                title="Buy 10 spins"
+              >+10</button>
+              <button
+                disabled={buying}
+                onClick={(e)=>{e.stopPropagation(); buySpins(100n);}}
+                className="text-[10px] bg-[#DC8291] hover:bg-[#c86e7c] disabled:opacity-50 px-2 py-1 rounded"
+                title="Buy 100 spins"
+              >+100</button>
+            </div>
+          </div>
+          {buying && <div className="text-[10px] text-[#2d1b2e] bg-white/70 backdrop-blur px-2 py-1 rounded shadow">Purchasing…</div>}
+          {buyError && <div className="text-[10px] text-red-600 bg-white/80 px-2 py-1 rounded shadow max-w-[180px] break-words">{buyError}</div>}
+        </div>
+      )}
       <div className="container mx-auto px-3 sm:px-4 flex flex-col items-center gap-6 w-full">
         <div className="flex flex-col items-center gap-2 text-center">
           <img src="/brain-small.svg" alt="Brain" className="w-12 h-12 mb-1 drop-shadow" />
           <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e]">Jackpot</h1>
           <p className="text-base sm:text-lg text-[#5a3d5c]">Spin for a chance at the 10,000,000 $TRIV JACKPOT!</p>
-          <p className="text-xs sm:text-sm text-[#7a567c]">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points. One spin per 24h.</p>
+          <p className="text-xs sm:text-sm text-[#7a567c]">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points + pays {SPIN_PRICE_USDC} USDC (approve then spin). One spin per 24h.</p>
         </div>
         <div className="relative">
           <canvas
@@ -235,20 +304,89 @@ export default function JackpotPage() {
               {address && hasEnough && spunWithin24h && <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e]">Already spun. Next: {lastSpinTs && new Date(lastSpinTs + 24*60*60*1000).toLocaleTimeString()}</div>}
             </div>
           )}
+          {eligible && approving && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e] max-w-xs animate-pulse">
+                <p className="font-semibold mb-1">Approving USDC…</p>
+                {approveTxHash && <p className="text-[10px] break-all">Tx: <a className="underline" href={approveLink||'#'} target="_blank" rel="noreferrer">{approveTxHash.slice(0,10)}…</a></p>}
+                {approveError && <p className="mt-1 text-xs text-red-600">{approveError}</p>}
+              </div>
+            </div>
+          )}
+          {eligible && !approving && !hasAllowanceForSpin && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e] max-w-xs">
+                <p className="font-semibold mb-1">Approve {SPIN_PRICE_USDC} USDC for Jackpot.</p>
+                <p className="text-xs">USDC Balance: {usdcBalance !== null ? (Number(usdcBalance) / 10**USDC_DECIMALS).toFixed(2) : '…'} USDC</p>
+                {approveError && <p className="mt-1 text-xs text-red-600">{approveError}</p>}
+                <p className="mt-1 text-[10px] text-[#7a567c]">Click center to approve, then click again to spin.</p>
+              </div>
+            </div>
+          )}
+          {eligible && hasAllowanceForSpin && (credits||0n)===0n && !buying && !spinConfirming && !waitingVRF && !spinning && !finished && (
+            <div className="absolute inset-0 flex flex-col items-end justify-start p-2 gap-1">
+              <span className="text-[10px] bg-[#2d1b2e] text-[#FFE4EC] px-2 py-1 rounded">Approved ✓ Buy spins</span>
+              <div className="flex flex-col gap-1 text-[10px]">
+                <button onClick={(e)=>{e.stopPropagation(); buySpins(1n);}} className="bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded shadow">Buy 1</button>
+                <button onClick={(e)=>{e.stopPropagation(); buySpins(5n);}} className="bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded shadow">Buy 5</button>
+                <button onClick={(e)=>{e.stopPropagation(); buySpins(10n);}} className="bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded shadow">Buy 10</button>
+                <button onClick={(e)=>{e.stopPropagation(); buySpins(100n);}} className="bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded shadow">Buy 100</button>
+              </div>
+            </div>
+          )}
+          {eligible && hasAllowanceForSpin && buying && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e] max-w-xs animate-pulse">
+                <p className="font-semibold mb-1">Purchasing spin…</p>
+                {buyTxHash && <p className="text-[10px] break-all">Tx: <a className="underline" href={buyLink||'#'} target="_blank" rel="noreferrer">{buyTxHash.slice(0,10)}…</a></p>}
+                {buyError && <p className="mt-1 text-xs text-red-600">{buyError}</p>}
+              </div>
+            </div>
+          )}
+          {eligible && hasAllowanceForSpin && (credits||0n)>0n && !spinConfirming && !waitingVRF && !spinning && !finished && (
+            <div className="absolute inset-0 flex items-start justify-end p-2">
+              <div className="flex flex-col gap-1 items-end">
+                <span className="text-[10px] bg-[#2d1b2e] text-[#FFE4EC] px-2 py-1 rounded">Credits: {(credits||0n).toString()}</span>
+                <div className="flex gap-1 flex-wrap max-w-[140px]">
+                  <button onClick={(e)=>{e.stopPropagation(); buySpins(5n);}} className="text-[10px] bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded">+5</button>
+                  <button onClick={(e)=>{e.stopPropagation(); buySpins(10n);}} className="text-[10px] bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded">+10</button>
+                  <button onClick={(e)=>{e.stopPropagation(); buySpins(100n);}} className="text-[10px] bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded">+100</button>
+                </div>
+              </div>
+            </div>
+          )}
+          {eligible && spinConfirming && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e] max-w-xs animate-pulse">
+                <p className="font-semibold mb-1">Submitting spin transaction…</p>
+                {spinTxHash && <p className="text-[10px] break-all">Tx: <a className="underline" href={spinLink||'#'} target="_blank" rel="noreferrer">{spinTxHash.slice(0,10)}…</a> (waiting receipt)</p>}
+                {spinError && <p className="mt-1 text-xs text-red-600">{spinError}</p>}
+              </div>
+            </div>
+          )}
+          {eligible && waitingVRF && !spinConfirming && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e] max-w-xs">
+                <p className="font-semibold mb-1">Waiting for VRF randomness…</p>
+                {spinTxHash && <p className="text-[10px] break-all">Spin Tx: <a className="underline" href={spinLink||'#'} target="_blank" rel="noreferrer">{spinTxHash.slice(0,10)}…</a> confirmed</p>}
+                <p className="mt-1 text-[10px] text-[#7a567c]">Fulfillment typically 1-2 blocks.</p>
+              </div>
+            </div>
+          )}
         </div>
         {result && (
           <div className="mt-2 w-full max-w-md bg-gradient-to-r from-[#FFE4EC] to-[#FFC4D1] rounded-lg p-4 border border-[#F4A6B7] shadow">
             <h2 className="text-xl font-bold text-[#2d1b2e] mb-1">Result</h2>
             {result.value > 0 ? (
-              <p className="text-[#5a3d5c]">You won <span className="font-bold text-[#DC8291]">{result.value.toLocaleString()} $TRIV</span> 🎉 (UI only)</p>
+              <p className="text-[#5a3d5c]">Prize: <span className="font-bold text-[#DC8291]">{result.value.toLocaleString()} $TRIV</span> 🎉 (from on-chain SpinResult)</p>
             ) : (
-              <p className="text-[#5a3d5c]">{result.label} — no prize this time.</p>
+              <p className="text-[#5a3d5c]">{result.label} — no prize this time (on-chain result).</p>
             )}
-            <p className="mt-2 text-xs text-[#7a567c]">Secure awarding not implemented. Use a contract call or backend signature flow.</p>
+            <p className="mt-2 text-xs text-[#7a567c]">Ensure Jackpot contract is funded with enough $TRIV for large prizes.</p>
           </div>
         )}
         <div className="mt-4 text-xs text-center text-[#7a567c] max-w-xl">
-          <p>Jackpot odds are enforced client-side by weighted selection before animation. For production, move selection + award on-chain or server-side and verify eligibility to prevent tampering.</p>
+          <p>Flow: approve USDC → request spin (VRF) → wait for SpinResult event → wheel animates to the returned prize. Fund contract with $TRIV; monitor events for analytics.</p>
         </div>
       </div>
     </div>

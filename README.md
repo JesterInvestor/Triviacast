@@ -222,3 +222,55 @@ Format the value exactly as you want it to appear (e.g. include commas). Leading
 
 If none are set the UI falls back to `100,000 $TRIV`.
 
+### Jackpot / VRF / Prepaid Spins
+
+Add these variables to `.env.local` (and to Vercel project settings) to enable the on-chain Jackpot page flow:
+
+```
+NEXT_PUBLIC_JACKPOT_ADDRESS=0xYourDeployedJackpotContract
+NEXT_PUBLIC_USDC_ADDRESS=0x833589fCDd4FfD38E7aF5aD01D50e4d60C2d8bC7  # Base mainnet USDC (change if testnet)
+```
+
+Hardhat deployment requires VRF + token configuration (used only in scripts, not exposed client-side):
+
+```
+VRF_COORDINATOR=0xYourVrfCoordinator
+VRF_SUBSCRIPTION_ID=1234          # uint64 subscription id
+VRF_KEY_HASH=0xYourGasLaneKeyHash # Chainlink gas lane
+TRIV_TOKEN_ADDRESS=0xYourTrivErc20
+TRIVIAPOINTS_ADDRESS=0xYourTriviaPointsContract
+FEE_RECEIVER=0xDistributorOrTreasury
+USDC_ADDRESS=0x833589fCDd4FfD38E7aF5aD01D50e4d60C2d8bC7
+JACKPOT_PRICE_USDC=500000         # 0.5 USDC with 6 decimals
+JACKPOT_POINTS_THRESHOLD=100000   # Minimum T points to be eligible
+```
+
+After deploying the contract:
+1. Add the Jackpot contract as a consumer to the Chainlink VRF subscription.
+2. Fund LINK (if required by the network) to the subscription.
+3. Fund the Jackpot contract with enough `$TRIV` to cover maximum prizes (e.g. 10,000,000 $TRIV jackpot). You can top up over time.
+4. Set `NEXT_PUBLIC_JACKPOT_ADDRESS` so the frontend can interact.
+5. Ensure the USDC allowance is granted by users before buying spins.
+
+Prepaid spins flow:
+- User approves USDC to the Jackpot contract.
+- User buys N spins in one transaction (`buySpins(count)`); credits accumulate.
+- User consumes one credit per `spin()` call; 24h cooldown enforced by contract.
+- Chainlink VRF returns random tier; contract attempts immediate `$TRIV` payout if balance sufficient.
+
+Frontend considerations:
+- The wheel only animates after `SpinResult` event to reflect the actual on-chain outcome.
+- Credits badge shows remaining spin credits and quick buy buttons (+5, +10, +100).
+- Large purchases (e.g. 100 spins) may require users to increase UI allowance if you cap approvals.
+
+Security / Ops checklist:
+| Item | Action |
+|------|--------|
+| VRF subscription | Add Jackpot as consumer |
+| TRIV funding | Transfer reward tokens to contract address |
+| USDC price | Confirm `JACKPOT_PRICE_USDC` matches `price` state (update via `setPrice`) |
+| Tier odds | Adjust with `setTiers` ensuring sum of bp = 10000 |
+| Monitoring | Index `SpinRequested` & `SpinResult` for analytics |
+| Withdrawal | Use `rescueTokens` only by owner for non-prize tokens or maintenance |
+
+
