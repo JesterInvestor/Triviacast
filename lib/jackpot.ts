@@ -18,7 +18,7 @@ async function getBumpedFees() {
   const fallbackTip = baseFee / 10n
   const tipFee = tipRaw > 0n ? tipRaw : (fallbackTip > 0n ? fallbackTip : 1n)
     const bump = (v: bigint) => ((v * 125n) / 100n) + 1n
-    let maxPriorityFeePerGas = bump(tipFee)
+    const maxPriorityFeePerGas = bump(tipFee)
     let maxFeePerGas = bump(baseFee + tipFee)
     if (maxFeePerGas <= maxPriorityFeePerGas) {
       maxFeePerGas = maxPriorityFeePerGas + baseFee
@@ -28,7 +28,7 @@ async function getBumpedFees() {
   const fallbackBase = 1_000_000_000n
   const fallbackTip = 100_000_000n // 0.1 gwei
     const bump = (v: bigint) => ((v * 125n) / 100n) + 1n
-    let maxPriorityFeePerGas = bump(fallbackTip)
+    const maxPriorityFeePerGas = bump(fallbackTip)
     let maxFeePerGas = bump(fallbackBase + fallbackTip)
     if (maxFeePerGas <= maxPriorityFeePerGas) {
       maxFeePerGas = maxPriorityFeePerGas + fallbackBase
