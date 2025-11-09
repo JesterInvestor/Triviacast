@@ -29,12 +29,8 @@ export function useExplorerTxUrl(hash?: `0x${string}` | null) {
   const chainId = useChainId()
   return useMemo(() => {
     if (!hash) return null
-    // Base mainnet 8453, Base Sepolia 84532
-    const baseUrl = chainId === 8453
-      ? 'https://basescan.org'
-      : chainId === 84532
-      ? 'https://sepolia.basescan.org'
-      : null
+    // Base mainnet only
+    const baseUrl = chainId === 8453 ? 'https://basescan.org' : null
     return baseUrl ? `${baseUrl}/tx/${hash}` : null
   }, [hash, chainId])
 }
@@ -61,6 +57,8 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
   const [contractPrice, setContractPrice] = useState<bigint | null>(null)
   const [feeReceiver, setFeeReceiver] = useState<`0x${string}` | null>(null)
   const [contractUsdc, setContractUsdc] = useState<`0x${string}` | null>(null)
+  const simulateDisabled = String(process.env.NEXT_PUBLIC_DISABLE_SIMULATE || '').toLowerCase() === 'true'
+  const [usdcDecimals, setUsdcDecimals] = useState<number | null>(null)
   const unwatchRef = useRef<(() => void) | null>(null)
 
   // balances
@@ -116,6 +114,24 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     load()
     return () => { cancelled = true }
   }, [])
+
+  // token decimals (for sanity)
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      try {
+        const d = await readContract(wagmiConfig, {
+          address: params.usdcAddress,
+          abi: ERC20_ABI as any,
+          functionName: 'decimals',
+          args: []
+        }) as number
+        if (!cancelled) setUsdcDecimals(d)
+      } catch { if (!cancelled) setUsdcDecimals(null) }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [params.usdcAddress])
 
   // credits
   useEffect(() => {
@@ -346,5 +362,7 @@ export function useJackpot(params: { usdcAddress: `0x${string}`; priceUnits: big
     priceUnits: effectivePrice,
     feeReceiver,
     contractUsdc,
+    usdcDecimals,
+    simulateDisabled,
   }
 }

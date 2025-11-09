@@ -3,6 +3,7 @@ import { getAddress } from 'viem'
 import { wagmiConfig } from './wagmi'
 
 export const JACKPOT_ADDRESS = (process.env.NEXT_PUBLIC_JACKPOT_ADDRESS || '') as `0x${string}`
+const DISABLE_SIMULATE = String(process.env.NEXT_PUBLIC_DISABLE_SIMULATE || '').toLowerCase() === 'true'
 
 export const JACKPOT_ABI = [
   // Custom errors (for nicer revert decoding)
@@ -84,12 +85,22 @@ export const JACKPOT_ABI = [
 export const ERC20_ABI = [
   { name: 'balanceOf', type: 'function', stateMutability: 'view', inputs: [{ name: 'account', type: 'address' }], outputs: [{ name: '', type: 'uint256' }] },
   { name: 'allowance', type: 'function', stateMutability: 'view', inputs: [{ name: 'owner', type: 'address' }, { name: 'spender', type: 'address' }], outputs: [{ name: '', type: 'uint256' }] },
-  { name: 'approve', type: 'function', stateMutability: 'nonpayable', inputs: [{ name: 'spender', type: 'address' }, { name: 'amount', type: 'uint256' }], outputs: [{ name: '', type: 'bool' }] }
+  { name: 'approve', type: 'function', stateMutability: 'nonpayable', inputs: [{ name: 'spender', type: 'address' }, { name: 'amount', type: 'uint256' }], outputs: [{ name: '', type: 'bool' }] },
+  { name: 'decimals', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'uint8' }] }
 ] as const
 
 export async function approveUsdc(usdc: `0x${string}`, owner: `0x${string}`, amount: bigint) {
   const usdcAddr = getAddress(usdc)
   const ownerAddr = getAddress(owner)
+  if (DISABLE_SIMULATE) {
+    return writeContract(wagmiConfig, {
+      address: usdcAddr as `0x${string}`,
+      abi: ERC20_ABI as any,
+      functionName: 'approve',
+      args: [getAddress(JACKPOT_ADDRESS) as `0x${string}`, amount],
+      account: ownerAddr as `0x${string}`
+    })
+  }
   const { request } = await simulateContract(wagmiConfig, {
     address: usdcAddr as `0x${string}`,
     abi: ERC20_ABI as any,
@@ -113,6 +124,15 @@ export async function getUsdcAllowance(usdc: `0x${string}`, owner: `0x${string}`
 
 export async function spinJackpot(owner: `0x${string}`) {
   const ownerAddr = getAddress(owner)
+  if (DISABLE_SIMULATE) {
+    return writeContract(wagmiConfig, {
+      address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+      abi: JACKPOT_ABI as any,
+      functionName: 'spin',
+      args: [],
+      account: ownerAddr as `0x${string}`
+    })
+  }
   const { request } = await simulateContract(wagmiConfig, {
     address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
     abi: JACKPOT_ABI as any,
@@ -125,6 +145,15 @@ export async function spinJackpot(owner: `0x${string}`) {
 
 export async function buySpin(owner: `0x${string}`, count: bigint = 1n) {
   const ownerAddr = getAddress(owner)
+  if (DISABLE_SIMULATE) {
+    return writeContract(wagmiConfig, {
+      address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
+      abi: JACKPOT_ABI as any,
+      functionName: 'buySpins',
+      args: [count],
+      account: ownerAddr as `0x${string}`
+    })
+  }
   const { request } = await simulateContract(wagmiConfig, {
     address: getAddress(JACKPOT_ADDRESS) as `0x${string}`,
     abi: JACKPOT_ABI as any,

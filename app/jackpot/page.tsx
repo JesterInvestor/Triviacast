@@ -144,6 +144,7 @@ export default function JackpotPage() {
     priceUnits: contractPriceUnits,
     feeReceiver,
     contractUsdc,
+    simulateDisabled,
   } = jackpot as any;
   const priceUsdcDisplay = useMemo(() => {
     const units = contractPriceUnits ?? priceUnits;
@@ -350,66 +351,78 @@ export default function JackpotPage() {
       {/* Action bar for accessibility / alternative to center click */}
       {eligible && (
         <div className="mb-4 flex flex-wrap gap-2 items-center justify-center w-full px-4">
-              {!hasAllowanceForSpin && !approving && (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={(e)=>{e.stopPropagation(); if (!approving) doApprove();}}
-                    className="bg-[#2d1b2e] text-[#FFE4EC] px-4 py-2 rounded shadow disabled:opacity-50 text-sm"
-                    disabled={approving || !canApprove}
-                  >{approving ? 'Approving…' : `Approve ${priceUsdcDisplay} USDC`}</button>
-                  <div className="flex gap-1 flex-wrap">
-                    {[0.5,2.5,5,10,25,50].map(v => {
-                      const units = BigInt(Math.round(v * 10 ** USDC_DECIMALS))
-                      return (
-                        <button
-                          key={v}
-                          disabled={approving}
-                          onClick={(e)=>{e.stopPropagation(); approveAmount(units);}}
-                          className="text-[10px] bg-[#DC8291] hover:bg-[#c86e7c] disabled:opacity-50 px-2 py-1 rounded"
-                          title={`Approve ${v.toFixed(2)} USDC`}
-                        >{v}</button>
-                      )
-                    })}
-                  </div>
-                  {/* Custom approve input */}
-                  <div className="flex items-center gap-1">
-                    <label htmlFor="approveCustom" className="sr-only">Custom approve (USDC)</label>
-                    <input
-                      id="approveCustom"
-                      type="number"
-                      inputMode="decimal"
-                      step="0.01"
-                      min={0.01}
-                      placeholder="USDC"
-                      value={approveCustom}
-                      onChange={(e)=> setApproveCustom(e.target.value)}
-                      className="w-20 text-[12px] px-2 py-1 rounded border border-[#DC8291] bg-white/80 text-[#2d1b2e]"
-                    />
+          {!hasAllowanceForSpin && !approving && (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+              <button
+                onClick={(e)=>{e.stopPropagation(); if (!approving) doApprove();}}
+                className="bg-[#2d1b2e] text-[#FFE4EC] px-4 py-2 rounded shadow disabled:opacity-50 text-sm"
+                disabled={approving || !canApprove}
+              >{approving ? 'Approving…' : `Approve ${priceUsdcDisplay} USDC`}</button>
+              <div className="flex gap-1 flex-wrap max-w-[240px]">
+                {[0.5,2.5,5,10,25,50].map(v => {
+                  const units = BigInt(Math.round(v * 10 ** USDC_DECIMALS))
+                  return (
                     <button
-                      disabled={approving || !approveCustom}
-                      onClick={(e)=>{
-                        e.stopPropagation();
-                        const v = Number(approveCustom);
-                        if (isNaN(v) || v <= 0) return;
-                        // Clamp to a reasonable max; allow up to 50 by default
-                        const clamped = Math.max(0.01, Math.min(50, v));
-                        const units = BigInt(Math.round(clamped * 10 ** USDC_DECIMALS));
-                        approveAmount(units);
-                      }}
-                      className="text-[12px] bg-[#2d1b2e] text-[#FFE4EC] px-2 py-1 rounded disabled:opacity-50"
-                    >Approve</button>
-                  </div>
-                </div>
-              )}
+                      key={v}
+                      disabled={approving}
+                      onClick={(e)=>{e.stopPropagation(); approveAmount(units);}}
+                      className="text-[10px] bg-[#DC8291] hover:bg-[#c86e7c] disabled:opacity-50 px-2 py-1 rounded"
+                      title={`Approve ${v.toFixed(2)} USDC`}
+                    >{v}</button>
+                  )
+                })}
+                <button
+                  disabled={approving}
+                  onClick={(e)=>{e.stopPropagation(); approveAmount(0n);}}
+                  className="text-[10px] bg-[#7a567c] hover:bg-[#6a4e70] disabled:opacity-50 px-2 py-1 rounded"
+                  title="Reset allowance to 0"
+                >0</button>
+              </div>
+              <div className="flex items-center gap-1">
+                <label htmlFor="approveCustom" className="sr-only">Custom approve (USDC)</label>
+                <input
+                  id="approveCustom"
+                  type="number"
+                  inputMode="decimal"
+                  step="0.01"
+                  min={0.01}
+                  placeholder="Custom"
+                  value={approveCustom}
+                  onChange={(e)=> setApproveCustom(e.target.value)}
+                  className="w-20 text-[12px] px-2 py-1 rounded border border-[#DC8291] bg-white/80 text-[#2d1b2e]"
+                />
+                <button
+                  disabled={approving || !approveCustom}
+                  onClick={(e)=>{
+                    e.stopPropagation();
+                    const v = Number(approveCustom);
+                    if (isNaN(v) || v <= 0) return;
+                    const clamped = Math.max(0.01, Math.min(500, v));
+                    const units = BigInt(Math.round(clamped * 10 ** USDC_DECIMALS));
+                    approveAmount(units);
+                  }}
+                  className="text-[12px] bg-[#2d1b2e] text-[#FFE4EC] px-2 py-1 rounded disabled:opacity-50"
+                >Approve</button>
+              </div>
+            </div>
+          )}
           {!jackpotAddrValid && (
             <span className="text-[11px] text-red-600">Missing NEXT_PUBLIC_JACKPOT_ADDRESS</span>
           )}
           {hasAllowanceForSpin && (credits||0n)===0n && !buying && (
-            <button
-              onClick={(e)=>{e.stopPropagation(); buyOneSpin();}}
-              className="bg-[#DC8291] text-[#FFE4EC] px-4 py-2 rounded shadow text-sm disabled:opacity-50"
-              disabled={buying}
-            >Buy 1 Spin</button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={(e)=>{e.stopPropagation(); buyOneSpin();}}
+                className="bg-[#DC8291] text-[#FFE4EC] px-4 py-2 rounded shadow text-sm disabled:opacity-50"
+                disabled={buying}
+              >Buy 1 Spin</button>
+              <button
+                onClick={(e)=>{e.stopPropagation(); if (confirm('Send without simulate? This may reveal revert only after wallet signs.')) forceBuySpins(1n);}}
+                className="bg-[#7a567c] text-white px-3 py-2 rounded shadow text-sm disabled:opacity-50"
+                disabled={buying}
+                title="Force send without simulate (debug)"
+              >Force Buy 1 (no sim)</button>
+            </div>
           )}
           {hasAllowanceForSpin && (credits||0n)>0n && !spinConfirming && !waitingVRF && (
             <button
@@ -466,6 +479,7 @@ export default function JackpotPage() {
               <span>Price (USDC):</span><span>{priceUsdcDisplay}</span>
               <span>Contract USDC:</span><span className="truncate max-w-[180px]">{contractUsdc || '—'}</span>
               <span>Fee Receiver:</span><span className="truncate max-w-[180px]">{feeReceiver || '—'}</span>
+              <span>Simulate Disabled:</span><span>{String(simulateDisabled)}</span>
               <span>USDC Balance:</span><span>{usdcBalance !== null ? usdcBalance.toString() : 'null'} {balanceError && '(err)'}</span>
               <span>Balance Error:</span><span className="truncate max-w-[140px]">{balanceError||'—'}</span>
               <span>Allowance:</span><span>{usdcAllowance !== null ? usdcAllowance.toString() : 'null'} {allowanceError && '(err)'}</span>
