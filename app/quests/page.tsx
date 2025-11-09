@@ -99,7 +99,7 @@ export default function QuestsPage() {
   const gasless = process.env.NEXT_PUBLIC_QUEST_GASLESS === 'true';
   const requiresBase = !gasless;
   const [inlineError, setInlineError] = useState<string | null>(null);
-  const { claimedShare, claimedQuizPlay, claimedChallenge, claimedFollowJester, claimedOneIQ, claimShare, claimDailyQuizPlay, claimDailyChallenge, claimFollowJester, claimDailyOneIQ, loading, error, secondsUntilReset } = useQuestIQ(address as `0x${string}` | undefined);
+  const { claimedShare, claimedQuizPlay, claimedChallenge, claimedFollowJester, claimShare, claimDailyQuizPlay, claimDailyChallenge, claimFollowJester, loading, error, secondsUntilReset } = useQuestIQ(address as `0x${string}` | undefined);
   const quizCompletedToday = useQuizCompletedTodayOnChain(address as `0x${string}` | undefined);
   const friendSearchedToday = useFriendSearchedTodayOnChain(address as `0x${string}` | undefined);
   const resetHours = Math.floor(secondsUntilReset / 3600);
@@ -247,28 +247,6 @@ export default function QuestsPage() {
             <a href="https://farcaster.xyz/jesterinvestor" target="_blank" rel="noopener noreferrer" className="underline decoration-dotted underline-offset-2 hover:decoration-solid">Follow @jesterinvestor</a> to enable this quest.
           </div>
 
-          <QuestCard
-            title="Daily +1 iQ"
-            emoji="✨"
-            description="Login bonus — claim 1 iQ each day."
-            reward="1 iQ"
-            claimed={claimedOneIQ}
-            disabled={claimedOneIQ || !address || !!error || switchingChain}
-            onClaim={async () => {
-              setInlineError(null);
-              const ok = await ensureOnBase();
-              if (!ok) return;
-              if (gasless && address) {
-                try { await claimGasless(5, address as `0x${string}`); } catch (e: any) { setInlineError(e.message); return; }
-              } else { await claimDailyOneIQ(); }
-              try {
-                window.dispatchEvent(new Event('triviacast:questClaimed'));
-                window.dispatchEvent(new Event('triviacast:iqUpdated'));
-                window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+1 iQ claimed' } }));
-              } catch {}
-            }}
-            loading={loading}
-          />
         </div>
 
         {(error || inlineError) && (
@@ -278,7 +256,7 @@ export default function QuestsPage() {
         )}
 
         <div className="mt-8 text-center text-xs text-[#5a3d5c]">
-          Minimal gating: quiz completion is a local flag today; on-chain or attestation gating planned. {gasless ? 'Gasless claims are enabled.' : 'Gasless claims not configured.'}
+          Quests: quiz & challenge depend on on-chain day markers; follow requires manual verification. {gasless ? 'Gasless claims enabled.' : 'Gasless claims not configured.'}
         </div>
       </div>
     </div>
