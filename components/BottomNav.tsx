@@ -15,7 +15,7 @@ const navItems = [
 export default function BottomNav() {
   const pathname = usePathname();
   return (
-    <nav style={{
+    <nav className="bottom-nav" style={{
       position: 'fixed',
       bottom: 0,
       left: 0,
@@ -35,13 +35,13 @@ export default function BottomNav() {
         {navItems.map(item => (
           <Link key={item.href} href={item.href} legacyBehavior>
             <a
+              className="bottom-nav__link"
               aria-label={item.label}
               title={item.label}
               style={{
                 color: pathname === item.href ? '#7C3AED' : '#333',
                 fontWeight: pathname === item.href ? 'bold' : 'normal',
                 textDecoration: 'none',
-                fontSize: '1.5rem',
                 textAlign: 'center',
                 padding: '12px 8px',
                 minWidth: '64px',
@@ -54,6 +54,21 @@ export default function BottomNav() {
         ))}
       </div>
       {/* No right-side buttons; nav items include all routes and Info is on far right */}
+      <style jsx>{`
+        /* Base size */
+        .bottom-nav__link { font-size: 1.5rem; }
+
+        /* Very small widths: shrink to 1.375rem */
+        @media (max-width: 360px) {
+          .bottom-nav { padding-left: 8px; padding-right: 8px; }
+          .bottom-nav__link { font-size: 1.375rem; padding: 10px 6px; min-width: 56px; }
+        }
+
+        /* Extremely small (legacy devices) */
+        @media (max-width: 320px) {
+          .bottom-nav__link { font-size: 1.25rem; padding: 8px 6px; min-width: 52px; }
+        }
+      `}</style>
     </nav>
   );
 }
