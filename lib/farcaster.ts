@@ -3,9 +3,9 @@
  *
  * Share helpers for Triviacast.
  *
- * This file ensures that when building a "share" preview (action === 'share')
- * any plain @username mention that does not already end with `.eth` or
- * `.farcaster.eth` will be rewritten to include `.farcaster.eth`.
+ * This version ensures that any @username mention used in share text
+ * will always be suffixed with `.farcaster.eth` unless it already ends
+ * with `.eth` or `.farcaster.eth`.
  *
  * Paste this file over your existing lib/farcaster.ts
  */
@@ -106,8 +106,8 @@ export async function openShareUrl(url: string): Promise<void> {
 }
 
 /**
- * Ensure mentions used in share previews include the `.farcaster.eth` suffix
- * unless they already end with `.eth` or `.farcaster.eth`.
+ * Ensure mentions include the `.farcaster.eth` suffix unless they already
+ * end with `.eth` or `.farcaster.eth`.
  *
  * Examples:
  *  - "@alice" => "@alice.farcaster.eth"
@@ -116,6 +116,7 @@ export async function openShareUrl(url: string): Promise<void> {
  */
 export function addFarcasterSuffixToMentions(text: string): string {
   if (!text) return text;
+  // Replace only mentions that do NOT already have .eth or .farcaster.eth
   return text.replace(/(^|\s)@([A-Za-z0-9_-]+)(?!\.(?:eth|farcaster\.eth))/g, (_match, prefix, handle) => {
     return `${prefix}@${handle}.farcaster.eth`;
   });
@@ -138,15 +139,18 @@ function buildEmbedsParams(embeds: string[] = []): string {
 
 /**
  * Build the Warpcast compose URL.
- * When action === 'share' we apply addFarcasterSuffixToMentions to the text so
- * the share preview shows full farcaster handles.
+ * NOTE: We now ALWAYS apply addFarcasterSuffixToMentions to the text here,
+ * so any @username included in share text will get the `.farcaster.eth`
+ * suffix unless it already has an .eth or .farcaster.eth suffix.
  */
 export function buildWarpcastShareUrl(text: string, embeds?: string[], options?: { action?: 'cast' | 'share' }): string {
   const base = 'https://warpcast.com/~/compose';
-  const action = options?.action || 'cast';
-  const textForUrl = action === 'share' ? addFarcasterSuffixToMentions(text) : text;
+  // Always add suffix to mentions for share text (user requested "always add .farcaster.eth")
+  const textForUrl = addFarcasterSuffixToMentions(text);
   const textParam = `text=${encodeURIComponent(textForUrl)}`;
 
+  // Keep previous logic for including embeds (share vs cast)
+  const action = options?.action || 'cast';
   const shouldIncludeEmbeds = action === 'share' || !hasTaggedFriends(text);
   const embedsParam = shouldIncludeEmbeds ? buildEmbedsParams(embeds || []) : '';
   return embedsParam ? `${base}?${textParam}&${embedsParam}` : `${base}?${textParam}`;
@@ -154,8 +158,12 @@ export function buildWarpcastShareUrl(text: string, embeds?: string[], options?:
 
 /**
  * Build a share URL that works for both Farcaster and Base.
- * For Farcaster/Base we typically return the canonical app URL (first embed)
+ * For Farcaster/Base we usually return the canonical app URL (first embed)
  * so the native app opens the correct target; for web we return the Warpcast compose URL.
+ *
+ * Because we always add `.farcaster.eth` in buildWarpcastShareUrl, web share text
+ * will contain the full farcaster handles. If the native app path is used
+ * (embeds[0] or getBaseUrl), those URLs are unchanged (they point to the app).
  */
 export function buildPlatformShareUrl(text: string, embeds?: string[], options?: { action?: 'cast' | 'share' }): string {
   const platform = getPlatform();
@@ -193,7 +201,6 @@ export function shareAppUrl(): string {
 
 /**
  * Results text (keeps existing API used by components)
- * This was present previously; we keep it intact so callers can generate text.
  */
 export function shareResultsText(score: number, total: number, percent: number, tPoints: number): string {
   const url = getBaseUrl();
@@ -216,7 +223,7 @@ export function shareResultsText(score: number, total: number, percent: number, 
 
 /**
  * Return a share URL for quiz results. Components expect this export name.
- * This will ensure the share preview (on web) appends `.farcaster.eth` to any @mentions.
+ * The share text will always have `.farcaster.eth` appended to plain @mentions.
  */
 export function shareResultsUrl(score: number, total: number, percent: number, tPoints: number): string {
   const text = shareResultsText(score, total, percent, tPoints);
@@ -227,8 +234,6 @@ export function shareResultsUrl(score: number, total: number, percent: number, t
 /**
  * Return a share URL for the global leaderboard.
  * Signature kept simple to match existing usage `shareLeaderboardUrl(null, 0)`
- * - username: optional username to highlight (can be '@alice' or 'alice')
- * - offset: optional numeric offset / page (unused for now but accepted for compatibility)
  */
 export function shareLeaderboardUrl(username: string | null = null, offset: number = 0): string {
   const url = getBaseUrl();
@@ -236,7 +241,6 @@ export function shareLeaderboardUrl(username: string | null = null, offset: numb
   if (username) {
     const raw = username.trim();
     handlePart = raw.startsWith('@') ? raw : `@${raw}`;
-    // Keep the handle in text so addFarcasterSuffixToMentions can transform it for share previews
     handlePart = ` — ${handlePart}`;
   }
   const text = `Check out the Triviacast leaderboard${handlePart}! See who's on top: ${url}`;
