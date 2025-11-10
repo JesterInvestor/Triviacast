@@ -165,7 +165,7 @@ export default function FarcasterLookupPage() {
             <button
               onClick={lookup}
               disabled={loading}
-              className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7C] text-white font-bold py-2 px-3 rounded-lg transition shadow-md w-full"
+              className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg transition shadow-md w-full"
             >
               {loading ? 'Searching…' : 'Lookup'}
             </button>
@@ -242,20 +242,9 @@ export default function FarcasterLookupPage() {
                         // Close the quiz modal first
                         setQuizOpen(false);
                         // Open an editable preview modal so the user can edit the cast text
-                        const rawTarget = result?.profile?.username || '';
-
+                        const target = result?.profile?.username || '';
                         // normalize handle so we don't end up with duplicate @ (some sources include '@')
-                        const cleanHandle = rawTarget.startsWith('@') ? rawTarget.slice(1) : rawTarget;
-
-                        // If the handle already contains the domain, don't append it again.
-                        // This produces a mention like: @username.farcaster.eth
-                        const handleLower = cleanHandle.toLowerCase();
-                        const handleWithDomain = cleanHandle
-                          ? (handleLower.includes('.farcaster.eth') ? cleanHandle : `${cleanHandle}.farcaster.eth`)
-                          : '';
-
-                        const mention = handleWithDomain ? `@${handleWithDomain}` : '';
-
+                        const cleanHandle = target.startsWith('@') ? target.slice(1) : target;
                         // Use tPoints from quiz results (includes streak bonuses); fallback to base calc
                         const computedTPoints = typeof (res as any)?.details?.tPoints === 'number'
                           ? (res as any).details.tPoints
@@ -263,9 +252,9 @@ export default function FarcasterLookupPage() {
                         // Use the Triviacast Challenge page link for share links (clickable HTTPS).
                         const challengeLink = 'https://triviacast.xyz/farcaster-lookup';
                         const pointsStr = Number(computedTPoints).toLocaleString();
-                        // Spiced / playful default message that mentions the user as @username.farcaster.eth
-                        const defaultText = mention
-                          ? `${mention} — I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`
+                        // Spiced / playful default message
+                        const defaultText = cleanHandle
+                          ? `@${cleanHandle}.farcaster.eth — I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`
                           : `I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`;
                         setPreviewText(defaultText);
                         setPreviewLink(challengeLink);
