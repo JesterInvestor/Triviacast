@@ -254,7 +254,7 @@ export default function FarcasterLookupPage() {
                         const pointsStr = Number(computedTPoints).toLocaleString();
                         // Spiced / playful default message
                         const defaultText = cleanHandle
-                          ? `@${cleanHandle} — I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`
+                          ? `@${cleanHandle}.farcaster.eth — I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`
                           : `I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`;
                         setPreviewText(defaultText);
                         setPreviewLink(challengeLink);
