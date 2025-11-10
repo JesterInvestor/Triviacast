@@ -33,16 +33,23 @@ export default function JackpotPage() {
   const finished = remainingMs <= 0;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] p-8">
-      <div className="max-w-3xl w-full text-center bg-white/80 backdrop-blur px-8 py-12 rounded-2xl border border-[#F4A6B7] shadow-lg">
+    // full-screen center container
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] p-8">
+      {/* card centered and constrained */}
+      <div
+        className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center text-center bg-white/80 backdrop-blur px-8 py-12 rounded-2xl border border-[#F4A6B7] shadow-lg"
+        role="region"
+        aria-label="Jackpot countdown"
+      >
         <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] mb-4">Jackpot coming soon.....</h1>
         <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">Only for players with 100,000 T points and 70 iQ.</p>
 
-        <div className="inline-flex flex-col items-center gap-6">
-          <div className="rounded-xl bg-gradient-to-b from-white/60 to-white/30 px-6 py-5 border border-[#F4A6B7] shadow-md">
-            <div className="text-sm uppercase tracking-wider text-[#6b4460] mb-2">Time remaining</div>
+        <div className="w-full flex flex-col items-center gap-6">
+          <div className="rounded-xl bg-gradient-to-b from-white/60 to-white/30 px-6 py-5 border border-[#F4A6B7] shadow-md w-full">
+            <div className="text-sm uppercase tracking-wider text-[#6b4460] mb-4">Time remaining</div>
 
-            <div className="flex items-center gap-4 sm:gap-6">
+            {/* center the countdown row */}
+            <div className="w-full flex items-center justify-center gap-4 sm:gap-6">
               <div className="flex flex-col items-center">
                 <div className="text-xs text-[#7a516d] mb-2">Days</div>
                 <div className="w-20 sm:w-24 h-20 sm:h-24 rounded-lg bg-[#ffeaf0] flex items-center justify-center border border-[#f2bccb] shadow-inner">
@@ -63,9 +70,7 @@ export default function JackpotPage() {
           {finished ? (
             <div className="mt-2 text-green-700 font-semibold">The jackpot is live! Claim now 🎉</div>
           ) : (
-            <p className="text-2xl sm:text-3xl font-bold text-[#DC8291] animate-pulse">
-              Get Triviacasting and share + claim daily!
-            </p>
+            <p className="text-2xl sm:text-3xl font-bold text-[#DC8291] animate-pulse">Get Triviacasting and share + claim daily!</p>
           )}
         </div>
 
@@ -75,7 +80,7 @@ export default function JackpotPage() {
             : `Time remaining: ${days} days, ${pad(hoursTotal)} hours, ${pad(minutes)} minutes, ${pad(seconds)} seconds`}
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
