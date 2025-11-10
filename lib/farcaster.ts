@@ -1,11 +1,13 @@
 /**
- * Shared Farcaster / sharing helpers
+ * lib/farcaster.ts
  *
- * This file updates share behavior so that when building a "share" preview
- * we append ".farcaster.eth" to each @username mention that does not
- * already end with `.eth` or `.farcaster.eth`.
+ * Share helpers for Triviacast.
  *
- * Paste this file over the existing lib/farcaster.ts
+ * This file ensures that when building a "share" preview (action === 'share')
+ * any plain @username mention that does not already end with `.eth` or
+ * `.farcaster.eth` will be rewritten to include `.farcaster.eth`.
+ *
+ * Paste this file over your existing lib/farcaster.ts
  */
 
 function hasTaggedFriends(text: string): boolean {
@@ -39,16 +41,17 @@ function getPlatform(): 'farcaster' | 'base' | 'web' {
   return 'web';
 }
 
+// Helper to open share URL properly within mini app or externally
 export async function openShareUrl(url: string): Promise<void> {
   if (typeof window === 'undefined') return;
 
   const platform = getPlatform();
 
+  // Always try to use Farcaster SDK first (works in miniapp and desktop app)
   try {
     const { sdk } = await import('@farcaster/miniapp-sdk');
 
-    // Try to get context to determine if we're in Farcaster environment
-    // Note: sdk.context is a promise that resolves to context or throws
+    // Check if SDK context is available (indicates we're in a Farcaster environment)
     const context = await sdk.context;
     if (context) {
       // Parse the Warpcast compose URL to extract text and embeds
@@ -56,12 +59,14 @@ export async function openShareUrl(url: string): Promise<void> {
       const text = urlObj.searchParams.get('text') || '';
       const embeds: string[] = [];
 
+      // Extract embeds (Warpcast uses embeds[] param)
       urlObj.searchParams.forEach((value, key) => {
         if (key === 'embeds[]' && embeds.length < 2) {
           embeds.push(value);
         }
       });
 
+      // Format embeds for composeCast (undefined, [string], or [string, string])
       const formattedEmbeds = embeds.length > 0
         ? (embeds.slice(0, 2) as [] | [string] | [string, string])
         : undefined;
@@ -80,7 +85,7 @@ export async function openShareUrl(url: string): Promise<void> {
 
   // For Base or Farcaster miniapp, open the app URL directly instead of Warpcast compose
   if (platform === 'base' || platform === 'farcaster') {
-    // If the URL is the Warpcast compose URL and includes embeds[], prefer first embed (the canonical app link)
+    // Extract the app URL from the Warpcast compose URL if it contains embeds
     try {
       const urlObj = new URL(url);
       const embeds: string[] = [];
@@ -92,19 +97,17 @@ export async function openShareUrl(url: string): Promise<void> {
         return;
       }
     } catch (e) {
-      // ignore and fallback to opening provided URL
+      // ignore and fallback
     }
   }
 
-  // Default fallback - open in new tab/window
+  // Default: open compose URL in a new tab
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 /**
  * Ensure mentions used in share previews include the `.farcaster.eth` suffix
  * unless they already end with `.eth` or `.farcaster.eth`.
- *
- * This targets only plain @username mentions (letters, numbers, underscore, dash).
  *
  * Examples:
  *  - "@alice" => "@alice.farcaster.eth"
@@ -113,24 +116,19 @@ export async function openShareUrl(url: string): Promise<void> {
  */
 export function addFarcasterSuffixToMentions(text: string): string {
   if (!text) return text;
-  // Replace only mentions that do NOT already have .eth or .farcaster.eth
-  // Keep leading whitespace/newline intact
-  // We use a negative lookahead to avoid touching existing suffixes.
   return text.replace(/(^|\s)@([A-Za-z0-9_-]+)(?!\.(?:eth|farcaster\.eth))/g, (_match, prefix, handle) => {
     return `${prefix}@${handle}.farcaster.eth`;
   });
 }
 
-// Helper: simple base URL for the app
+// Helper: canonical app URL
 export function getBaseUrl(): string {
-  // Keep in sync with site host
   return 'https://triviacast.xyz';
 }
 
 // Build embed params string for Warpcast compose URL
 function buildEmbedsParams(embeds: string[] = []): string {
   if (!embeds || embeds.length === 0) return '';
-  // Warpcast expects embeds[] params, we limit to first two
   const parts: string[] = [];
   for (let i = 0; i < Math.min(2, embeds.length); i++) {
     parts.push(`embeds[]=${encodeURIComponent(embeds[i])}`);
@@ -138,10 +136,13 @@ function buildEmbedsParams(embeds: string[] = []): string {
   return parts.join('&');
 }
 
-// Build the Warpcast compose URL
+/**
+ * Build the Warpcast compose URL.
+ * When action === 'share' we apply addFarcasterSuffixToMentions to the text so
+ * the share preview shows full farcaster handles.
+ */
 export function buildWarpcastShareUrl(text: string, embeds?: string[], options?: { action?: 'cast' | 'share' }): string {
   const base = 'https://warpcast.com/~/compose';
-  // If this is intended to be a "share preview", append the .farcaster.eth suffix to mentions
   const action = options?.action || 'cast';
   const textForUrl = action === 'share' ? addFarcasterSuffixToMentions(text) : text;
   const textParam = `text=${encodeURIComponent(textForUrl)}`;
@@ -151,20 +152,17 @@ export function buildWarpcastShareUrl(text: string, embeds?: string[], options?:
   return embedsParam ? `${base}?${textParam}&${embedsParam}` : `${base}?${textParam}`;
 }
 
-// Build a share URL that works for both Farcaster and Base
+/**
+ * Build a share URL that works for both Farcaster and Base.
+ * For Farcaster/Base we typically return the canonical app URL (first embed)
+ * so the native app opens the correct target; for web we return the Warpcast compose URL.
+ */
 export function buildPlatformShareUrl(text: string, embeds?: string[], options?: { action?: 'cast' | 'share' }): string {
   const platform = getPlatform();
   const action = options?.action || 'cast';
 
-  // When composing a cast (not a share) with tagged friends, do not include embeds
   const shouldIncludeEmbeds = action === 'share' || !hasTaggedFriends(text);
 
-  // For Base and Farcaster, return the app URL directly (first embed if available).
-  // Ensure that for share previews we return an app URL (embed) — the preview shown by the app
-  // should include the suffixed mentions. So if we're returning an embed URL (embeds[0]),
-  // make sure to transform the text in the actual embed if you control embed generation.
-  // In many places we pass the canonical app URL as the embed; that URL itself doesn't need
-  // per-mention suffixing, because the preview text is the text param passed to the composer.
   if (platform === 'base' || platform === 'farcaster') {
     if (shouldIncludeEmbeds && embeds && embeds.length > 0) {
       return embeds[0];
@@ -172,11 +170,11 @@ export function buildPlatformShareUrl(text: string, embeds?: string[], options?:
     return getBaseUrl();
   }
 
-  // For web, use Warpcast compose URL (opens Warpcast composer on the web)
   return buildWarpcastShareUrl(text, embeds, options);
 }
 
-// A few niceties used elsewhere in the app
+/* ---- Convenience share builders used across the app ---- */
+
 export function shareAppText(): string {
   const url = getBaseUrl();
   const variants = [
@@ -193,6 +191,10 @@ export function shareAppUrl(): string {
   return buildPlatformShareUrl(shareAppText(), [url], { action: 'share' });
 }
 
+/**
+ * Results text (keeps existing API used by components)
+ * This was present previously; we keep it intact so callers can generate text.
+ */
 export function shareResultsText(score: number, total: number, percent: number, tPoints: number): string {
   const url = getBaseUrl();
   const points = tPoints.toLocaleString();
@@ -210,4 +212,33 @@ export function shareResultsText(score: number, total: number, percent: number, 
   ];
   const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
   return pick(variants)(url);
+}
+
+/**
+ * Return a share URL for quiz results. Components expect this export name.
+ * This will ensure the share preview (on web) appends `.farcaster.eth` to any @mentions.
+ */
+export function shareResultsUrl(score: number, total: number, percent: number, tPoints: number): string {
+  const text = shareResultsText(score, total, percent, tPoints);
+  const url = getBaseUrl();
+  return buildPlatformShareUrl(text, [url], { action: 'share' });
+}
+
+/**
+ * Return a share URL for the global leaderboard.
+ * Signature kept simple to match existing usage `shareLeaderboardUrl(null, 0)`
+ * - username: optional username to highlight (can be '@alice' or 'alice')
+ * - offset: optional numeric offset / page (unused for now but accepted for compatibility)
+ */
+export function shareLeaderboardUrl(username: string | null = null, offset: number = 0): string {
+  const url = getBaseUrl();
+  let handlePart = '';
+  if (username) {
+    const raw = username.trim();
+    handlePart = raw.startsWith('@') ? raw : `@${raw}`;
+    // Keep the handle in text so addFarcasterSuffixToMentions can transform it for share previews
+    handlePart = ` — ${handlePart}`;
+  }
+  const text = `Check out the Triviacast leaderboard${handlePart}! See who's on top: ${url}`;
+  return buildPlatformShareUrl(text, [url], { action: 'share' });
 }
