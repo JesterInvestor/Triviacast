@@ -9,6 +9,8 @@ import { useAccount } from 'wagmi';
 import { ProfileCard } from '@/components/ProfileCard';
 import { NeynarCastCard } from '@/components/NeynarCastCard';
 import NeynarUserDropdown from '@/components/NeynarUserDropdown';
+import { useEffect } from 'react';
+import { getLeaderboard } from '@/lib/tpoints';
 
 type Cast = {
   hash?: string;
@@ -44,6 +46,29 @@ export default function FarcasterLookupPage() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewText, setPreviewText] = useState<string>('');
   const [previewLink, setPreviewLink] = useState<string>('');
+  const [topFive, setTopFive] = useState<Array<{ walletAddress: string; tPoints: number }>>([]);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+  useEffect(() => {
+    let mounted = true;
+    async function loadTop() {
+      try {
+        setLeaderboardLoading(true);
+        const lb = await getLeaderboard();
+        if (!mounted) return;
+        // getLeaderboard returns entries ordered by points desc in lib/tpoints
+        const top = (lb || []).slice(0, 5).map((e: any) => ({ walletAddress: e.walletAddress, tPoints: e.tPoints || 0 }));
+        setTopFive(top);
+      } catch (err) {
+        console.error('Failed to load leaderboard', err);
+      } finally {
+        if (mounted) setLeaderboardLoading(false);
+      }
+    }
+    loadTop();
+    return () => {
+      mounted = false;
+    };
+  }, []);
   // NOTE: intentionally not auto-prefilling the lookup from URL params.
   // Shares should point to the canonical site only (https://triviacast.xyz).
 
@@ -264,7 +289,7 @@ export default function FarcasterLookupPage() {
                 <div className="mt-4 w-full">
                   <h3 className="font-bold text-[#2d1b2e] text-base mb-2">Recent Casts</h3>
                   <ul className="space-y-2">
-                    {result.profile.casts.map((cast: any, idx: number) => (
+                    {result.profile.casts.slice(0,5).map((cast: any, idx: number) => (
                       <li key={cast.hash || idx}>
                         <NeynarCastCard
                           identifier={cast.hash || ''}
@@ -276,7 +301,27 @@ export default function FarcasterLookupPage() {
                   </ul>
                 </div>
               )}
-              {/* Raw profile JSON removed from UI */}
+              {/* Top 5 leaderboard (simple) */}
+              <div className="mt-6 w-full bg-white rounded-lg p-4 shadow">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-bold text-[#2d1b2e] text-base">Top 5 Leaderboard</h3>
+                  {leaderboardLoading && <span className="text-sm text-[#5a3d5c]">Loading…</span>}
+                </div>
+                {topFive.length === 0 ? (
+                  <div className="text-sm text-[#5a3d5c]">No leaderboard data available.</div>
+                ) : (
+                  <ol className="list-decimal pl-6">
+                    {topFive.map((entry, i) => (
+                      <li key={entry.walletAddress} className="mb-2">
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm font-semibold">{entry.walletAddress.slice(0,6)}…{entry.walletAddress.slice(-4)}</div>
+                          <div className="text-sm text-[#DC8291] font-bold">{entry.tPoints.toLocaleString()}</div>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </div>
             </div>
           )}
         </div>
