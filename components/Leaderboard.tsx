@@ -8,7 +8,7 @@ import { getIQPoints } from '@/lib/iq';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
 
-import { shareLeaderboardUrl, openShareUrl } from '@/lib/farcaster';
+// shareLeaderboardUrl/openShareUrl removed — wallet badge removed from leaderboard
 import { base } from 'viem/chains';
 // Avatar/Name from @coinbase/onchainkit/identity are optional at build time.
 // We'll load them dynamically at runtime and provide fallbacks.
@@ -70,19 +70,12 @@ function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?
 
 export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | 'iq' }) {
   const [leaderboard, setLeaderboard] = useState<Array<any>>([]);
-  const [walletTotal, setWalletTotal] = useState<number>(0);
   const [profiles, setProfiles] = useState<Record<string, any>>({});
   const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const { address } = useAccount();
 
 
-
-  const myRank = useMemo(() => {
-    if (!address) return null;
-    const idx = leaderboard.findIndex(l => l.walletAddress.toLowerCase() === address.toLowerCase());
-    return idx >= 0 ? idx + 1 : null;
-  }, [address, leaderboard]);
 
   const totalTPoints = useMemo(() => {
     return leaderboard.reduce((sum, entry) => sum + (entry?.tPoints || 0), 0);
@@ -113,7 +106,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
         }
 
         // Batch fetch Farcaster profiles for leaderboard addresses
-        const addresses = board.map(b => b.walletAddress?.toLowerCase()).filter(Boolean);
+        const addresses = board.map((b: any) => b.walletAddress?.toLowerCase()).filter(Boolean);
         try {
           const response = await fetch('/api/neynar/user', {
             method: 'POST',
@@ -135,19 +128,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
           setProfileErrors({ api: String(err) });
         }
 
-        if (address) {
-          if (view === 'iq') {
-            try {
-              const v = await getIQPoints(address as `0x${string}`);
-              setWalletTotal(Number(v));
-            } catch (_) {
-              setWalletTotal(0);
-            }
-          } else {
-            const points = await getWalletTotalPoints(address);
-            setWalletTotal(points);
-          }
-        }
+        // walletTotal badge removed — no per-wallet fetch here
       } finally {
         setLoading(false);
       }
@@ -243,26 +224,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
           and some losers 😭😩😞
         </p>
 
-        {walletTotal > 0 && address && (
-          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gradient-to-r from-[#FFE4EC] to-[#FFC4D1] rounded-lg border-2 border-[#F4A6B7] shadow-md">
-            <div className="text-center">
-              <div className="text-xs sm:text-sm text-[#5a3d5c] mb-1 font-semibold">{view === 'iq' ? 'Your Wallet iQ' : 'Your Wallet T Points'}</div>
-              <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">
-                {walletTotal.toLocaleString()}
-              </div>
-              {/* Profile UI removed */}
-              <div className="mt-3 flex items-center gap-2 justify-center flex-wrap">
-                <button
-                  onClick={() => openShareUrl(shareLeaderboardUrl(myRank, walletTotal))}
-                  className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-4 rounded-lg text-sm transition inline-flex items-center justify-center shadow gap-2"
-                >
-                  <Image src="/farcaster.svg" alt="Farcaster" width={16} height={16} className="w-4 h-4" />
-                  Share on Farcaster
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Wallet badge removed from leaderboard page per request */}
 
         {loading ? (
           <div className="text-center py-8 sm:py-12">
