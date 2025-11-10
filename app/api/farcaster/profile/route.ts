@@ -81,7 +81,8 @@ export async function POST(req: Request) {
 
     // Best-effort: fetch up to 5 recent casts and attach to profile
     try {
-      const fid = profile.raw?.fid;
+      // FIX: prefer normalized profile.fid, fall back to raw fid for compatibility
+      const fid = profile.fid ?? profile.raw?.fid;
       if (fid) {
         const casts = await fetchRecentCastsForFid(String(fid), apiKey, 5);
         profile.casts = casts;
