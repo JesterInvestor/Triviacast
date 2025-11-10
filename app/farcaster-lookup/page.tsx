@@ -50,12 +50,13 @@ export default function FarcasterLookupPage() {
   // NOTE: intentionally not auto-prefilling the lookup from URL params.
   // Shares should point to the canonical site only (https://triviacast.xyz).
 
-  const lookup = async () => {
+  const lookup = async (usernameOverride?: string) => {
     setLoading(true);
     setError(null);
     setResult(null);
     try {
-      if (!username || username.trim() === '') {
+      const usernameToLookup = usernameOverride || username;
+      if (!usernameToLookup || usernameToLookup.trim() === '') {
         setError('Please provide a Farcaster username to lookup');
         setLoading(false);
         return;
@@ -64,7 +65,7 @@ export default function FarcasterLookupPage() {
       const res = await fetch('/api/farcaster/profile', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ username }),
+        body: JSON.stringify({ username: usernameToLookup }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'lookup failed');
@@ -209,7 +210,7 @@ export default function FarcasterLookupPage() {
                               const uname = p.username ? String(p.username).replace(/^@/, '') : '';
                               if (uname) {
                                 setUsername(uname);
-                                setTimeout(() => lookup(), 40);
+                                lookup(uname);
                               }
                             }}
                           >
