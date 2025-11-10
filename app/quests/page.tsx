@@ -12,6 +12,7 @@ import {
   isShareMarkedToday,
   isFollowMarkedToday,
 } from '@/lib/questsClient';
+import Leaderboard from '@/components/Leaderboard';
 // import Link from 'next/link';
 import { base } from 'wagmi/chains';
 
@@ -269,6 +270,10 @@ export default function QuestsPage() {
 
         <div className="mt-8 text-center text-xs text-[#5a3d5c]">
           Simplified quests: Cast (+1 iQ), Follow (+50 iQ), Daily Claim (+1 iQ). Quiz/Challenge remain disabled (require relayer).
+        </div>
+        {/* Insert the global iQ leaderboard here */}
+        <div className="mt-8">
+          <Leaderboard />
         </div>
       </div>
     </div>
