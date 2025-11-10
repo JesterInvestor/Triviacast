@@ -248,9 +248,10 @@ export default function FarcasterLookupPage() {
                         // Use the Triviacast site link for share links (clickable HTTPS).
                         const challengeLink = 'https://triviacast.xyz';
                         const pointsStr = Number(computedTPoints).toLocaleString();
+                        // Playful / trash-talk default message
                         const defaultText = cleanHandle
-                          ? `@${cleanHandle}.farcaster.eth I scored ${res.score} (${pointsStr} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`
-                          : `I scored ${res.score} (${pointsStr} T Points) on the Triviacast Challenge — beat my score! Play it: ${challengeLink}`;
+                          ? `@${cleanHandle} — I just obliterated Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can stop my brain from flexing? Come prove it: ${challengeLink}`
+                          : `I just obliterated Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can stop my brain from flexing? Come prove it: ${challengeLink}`;
                         setPreviewText(defaultText);
                         setPreviewLink(challengeLink);
                         setPreviewOpen(true);
