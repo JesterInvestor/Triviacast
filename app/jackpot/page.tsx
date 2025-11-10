@@ -1,144 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
-import { base, mainnet } from "wagmi/chains";
-import { useJackpot, useExplorerTxUrl } from '@/lib/hooks/useJackpot';
-import { getWalletTotalPoints } from "@/lib/tpoints";
-
-// Config
-const REQUIRED_T_POINTS = 100_000;
-const TRIV_DECIMALS = 18;
-// Provide TRIV token address via env; normalize checksum to satisfy viem strict address validation
-import { getAddress } from 'viem';
-const RAW_TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || '';
-let USDC_ADDRESS: `0x${string}`;
-try {
-  // keep the hook param name `usdcAddress` for minimal changes; pass TRIV here
-  USDC_ADDRESS = getAddress(RAW_TRIV_ADDRESS) as `0x${string}`;
-} catch {
-  USDC_ADDRESS = RAW_TRIV_ADDRESS.toLowerCase() as `0x${string}`;
-}
-const LAST_SPIN_KEY_PREFIX = "jackpot:lastSpin:";
-
-// Weighted prize table (basis points out of 10,000)
-const PRIZE_WEIGHTS: Array<{ label: string; value: number; bp: number }> = [
-  { label: "10,000,000 $TRIV JACKPOT", value: 10_000_000, bp: 1 },      // 0.01%
-  { label: "10,000 $TRIV", value: 10_000, bp: 49 },                    // 0.49%
-  { label: "1,000 $TRIV", value: 1_000, bp: 950 },                     // 9.5%
-  { label: "100 $TRIV", value: 100, bp: 3000 },                        // 30%
-  { label: "Better luck", value: 0, bp: 6000 }                         // 60%
-];
-
-// Visual wheel slices (does not need to reflect weights exactly; winner forced)
-const WHEEL_SEGMENTS = [
-  "Better luck", "100 $TRIV", "1,000 $TRIV", "Better luck", "10,000 $TRIV", "Better luck",
-  "100 $TRIV", "Better luck", "1,000 $TRIV", "Better luck", "10,000 $TRIV", "Better luck",
-  "100 $TRIV", "Better luck", "1,000 $TRIV", "Better luck", "10,000,000 $TRIV JACKPOT", "Better luck"
-];
-
-// Colors repeated
-const SEGMENT_COLORS = ["#EE4040", "#F0CF50", "#815CD1", "#3DA5E0", "#34A24F", "#F9AA1F", "#EC3F3F", "#FF9000"]; // will mod index
-
-// On-chain randomness now determines the prize (forcedPrize comes from SpinResult event).
-
 export default function JackpotPage() {
-  const { address } = useAccount();
-  const chainId = useChainId();
-  const { switchChain, switchChainAsync, isPending: switchingChain, error: switchError } = useSwitchChain();
-  const isOnBase = chainId === base.id;
-  const chainLabel = useMemo(() => {
-    if (!chainId) return 'Unknown';
-    if (chainId === base.id) return `Base mainnet (${base.id})`;
-    if (chainId === mainnet.id) return `Ethereum mainnet (${mainnet.id})`;
-    return `Chain ${chainId}`;
-  }, [chainId]);
-  const [walletPoints, setWalletPoints] = useState<number | null>(null);
-  const [lastSpinTs, setLastSpinTs] = useState<number | null>(null);
-  const [showDebug, setShowDebug] = useState<boolean>(false);
-  const [approveCustom, setApproveCustom] = useState<string>("");
-  const [result, setResult] = useState<{ label: string; value: number } | null>(null);
-  const [networkError, setNetworkError] = useState<string | null>(null);
-  // forcedPrize is provided by hook now
-  const [spinning, setSpinning] = useState(false);
-  const [angle, setAngle] = useState(0); // radians current
-  const [startAngle] = useState(0);
-  const [spinStart, setSpinStart] = useState<number | null>(null);
-  const [finished, setFinished] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const size = 300; // radius
-  const upDuration = 1200; // ms accel
-  const downDuration = 4000; // ms decel
-  // Eligibility and hook for blockchain interactions
-  // Cooldown (local storage only for now); TODO: integrate on-chain lastSpinAt mapping for authoritative timestamp
-  const spunWithin24h = useMemo(() => lastSpinTs ? (Date.now() - lastSpinTs) < 24*60*60*1000 : false, [lastSpinTs]);
-  const nextSpinAt = useMemo(() => lastSpinTs ? lastSpinTs + 24*60*60*1000 : null, [lastSpinTs]);
-  const pointsKnown = walletPoints !== null;
-  const hasEnough = (walletPoints || 0) >= REQUIRED_T_POINTS;
-  // If points are unknown (API/contract not configured), don't block; on-chain will enforce
-  const eligible = !!address && (!pointsKnown || hasEnough) && !spunWithin24h;
-  // Fallback UI priceUnits (contract enforces 25,000 TRIV)
-  const priceUnits = 25000n * (10n ** 18n);
-  const jackpot = useJackpot({ usdcAddress: USDC_ADDRESS, priceUnits, eligible });
-  const {
-    usdcBalance,
-    usdcAllowance,
-    approving,
-    approveError,
-    approveTxHash,
-    spinConfirming,
-    waitingVRF,
-    spinError,
-    spinTxHash,
-    forcedPrize,
-    credits,
-    buying,
-    buyError,
-    buyTxHash,
-    hasAllowanceForSpin,
-    canApprove,
-    canRequestSpin,
-  canRequestSpinPaying,
-    doApprove,
-    requestSpin,
-  requestSpinPaying,
-    buyOneSpin,
-    buySpins,
-    approveAmount,
-    forceBuySpins,
-  previewBuySpins,
-    jackpotAddrValid,
-    lastSpinAt,
-    balanceError,
-    allowanceError,
-    priceUnits: contractPriceUnits,
-    feeReceiver,
-    contractUsdc,
-    simulateDisabled,
-  } = jackpot as any;
-    const { preflightOk, preflightError } = (jackpot as any);
-  const priceTrivDisplay = useMemo(() => {
-    const units = contractPriceUnits ?? priceUnits;
-    return String(units / (10n ** 18n))
-  }, [contractPriceUnits, priceUnits]);
-  const approveLink = useExplorerTxUrl(approveTxHash);
-  const spinLink = useExplorerTxUrl(spinTxHash);
-  const buyLink = useExplorerTxUrl(buyTxHash);
-
-  const requireBase = useCallback(async () => {
-    if (!address) {
-      setNetworkError('Connect your wallet to continue.');
-      return false;
-    }
-    if (isOnBase) {
-      setNetworkError(null);
-      return true;
-    }
-    try {
-      if (switchChainAsync) {
-        await switchChainAsync({ chainId: base.id });
-        setNetworkError(null);
-        return true;
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex items-center justify-center p-8">
+      <div className="max-w-3xl text-center bg-white/80 backdrop-blur px-8 py-12 rounded-lg border border-[#F4A6B7] shadow">
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] mb-4">Jackpot coming soon.............</h1>
+        <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">Only for players with 100,000 T points and more.</p>
+        <p className="text-2xl sm:text-3xl font-bold text-[#DC8291]">Triviacast now!!!!!!!!!</p>
+      </div>
+    </div>
+  );
+}
       }
       if (switchChain) {
         switchChain({ chainId: base.id });
