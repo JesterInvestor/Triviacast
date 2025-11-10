@@ -45,6 +45,8 @@ export default function FarcasterLookupPage() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewText, setPreviewText] = useState<string>('');
   const [previewLink, setPreviewLink] = useState<string>('');
+  const [related, setRelated] = useState<Array<any>>([]);
+  const [relatedLoading, setRelatedLoading] = useState(false);
   // NOTE: intentionally not auto-prefilling the lookup from URL params.
   // Shares should point to the canonical site only (https://triviacast.xyz).
   // NOTE: intentionally not auto-prefilling the lookup from URL params.
@@ -71,6 +73,26 @@ export default function FarcasterLookupPage() {
       // If the response is a profile object, wrap it as { profile: data }
       if (data && (data.address || data.username) && !data.error) {
         setResult({ profile: data });
+        // fetch related players suggestions for this profile (by fid) in background
+        try {
+          const fid = data.raw?.fid || data.fid || null;
+          if (fid) {
+            setRelatedLoading(true);
+            const r = await fetch('/api/neynar/related', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fid: Number(fid), limit: 6 }) });
+            if (r.ok) {
+              const parsed = await r.json();
+              setRelated(Array.isArray(parsed.result) ? parsed.result : []);
+            } else {
+              setRelated([]);
+            }
+          } else {
+            setRelated([]);
+          }
+        } catch (err) {
+          setRelated([]);
+        } finally {
+          setRelatedLoading(false);
+        }
       } else {
         setResult(data);
       }
@@ -156,6 +178,56 @@ export default function FarcasterLookupPage() {
                 >
                   Play Quiz
                 </button>
+              </div>
+
+              {/* Related players section */}
+              <div className="w-full mt-4">
+                <h4 className="font-semibold text-[#2d1b2e] mb-2">Related players</h4>
+                {relatedLoading ? (
+                  <div className="text-sm text-[#5a3d5c]">Loading related players…</div>
+                ) : related && related.length > 0 ? (
+                  <div className="flex gap-3 overflow-x-auto py-2">
+                    {related.map((p: any) => (
+                      <div key={p.fid || p.username} className="flex-shrink-0 w-40 bg-white rounded-lg border p-3 shadow-sm">
+                        <div className="flex items-center gap-3 mb-2">
+                          <img src={p.pfpUrl || `https://cdn.stamp.fyi/avatar/${String(p.raw?.custody_address || '')}?s=64`} alt={p.username || p.displayName || 'user'} className="w-10 h-10 rounded-full" />
+                          <div>
+                            <div className="text-sm font-bold">{p.displayName || p.username || `FID ${p.fid}`}</div>
+                            <div className="text-xs text-gray-500">{p.username || ''}</div>
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500 mb-2">{(p.followers || 0).toLocaleString()} followers</div>
+                        <div className="flex gap-2">
+                          <button
+                            className="flex-1 bg-[#F4A6B7] text-white text-xs py-1 rounded"
+                            onClick={() => {
+                              // populate lookup with this username and trigger lookup
+                              const uname = p.username ? String(p.username).replace(/^@/, '') : '';
+                              if (uname) {
+                                setUsername(uname);
+                                setTimeout(() => lookup(), 40);
+                              }
+                            }}
+                          >
+                            View
+                          </button>
+                          <button
+                            className="flex-1 border text-xs py-1 rounded"
+                            onClick={() => {
+                              // open their Neynar profile in a new tab
+                              const user = p.username ? p.username.replace(/^@/, '') : String(p.fid);
+                              window.open(`https://warpcast.com/${encodeURIComponent(user)}`, '_blank');
+                            }}
+                          >
+                            Warpcast
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-sm text-[#5a3d5c]">No related players found.</div>
+                )}
               </div>
 
               {quizOpen && (
