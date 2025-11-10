@@ -138,7 +138,7 @@ export default function FarcasterLookupPage() {
               className="w-10 h-10 sm:w-12 sm:h-12 mb-2 drop-shadow"
               loading="lazy"
             />
-            <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e] text-center">Challenge and New Friends</h1>
+            <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e] text-center">Challenge and Find New Friends</h1>
             <span className="text-xs text-[#5a3d5c] mt-1 inline-flex items-center gap-1">
               powered by
               <a
