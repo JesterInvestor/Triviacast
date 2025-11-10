@@ -6,7 +6,7 @@ import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import Link from 'next/link';
 import Image from 'next/image';
 import { shareLeaderboardUrl } from '@/lib/farcaster';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FarcasterProfile } from '@/components/FarcasterProfile';
 import { useAccount } from 'wagmi';
 import { sdk } from '@farcaster/miniapp-sdk';
@@ -16,6 +16,7 @@ export const dynamic = 'force-dynamic';
 
 export default function LeaderboardPage() {
   const { address } = useAccount();
+  const [view, setView] = useState<'tpoints' | 'iq'>('tpoints');
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
       <div className="w-full max-w-3xl px-2 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
@@ -63,7 +64,24 @@ export default function LeaderboardPage() {
             <ClientOnlyWidgets />
           </div>
         </div>
-        <Leaderboard />
+        <div className="w-full flex items-center justify-center mb-6">
+          <div className="inline-flex rounded-lg bg-white p-1 shadow-md border">
+            <button
+              onClick={() => setView('tpoints')}
+              className={`px-4 py-2 rounded-md font-semibold ${view === 'tpoints' ? 'bg-[#FF6B99] text-white' : 'text-[#5a3d5c]'}`}
+            >
+              T Points
+            </button>
+            <button
+              onClick={() => setView('iq')}
+              className={`px-4 py-2 rounded-md font-semibold ${view === 'iq' ? 'bg-[#7BC3EC] text-white' : 'text-[#5a3d5c]'}`}
+            >
+              iQ
+            </button>
+          </div>
+        </div>
+
+        <Leaderboard view={view} />
       </div>
     </div>
   );
