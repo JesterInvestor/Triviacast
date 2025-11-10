@@ -220,7 +220,7 @@ export default function QuestsPage() {
         )}
 
         <div className="mt-8 text-center text-xs text-[#5a3d5c]">
-          Simplified quests: Cast (+2 iQ), Follow (+50 iQ), Daily Claim (+1 iQ). Quiz/Challenge remain disabled (require relayer).
+          Simplified quests: Cast (+1 iQ), Follow (+50 iQ), Daily Claim (+1 iQ). Quiz/Challenge remain disabled (require relayer).
         </div>
       </div>
     </div>
