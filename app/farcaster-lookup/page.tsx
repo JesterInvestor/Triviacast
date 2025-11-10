@@ -48,6 +48,8 @@ export default function FarcasterLookupPage() {
   const [previewLink, setPreviewLink] = useState<string>('');
   const [topFive, setTopFive] = useState<Array<{ walletAddress: string; tPoints: number }>>([]);
   const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+  const [top3Casts, setTop3Casts] = useState<Array<{ walletAddress: string; fid?: number; casts: Cast[] }>>([]);
+  const [top3Loading, setTop3Loading] = useState(false);
   useEffect(() => {
     let mounted = true;
     async function loadTop() {
@@ -69,6 +71,54 @@ export default function FarcasterLookupPage() {
       mounted = false;
     };
   }, []);
+
+  // When we have the topFive, fetch profiles for top 3 and load their recent casts (up to 5 each)
+  useEffect(() => {
+    let mounted = true;
+    async function loadTop3Casts() {
+      if (!topFive || topFive.length === 0) return;
+      setTop3Loading(true);
+      try {
+        const top3 = topFive.slice(0, 3);
+        const addresses = top3.map((t) => t.walletAddress.toLowerCase());
+
+        // Fetch profiles for these addresses via server-side Neynar proxy
+        const resp = await fetch('/api/neynar/user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ addresses }) });
+        const data = await resp.json();
+        // data.result is a map of address -> profile
+
+        // For each top3, call /api/farcaster/profile to get recent casts (server will attach up to 5)
+        const castsPromises = top3.map(async (entry) => {
+          const addr = entry.walletAddress.toLowerCase();
+          let fid: number | undefined = undefined;
+          if (data && data.result && data.result[addr] && data.result[addr].fid) fid = Number(data.result[addr].fid);
+
+          try {
+            const pResp = await fetch('/api/farcaster/profile', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ address: addr }) });
+            if (!pResp.ok) return { walletAddress: addr, fid, casts: [] as Cast[] };
+            const profile = await pResp.json();
+            const casts = Array.isArray(profile?.casts) ? (profile.casts as Cast[]).slice(0, 5) : [];
+            return { walletAddress: addr, fid, casts };
+          } catch (err) {
+            return { walletAddress: addr, fid, casts: [] as Cast[] };
+          }
+        });
+
+        const results = await Promise.all(castsPromises);
+        if (!mounted) return;
+        setTop3Casts(results);
+      } catch (err) {
+        console.error('Failed to load top3 casts', err);
+        setTop3Casts([]);
+      } finally {
+        if (mounted) setTop3Loading(false);
+      }
+    }
+    loadTop3Casts();
+    return () => {
+      mounted = false;
+    };
+  }, [topFive]);
   // NOTE: intentionally not auto-prefilling the lookup from URL params.
   // Shares should point to the canonical site only (https://triviacast.xyz).
 
@@ -320,6 +370,38 @@ export default function FarcasterLookupPage() {
                       </li>
                     ))}
                   </ol>
+                )}
+              </div>
+              {/* Top 3 players' recent casts */}
+              <div className="mt-4 w-full bg-white rounded-lg p-4 shadow">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-bold text-[#2d1b2e] text-base">Top Players' Recent Casts</h3>
+                  {top3Loading && <span className="text-sm text-[#5a3d5c]">Loading…</span>}
+                </div>
+                {top3Casts.length === 0 ? (
+                  <div className="text-sm text-[#5a3d5c]">No casts available for top players.</div>
+                ) : (
+                  <div className="space-y-4">
+                    {top3Casts.map((p) => (
+                      <div key={p.walletAddress} className="border-t pt-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="text-sm font-semibold">{p.walletAddress.slice(0,6)}…{p.walletAddress.slice(-4)}{p.fid ? ` • FID ${p.fid}` : ''}</div>
+                          <div className="text-xs text-gray-500">{p.casts.length} casts</div>
+                        </div>
+                        {p.casts.length === 0 ? (
+                          <div className="text-sm text-[#5a3d5c]">No recent casts found.</div>
+                        ) : (
+                          <ul className="space-y-2">
+                            {p.casts.map((cast, idx) => (
+                              <li key={cast.hash || idx}>
+                                <NeynarCastCard identifier={cast.hash || ''} renderEmbeds={true} type="url" />
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
