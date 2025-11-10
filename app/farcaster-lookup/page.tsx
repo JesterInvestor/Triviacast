@@ -276,7 +276,7 @@ export default function FarcasterLookupPage() {
                   </ul>
                 </div>
               )}
-              <pre className="text-xs overflow-auto mt-2">{JSON.stringify(result, null, 2)}</pre>
+              {/* Raw profile JSON removed from UI */}
             </div>
           )}
         </div>
