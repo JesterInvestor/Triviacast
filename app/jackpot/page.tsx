@@ -8,17 +8,16 @@ import { getWalletTotalPoints } from "@/lib/tpoints";
 
 // Config
 const REQUIRED_T_POINTS = 100_000;
-const USDC_DECIMALS = 6;
-const SPIN_PRICE_USDC = 0.5; // $0.5 USDC per spin
-// Provide USDC address via env; normalize checksum to satisfy viem strict address validation
+const TRIV_DECIMALS = 18;
+// Provide TRIV token address via env; normalize checksum to satisfy viem strict address validation
 import { getAddress } from 'viem';
-const RAW_USDC_ADDRESS = process.env.NEXT_PUBLIC_USDC_ADDRESS || '0x833589fCDd4FfD38E7aF5aD01D50e4d60C2d8bC7';
+const RAW_TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || '';
 let USDC_ADDRESS: `0x${string}`;
 try {
-  USDC_ADDRESS = getAddress(RAW_USDC_ADDRESS) as `0x${string}`;
+  // keep the hook param name `usdcAddress` for minimal changes; pass TRIV here
+  USDC_ADDRESS = getAddress(RAW_TRIV_ADDRESS) as `0x${string}`;
 } catch {
-  // Fallback: lowercase; operations will still fail but we surface debug state
-  USDC_ADDRESS = RAW_USDC_ADDRESS.toLowerCase() as `0x${string}`;
+  USDC_ADDRESS = RAW_TRIV_ADDRESS.toLowerCase() as `0x${string}`;
 }
 const LAST_SPIN_KEY_PREFIX = "jackpot:lastSpin:";
 
@@ -78,7 +77,8 @@ export default function JackpotPage() {
   const hasEnough = (walletPoints || 0) >= REQUIRED_T_POINTS;
   // If points are unknown (API/contract not configured), don't block; on-chain will enforce
   const eligible = !!address && (!pointsKnown || hasEnough) && !spunWithin24h;
-  const priceUnits = useMemo(() => BigInt(Math.round(SPIN_PRICE_USDC * 10 ** USDC_DECIMALS)), []);
+  // Fallback UI priceUnits (contract enforces 25,000 TRIV)
+  const priceUnits = 25000n * (10n ** 18n);
   const jackpot = useJackpot({ usdcAddress: USDC_ADDRESS, priceUnits, eligible });
   const {
     usdcBalance,
@@ -117,9 +117,9 @@ export default function JackpotPage() {
     simulateDisabled,
   } = jackpot as any;
     const { preflightOk, preflightError } = (jackpot as any);
-  const priceUsdcDisplay = useMemo(() => {
+  const priceTrivDisplay = useMemo(() => {
     const units = contractPriceUnits ?? priceUnits;
-    return (Number(units) / 10**USDC_DECIMALS).toFixed(2)
+    return String(units / (10n ** 18n))
   }, [contractPriceUnits, priceUnits]);
   const approveLink = useExplorerTxUrl(approveTxHash);
   const spinLink = useExplorerTxUrl(spinTxHash);
@@ -379,10 +379,10 @@ export default function JackpotPage() {
                 }}
                 className="bg-[#2d1b2e] text-[#FFE4EC] px-4 py-2 rounded shadow disabled:opacity-50 text-sm"
                 disabled={approving || !canApprove}
-              >{approving ? 'Approving…' : `Approve ${priceUsdcDisplay} USDC`}</button>
+              >{approving ? 'Approving…' : `Approve ${priceTrivDisplay} $TRIV`}</button>
               <div className="flex gap-1 flex-wrap max-w-[240px]">
-                {[0.5,2.5,5,10,25,50].map(v => {
-                  const units = BigInt(Math.round(v * 10 ** USDC_DECIMALS))
+                {[25000,50000,100000].map(v => {
+                  const units = BigInt(v) * (10n ** 18n)
                   return (
                     <button
                       key={v}
@@ -392,8 +392,8 @@ export default function JackpotPage() {
                         await runWithBase(() => approveAmount(units));
                       }}
                       className="text-[10px] bg-[#DC8291] hover:bg-[#c86e7c] disabled:opacity-50 px-2 py-1 rounded"
-                      title={`Approve ${v.toFixed(2)} USDC`}
-                    >{v}</button>
+                      title={`Approve ${v.toLocaleString()} $TRIV`}
+                    >{v.toLocaleString()}</button>
                   )
                 })}
                 <button
@@ -407,14 +407,14 @@ export default function JackpotPage() {
                 >0</button>
               </div>
               <div className="flex items-center gap-1">
-                <label htmlFor="approveCustom" className="sr-only">Custom approve (USDC)</label>
+                <label htmlFor="approveCustom" className="sr-only">Custom approve ($TRIV)</label>
                 <input
                   id="approveCustom"
                   type="number"
                   inputMode="decimal"
-                  step="0.01"
-                  min={0.01}
-                  placeholder="Custom"
+                  step="1"
+                  min={1}
+                  placeholder="Custom TRIV"
                   value={approveCustom}
                   onChange={(e)=> setApproveCustom(e.target.value)}
                   className="w-20 text-[12px] px-2 py-1 rounded border border-[#DC8291] bg-white/80 text-[#2d1b2e]"
@@ -425,8 +425,8 @@ export default function JackpotPage() {
                     e.stopPropagation();
                     const v = Number(approveCustom);
                     if (isNaN(v) || v <= 0) return;
-                    const clamped = Math.max(0.01, Math.min(500, v));
-                    const units = BigInt(Math.round(clamped * 10 ** USDC_DECIMALS));
+                    const clamped = Math.max(1, Math.min(10000000, v));
+                    const units = BigInt(Math.round(clamped)) * (10n ** 18n);
                     await runWithBase(() => approveAmount(units));
                   }}
                   className="text-[12px] bg-[#2d1b2e] text-[#FFE4EC] px-2 py-1 rounded disabled:opacity-50"
@@ -519,11 +519,11 @@ export default function JackpotPage() {
               <span>Chain ID:</span><span>{chainId}</span>
               <span>Jackpot Address:</span><span className="truncate max-w-[180px]">{process.env.NEXT_PUBLIC_JACKPOT_ADDRESS || '—'}</span>
               <span>Price (units):</span><span>{contractPriceUnits ? contractPriceUnits.toString() : '—'}</span>
-              <span>Price (USDC):</span><span>{priceUsdcDisplay}</span>
-              <span>Contract USDC:</span><span className="truncate max-w-[180px]">{contractUsdc || '—'}</span>
+              <span>Price (TRIV):</span><span>{priceTrivDisplay}</span>
+              <span>Contract TRIV:</span><span className="truncate max-w-[180px]">{contractUsdc || '—'}</span>
               <span>Fee Receiver:</span><span className="truncate max-w-[180px]">{feeReceiver || '—'}</span>
               <span>Simulate Disabled:</span><span>{String(simulateDisabled)}</span>
-              <span>USDC Balance:</span><span>{usdcBalance !== null ? usdcBalance.toString() : 'null'} {balanceError && '(err)'}</span>
+              <span>TRIV Balance:</span><span>{usdcBalance !== null ? usdcBalance.toString() : 'null'} {balanceError && '(err)'}</span>
               <span>Balance Error:</span><span className="truncate max-w-[140px]">{balanceError||'—'}</span>
               <span>Allowance:</span><span>{usdcAllowance !== null ? usdcAllowance.toString() : 'null'} {allowanceError && '(err)'}</span>
               <span>Allowance Error:</span><span className="truncate max-w-[140px]">{allowanceError||'—'}</span>
@@ -540,7 +540,7 @@ export default function JackpotPage() {
               <span>On-chain Last Spin:</span><span>{lastSpinAt ? new Date(Number(lastSpinAt)*1000).toLocaleTimeString() : '—'}</span>
               <span>Cooldown Active:</span><span>{String(spunWithin24h)}</span>
               <span>Next Spin:</span><span>{nextSpinAt ? new Date(nextSpinAt).toLocaleTimeString() : '—'}</span>
-              <span>Preflight USDC:</span><span>{preflightOk === null ? '—' : String(preflightOk)}</span>
+              <span>Preflight TRIV:</span><span>{preflightOk === null ? '—' : String(preflightOk)}</span>
               <span>Preflight Error:</span><span className="truncate max-w-[140px]">{preflightError || '—'}</span>
             </div>
             <button onClick={()=>{localStorage.removeItem(LAST_SPIN_KEY_PREFIX + address); setLastSpinTs(null);}} className="mt-2 bg-[#DC8291] text-[#FFE4EC] px-2 py-1 rounded">Reset Local Cooldown</button>
@@ -550,7 +550,7 @@ export default function JackpotPage() {
           <img src="/brain-small.svg" alt="Brain" className="w-12 h-12 mb-1 drop-shadow" />
           <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e]">Jackpot</h1>
           <p className="text-base sm:text-lg text-[#5a3d5c]">Spin for a chance at the 10,000,000 $TRIV JACKPOT!</p>
-          <p className="text-xs sm:text-sm text-[#7a567c]">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points + pays {priceUsdcDisplay} USDC (approve then spin).</p>
+          <p className="text-xs sm:text-sm text-[#7a567c]">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points + pays {priceTrivDisplay} $TRIV (approve then spin).</p>
           <div className="text-[11px] sm:text-xs text-[#2d1b2e] bg-white/70 backdrop-blur px-3 py-2 rounded border border-[#F4A6B7] max-w-[640px]">
             <span className="font-semibold">Note:</span> One spin every 24 hours per wallet. The cooldown resets when your last spin’s VRF result arrives. Unused spin credits persist until you use them.
           </div>
@@ -585,7 +585,7 @@ export default function JackpotPage() {
           {eligible && approving && (
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <div className="bg-white/70 backdrop-blur p-4 rounded border border-[#DC8291] text-[#2d1b2e] max-w-xs animate-pulse">
-                <p className="font-semibold mb-1">Approving USDC…</p>
+                <p className="font-semibold mb-1">Approving TRIV…</p>
                 {approveTxHash && <p className="text-[10px] break-all">Tx: <a className="underline" href={approveLink||'#'} target="_blank" rel="noreferrer">{approveTxHash.slice(0,10)}…</a></p>}
                 {approveError && <p className="mt-1 text-xs text-red-600">{approveError}</p>}
               </div>
@@ -594,11 +594,11 @@ export default function JackpotPage() {
           {eligible && !approving && !hasAllowanceForSpin && (
             <div className="absolute inset-0 flex items-start justify-end p-2 pointer-events-none">
               <div className="bg-white/80 backdrop-blur px-3 py-2 rounded border border-[#DC8291] text-[#2d1b2e] max-w-[260px] shadow">
-                <p className="font-semibold text-sm">Approve USDC for spins</p>
-                <p className="text-[11px]">Current needed: {priceUsdcDisplay} USDC (per spin)</p>
-                <p className="text-[11px]">Balance: {usdcBalance !== null ? (Number(usdcBalance) / 10**USDC_DECIMALS).toFixed(2) : '…'} USDC</p>
+                <p className="font-semibold text-sm">Approve TRIV for spins</p>
+                <p className="text-[11px]">Current needed: {priceTrivDisplay} $TRIV (per spin)</p>
+                <p className="text-[11px]">Balance: {usdcBalance !== null ? (Number(usdcBalance / (10n ** 18n))).toLocaleString() : '…'} $TRIV</p>
                 {approveError && <p className="mt-1 text-[11px] text-red-600">{approveError}</p>}
-                <p className="mt-1 text-[10px] text-[#7a567c]">Use quick approve buttons above to set higher allowance (0.5–50 USDC) then buy spins.</p>
+                <p className="mt-1 text-[10px] text-[#7a567c]">Use quick approve buttons above to set a higher allowance then buy spins.</p>
               </div>
             </div>
           )}
@@ -670,7 +670,7 @@ export default function JackpotPage() {
           </div>
         )}
         <div className="mt-4 text-xs text-center text-[#7a567c] max-w-xl">
-          <p>Flow: approve USDC → request spin (VRF) → wait for SpinResult event → wheel animates to the returned prize.</p>
+          <p>Flow: approve TRIV → request spin (VRF) → wait for SpinResult event → wheel animates to the returned prize.</p>
         </div>
       </div>
     </div>

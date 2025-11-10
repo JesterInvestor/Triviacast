@@ -69,11 +69,10 @@ task("jackpot:deploy", "Deploy Jackpot contract")
     const env = process.env as Record<string,string>;
     const required = [
       'VRF_COORDINATOR', 'VRF_SUBSCRIPTION_ID', 'VRF_KEYHASH',
-      'USDC_ADDRESS', 'TRIV_TOKEN_ADDRESS', 'TRIVIAPOINTS_ADDRESS', 'FEE_RECEIVER_ADDRESS'
+      'TRIV_TOKEN_ADDRESS', 'TRIVIAPOINTS_ADDRESS', 'FEE_RECEIVER_ADDRESS'
     ];
     for (const k of required) if (!env[k]) throw new Error(`Missing env var ${k}`);
-    const price = env.SPIN_PRICE_USDC ? BigInt(env.SPIN_PRICE_USDC) : 500000n;
-    const threshold = env.POINTS_THRESHOLD ? BigInt(env.POINTS_THRESHOLD) : 100000n;
+  const threshold = env.POINTS_THRESHOLD ? BigInt(env.POINTS_THRESHOLD) : 100000n;
     const Jackpot = await hre.ethers.getContractFactory('Jackpot');
     const norm = (s: string) => {
       const t = s.trim();
@@ -90,11 +89,9 @@ task("jackpot:deploy", "Deploy Jackpot contract")
       norm(env.VRF_COORDINATOR),
       BigInt(env.VRF_SUBSCRIPTION_ID),
       env.VRF_KEYHASH as `0x${string}`,
-      norm(env.USDC_ADDRESS),
       norm(env.TRIV_TOKEN_ADDRESS),
       norm(env.TRIVIAPOINTS_ADDRESS),
       norm(env.FEE_RECEIVER_ADDRESS),
-      price,
       threshold,
       { maxFeePerGas, maxPriorityFeePerGas, nonce }
     );
