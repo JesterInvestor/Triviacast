@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface NeynarCastCardProps {
   identifier: string;
@@ -8,19 +8,31 @@ interface NeynarCastCardProps {
   type?: "hash" | "url" | string;
 }
 
-// Small wrapper that prefers the official Neynar React CastCard when available.
-// Falls back to a simple placeholder if the library isn't present at runtime.
+// Client-side wrapper that dynamically imports the optional `@neynar/react` package.
+// This avoids bundling or using `require()` which is flagged by the linter/build.
 export const NeynarCastCard: React.FC<NeynarCastCardProps> = ({ identifier, renderEmbeds = true, type = "hash" }) => {
-  try {
-    // Use a dynamic require to avoid bundler resolving this at build time if it's optional
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const mod = require('@neynar/react') as any;
-    const RealCast = mod?.NeynarCastCard ?? mod?.CastCard ?? (mod?.default && mod.default.NeynarCastCard);
-    if (RealCast) {
-      return <RealCast identifier={identifier} renderEmbeds={renderEmbeds} type={type} />;
+  const [RealCast, setRealCast] = useState<React.ComponentType<any> | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      try {
+        const mod = await import("@neynar/react");
+        const Comp = (mod as any)?.NeynarCastCard ?? (mod as any)?.CastCard ?? ((mod as any)?.default && (mod as any).default.NeynarCastCard);
+        if (mounted && Comp) setRealCast(() => Comp);
+      } catch (err) {
+        // If the optional package isn't installed, we simply keep the fallback UI.
+        // Do not rethrow — this is an optional runtime enhancement.
+      }
     }
-  } catch (err) {
-    // ignore and fall through to fallback UI
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (RealCast) {
+    return <RealCast identifier={identifier} renderEmbeds={renderEmbeds} type={type} />;
   }
 
   // Fallback UI (keeps markup consistent / minimal)
