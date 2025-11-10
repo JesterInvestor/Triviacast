@@ -4,10 +4,11 @@ import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { LeaderboardEntry } from '@/types/quiz';
 import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
+import { getIQPoints } from '@/lib/iq';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
 
-import { shareLeaderboardUrl, openShareUrl } from '@/lib/farcaster';
+// shareLeaderboardUrl/openShareUrl removed — wallet badge removed from leaderboard
 import { base } from 'viem/chains';
 // Avatar/Name from @coinbase/onchainkit/identity are optional at build time.
 // We'll load them dynamically at runtime and provide fallbacks.
@@ -67,21 +68,14 @@ function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?
 }
 // Farcaster profile display logic
 
-export default function Leaderboard() {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [walletTotal, setWalletTotal] = useState(0);
+export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | 'iq' }) {
+  const [leaderboard, setLeaderboard] = useState<Array<any>>([]);
   const [profiles, setProfiles] = useState<Record<string, any>>({});
   const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const { address } = useAccount();
 
 
-
-  const myRank = useMemo(() => {
-    if (!address) return null;
-    const idx = leaderboard.findIndex(l => l.walletAddress.toLowerCase() === address.toLowerCase());
-    return idx >= 0 ? idx + 1 : null;
-  }, [address, leaderboard]);
 
   const totalTPoints = useMemo(() => {
     return leaderboard.reduce((sum, entry) => sum + (entry?.tPoints || 0), 0);
@@ -92,10 +86,27 @@ export default function Leaderboard() {
       setLoading(true);
       try {
         const board = await getLeaderboard();
-        setLeaderboard(board);
+        // board contains walletAddress and tPoints; for IQ view we'll augment with iqPoints
+        if (view === 'iq') {
+          // Fetch IQ points for each address in parallel (best-effort)
+          const entries = await Promise.all(
+            board.map(async (b: any) => {
+              const addr = (b.walletAddress || '').toLowerCase();
+              try {
+                const v = await getIQPoints(addr as `0x${string}`);
+                return { walletAddress: addr, iqPoints: Number(v) };
+              } catch (err) {
+                return { walletAddress: addr, iqPoints: 0 };
+              }
+            })
+          );
+          setLeaderboard(entries);
+        } else {
+          setLeaderboard(board);
+        }
 
         // Batch fetch Farcaster profiles for leaderboard addresses
-        const addresses = board.map(b => b.walletAddress?.toLowerCase()).filter(Boolean);
+        const addresses = board.map((b: any) => b.walletAddress?.toLowerCase()).filter(Boolean);
         try {
           const response = await fetch('/api/neynar/user', {
             method: 'POST',
@@ -117,16 +128,13 @@ export default function Leaderboard() {
           setProfileErrors({ api: String(err) });
         }
 
-        if (address) {
-          const points = await getWalletTotalPoints(address);
-          setWalletTotal(points);
-        }
+        // walletTotal badge removed — no per-wallet fetch here
       } finally {
         setLoading(false);
       }
     }
     fetchData();
-  }, [address]);
+  }, [address, view]);
 
   return (
     <div className="w-full px-0 sm:px-6">
@@ -141,12 +149,13 @@ export default function Leaderboard() {
             <button
               onClick={() => {
                 try {
-                  const sorted = leaderboard.slice().sort((a, b) => b.tPoints - a.tPoints);
+                  const pointsKey = view === 'iq' ? 'iqPoints' : 'tPoints';
+                  const sorted = leaderboard.slice().sort((a, b) => (b[pointsKey] || 0) - (a[pointsKey] || 0));
                   const rows: string[] = [];
                   const header = [
                     'rank',
                     'address',
-                    't_points',
+                    view === 'iq' ? 'iq_points' : 't_points',
                     'farcaster_username',
                     'display_name',
                     'fid',
@@ -179,7 +188,7 @@ export default function Leaderboard() {
                     const csvRow = [
                       String(idx + 1),
                       addr,
-                      String(entry.tPoints),
+                      String(entry[pointsKey] || 0),
                       username,
                       displayName,
                       String(fid),
@@ -215,26 +224,7 @@ export default function Leaderboard() {
           and some losers 😭😩😞
         </p>
 
-        {walletTotal > 0 && address && (
-          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gradient-to-r from-[#FFE4EC] to-[#FFC4D1] rounded-lg border-2 border-[#F4A6B7] shadow-md">
-            <div className="text-center">
-              <div className="text-xs sm:text-sm text-[#5a3d5c] mb-1 font-semibold">Your Wallet T Points</div>
-              <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">
-                {walletTotal.toLocaleString()}
-              </div>
-              {/* Profile UI removed */}
-              <div className="mt-3 flex items-center gap-2 justify-center flex-wrap">
-                <button
-                  onClick={() => openShareUrl(shareLeaderboardUrl(myRank, walletTotal))}
-                  className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-4 rounded-lg text-sm transition inline-flex items-center justify-center shadow gap-2"
-                >
-                  <Image src="/farcaster.svg" alt="Farcaster" width={16} height={16} className="w-4 h-4" />
-                  Share on Farcaster
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Wallet badge removed from leaderboard page per request */}
 
         {loading ? (
           <div className="text-center py-8 sm:py-12">
@@ -258,7 +248,7 @@ export default function Leaderboard() {
           </div>
         ) : null}
 
-        {leaderboard.length > 0 && (
+          {leaderboard.length > 0 && (
           <>
             {/* Wallet Connected message for current user */}
             {/* Wallet Connected badge removed per request */}
@@ -268,13 +258,17 @@ export default function Leaderboard() {
                   <tr className="text-xs sm:text-sm text-[#5a3d5c] border-b border-[#f3dbe0]">
                     <th className="py-2">#</th>
                     <th className="py-2">Player</th>
-                    <th className="py-2">T Points</th>
+                    <th className="py-2">{view === 'iq' ? 'iQ' : 'T Points'}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {leaderboard
                     .slice()
-                    .sort((a, b) => b.tPoints - a.tPoints)
+                    .sort((a, b) => {
+                      const aPoints = view === 'iq' ? (a.iqPoints || 0) : (a.tPoints || 0);
+                      const bPoints = view === 'iq' ? (b.iqPoints || 0) : (b.tPoints || 0);
+                      return bPoints - aPoints;
+                    })
                     .map((entry, i) => {
                       const rank = i + 1;
                       // Always normalize address for lookup
@@ -308,7 +302,7 @@ export default function Leaderboard() {
                               )}
                             </div>
                           </td>
-                          <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{entry.tPoints.toLocaleString()}</td>
+                          <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{(view === 'iq' ? (entry.iqPoints || 0) : (entry.tPoints || 0)).toLocaleString()}</td>
                         </tr>
                       );
                     })}
@@ -319,8 +313,8 @@ export default function Leaderboard() {
             {/* Total T Points summary */}
             <div className="mt-6 sm:mt-8 text-center w-full">
               <div className="bg-[#FFF4F6] border-2 border-[#F4A6B7] rounded-lg p-3 sm:p-4 mb-4 inline-block w-full">
-                <div className="text-sm text-[#5a3d5c]">Total T Points (all players)</div>
-                <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">{totalTPoints.toLocaleString()}</div>
+                <div className="text-sm text-[#5a3d5c]">{view === 'iq' ? 'Total iQ (all players)' : 'Total T Points (all players)'}</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">{(view === 'iq' ? leaderboard.reduce((s, e) => s + (e.iqPoints || 0), 0) : totalTPoints).toLocaleString()}</div>
               </div>
             </div>
 

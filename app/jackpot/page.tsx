@@ -2,13 +2,11 @@
 
 export default function JackpotPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
-        <div className="flex flex-col items-center gap-3 sm:gap-4 w-full">
-          <img src="/brain-small.svg" alt="Brain" className="w-10 h-10 sm:w-12 sm:h-12 mb-2 drop-shadow" />
-          <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e] text-center">Jackpot</h1>
-          <p className="text-base sm:text-lg text-[#5a3d5c] text-center">Jackpot coming soon.</p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] p-8">
+      <div className="max-w-3xl text-center bg-white/80 backdrop-blur px-8 py-12 rounded-lg border border-[#F4A6B7] shadow">
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] mb-4">Jackpot coming soon.....</h1>
+        <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">Only for players with 100,000 T points.</p>
+        <p className="text-2xl sm:text-3xl font-bold text-[#DC8291]">Get Triviacasting!!!!!!!</p>
       </div>
     </div>
   );

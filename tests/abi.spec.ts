@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { extendAbiWithErrors } from '@/lib/contract';
+import { extendAbiWithErrors } from '../lib/contract';
 
 describe('extendAbiWithErrors', () => {
   it('appends standard Error and Panic types', () => {

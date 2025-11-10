@@ -5,6 +5,7 @@ import ShareButton from '@/components/ShareButton';
 import { buildPlatformShareUrl } from '@/lib/farcaster';
 import { useState } from 'react';
 import Quiz from '@/components/Quiz';
+import { useAccount } from 'wagmi';
 import { ProfileCard } from '@/components/ProfileCard';
 import { NeynarCastCard } from '@/components/NeynarCastCard';
 import NeynarUserDropdown from '@/components/NeynarUserDropdown';
@@ -34,6 +35,7 @@ type LookupResult = {
 } | null;
 
 export default function FarcasterLookupPage() {
+  const { address } = useAccount();
   const [username, setUsername] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<LookupResult>(null);
@@ -69,6 +71,8 @@ export default function FarcasterLookupPage() {
       } else {
         setResult(data);
       }
+
+      // Backend relayer disabled; skip on-chain mark.
     } catch (err: unknown) {
       const e = err as { message?: string } | null;
       setError(e?.message || 'unknown error');

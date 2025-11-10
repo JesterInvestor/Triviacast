@@ -1,4 +1,4 @@
-import { HardhatUserConfig } from "hardhat/config";
+import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import * as dotenv from "dotenv";
 import path from "path";
@@ -38,10 +38,8 @@ const config: HardhatUserConfig = {
     }
   },
   etherscan: {
-    apiKey: {
-      baseSepolia: process.env.BASESCAN_API_KEY || "",
-      base: process.env.BASESCAN_API_KEY || ""
-    },
+    // Prefer a single Etherscan v2 API key; fallback to BASESCAN_API_KEY for backwards compatibility
+    apiKey: process.env.ETHERSCAN_API_KEY || process.env.BASESCAN_API_KEY || "",
     customChains: [
       {
         network: "baseSepolia",
@@ -64,3 +62,40 @@ const config: HardhatUserConfig = {
 };
 
 export default config;
+
+// Custom task to deploy Jackpot contract quickly
+task("jackpot:deploy", "Deploy Jackpot contract")
+  .setAction(async (_, hre) => {
+    const env = process.env as Record<string,string>;
+    const required = [
+      'VRF_COORDINATOR', 'VRF_SUBSCRIPTION_ID', 'VRF_KEYHASH',
+      'TRIV_TOKEN_ADDRESS', 'TRIVIAPOINTS_ADDRESS', 'FEE_RECEIVER_ADDRESS'
+    ];
+    for (const k of required) if (!env[k]) throw new Error(`Missing env var ${k}`);
+  const threshold = env.POINTS_THRESHOLD ? BigInt(env.POINTS_THRESHOLD) : 100000n;
+    const Jackpot = await hre.ethers.getContractFactory('Jackpot');
+    const norm = (s: string) => {
+      const t = s.trim();
+      const hex = t.startsWith('0x') ? t.slice(2) : t;
+      return ('0x' + hex).toLowerCase();
+    };
+    // Bump fees similar to other deploy script to avoid Base replacement underpriced errors
+    const fee = await hre.ethers.provider.getFeeData();
+    const bump = (v: bigint) => ((v * 125n) / 100n) + 1n;
+    const maxFeePerGas = bump(fee.maxFeePerGas ?? fee.gasPrice ?? 0n);
+    const maxPriorityFeePerGas = bump(fee.maxPriorityFeePerGas ?? 0n);
+    let nonce = await hre.ethers.provider.getTransactionCount((await hre.ethers.getSigners())[0].address, 'pending');
+    const contract = await Jackpot.deploy(
+      norm(env.VRF_COORDINATOR),
+      BigInt(env.VRF_SUBSCRIPTION_ID),
+      env.VRF_KEYHASH as `0x${string}`,
+      norm(env.TRIV_TOKEN_ADDRESS),
+      norm(env.TRIVIAPOINTS_ADDRESS),
+      norm(env.FEE_RECEIVER_ADDRESS),
+      threshold,
+      { maxFeePerGas, maxPriorityFeePerGas, nonce }
+    );
+    await contract.waitForDeployment();
+    const addr = await contract.getAddress();
+    console.log('Jackpot deployed at', addr);
+  });

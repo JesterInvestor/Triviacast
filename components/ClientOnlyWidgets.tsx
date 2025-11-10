@@ -123,7 +123,8 @@ export default function ClientOnlyWidgets() {
 
   const content = (
     <>
-      {connectSection}
+  {connectSection}
+  {/* iQ Points badge removed from ClientOnlyWidgets (main page) */}
       <AddMiniAppPrompt />
       <StakingDailyClaimPrompt />
       <Toaster />
