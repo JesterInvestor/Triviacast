@@ -111,6 +111,54 @@ h1:hover, h2:hover {
   animation: wobble 0.6s ease-in-out;
 }
 
+/* Fun CTA button styles */
+@keyframes pulse-soft {
+  0% { transform: scale(1); box-shadow: 0 6px 18px rgba(200,110,125,0.12); }
+  50% { transform: scale(1.03); box-shadow: 0 10px 24px rgba(200,110,125,0.18); }
+  100% { transform: scale(1); box-shadow: 0 6px 18px rgba(200,110,125,0.12); }
+}
+
+@keyframes pop-emoji {
+  0% { transform: translateY(0) scale(0.8); opacity: 0.0; }
+  20% { transform: translateY(-8px) scale(1.15); opacity: 1; }
+  60% { transform: translateY(-20px) scale(1.05); opacity: 1; }
+  100% { transform: translateY(-32px) scale(0.9); opacity: 0; }
+}
+
+.btn-cta {
+  background: linear-gradient(90deg, var(--brain-accent), var(--brain-tertiary));
+  color: var(--text-on-brain);
+  padding: 10px 18px;
+  border-radius: 9999px;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(200,110,125,0.16);
+  transition: transform 160ms cubic-bezier(.2,.9,.3,1), box-shadow 160ms;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.btn-cta:hover { transform: translateY(-4px) scale(1.02); }
+.btn-cta:active { transform: translateY(0) scale(0.995); }
+.btn-cta.pulsing { animation: pulse-soft 1.8s ease-in-out infinite; }
+
+.cta-emoji {
+  font-size: 18px;
+  display: inline-block;
+  transform-origin: center;
+}
+
+.emoji-burst {
+  position: absolute;
+  right: 12px;
+  top: -6px;
+  font-size: 18px;
+  pointer-events: none;
+  animation: pop-emoji 900ms forwards;
+}
+
+
 /* Optional: a subtle gradient for main page titles (keeps readability) */
 h1 {
   background: linear-gradient(90deg, var(--brain-primary), var(--brain-accent));

@@ -75,6 +75,9 @@ export default function QuestsPage() {
     setToasts(t => [...t, { id, message, type }]);
     setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3000);
   }, []);
+  // Small ephemeral UI bursts when user presses Cast/Follow
+  const [castBurst, setCastBurst] = useState(false);
+  const [followBurst, setFollowBurst] = useState(false);
   const {
     claimedFollowJester,
     claimFollowJester,
@@ -169,13 +172,27 @@ export default function QuestsPage() {
             }}
             loading={loading}
           />
-          <div className="-mt-3 mb-2 flex items-center gap-2 text-xs text-[#5a3d5c]">
-            <button
-              type="button"
-              className="px-2 py-1 rounded bg-white border border-[#7BC3EC] text-[#1b3d5c] hover:bg-[#E3F5FF]"
-              onClick={() => { markShareDone(); showToast('Cast action recorded — Claim enabled for today', 'success'); openShareUrl(shareAppUrl()); }}
-            >Cast now</button>
-            <span className="opacity-80">Use the button to open Warpcast, then come back and claim.</span>
+          <div className="-mt-3 mb-2 flex items-center gap-3 text-xs text-[#5a3d5c]">
+            <div className="relative">
+              <button
+                type="button"
+                aria-label="Cast now"
+                className={`btn-cta ${isShareMarkedToday() ? '' : 'pulsing'}`}
+                onClick={() => {
+                  markShareDone();
+                  showToast('Cast action recorded — Claim enabled for today', 'success');
+                  try { openShareUrl(shareAppUrl()); } catch {}
+                  // small emoji burst
+                  setCastBurst(true);
+                  setTimeout(() => setCastBurst(false), 900);
+                }}
+              >
+                <span className="cta-emoji">📣</span>
+                Cast now
+              </button>
+              {castBurst && <span className="emoji-burst">✨</span>}
+            </div>
+            <span className="opacity-80">Open Warpcast, then come back and press Claim.</span>
           </div>
 
           <QuestCard
@@ -199,11 +216,24 @@ export default function QuestsPage() {
             loading={loading}
           />
           <div className="text-xs -mt-3 mb-4 text-[#5a3d5c] flex items-center gap-3">
-            <button
-              type="button"
-              className="px-2 py-1 rounded bg-white border border-[#7BC3EC] text-[#1b3d5c] hover:bg-[#E3F5FF]"
-              onClick={() => { markFollowDone(); showToast('Follow action recorded — Claim enabled for today', 'success'); window.open('https://farcaster.xyz/jesterinvestor', '_blank', 'noopener'); }}
-            >Follow now</button>
+            <div className="relative">
+              <button
+                type="button"
+                aria-label="Follow now"
+                className={`btn-cta ${isFollowMarkedToday() ? '' : 'pulsing'}`}
+                onClick={() => {
+                  markFollowDone();
+                  showToast('Follow action recorded — Claim enabled for today', 'success');
+                  try { window.open('https://farcaster.xyz/jesterinvestor', '_blank', 'noopener'); } catch {}
+                  setFollowBurst(true);
+                  setTimeout(() => setFollowBurst(false), 900);
+                }}
+              >
+                <span className="cta-emoji">👤</span>
+                Follow now
+              </button>
+              {followBurst && <span className="emoji-burst">🎉</span>}
+            </div>
             <span className="opacity-80">Open Farcaster to follow, then come back and press Claim (Follow reveals Claim for today).</span>
           </div>
 
