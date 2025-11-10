@@ -13,7 +13,7 @@ describe('getPointsFromChain (mocked)', () => {
   });
 
   it('returns numeric value from mocked read', async () => {
-    const { getPointsFromChain } = await import('@/lib/contract');
+  const { getPointsFromChain } = await import('../lib/contract');
     const value = await getPointsFromChain('0x0000000000000000000000000000000000000001');
     expect(value).toBe(42);
   });

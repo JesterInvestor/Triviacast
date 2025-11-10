@@ -6,6 +6,12 @@ import { useQuestIQ } from '@/lib/hooks/useQuestIQ';
 import { shareAppUrl, openShareUrl } from '@/lib/farcaster';
 // Gating reads removed (we no longer rely on backend relayer to mark quiz/friend searches)
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  markShareDone,
+  markFollowDone,
+  isShareMarkedToday,
+  isFollowMarkedToday,
+} from '@/lib/questsClient';
 // import Link from 'next/link';
 import { base } from 'wagmi/chains';
 
@@ -62,6 +68,13 @@ export default function QuestsPage() {
   // Always require Base network for direct on-chain user claims (no gasless backend).
   const requiresBase = true;
   const [inlineError, setInlineError] = useState<string | null>(null);
+  // Toasts
+  const [toasts, setToasts] = useState<Array<{ id: number; message: string; type?: string }>>([]);
+  const showToast = useCallback((message: string, type = 'info') => {
+    const id = Date.now() + Math.round(Math.random()*1000);
+    setToasts(t => [...t, { id, message, type }]);
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3000);
+  }, []);
   const {
     claimedFollowJester,
     claimFollowJester,
@@ -142,7 +155,7 @@ export default function QuestsPage() {
             description="Post a quick cast about Triviacast. You can use the cast shortcut, then claim."
             reward="+1 iQ"
             claimed={claimedShare}
-            disabled={claimedShare || !address || !!error || switchingChain}
+            disabled={claimedShare || !address || !!error || switchingChain || !isShareMarkedToday()}
             onClaim={async () => {
               setInlineError(null);
               const ok = await ensureOnBase();
@@ -160,7 +173,7 @@ export default function QuestsPage() {
             <button
               type="button"
               className="px-2 py-1 rounded bg-white border border-[#7BC3EC] text-[#1b3d5c] hover:bg-[#E3F5FF]"
-              onClick={() => openShareUrl(shareAppUrl())}
+              onClick={() => { markShareDone(); showToast('Cast action recorded — Claim enabled for today', 'success'); openShareUrl(shareAppUrl()); }}
             >Cast now</button>
             <span className="opacity-80">Use the button to open Warpcast, then come back and claim.</span>
           </div>
@@ -171,7 +184,7 @@ export default function QuestsPage() {
             description="Follow @jesterinvestor on Farcaster (manual trust now)."
             reward="+50 iQ"
             claimed={claimedFollowJester}
-            disabled={claimedFollowJester || !address || !!error || switchingChain}
+            disabled={claimedFollowJester || !address || !!error || switchingChain || !isFollowMarkedToday()}
             onClaim={async () => {
               setInlineError(null);
               const ok = await ensureOnBase();
@@ -185,8 +198,13 @@ export default function QuestsPage() {
             }}
             loading={loading}
           />
-          <div className="text-xs -mt-3 mb-4 text-[#5a3d5c]">
-            <a href="https://farcaster.xyz/jesterinvestor" target="_blank" rel="noopener noreferrer" className="underline decoration-dotted underline-offset-2 hover:decoration-solid">Follow @jesterinvestor</a> to enable this quest.
+          <div className="text-xs -mt-3 mb-4 text-[#5a3d5c] flex items-center gap-3">
+            <button
+              type="button"
+              className="px-2 py-1 rounded bg-white border border-[#7BC3EC] text-[#1b3d5c] hover:bg-[#E3F5FF]"
+              onClick={() => { markFollowDone(); showToast('Follow action recorded — Claim enabled for today', 'success'); window.open('https://farcaster.xyz/jesterinvestor', '_blank', 'noopener'); }}
+            >Follow now</button>
+            <span className="opacity-80">Open Farcaster to follow, then come back and press Claim (Follow reveals Claim for today).</span>
           </div>
 
           {/* Daily claim: +1 iQ */}
