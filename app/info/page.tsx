@@ -1,6 +1,7 @@
 "use client";
 
 import Image from 'next/image';
+import HiddenMintButton from '@/components/HiddenMintButton';
 
 export default function InfoPage() {
   return (
@@ -115,6 +116,7 @@ export default function InfoPage() {
         </div>
         <footer className="mt-8 text-center text-xs text-gray-400">Triviacast &copy; 2025. May your answers be quick and your points be plenty! 🚀</footer>
       </div>
+      <HiddenMintButton />
     </div>
   );
 }
