@@ -135,12 +135,12 @@ export default function QuestsPage() {
         <div className="space-y-4">
           {/* Quests that can be claimed directly by user without relayer. */}
 
-          {/* Cast quest: +2 iQ */}
+          {/* Cast quest: +1 iQ */}
           <QuestCard
             title="Cast about Triviacast"
             emoji="📣"
             description="Post a quick cast about Triviacast. You can use the cast shortcut, then claim."
-            reward="+2 iQ"
+            reward="+1 iQ"
             claimed={claimedShare}
             disabled={claimedShare || !address || !!error || switchingChain}
             onClaim={async () => {
@@ -151,7 +151,7 @@ export default function QuestsPage() {
               try {
                 window.dispatchEvent(new Event('triviacast:questClaimed'));
                 window.dispatchEvent(new Event('triviacast:iqUpdated'));
-                window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+2 iQ claimed' } }));
+                window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+1 iQ claimed' } }));
               } catch {}
             }}
             loading={loading}
