@@ -2,6 +2,7 @@
 
 import { useAccount, useChainId, useSwitchChain } from 'wagmi';
 import { useIQPoints } from '@/lib/hooks/useIQPoints';
+import WalletIQPoints from '@/components/WalletIQPoints';
 import { useQuestIQ } from '@/lib/hooks/useQuestIQ';
 import { shareAppUrl, openShareUrl } from '@/lib/farcaster';
 // Gating reads removed (we no longer rely on backend relayer to mark quiz/friend searches)
@@ -122,9 +123,7 @@ export default function QuestsPage() {
           <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] text-center">Daily Quests</h1>
           <div className="text-sm text-[#5a3d5c]">Reset in {resetHours}h {resetMinutes}m {resetSeconds}s</div>
           {address && (
-            <div className="px-4 py-2 rounded-lg bg-[#E3F5FF] border-2 border-[#7BC3EC] text-[#1b3d5c] font-semibold text-sm shadow">
-              iQ Balance: {iqPoints ? Number(iqPoints).toLocaleString() : '—'}
-            </div>
+            <WalletIQPoints />
           )}
         </div>
 

@@ -5,7 +5,6 @@ import AddMiniAppPrompt from './AddMiniAppPrompt';
 import StakingDailyClaimPrompt from './StakingDailyClaimPrompt';
 import Toaster from './Toaster';
 import ClientErrorBoundary from './ClientErrorBoundary';
-import WalletIQPoints from './WalletIQPoints';
 import { useAccount, useConnect, useDisconnect, useChainId } from 'wagmi';
 
 // Replace Thirdweb ConnectButton with a lightweight wagmi + WalletConnect based UI.
@@ -125,8 +124,7 @@ export default function ClientOnlyWidgets() {
   const content = (
     <>
   {connectSection}
-  {/* iQ Points badge (hidden if no wallet or zero) */}
-  <WalletIQPoints />
+  {/* iQ Points badge removed from ClientOnlyWidgets (main page) */}
       <AddMiniAppPrompt />
       <StakingDailyClaimPrompt />
       <Toaster />
