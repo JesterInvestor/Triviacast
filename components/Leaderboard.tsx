@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import Image from 'next/image';
 import { LeaderboardEntry } from '@/types/quiz';
 import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
@@ -50,13 +50,14 @@ async function ensureOnchainKit() {
   }
 }
 
-function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string; avatarImgUrl?: string; fid?: number; bio?: string; followers?: number; following?: number; hasPowerBadge?: boolean } | null | undefined; fallbackAddress: string }) {
+function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string; avatarImgUrl?: string; fid?: number; bio?: string; followers?: number; following?: number; custody_address?: string; verified_addresses?: any }, fallbackAddress?: string }) {
   // Use avatar from profile if available, else fallback to stamp
   const avatarUrl = profile?.avatarImgUrl || (fallbackAddress ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32` : undefined);
   const display = profile?.username || profile?.displayName || "Get on Facaster bro";
   return (
     <div className="flex items-center gap-2">
       {avatarUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
         <img src={avatarUrl} alt="avatar" className="rounded-full w-8 h-8" />
       )}
       <span className="font-bold text-[#2d1b2e] text-base sm:text-lg">{display}</span>
@@ -69,17 +70,37 @@ function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?
 // Farcaster profile display logic
 
 export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | 'iq' }) {
+  const ITEMS_PER_PAGE = 20;
+
   const [leaderboard, setLeaderboard] = useState<Array<any>>([]);
   const [profiles, setProfiles] = useState<Record<string, any>>({});
   const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const { address } = useAccount();
 
-
+  const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const totalTPoints = useMemo(() => {
     return leaderboard.reduce((sum, entry) => sum + (entry?.tPoints || 0), 0);
   }, [leaderboard]);
+
+  // Sorted leaderboard memoized so we can paginate the sorted list consistently
+  const sortedLeaderboard = useMemo(() => {
+    return leaderboard
+      .slice()
+      .sort((a, b) => {
+        const aPoints = view === 'iq' ? (a.iqPoints || 0) : (a.tPoints || 0);
+        const bPoints = view === 'iq' ? (b.iqPoints || 0) : (b.tPoints || 0);
+        return bPoints - aPoints;
+      });
+  }, [leaderboard, view]);
+
+  // Reset displayCount when leaderboard or view change
+  useEffect(() => {
+    setDisplayCount(ITEMS_PER_PAGE);
+  }, [leaderboard, view]);
 
   useEffect(() => {
     async function fetchData() {
@@ -136,6 +157,40 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
     fetchData();
   }, [address, view]);
 
+  // IntersectionObserver for infinite scroll
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+    const sentinel = sentinelRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // If there are more items, load next page
+            if (displayCount < sortedLeaderboard.length && !isFetchingMore) {
+              setIsFetchingMore(true);
+              // small timeout to allow UI feedback and avoid extremely fast repeated increments
+              setTimeout(() => {
+                setDisplayCount((prev) => Math.min(prev + ITEMS_PER_PAGE, sortedLeaderboard.length));
+                setIsFetchingMore(false);
+              }, 250);
+            }
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: '200px',
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [sentinelRef.current, displayCount, sortedLeaderboard.length, isFetchingMore]);
+
   return (
     <div className="w-full px-0 sm:px-6">
       <div className="bg-white rounded-lg shadow-xl p-2 sm:p-6 border-4 border-[#F4A6B7] w-full max-w-full">
@@ -145,12 +200,12 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             Leaderboard
           </h1>
           {/* Export CSV of usernames -> addresses */}
-          {leaderboard.length > 0 && (
+          {sortedLeaderboard.length > 0 && (
             <button
               onClick={() => {
                 try {
                   const pointsKey = view === 'iq' ? 'iqPoints' : 'tPoints';
-                  const sorted = leaderboard.slice().sort((a, b) => (b[pointsKey] || 0) - (a[pointsKey] || 0));
+                  const sorted = sortedLeaderboard;
                   const rows: string[] = [];
                   const header = [
                     'rank',
@@ -212,7 +267,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                   alert('Failed to export CSV');
                 }
               }}
-              className="ml-2 bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg text-xs sm:text-sm transition inline-flex items-center justify-center shadow gap-2"
+              className="ml-2 bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg text-xs sm:text-sm transition inline-flex items-center justify-center shadow"
             >
               Export CSV
             </button>
@@ -233,7 +288,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
               Loading leaderboard...
             </p>
           </div>
-        ) : leaderboard.length === 0 ? (
+        ) : sortedLeaderboard.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
             <Image src="/brain-large.svg" alt="Brain" width={80} height={80} className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 opacity-50" priority />
             <p className="text-[#5a3d5c] text-base sm:text-lg mb-4">
@@ -248,10 +303,8 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
           </div>
         ) : null}
 
-          {leaderboard.length > 0 && (
+          {sortedLeaderboard.length > 0 && (
           <>
-            {/* Wallet Connected message for current user */}
-            {/* Wallet Connected badge removed per request */}
             <div className="mt-4 overflow-x-auto w-full">
               <table className="min-w-[320px] w-full text-left table-auto">
                 <thead>
@@ -262,13 +315,8 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                   </tr>
                 </thead>
                 <tbody>
-                  {leaderboard
-                    .slice()
-                    .sort((a, b) => {
-                      const aPoints = view === 'iq' ? (a.iqPoints || 0) : (a.tPoints || 0);
-                      const bPoints = view === 'iq' ? (b.iqPoints || 0) : (b.tPoints || 0);
-                      return bPoints - aPoints;
-                    })
+                  {sortedLeaderboard
+                    .slice(0, displayCount)
                     .map((entry, i) => {
                       const rank = i + 1;
                       // Always normalize address for lookup
@@ -291,7 +339,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                         });
                       }
                       return (
-                        <tr key={addr} className="border-b border-[#f8e8eb]">
+                        <tr key={`${addr}-${i}`} className="border-b border-[#f8e8eb]">
                           <td className="py-3 align-middle w-12 font-semibold text-sm text-[#2d1b2e]">{rank}</td>
                           <td className="py-3 align-middle">
                             <div className="flex items-center gap-3">
@@ -308,7 +356,22 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                     })}
                 </tbody>
               </table>
+              {/* Sentinel element observed by IntersectionObserver to trigger loading more */}
+              <div ref={sentinelRef} />
             </div>
+
+            {/* show a small loader or message when fetching more */}
+            {displayCount < sortedLeaderboard.length && (
+              <div className="text-center py-4">
+                <div className="inline-flex items-center gap-2 text-sm text-[#5a3d5c]">
+                  <svg className="animate-spin h-5 w-5 text-[#DC8291]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                  </svg>
+                  <span>{isFetchingMore ? 'Loading more...' : 'Scroll to load more'}</span>
+                </div>
+              </div>
+            )}
 
             {/* Total T Points summary */}
             <div className="mt-6 sm:mt-8 text-center w-full">
