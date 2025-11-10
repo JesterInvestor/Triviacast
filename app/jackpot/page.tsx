@@ -1,4 +1,4 @@
-""use client";
+"use client";
 
 import React, { useEffect, useMemo, useState } from "react";
 
@@ -7,8 +7,8 @@ function pad(n: number) {
 }
 
 export default function JackpotPage() {
-  // Fixed target: Nov 22, 2025 at 00:00 (midnight) — interpreted in the user's local timezone.
-  // If you want UTC midnight instead, change to Date.UTC(2025, 10, 22, 0, 0, 0)
+  // Fixed target: Nov 22, 2025 at 00:00 (midnight) in the user's local timezone.
+  // If you prefer UTC midnight, replace with: Date.UTC(2025, 10, 22, 0, 0, 0)
   const target = useMemo(() => new Date("2025-11-22T00:00:00").getTime(), []);
 
   const [remainingMs, setRemainingMs] = useState(Math.max(0, target - Date.now()));
@@ -30,7 +30,6 @@ export default function JackpotPage() {
   const seconds = Math.floor((remainingMs % (60 * 1000)) / 1000);
 
   const hoursTotal = days * 24 + hours;
-
   const finished = remainingMs <= 0;
 
   return (
@@ -93,16 +92,4 @@ function TimeBlock({ label, value }: { label: string; value: string }) {
 
 function Separator() {
   return <div className="text-[#b38897] font-bold text-xl sm:text-2xl select-none">:</div>;
-}use client";
-
-export default function JackpotPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] p-8">
-      <div className="max-w-3xl text-center bg-white/80 backdrop-blur px-8 py-12 rounded-lg border border-[#F4A6B7] shadow">
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] mb-4">Jackpot coming soon.....</h1>
-        <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">Only for players with 100,000 T points and 70 iQ.</p>
-        <p className="text-2xl sm:text-3xl font-bold text-[#DC8291]">Get Triviacasting and share+claim daily!!!!!!!</p>
-      </div>
-    </div>
-  );
 }
