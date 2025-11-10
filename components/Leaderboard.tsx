@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, useRef } from 'react';
+import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { LeaderboardEntry } from '@/types/quiz';
 import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
@@ -81,6 +81,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
   const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const lastScrollCheckRef = useRef<number>(0);
 
   const totalTPoints = useMemo(() => {
     return leaderboard.reduce((sum, entry) => sum + (entry?.tPoints || 0), 0);
@@ -157,29 +158,32 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
     fetchData();
   }, [address, view]);
 
-  // IntersectionObserver for infinite scroll
+  // loadMore callback used by both IntersectionObserver and scroll fallback
+  const loadMore = useCallback(() => {
+    if (displayCount >= sortedLeaderboard.length || isFetchingMore) return;
+    setIsFetchingMore(true);
+    // small timeout to allow UI feedback and avoid extremely fast repeated increments
+    setTimeout(() => {
+      setDisplayCount((prev) => Math.min(prev + ITEMS_PER_PAGE, sortedLeaderboard.length));
+      setIsFetchingMore(false);
+    }, 250);
+  }, [displayCount, sortedLeaderboard.length, isFetchingMore]);
+
+  // IntersectionObserver for infinite scroll (works in desktop and modern mobile browsers)
   useEffect(() => {
-    if (!sentinelRef.current) return;
     const sentinel = sentinelRef.current;
+    if (!sentinel) return;
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // If there are more items, load next page
-            if (displayCount < sortedLeaderboard.length && !isFetchingMore) {
-              setIsFetchingMore(true);
-              // small timeout to allow UI feedback and avoid extremely fast repeated increments
-              setTimeout(() => {
-                setDisplayCount((prev) => Math.min(prev + ITEMS_PER_PAGE, sortedLeaderboard.length));
-                setIsFetchingMore(false);
-              }, 250);
-            }
+            loadMore();
           }
         });
       },
       {
         root: null,
-        rootMargin: '200px',
+        rootMargin: '400px', // larger margin to prefetch earlier on mobile
         threshold: 0.1,
       }
     );
@@ -189,7 +193,39 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
     return () => {
       observer.disconnect();
     };
-  }, [sentinelRef.current, displayCount, sortedLeaderboard.length, isFetchingMore]);
+  }, [sentinelRef.current, loadMore]);
+
+  // Scroll/touch fallback for environments (webviews / older mobile browsers) where IntersectionObserver doesn't reliably fire
+  useEffect(() => {
+    const handler = () => {
+      // throttle checks to ~250ms
+      const now = Date.now();
+      if (now - lastScrollCheckRef.current < 250) return;
+      lastScrollCheckRef.current = now;
+
+      // don't try to load if already fetching or nothing left to load
+      if (isFetchingMore || displayCount >= sortedLeaderboard.length) return;
+
+      // check if we're near the bottom of the page
+      const scrollY = window.scrollY || window.pageYOffset;
+      const viewportHeight = window.innerHeight;
+      const fullHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+      const threshold = 200; // px from bottom to trigger
+      if (viewportHeight + scrollY >= fullHeight - threshold) {
+        loadMore();
+      }
+    };
+
+    window.addEventListener('scroll', handler, { passive: true });
+    window.addEventListener('touchmove', handler, { passive: true });
+    // also check once on mount in case content is short
+    handler();
+
+    return () => {
+      window.removeEventListener('scroll', handler);
+      window.removeEventListener('touchmove', handler);
+    };
+  }, [displayCount, sortedLeaderboard.length, isFetchingMore, loadMore]);
 
   return (
     <div className="w-full px-0 sm:px-6">
@@ -357,7 +393,8 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                 </tbody>
               </table>
               {/* Sentinel element observed by IntersectionObserver to trigger loading more */}
-              <div ref={sentinelRef} />
+              {/* give it a small height so some mobile browsers can detect intersection */}
+              <div ref={sentinelRef} style={{ height: 1 }} aria-hidden="true" />
             </div>
 
             {/* show a small loader or message when fetching more */}
