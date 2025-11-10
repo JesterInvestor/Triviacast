@@ -49,8 +49,6 @@ export default function FarcasterLookupPage() {
   const [relatedLoading, setRelatedLoading] = useState(false);
   // NOTE: intentionally not auto-prefilling the lookup from URL params.
   // Shares should point to the canonical site only (https://triviacast.xyz).
-  // NOTE: intentionally not auto-prefilling the lookup from URL params.
-  // Shares should point to the canonical site only (https://triviacast.xyz).
 
   const lookup = async () => {
     setLoading(true);
@@ -119,12 +117,12 @@ export default function FarcasterLookupPage() {
         <WagmiWalletConnect />
         <ShareButton
           url={buildPlatformShareUrl(
-            'Come check out our Farcaster lookup page powered by neynar!! https://triviacast.xyz/farcaster-lookup',
+            'Think you can outsmart your friends? Take the Challenge on the Challenge page — powered by neynar! https://triviacast.xyz/farcaster-lookup',
             ['https://triviacast.xyz/farcaster-lookup'],
             { action: 'share' }
           )}
-          className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[40px] text-sm shrink-0"
-          ariaLabel="Share Farcaster Lookup"
+          className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[40px]"
+          ariaLabel="Share Challenge page"
         />
       </div>
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
@@ -164,7 +162,13 @@ export default function FarcasterLookupPage() {
           </div>
           <div className="flex flex-col items-center gap-2 w-full max-w-md bg-white rounded-xl border-2 border-[#F4A6B7] shadow-md px-4 py-4">
             <NeynarUserDropdown value={username} onChange={setUsername} />
-            <button onClick={lookup} disabled={loading} className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg transition shadow-md w-full">{loading ? 'Loading...' : 'Lookup'}</button>
+            <button
+              onClick={lookup}
+              disabled={loading}
+              className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg transition shadow-md w-full"
+            >
+              {loading ? 'Searching…' : 'Lookup'}
+            </button>
           </div>
           {error && <div className="text-red-600 mt-2">{error}</div>}
           {result && result.profile && (
@@ -245,13 +249,13 @@ export default function FarcasterLookupPage() {
                         const computedTPoints = typeof (res as any)?.details?.tPoints === 'number'
                           ? (res as any).details.tPoints
                           : (res.score ?? 0) * 1000;
-                        // Use the Triviacast site link for share links (clickable HTTPS).
-                        const challengeLink = 'https://triviacast.xyz';
+                        // Use the Triviacast Challenge page link for share links (clickable HTTPS).
+                        const challengeLink = 'https://triviacast.xyz/farcaster-lookup';
                         const pointsStr = Number(computedTPoints).toLocaleString();
-                        // Playful / trash-talk default message
+                        // Spiced / playful default message
                         const defaultText = cleanHandle
-                          ? `@${cleanHandle} — I just obliterated Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can stop my brain from flexing? Come prove it: ${challengeLink}`
-                          : `I just obliterated Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can stop my brain from flexing? Come prove it: ${challengeLink}`;
+                          ? `@${cleanHandle} — I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`
+                          : `I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`;
                         setPreviewText(defaultText);
                         setPreviewLink(challengeLink);
                         setPreviewOpen(true);
