@@ -96,6 +96,137 @@ export default function InfoPage() {
           🚀 Connect with Farcaster and your Base wallet to unlock the full Triviacast experience
         </div>
 
+        {/* OpenTDB-like Add Question form (moved to top) */}
+        <div className="mb-6 p-4 bg-white rounded-xl shadow w-full max-w-2xl border">
+          <h2 className="text-xl font-bold mb-2 text-purple-600">Add a Trivia Question (OpenTDB format)</h2>
+          <p className="text-sm text-gray-600 mb-3">Fill the fields to create a multiple-choice question. Share it to Warpcast or add it manually on OpenTDB.</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label className="flex flex-col text-sm text-gray-700">
+              Category
+              <select
+                className="mt-1 p-2 border rounded"
+                name="category"
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+              >
+                <option value="">Select a category</option>
+                <option>General Knowledge</option>
+                <option>Entertainment: Books</option>
+                <option>Entertainment: Film</option>
+                <option>Entertainment: Music</option>
+                <option>Entertainment: Musicals & Theatres</option>
+                <option>Entertainment: Television</option>
+                <option>Entertainment: Video Games</option>
+                <option>Entertainment: Board Games</option>
+                <option>Science & Nature</option>
+                <option>Science: Computers</option>
+                <option>Science: Mathematics</option>
+                <option>Mythology</option>
+                <option>Sports</option>
+                <option>Geography</option>
+                <option>History</option>
+                <option>Politics</option>
+                <option>Art</option>
+                <option>Celebrities</option>
+                <option>Animals</option>
+                <option>Vehicles</option>
+                <option>Entertainment: Comics</option>
+                <option>Science: Gadgets</option>
+                <option>Entertainment: Japanese Anime & Manga</option>
+                <option>Entertainment: Cartoon & Animations</option>
+              </select>
+            </label>
+
+            <label className="flex flex-col text-sm text-gray-700">
+              Difficulty
+              <select
+                className="mt-1 p-2 border rounded"
+                name="difficulty"
+                value={form.difficulty}
+                onChange={(e) => setForm({ ...form, difficulty: e.target.value })}
+              >
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </label>
+
+            <label className="flex flex-col text-sm text-gray-700">
+              Correct answer
+              <input
+                className="mt-1 p-2 border rounded"
+                name="correct_answer"
+                value={form.correct_answer}
+                onChange={(e) => setForm({ ...form, correct_answer: e.target.value })}
+                placeholder="Correct answer text"
+              />
+            </label>
+          </div>
+
+          <label className="flex flex-col text-sm text-gray-700 mt-3">
+            Question
+            <textarea
+              className="mt-1 p-2 border rounded"
+              name="question"
+              value={form.question}
+              onChange={(e) => setForm({ ...form, question: e.target.value })}
+              rows={3}
+              placeholder="Type the question here"
+            />
+          </label>
+
+          <label className="flex flex-col text-sm text-gray-700 mt-3">
+            Incorrect answers (comma-separated)
+            <input
+              className="mt-1 p-2 border rounded"
+              name="incorrect_answers"
+              value={form.incorrect_answers}
+              onChange={(e) => setForm({ ...form, incorrect_answers: e.target.value })}
+              placeholder="e.g. red, blue, green"
+            />
+          </label>
+
+          <div className="mt-3 p-3 bg-indigo-50 border border-indigo-100 rounded text-sm text-gray-700">
+            <strong>Share this question</strong>
+            <p className="mt-2">You have a few options to share or submit the question you create:</p>
+            <ul className="list-disc pl-5 mt-2">
+              <li>
+                <strong>Cast to Farcaster</strong>: Click <em>Cast to Farcaster</em> to copy a ready-to-post message that mentions <code>@jesterinvestor</code> and open the Warpcast composer. If the composer doesn't prefill the message, paste from your clipboard into the compose box.
+              </li>
+              <li className="mt-1">
+                <strong>Add directly to OpenTDB</strong>: Click <em>Add directly to OpenTDB</em> to open the OpenTDB submission page. Fill the OpenTDB form manually — no autofill is provided.
+              </li>
+            </ul>
+          </div>
+          <div className="mt-4 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => castToFarcaster()}
+              disabled={!canCast}
+              className={`px-4 py-2 rounded text-white ${canCast ? 'bg-fuchsia-600 hover:bg-fuchsia-700' : 'bg-gray-300 cursor-not-allowed'}`}
+              title={canCast ? 'Cast this question to Farcaster (opens composer and copies message)' : 'Fill question and correct answer to enable casting'}
+            >
+              Cast to Farcaster
+            </button>
+            <button
+              type="button"
+              onClick={() => openOpenTDB()}
+              className={`px-4 py-2 rounded text-white bg-yellow-600 hover:bg-yellow-700`}
+              title={'Open OpenTDB add question page'}
+            >
+              Add directly to OpenTDB
+            </button>
+            <button
+              type="button"
+              onClick={() => setForm(DEFAULT_FORM)}
+              className="px-3 py-2 border rounded bg-white"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+
         <div className="mb-6 p-4 bg-gradient-to-r from-pink-100 to-blue-100 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-purple-600">How to Play</h2>
           <ul className="list-disc pl-6 text-gray-700">
@@ -202,138 +333,7 @@ export default function InfoPage() {
           </a>
         </div>
 
-        {/* OpenTDB-like Add Question form */}
-        <div className="mb-6 p-4 bg-white rounded-xl shadow w-full max-w-2xl border">
-          <h2 className="text-xl font-bold mb-2 text-purple-600">Add a Trivia Question (OpenTDB format)</h2>
-          <p className="text-sm text-gray-600 mb-3">Fill the fields and export a JSON file compatible with OpenTDB question format.</p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <label className="flex flex-col text-sm text-gray-700">
-              Category
-              <select
-                className="mt-1 p-2 border rounded"
-                name="category"
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-              >
-                <option value="">Select a category</option>
-                <option>General Knowledge</option>
-                <option>Entertainment: Books</option>
-                <option>Entertainment: Film</option>
-                <option>Entertainment: Music</option>
-                <option>Entertainment: Musicals & Theatres</option>
-                <option>Entertainment: Television</option>
-                <option>Entertainment: Video Games</option>
-                <option>Entertainment: Board Games</option>
-                <option>Science & Nature</option>
-                <option>Science: Computers</option>
-                <option>Science: Mathematics</option>
-                <option>Mythology</option>
-                <option>Sports</option>
-                <option>Geography</option>
-                <option>History</option>
-                <option>Politics</option>
-                <option>Art</option>
-                <option>Celebrities</option>
-                <option>Animals</option>
-                <option>Vehicles</option>
-                <option>Entertainment: Comics</option>
-                <option>Science: Gadgets</option>
-                <option>Entertainment: Japanese Anime & Manga</option>
-                <option>Entertainment: Cartoon & Animations</option>
-              </select>
-            </label>
-
-            <label className="flex flex-col text-sm text-gray-700">
-              Difficulty
-              <select
-                className="mt-1 p-2 border rounded"
-                name="difficulty"
-                value={form.difficulty}
-                onChange={(e) => setForm({ ...form, difficulty: e.target.value })}
-              >
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-              </select>
-            </label>
-
-            <label className="flex flex-col text-sm text-gray-700">
-              Correct answer
-              <input
-                className="mt-1 p-2 border rounded"
-                name="correct_answer"
-                value={form.correct_answer}
-                onChange={(e) => setForm({ ...form, correct_answer: e.target.value })}
-                placeholder="Correct answer text"
-              />
-            </label>
-          </div>
-
-          <label className="flex flex-col text-sm text-gray-700 mt-3">
-            Question
-            <textarea
-              className="mt-1 p-2 border rounded"
-              name="question"
-              value={form.question}
-              onChange={(e) => setForm({ ...form, question: e.target.value })}
-              rows={3}
-              placeholder="Type the question here"
-            />
-          </label>
-
-          <label className="flex flex-col text-sm text-gray-700 mt-3">
-            Incorrect answers (comma-separated)
-            <input
-              className="mt-1 p-2 border rounded"
-              name="incorrect_answers"
-              value={form.incorrect_answers}
-              onChange={(e) => setForm({ ...form, incorrect_answers: e.target.value })}
-              placeholder="e.g. red, blue, green"
-            />
-          </label>
-
-          <div className="mt-3 p-3 bg-indigo-50 border border-indigo-100 rounded text-sm text-gray-700">
-            <strong>Share this question</strong>
-            <p className="mt-2">You have a few options to share or submit the question you create:</p>
-            <ul className="list-disc pl-5 mt-2">
-              <li>
-                <strong>Cast to Farcaster</strong>: Click <em>Cast to Farcaster</em> to copy a ready-to-post message that mentions <code>@jesterinvestor</code> and open the Triviacast Farcaster miniapp. If the miniapp doesn't prefill the message, paste from your clipboard into the compose box.
-              </li>
-              <li className="mt-1">
-                <strong>Add directly to OpenTDB</strong>: Click <em>Add directly to OpenTDB</em> to open the OpenTDB submission page. Fill the OpenTDB form manually — no autofill is provided.
-              </li>
-            </ul>
-          </div>
-          <div className="mt-4 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => castToFarcaster()}
-              disabled={!canCast}
-              className={`px-4 py-2 rounded text-white ${canCast ? 'bg-fuchsia-600 hover:bg-fuchsia-700' : 'bg-gray-300 cursor-not-allowed'}`}
-              title={canCast ? 'Cast this question to Farcaster (opens miniapp and copies message)' : 'Fill question and correct answer to enable casting'}
-            >
-              Cast to Farcaster
-            </button>
-            <button
-              type="button"
-              onClick={() => openOpenTDB()}
-              disabled={!canCast}
-              className={`px-4 py-2 rounded text-white ${canCast ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-gray-300 cursor-not-allowed'}`}
-              title={canCast ? 'Open OpenTDB add question page and copy payload to clipboard' : 'Fill question and correct answer to enable this action'}
-            >
-              Add directly to OpenTDB
-            </button>
-            <button
-              type="button"
-              onClick={() => setForm(DEFAULT_FORM)}
-              className="px-3 py-2 border rounded bg-white"
-            >
-              Reset
-            </button>
-            <span className="text-sm text-gray-500">Downloads a file named like <em>opentdb_question_*.json</em></span>
-          </div>
-        </div>
+        
 
         <footer className="mt-8 text-center text-xs text-gray-400">
           Triviacast © 2025. May your answers be quick and your points be plenty. Rocket fuel not included
