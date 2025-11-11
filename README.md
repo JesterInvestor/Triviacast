@@ -1,3 +1,18 @@
+### Quiz results messaging
+
+The component `components/QuizResults.tsx` shows tiered, Farcaster-flavored messages based on the user's score:
+
+- 100%: "Perfect frame flip" flex line
+- 90–99%: DWR/"onchain brain" quip
+- 80–89%: "Certified Frame Lord"
+- 60–79%: "Cast-worthy" encouragement
+- 40–59%: "Starter pack energy"
+- 20–39%: "Feed scrolled" gentle nudge
+- <20%: "Rugged by trivia" jab
+- Special case: exactly 1000 T Points (≈1 correct): harsh-but-funny "one lonely warp" line
+
+Adjust copy in `getResultMessage()` if tone needs to change.
+
 [![Tip in Crypto](https://tip.md/badge.svg)](https://tip.md/jesterinvestor)
 # Quiz Challenge - Farcaster Trivia App
 

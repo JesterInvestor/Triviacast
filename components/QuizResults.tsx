@@ -113,10 +113,16 @@ export default function QuizResults({
   }, [address, tPoints, pointsSaved, signMessageAsync]);
   
   const getResultMessage = () => {
-    if (percentage >= 80) return "Excellent! 🎉";
-    if (percentage >= 60) return "Great job! 👏";
-    if (percentage >= 40) return "Good effort! 👍";
-    return "Keep practicing! 💪";
+    // Farcaster-flavored, wacky messages. Harsh-but-funny if they only earned 1000 T Points.
+    // Assumption: 1000 T Points == exactly one correct answer (base 1000 per correct).
+    if (tPoints === 1000) return "One lonely warp. Like casting to /alpha at 3am—no recasts, just vibes. 🥲";
+    if (percentage === 100) return "Perfect frame flip. Absolute signal. Expect unsolicited warps. 🟣";
+    if (percentage >= 90) return "Onchain grey-matter. DWR farm online. 🔥";
+    if (percentage >= 80) return "Certified Frame Lord. People will quote-cast you for clout. 👑";
+    if (percentage >= 60) return "Cast-worthy run—needs a couple more recasts. 📈";
+    if (percentage >= 40) return "Starter pack energy: 1 warp, 0 replies, solid potential. 🚀";
+    if (percentage >= 20) return "You casted, the feed scrolled. Touch more frames. 🧪";
+    return "Rugged by trivia. Rage-cast, regroup, return. 💀";
   };
 
   const getResultColor = () => {
