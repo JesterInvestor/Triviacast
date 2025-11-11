@@ -16,39 +16,11 @@ export default function InfoPage() {
 
   const [form, setForm] = useState(DEFAULT_FORM);
 
-  const exportToFile = () => {
-    try {
-      const incorrect = form.incorrect_answers
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-
-      const payload = {
-        category: form.category,
-        difficulty: form.difficulty,
-        type: form.type,
-        question: form.question,
-        correct_answer: form.correct_answer,
-        incorrect_answers: incorrect,
-      };
-
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `opentdb_question_${Date.now()}.json`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      // graceful no-op in UI; could add toast later
-      // eslint-disable-next-line no-console
-      console.error("Failed to export question:", err);
-    }
-  };
+  // exportToFile removed — exporting as JSON via the UI was removed per request
 
   const FARCASTER_MINIAPP = "https://farcaster.xyz/miniapps/UmWywlPILouA/triviacast";
+
+  const WARPCAST_COMPOSE = "https://warpcast.com/compose";
 
   const canCast = form.question.trim() !== "" && form.correct_answer.trim() !== "";
 
@@ -78,13 +50,13 @@ export default function InfoPage() {
       console.error("Clipboard write failed", err);
     }
 
-    // Try opening the miniapp with prefilled text param (best-effort)
-    const url = `${FARCASTER_MINIAPP}?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+  // Try opening Warpcast compose with the message prefilled so the user can post a cast directly.
+  const warpUrl = `${WARPCAST_COMPOSE}?text=${encodeURIComponent(message)}`;
+  window.open(warpUrl, "_blank", "noopener,noreferrer");
 
-    // Inform the user that the message was copied
-    // eslint-disable-next-line no-alert
-    alert("Cast message copied to clipboard and opening Farcaster miniapp. If the message is not prefilled, paste it into the miniapp to post.");
+  // Inform the user that the message was copied and the composer opened
+  // eslint-disable-next-line no-alert
+  alert("Cast message copied to clipboard and opening Warpcast composer. If the message is not prefilled, paste it into the composer to post.");
   };
 
   const OPEN_TDB_URL = "https://opentdb.com/trivia_add_question.php";
@@ -116,8 +88,9 @@ export default function InfoPage() {
       console.error("Clipboard write failed", err);
     }
 
-    // Open OpenTDB add question page in new tab. User should paste the payload into the form manually.
-    window.open(OPEN_TDB_URL, "_blank", "noopener,noreferrer");
+  // Try to open OpenTDB add question page in new tab and pass category as a query param to assist autofill (best-effort).
+  const openUrl = form.category ? `${OPEN_TDB_URL}?category=${encodeURIComponent(form.category)}` : OPEN_TDB_URL;
+  window.open(openUrl, "_blank", "noopener,noreferrer");
 
     // Inform the user what to do next
     // eslint-disable-next-line no-alert
@@ -268,13 +241,38 @@ export default function InfoPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label className="flex flex-col text-sm text-gray-700">
               Category
-              <input
+              <select
                 className="mt-1 p-2 border rounded"
                 name="category"
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
-                placeholder="e.g. Science: Computers"
-              />
+              >
+                <option value="">Select a category</option>
+                <option>General Knowledge</option>
+                <option>Entertainment: Books</option>
+                <option>Entertainment: Film</option>
+                <option>Entertainment: Music</option>
+                <option>Entertainment: Musicals & Theatres</option>
+                <option>Entertainment: Television</option>
+                <option>Entertainment: Video Games</option>
+                <option>Entertainment: Board Games</option>
+                <option>Science & Nature</option>
+                <option>Science: Computers</option>
+                <option>Science: Mathematics</option>
+                <option>Mythology</option>
+                <option>Sports</option>
+                <option>Geography</option>
+                <option>History</option>
+                <option>Politics</option>
+                <option>Art</option>
+                <option>Celebrities</option>
+                <option>Animals</option>
+                <option>Vehicles</option>
+                <option>Entertainment: Comics</option>
+                <option>Science: Gadgets</option>
+                <option>Entertainment: Japanese Anime & Manga</option>
+                <option>Entertainment: Cartoon & Animations</option>
+              </select>
             </label>
 
             <label className="flex flex-col text-sm text-gray-700">
@@ -288,19 +286,6 @@ export default function InfoPage() {
                 <option value="easy">Easy</option>
                 <option value="medium">Medium</option>
                 <option value="hard">Hard</option>
-              </select>
-            </label>
-
-            <label className="flex flex-col text-sm text-gray-700">
-              Type
-              <select
-                className="mt-1 p-2 border rounded"
-                name="type"
-                value={form.type}
-                onChange={(e) => setForm({ ...form, type: e.target.value })}
-              >
-                <option value="multiple">Multiple Choice</option>
-                <option value="boolean">True / False</option>
               </select>
             </label>
 
@@ -339,14 +324,19 @@ export default function InfoPage() {
             />
           </label>
 
+          <div className="mt-3 p-3 bg-indigo-50 border border-indigo-100 rounded text-sm text-gray-700">
+            <strong>Share this question</strong>
+            <p className="mt-2">You have a few options to share or submit the question you create:</p>
+            <ul className="list-disc pl-5 mt-2">
+              <li>
+                <strong>Cast to Farcaster</strong>: Click <em>Cast to Farcaster</em> to copy a ready-to-post message that mentions <code>@jesterinvestor</code> and open the Triviacast Farcaster miniapp. If the miniapp doesn't prefill the message, paste from your clipboard into the compose box.
+              </li>
+              <li className="mt-1">
+                <strong>Add directly to OpenTDB</strong>: Click <em>Add directly to OpenTDB</em> to open the OpenTDB submission page and copy a prepared payload to your clipboard — paste it into the OpenTDB form fields manually.
+              </li>
+            </ul>
+          </div>
           <div className="mt-4 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => exportToFile()}
-              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-            >
-              Export as JSON
-            </button>
             <button
               type="button"
               onClick={() => castToFarcaster()}
