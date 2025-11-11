@@ -21,6 +21,7 @@ export default function InfoPage() {
   const FARCASTER_MINIAPP = "https://farcaster.xyz/miniapps/UmWywlPILouA/triviacast";
 
   const WARPCAST_COMPOSE = "https://warpcast.com/compose";
+  const WARPCAST_HOME = "https://warpcast.com";
 
   const canCast = form.question.trim() !== "" && form.correct_answer.trim() !== "";
 
@@ -40,25 +41,23 @@ export default function InfoPage() {
   // Build a clean compose message without the miniapp link to avoid compose/profile preview issues
   const message = `Triviacast question: ${form.question}\nCorrect: ${form.correct_answer}\nIncorrect: ${incorrect.join(", ")}\n@jesterinvestor`;
 
-    try {
-      // Copy to clipboard so user can paste if the miniapp doesn't accept prefilled text
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(message);
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(message);
+          // eslint-disable-next-line no-alert
+          alert("Cast message copied to clipboard. Paste it into Warpcast (Compose) to post.");
+        } else {
+          // eslint-disable-next-line no-alert
+          alert("Clipboard not available — please select and copy the message manually.");
+        }
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("Clipboard write failed", err);
+        // eslint-disable-next-line no-alert
+        alert("Failed to copy message to clipboard.");
       }
-    } catch (err) {
-      // ignore clipboard failures
-      // eslint-disable-next-line no-console
-      console.error("Clipboard write failed", err);
-    }
-
-  // Try opening Warpcast compose with the message prefilled so the user can post a cast directly.
-  const warpUrl = `${WARPCAST_COMPOSE}?text=${encodeURIComponent(message)}`;
-  window.open(warpUrl, "_blank", "noopener,noreferrer");
-
-  // Inform the user that the message was copied and the composer opened
-  // eslint-disable-next-line no-alert
-  alert("Cast message copied to clipboard and opening Warpcast composer. If the message is not prefilled, paste it into the composer to post.");
   };
+
 
   const OPEN_TDB_URL = "https://opentdb.com/trivia_add_question.php";
 
@@ -207,9 +206,9 @@ export default function InfoPage() {
               onClick={() => castToFarcaster()}
               disabled={!canCast}
               className={`px-4 py-2 rounded text-white ${canCast ? 'bg-fuchsia-600 hover:bg-fuchsia-700' : 'bg-gray-300 cursor-not-allowed'}`}
-              title={canCast ? 'Cast this question to Farcaster (opens composer and copies message)' : 'Fill question and correct answer to enable casting'}
+              title={canCast ? 'Copy prepared cast message to clipboard' : 'Fill question and correct answer to enable copying'}
             >
-              Cast to Farcaster
+              Copy message
             </button>
             <button
               type="button"
