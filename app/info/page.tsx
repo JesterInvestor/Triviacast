@@ -62,39 +62,8 @@ export default function InfoPage() {
   const OPEN_TDB_URL = "https://opentdb.com/trivia_add_question.php";
 
   const openOpenTDB = async () => {
-    // Prepare payload similar to OpenTDB form fields
-    const incorrect = form.incorrect_answers
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-
-    const payload = {
-      category: form.category,
-      difficulty: form.difficulty,
-      type: form.type,
-      question: form.question,
-      correct_answer: form.correct_answer,
-      incorrect_answers: incorrect,
-    };
-
-    const message = `OpenTDB question payload:\n${JSON.stringify(payload, null, 2)}`;
-
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(message);
-      }
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("Clipboard write failed", err);
-    }
-
-  // Try to open OpenTDB add question page in new tab and pass category as a query param to assist autofill (best-effort).
-  const openUrl = form.category ? `${OPEN_TDB_URL}?category=${encodeURIComponent(form.category)}` : OPEN_TDB_URL;
-  window.open(openUrl, "_blank", "noopener,noreferrer");
-
-    // Inform the user what to do next
-    // eslint-disable-next-line no-alert
-    alert("Prepared OpenTDB payload copied to clipboard. The OpenTDB add question page is opening — paste the payload into the appropriate fields.");
+    // Open OpenTDB add question page in a new tab. The OpenTDB form must be filled manually.
+    window.open(OPEN_TDB_URL, "_blank", "noopener,noreferrer");
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
@@ -332,7 +301,7 @@ export default function InfoPage() {
                 <strong>Cast to Farcaster</strong>: Click <em>Cast to Farcaster</em> to copy a ready-to-post message that mentions <code>@jesterinvestor</code> and open the Triviacast Farcaster miniapp. If the miniapp doesn't prefill the message, paste from your clipboard into the compose box.
               </li>
               <li className="mt-1">
-                <strong>Add directly to OpenTDB</strong>: Click <em>Add directly to OpenTDB</em> to open the OpenTDB submission page and copy a prepared payload to your clipboard — paste it into the OpenTDB form fields manually.
+                <strong>Add directly to OpenTDB</strong>: Click <em>Add directly to OpenTDB</em> to open the OpenTDB submission page. Fill the OpenTDB form manually — no autofill is provided.
               </li>
             </ul>
           </div>
