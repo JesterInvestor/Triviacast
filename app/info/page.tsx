@@ -39,7 +39,8 @@ export default function InfoPage() {
       .filter(Boolean);
 
   // Build a clean compose message without the miniapp link to avoid compose/profile preview issues
-  const message = `Triviacast question: ${form.question}\nCorrect: ${form.correct_answer}\nIncorrect: ${incorrect.join(", ")}\n@jesterinvestor`;
+  const TRIVIACAST_INFO = "https://triviacast.xyz/info";
+  const message = `Triviacast question: ${form.question}\nCorrect: ${form.correct_answer}\nIncorrect: ${incorrect.join(", ")}\n@jesterinvestor\nAdd your own questions: ${TRIVIACAST_INFO}`;
 
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -199,6 +200,7 @@ export default function InfoPage() {
               </li>
             </ul>
             <p className="mt-3 text-sm text-gray-600">Casted questions will be reviewed and, when accepted, added to Triviacast on a weekly cadence.</p>
+            <p className="mt-2 text-sm text-gray-600">Readers: you can add your own questions at <a href="https://triviacast.xyz/info" className="underline">triviacast.xyz/info</a>.</p>
           </div>
           <div className="mt-4 flex items-center gap-3">
             <button
