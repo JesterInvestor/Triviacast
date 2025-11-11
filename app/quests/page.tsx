@@ -168,26 +168,7 @@ export default function QuestsPage() {
           )}
         </div>
 
-        {requiresBase && address && (
-          <div className="mb-4 flex justify-center">
-            <div className={`flex items-center gap-3 px-3 py-2 rounded-lg border text-sm shadow ${isOnBase ? 'bg-[#E3F5FF]/70 border-[#7BC3EC]' : 'bg-white border-[#DC8291]'}`}>
-              <span>Network: <span className={`font-semibold ${isOnBase ? 'text-[#1b3d5c]' : 'text-[#b14f5f]'}`}>{chainLabel}</span></span>
-              {!isOnBase && (
-                <button
-                  onClick={() => switchChain?.({ chainId: base.id })}
-                  disabled={switchingChain}
-                  className="bg-[#2d1b2e] text-[#FFE4EC] px-3 py-1 rounded disabled:opacity-50"
-                >{switchingChain ? 'Switching…' : 'Switch to Base'}</button>
-              )}
-            </div>
-          </div>
-        )}
-        {requiresBase && address && switchError && (
-          <div className="mb-4 text-center text-sm text-red-600">Switch failed: {switchError.message}</div>
-        )}
-        {networkGateActive && (
-          <div className="mb-4 text-center text-sm text-[#b14f5f]">Switch to Base mainnet to claim quest rewards.</div>
-        )}
+        {/* Removed the Base mainnet badge / network switch UI per request */}
 
         <div className="space-y-4">
           {/* Quests that can be claimed directly by user without relayer. */}
