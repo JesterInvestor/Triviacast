@@ -5,6 +5,7 @@ import { useIQPoints } from '@/lib/hooks/useIQPoints';
 import WalletIQPoints from '@/components/WalletIQPoints';
 import { useQuestIQ } from '@/lib/hooks/useQuestIQ';
 import { shareAppUrl, openShareUrl } from '@/lib/farcaster';
+import { shareAppOnXUrl, openXShareUrl } from '@/lib/twitter';
 // Gating reads removed (we no longer rely on backend relayer to mark quiz/friend searches)
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
@@ -67,6 +68,9 @@ export default function QuestsPage() {
     return `Chain ${chainId}`;
   }, [chainId]);
   const { iqPoints } = useIQPoints(address as `0x${string}` | undefined);
+  const hasMinimumIQ = useMemo(() => {
+    try { return (iqPoints ?? 0n) >= 54n; } catch { return false; }
+  }, [iqPoints]);
   // Always require Base network for direct on-chain user claims (no gasless backend).
   const requiresBase = true;
   const [inlineError, setInlineError] = useState<string | null>(null);
@@ -192,12 +196,12 @@ export default function QuestsPage() {
 
           {/* Cast quest: +1 iQ */}
           <QuestCard
-            title="Cast about Triviacast"
+            title="Share about Triviacast"
             emoji="📣"
-            description="Post a quick cast about Triviacast. You can use the cast shortcut, then claim."
+            description="Post on Farcaster or X about Triviacast. Use a shortcut below, then claim."
             reward="+1 iQ"
             claimed={claimedShare}
-            disabled={claimedShare || !address || !!error || switchingChain || !isShareMarkedToday()}
+            disabled={claimedShare || !address || !!error || switchingChain || !isShareMarkedToday() || !hasMinimumIQ}
             onClaim={async () => {
               setInlineError(null);
               const ok = await ensureOnBase();
@@ -225,14 +229,36 @@ export default function QuestsPage() {
                   setCastBurst(true);
                   setTimeout(() => setCastBurst(false), 900);
                 }}
+                disabled={!hasMinimumIQ}
               >
                 <span className="cta-emoji">📣</span>
                 Cast now
               </button>
               {castBurst && <span className="emoji-burst">✨</span>}
             </div>
-            <span className="opacity-80">Open Warpcast, then come back and press Claim.</span>
+            <div className="relative">
+              <button
+                type="button"
+                aria-label="Post on X"
+                className={`btn-cta ${isShareMarkedToday() ? '' : 'pulsing'}`}
+                onClick={() => {
+                  markShareDone();
+                  showToast('X post recorded — Claim enabled for today', 'success');
+                  try { openXShareUrl(shareAppOnXUrl()); } catch {}
+                  setCastBurst(true);
+                  setTimeout(() => setCastBurst(false), 900);
+                }}
+                disabled={!hasMinimumIQ}
+              >
+                <span className="cta-emoji">𝕏</span>
+                Post on X
+              </button>
+            </div>
+            <span className="opacity-80">Open Warpcast or X, then come back and press Claim.</span>
           </div>
+          {!hasMinimumIQ && (
+            <div className="-mt-2 mb-3 text-xs text-[#b14f5f]">Requires at least 54 iQ to participate.</div>
+          )}
 
           {alreadyFollowingJester === true ? (
             <div className="p-4 bg-white/70 border-2 border-[#DC8291] rounded-lg text-xs text-[#5a3d5c]">

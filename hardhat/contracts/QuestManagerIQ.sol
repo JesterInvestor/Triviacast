@@ -17,7 +17,12 @@ contract QuestManagerIQ {
     uint256 public dayAnchor; // optional anchor to align UTC day boundaries (seconds since epoch)
     address public relayer; // optional relayer allowed to mark daily actions
 
-    // quest ids examples: 1=Daily Share (+5000), 2=Daily Quiz Play (+1000), 3=Daily Challenge (+10000)
+    // quest ids examples:
+    // 1 = Daily Share (+1 iQ)
+    // 2 = Daily Quiz Play (+1000 iQ)
+    // 3 = Daily Challenge (+10000 iQ)
+    // 4 = Follow @jesterinvestor (+50 iQ)
+    // 5 = Daily micro claim (+1 iQ)
     mapping(uint8 => QuestConfig) public quest;
     // user => questId => last day index claimed
     mapping(address => mapping(uint8 => uint256)) public lastClaimDay;
@@ -49,6 +54,7 @@ contract QuestManagerIQ {
     quest[4] = QuestConfig(50, true);        // Follow @jesterinvestor (+50 iQ)
     // Daily claim: +1 iQ
     quest[5] = QuestConfig(1, true);
+        // (X follow quest intentionally not on-chain; handled via existing quests/UX only.)
         dayAnchor = 0; // 0 means use UNIX epoch for day boundaries (default behavior)
     }
 
