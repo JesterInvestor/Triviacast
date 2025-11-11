@@ -41,7 +41,13 @@ export default function InfoPage() {
 
   // Build a clean compose message without the miniapp link to avoid compose/profile preview issues
   const TRIVIACAST_INFO = "https://triviacast.xyz/info";
-  let message = `Triviacast question: ${form.question}\nCorrect: ${form.correct_answer}`;
+  let message = `Triviacast question: ${form.question}`;
+  if (form.category && form.category.trim()) {
+    message += `\nCategory: ${form.category.trim()}`;
+  }
+  // Difficulty always present (defaults to easy)
+  message += `\nDifficulty: ${form.difficulty}`;
+  message += `\nCorrect: ${form.correct_answer}`;
   if (incorrect.length) {
     message += `\nIncorrect: ${incorrect.join(", ")}`;
   }
