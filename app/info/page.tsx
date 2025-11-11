@@ -12,6 +12,7 @@ export default function InfoPage() {
     question: "",
     correct_answer: "",
     incorrect_answers: "",
+    reference: "",
   };
 
   const [form, setForm] = useState(DEFAULT_FORM);
@@ -194,6 +195,17 @@ export default function InfoPage() {
               value={form.incorrect_answers}
               onChange={(e) => setForm({ ...form, incorrect_answers: e.target.value })}
               placeholder="e.g. red, blue, green"
+            />
+          </label>
+
+          <label className="flex flex-col text-sm text-gray-700 mt-3">
+            Reference (optional)
+            <input
+              className="mt-1 p-2 border rounded"
+              name="reference"
+              value={form.reference}
+              onChange={(e) => setForm({ ...form, reference: e.target.value })}
+              placeholder="https://example.com/source"
             />
           </label>
 
