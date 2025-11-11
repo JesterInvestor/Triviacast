@@ -157,79 +157,11 @@ export default function QuestsPage() {
   // Gasless claim removed.
 
   // Determine follow-quest visibility:
+  // - hide if user already follows the target (alreadyFollowingJester === true) -> show a small 'already follow' message (same as before)
+  // - hide if user already claimed the follow reward (claimedFollowJester)
+  // - hide if user has >= FOLLOW_IQ_CAP iQ
   const userHasTooMuchIQ = (iqPoints ?? 0) >= FOLLOW_IQ_CAP;
   const followQuestVisible = !claimedFollowJester && alreadyFollowingJester !== true && !userHasTooMuchIQ;
-
-  // CAST options: single button cycles through these options, posts the active message and advances
-  const CAST_OPTIONS = [
-    {
-      label: 'Funny',
-      emoji: '📣',
-      message:
-        "Joined Triviacast — where my brain gets rewarded for being cheeky. Just earned an iQ for making sense of nonsense. If my neurons start high-fiving, mind your own synapses. 🧠🎉 #Triviacast",
-    },
-    {
-      label: 'Smart',
-      emoji: '📣',
-      message:
-        "Just tried Triviacast: short quizzes, daily quests, and measurable learning. Earn iQ while you learn something new every day. Thoughtful fun > mindless scrolling. 🧠📚 #Triviacast",
-    },
-    {
-      label: 'Witty',
-      emoji: '📣',
-      // Witty uses "T points for cleverness" as requested
-      message:
-        "Turn your scroll into a brain workout — Triviacast hands out T points for cleverness. I'm trading memes for medals and loving the ROI on my attention. Ready to flex some neurons? 😉🏆 #Triviacast",
-    },
-  ];
-
-  const [castIndex, setCastIndex] = useState(0);
-
-  // Handler: use single button to mark share, copy the pre-composed message to clipboard, open share URL,
-  // then advance to the next message so the next click will use a different tone.
-  const handleSingleCastButton = async () => {
-    // If user already marked a share for today, don't re-mark / spam.
-    if (isShareMarkedToday()) {
-      showToast('Cast already recorded for today — check your claim button', 'info');
-      return;
-    }
-
-    // Record local mark that user initiated a cast action
-    try {
-      markShareDone();
-    } catch (e) {
-      // ignore
-    }
-
-    const msg = CAST_OPTIONS[castIndex].message;
-
-    // Try to copy message to clipboard for easy pasting into Warpcast
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(msg);
-        showToast('Cast text copied to clipboard — open Warpcast to paste', 'success');
-      } else {
-        showToast('Open Warpcast to paste the suggested cast', 'success');
-      }
-    } catch (e) {
-      // fallback: still show toast
-      showToast('Open Warpcast to paste the suggested cast', 'success');
-    }
-
-    // Open the share URL (existing behavior). The clipboard copy gives user the exact content to paste.
-    try {
-      openShareUrl(shareAppUrl());
-    } catch (e) {
-      // ignore
-    }
-
-    // small visual burst
-    setCastBurst(true);
-    setTimeout(() => setCastBurst(false), 900);
-
-    // Advance to next option (wrap-around)
-    setCastIndex((i) => (i + 1) % CAST_OPTIONS.length);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] py-6 sm:py-10">
@@ -248,45 +180,55 @@ export default function QuestsPage() {
         <div className="space-y-4">
           {/* Quests that can be claimed directly by user without relayer. */}
 
-          {/* Cast quest: single button that cycles through three messages (Funny, Smart, Witty) */}
-          <div className="p-4 sm:p-5 bg-white rounded-lg border-4 border-[#F4A6B7] shadow relative overflow-hidden">
-            <div className="flex items-start gap-3">
-              <div className="text-3xl sm:text-4xl leading-none drop-shadow-sm">📣</div>
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-3 mb-1">
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-[#2d1b2e]">Cast about Triviacast</h2>
-                  <span className="px-2 py-1 bg-[#FFE4EC] border border-[#F4A6B7] rounded text-xs font-semibold text-[#5a3d5c]">+1 iQ</span>
-                </div>
-                <p className="text-sm text-[#5a3d5c] mb-3 leading-relaxed">
-                  Tap the button to post a ready-made cast. The button cycles through three tones: Funny, Smart, and Witty.
-                  The Witty option mentions T points for cleverness.
-                </p>
-
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <button
-                      type="button"
-                      aria-label={`Cast now - ${CAST_OPTIONS[castIndex].label}`}
-                      className={`btn-cta ${isShareMarkedToday() ? '' : 'pulsing'} px-4 py-2 rounded-lg text-sm font-bold shadow min-w-[140px]`}
-                      onClick={handleSingleCastButton}
-                      disabled={isShareMarkedToday()}
-                    >
-                      <span className="cta-emoji">{CAST_OPTIONS[castIndex].emoji}</span>
-                      {CAST_OPTIONS[castIndex].label}
-                    </button>
-                    {castBurst && <span className="emoji-burst">✨</span>}
-                  </div>
-
-                  <div className="flex-1 text-sm text-[#5a3d5c]">
-                    <div className="font-semibold mb-1">Suggested cast ({CAST_OPTIONS[castIndex].label}):</div>
-                    <div className="rounded-md p-2 bg-[#FFF5F7] border border-[#F4A6B7] text-xs">{CAST_OPTIONS[castIndex].message}</div>
-                  </div>
-                </div>
-
-              </div>
+          {/* Cast quest: +1 iQ */}
+          <QuestCard
+            title="Cast about Triviacast"
+            emoji="📣"
+            description="Post a quick cast about Triviacast. You can use the cast shortcut, then claim."
+            reward="+1 iQ"
+            claimed={claimedShare}
+            disabled={claimedShare || !address || !!error || switchingChain || !isShareMarkedToday()}
+            onClaim={async () => {
+              setInlineError(null);
+              const ok = await ensureOnBase();
+              if (!ok) return;
+              await claimShare();
+              try {
+                window.dispatchEvent(new Event('triviacast:questClaimed'));
+                window.dispatchEvent(new Event('triviacast:iqUpdated'));
+                window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+1 iQ claimed' } }));
+              } catch {}
+            }}
+            loading={loading}
+          />
+          <div className="-mt-3 mb-2 flex items-center gap-3 text-xs text-[#5a3d5c]">
+            <div className="relative">
+              <button
+                type="button"
+                aria-label="Cast now"
+                className={`btn-cta ${isShareMarkedToday() ? '' : 'pulsing'}`}
+                onClick={() => {
+                  markShareDone();
+                  showToast('Cast action recorded — Claim enabled for today', 'success');
+                  try { openShareUrl(shareAppUrl()); } catch {}
+                  // small emoji burst
+                  setCastBurst(true);
+                  setTimeout(() => setCastBurst(false), 900);
+                }}
+              >
+                <span className="cta-emoji">📣</span>
+                Cast now
+              </button>
+              {castBurst && <span className="emoji-burst">✨</span>}
             </div>
+            <span className="opacity-80">Open Warpcast, then come back and press Claim.</span>
           </div>
 
+          {/* Follow quest rendering:
+              - If user already follows, keep the previous small "quest hidden" message.
+              - Otherwise, only render the full Follow QuestCard + CTA when followQuestVisible === true.
+              - If followQuestVisible is false (e.g., user has >= FOLLOW_IQ_CAP or already claimed), hide it entirely.
+          */}
           {alreadyFollowingJester === true ? (
             <div className="p-4 bg-white/70 border-2 border-[#DC8291] rounded-lg text-xs text-[#5a3d5c]">
               ✅ You already follow @jesterinvestor — quest hidden.
