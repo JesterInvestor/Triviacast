@@ -1,4 +1,4 @@
-i"use client";
+"use client";
 
 import { useAccount, useChainId, useSwitchChain } from 'wagmi';
 import { useIQPoints } from '@/lib/hooks/useIQPoints';
@@ -91,6 +91,45 @@ export default function QuestsPage() {
     error,
     secondsUntilReset,
   } = useQuestIQ(address as `0x${string}` | undefined);
+
+  // --- Follow status check (hide Follow quest if user already follows target fid) ---
+  const TARGET_FID = 1175506; // @jesterinvestor
+  const [checkingFollow, setCheckingFollow] = useState(false);
+  const [alreadyFollowingJester, setAlreadyFollowingJester] = useState<boolean | null>(null);
+  useEffect(() => {
+    let ignore = false;
+    async function run() {
+      setAlreadyFollowingJester(null);
+      if (!address) return;
+      setCheckingFollow(true);
+      try {
+        const res = await fetch(`/api/friends?address=${address}`);
+        const data = await res.json().catch(() => ({}));
+        // Normalize potential arrays in response
+        const arrays: any[] = [];
+        if (Array.isArray(data)) arrays.push(data);
+        if (Array.isArray(data.follows)) arrays.push(data.follows);
+        if (Array.isArray(data.following)) arrays.push(data.following);
+        if (Array.isArray(data.result?.follows)) arrays.push(data.result.follows);
+        if (Array.isArray(data.result?.following)) arrays.push(data.result.following);
+        const flat = arrays.flat().filter(Boolean);
+        const found = flat.some((entry: any) => {
+          const fidVal = entry?.fid ?? entry?.targetFid ?? entry?.userFid ?? entry?.user?.fid;
+          const n = typeof fidVal === 'string' ? parseInt(fidVal, 10) : fidVal;
+          return Number(n) === TARGET_FID;
+        });
+        if (!ignore) setAlreadyFollowingJester(found);
+      } catch (e) {
+        // On error we intentionally leave quest visible; do not set to true.
+        console.warn('[Quests] follow status check failed', e);
+        if (!ignore) setAlreadyFollowingJester(false);
+      } finally {
+        if (!ignore) setCheckingFollow(false);
+      }
+    }
+    run();
+    return () => { ignore = true; };
+  }, [address]);
   const resetHours = Math.floor(secondsUntilReset / 3600);
   const resetMinutes = Math.floor((secondsUntilReset % 3600) / 60);
   const resetSeconds = secondsUntilReset % 60;
@@ -195,47 +234,56 @@ export default function QuestsPage() {
             <span className="opacity-80">Open Warpcast, then come back and press Claim.</span>
           </div>
 
-          <QuestCard
-            title="Follow @jesterinvestor"
-            emoji="👤"
-            description="Follow @jesterinvestor on Farcaster (manual trust now)."
-            reward="+50 iQ"
-            claimed={claimedFollowJester}
-            disabled={claimedFollowJester || !address || !!error || switchingChain || !isFollowMarkedToday()}
-            onClaim={async () => {
-              setInlineError(null);
-              const ok = await ensureOnBase();
-              if (!ok) return;
-              await claimFollowJester();
-              try {
-                window.dispatchEvent(new Event('triviacast:questClaimed'));
-                window.dispatchEvent(new Event('triviacast:iqUpdated'));
-                window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+50 iQ claimed' } }));
-              } catch {}
-            }}
-            loading={loading}
-          />
-          <div className="text-xs -mt-3 mb-4 text-[#5a3d5c] flex items-center gap-3">
-            <div className="relative">
-              <button
-                type="button"
-                aria-label="Follow now"
-                className={`btn-cta ${isFollowMarkedToday() ? '' : 'pulsing'}`}
-                onClick={() => {
-                  markFollowDone();
-                  showToast('Follow action recorded — Claim enabled for today', 'success');
-                  try { window.open('https://farcaster.xyz/jesterinvestor', '_blank', 'noopener'); } catch {}
-                  setFollowBurst(true);
-                  setTimeout(() => setFollowBurst(false), 900);
-                }}
-              >
-                <span className="cta-emoji">👤</span>
-                Follow now
-              </button>
-              {followBurst && <span className="emoji-burst">🎉</span>}
+          {alreadyFollowingJester === true ? (
+            <div className="p-4 bg-white/70 border-2 border-[#DC8291] rounded-lg text-xs text-[#5a3d5c]">
+              ✅ You already follow @jesterinvestor — quest hidden.
             </div>
-            <span className="opacity-80">Open Farcaster to follow, then come back and press Claim (Follow reveals Claim for today).</span>
-          </div>
+          ) : (
+            <>
+              <QuestCard
+                title="Follow @jesterinvestor"
+                emoji="👤"
+                description="Follow @jesterinvestor on Farcaster (manual trust now)."
+                reward="+50 iQ"
+                claimed={claimedFollowJester}
+                disabled={claimedFollowJester || !address || !!error || switchingChain || !isFollowMarkedToday() || checkingFollow}
+                onClaim={async () => {
+                  setInlineError(null);
+                  const ok = await ensureOnBase();
+                  if (!ok) return;
+                  await claimFollowJester();
+                  try {
+                    window.dispatchEvent(new Event('triviacast:questClaimed'));
+                    window.dispatchEvent(new Event('triviacast:iqUpdated'));
+                    window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+50 iQ claimed' } }));
+                  } catch {}
+                }}
+                loading={loading || checkingFollow}
+              />
+              <div className="text-xs -mt-3 mb-4 text-[#5a3d5c] flex items-center gap-3">
+                <div className="relative">
+                  <button
+                    type="button"
+                    aria-label="Follow now"
+                    className={`btn-cta ${isFollowMarkedToday() ? '' : 'pulsing'}`}
+                    onClick={() => {
+                      markFollowDone();
+                      showToast('Follow action recorded — Claim enabled for today', 'success');
+                      try { window.open('https://farcaster.xyz/jesterinvestor', '_blank', 'noopener'); } catch {}
+                      setFollowBurst(true);
+                      setTimeout(() => setFollowBurst(false), 900);
+                    }}
+                    disabled={checkingFollow}
+                  >
+                    <span className="cta-emoji">👤</span>
+                    {checkingFollow ? 'Checking…' : 'Follow now'}
+                  </button>
+                  {followBurst && <span className="emoji-burst">🎉</span>}
+                </div>
+                <span className="opacity-80">{checkingFollow ? 'Verifying existing follow…' : 'Open Farcaster to follow, then come back and press Claim.'}</span>
+              </div>
+            </>
+          )}
 
           {/* Daily claim: +1 iQ */}
           <QuestCard
@@ -268,7 +316,7 @@ export default function QuestsPage() {
         )}
 
         <div className="mt-8 text-center text-xs text-[#5a3d5c]">
-          Simplified quests: Cast (+1 iQ), Follow (+50 iQ), Daily Claim (+1 iQ). Quiz/Challenge. We trust you ;)
+          Simplified quests: Cast (+1 iQ), Follow (+50 iQ), Daily Claim (+1 iQ). Quiz/Challenge. We trust you to be honest!
         </div>
         {/* Leaderboard intentionally removed from Quests page */}
       </div>
