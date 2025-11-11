@@ -44,7 +44,7 @@ function QuestCard({ title, emoji, description, reward, claimed, disabled, onCla
               <button
                 disabled={disabled || loading}
                 onClick={() => !disabled && onClaim()}
-                className={`px-4 py-2 rounded-lg text-sm font-bold shadow transition min-w-[120px] ${disabled || loading ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white'}`}
+                className={`px-4 py-2 rounded-lg text-sm font-bold shadow transition min-w-[120px] ${disabled || loading ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-[#DC8291] hover:bg-[#c96a78] text-white'}`}
               >
                 {loading ? 'Processing…' : 'Claim'}
               </button>
@@ -94,6 +94,8 @@ export default function QuestsPage() {
 
   // --- Follow status check (hide Follow quest if user already follows target fid) ---
   const TARGET_FID = 1175506; // @jesterinvestor
+  // CAP: users with >= 52 iQ must NOT be able to claim the +50 follow reward
+  const FOLLOW_IQ_CAP = 52;
   const [checkingFollow, setCheckingFollow] = useState(false);
   const [alreadyFollowingJester, setAlreadyFollowingJester] = useState<boolean | null>(null);
   useEffect(() => {
@@ -246,9 +248,23 @@ export default function QuestsPage() {
                 description="Follow @jesterinvestor on Farcaster (manual trust now)."
                 reward="+50 iQ"
                 claimed={claimedFollowJester}
-                disabled={claimedFollowJester || !address || !!error || switchingChain || !isFollowMarkedToday() || checkingFollow}
+                // permanently disabled for users who already claimed OR users who have >= FOLLOW_IQ_CAP iQ
+                disabled={
+                  claimedFollowJester ||
+                  !address ||
+                  !!error ||
+                  switchingChain ||
+                  !isFollowMarkedToday() ||
+                  checkingFollow ||
+                  ((iqPoints ?? 0) >= FOLLOW_IQ_CAP)
+                }
                 onClaim={async () => {
                   setInlineError(null);
+                  // prevent claim for users that already have >= FOLLOW_IQ_CAP
+                  if ((iqPoints ?? 0) >= FOLLOW_IQ_CAP) {
+                    showToast(`Users with ${FOLLOW_IQ_CAP} or more iQ cannot claim the Follow reward`, 'info');
+                    return;
+                  }
                   const ok = await ensureOnBase();
                   if (!ok) return;
                   await claimFollowJester();
@@ -267,20 +283,38 @@ export default function QuestsPage() {
                     aria-label="Follow now"
                     className={`btn-cta ${isFollowMarkedToday() ? '' : 'pulsing'}`}
                     onClick={() => {
-                      markFollowDone();
-                      showToast('Follow action recorded — Claim enabled for today', 'success');
+                      // block opening/marking if user already has >= FOLLOW_IQ_CAP
+                      if ((iqPoints ?? 0) >= FOLLOW_IQ_CAP) {
+                        showToast(`Users with ${FOLLOW_IQ_CAP} or more iQ cannot claim the Follow reward`, 'info');
+                        return;
+                      }
+                      // local mark for today's follow action
+                      if (isFollowMarkedToday()) {
+                        showToast('Follow action already recorded for today', 'info');
+                      } else {
+                        markFollowDone();
+                        showToast('Follow action recorded — Claim enabled for today', 'success');
+                      }
                       try { window.open('https://farcaster.xyz/jesterinvestor', '_blank', 'noopener'); } catch {}
                       setFollowBurst(true);
                       setTimeout(() => setFollowBurst(false), 900);
                     }}
-                    disabled={checkingFollow}
+                    disabled={checkingFollow || isFollowMarkedToday() || claimedFollowJester || ((iqPoints ?? 0) >= FOLLOW_IQ_CAP)}
                   >
                     <span className="cta-emoji">👤</span>
                     {checkingFollow ? 'Checking…' : 'Follow now'}
                   </button>
                   {followBurst && <span className="emoji-burst">🎉</span>}
                 </div>
-                <span className="opacity-80">{checkingFollow ? 'Verifying existing follow…' : 'Open Farcaster to follow, then come back and press Claim.'}</span>
+                <span className="opacity-80">
+                  { checkingFollow
+                    ? 'Verifying existing follow…'
+                    : ((iqPoints ?? 0) >= FOLLOW_IQ_CAP
+                        ? `Not available if you have ${FOLLOW_IQ_CAP} or more iQ points.`
+                        : 'Open Farcaster to follow, then come back and press Claim.'
+                      )
+                  }
+                </span>
               </div>
             </>
           )}
@@ -323,4 +357,3 @@ export default function QuestsPage() {
     </div>
   );
 }
-
