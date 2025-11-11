@@ -40,7 +40,7 @@ export default function InfoPage() {
 
   // Build a clean compose message without the miniapp link to avoid compose/profile preview issues
   const TRIVIACAST_INFO = "https://triviacast.xyz/info";
-  const message = `Triviacast question: ${form.question}\nCorrect: ${form.correct_answer}\nIncorrect: ${incorrect.join(", ")}\n@jesterinvestor\nAdd your own questions: ${TRIVIACAST_INFO}`;
+  const message = `Triviacast question: ${form.question}\nCorrect: ${form.correct_answer}\nIncorrect: ${incorrect.join(", ")}\n@jesterinvestor\nUsers can add their own questions at: ${TRIVIACAST_INFO}`;
 
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -99,7 +99,16 @@ export default function InfoPage() {
 
         {/* OpenTDB-like Add Question form (moved to top) */}
         <div className="mb-6 p-4 bg-white rounded-xl shadow w-full max-w-2xl border">
-          <h2 className="text-xl font-bold mb-2 text-purple-600">Add a Trivia Question (OpenTDB format)</h2>
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-xl font-bold mb-2 text-purple-600">Add a Trivia Question (OpenTDB format)</h2>
+              <p className="text-sm text-gray-500 mb-1 italic">Thanks to OpenTBD for the open question format.</p>
+            </div>
+            <div className="ml-4 flex-shrink-0">
+              {/* Subtle OpenTDB logo — drop the file into public as /opentdb-logo.png to show */}
+              <img src="/opentdb-logo.png" alt="Open Trivia Database" className="w-20 opacity-60" />
+            </div>
+          </div>
           <p className="text-sm text-gray-600 mb-3">Fill the fields to create a multiple-choice question. Share it to Warpcast or add it manually on OpenTDB.</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
