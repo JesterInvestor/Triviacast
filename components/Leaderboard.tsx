@@ -98,10 +98,14 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
       });
   }, [leaderboard, view]);
 
+  // Limit to top 100 entries only (user request)
+  const MAX_DISPLAY = 100;
+  const limitedLeaderboard = useMemo(() => sortedLeaderboard.slice(0, MAX_DISPLAY), [sortedLeaderboard]);
+
   // Reset displayCount when leaderboard or view change
   useEffect(() => {
     setDisplayCount(ITEMS_PER_PAGE);
-  }, [leaderboard, view]);
+  }, [limitedLeaderboard, view]);
 
   useEffect(() => {
     async function fetchData() {
@@ -160,14 +164,14 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
 
   // loadMore callback used by both IntersectionObserver and scroll fallback
   const loadMore = useCallback(() => {
-    if (displayCount >= sortedLeaderboard.length || isFetchingMore) return;
+    if (displayCount >= limitedLeaderboard.length || isFetchingMore) return;
     setIsFetchingMore(true);
     // small timeout to allow UI feedback and avoid extremely fast repeated increments
     setTimeout(() => {
-      setDisplayCount((prev) => Math.min(prev + ITEMS_PER_PAGE, sortedLeaderboard.length));
+      setDisplayCount((prev) => Math.min(prev + ITEMS_PER_PAGE, limitedLeaderboard.length));
       setIsFetchingMore(false);
     }, 250);
-  }, [displayCount, sortedLeaderboard.length, isFetchingMore]);
+  }, [displayCount, limitedLeaderboard.length, isFetchingMore]);
 
   // IntersectionObserver for infinite scroll (works in desktop and modern mobile browsers)
   useEffect(() => {
@@ -204,7 +208,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
       lastScrollCheckRef.current = now;
 
       // don't try to load if already fetching or nothing left to load
-      if (isFetchingMore || displayCount >= sortedLeaderboard.length) return;
+  if (isFetchingMore || displayCount >= limitedLeaderboard.length) return;
 
       // check if we're near the bottom of the page
       const scrollY = window.scrollY || window.pageYOffset;
@@ -225,7 +229,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
       window.removeEventListener('scroll', handler);
       window.removeEventListener('touchmove', handler);
     };
-  }, [displayCount, sortedLeaderboard.length, isFetchingMore, loadMore]);
+  }, [displayCount, limitedLeaderboard.length, isFetchingMore, loadMore]);
 
   return (
     <div className="w-full px-0 sm:px-6">
@@ -339,7 +343,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
           </div>
         ) : null}
 
-          {sortedLeaderboard.length > 0 && (
+          {limitedLeaderboard.length > 0 && (
           <>
             <div className="mt-4 overflow-x-auto w-full">
               <table className="min-w-[320px] w-full text-left table-auto">
@@ -351,7 +355,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedLeaderboard
+                  {limitedLeaderboard
                     .slice(0, displayCount)
                     .map((entry, i) => {
                       const rank = i + 1;
@@ -398,7 +402,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             </div>
 
             {/* show a small loader or message when fetching more */}
-            {displayCount < sortedLeaderboard.length && (
+            {displayCount < limitedLeaderboard.length && (
               <div className="text-center py-4">
                 <div className="inline-flex items-center gap-2 text-sm text-[#5a3d5c]">
                   <svg className="animate-spin h-5 w-5 text-[#DC8291]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
