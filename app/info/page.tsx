@@ -37,7 +37,8 @@ export default function InfoPage() {
       .map((s) => s.trim())
       .filter(Boolean);
 
-    const message = `Triviacast question: ${form.question}\nCorrect: ${form.correct_answer}\nIncorrect: ${incorrect.join(", ")}\n@jesterinvestor ${FARCASTER_MINIAPP}`;
+  // Build a clean compose message without the miniapp link to avoid compose/profile preview issues
+  const message = `Triviacast question: ${form.question}\nCorrect: ${form.correct_answer}\nIncorrect: ${incorrect.join(", ")}\n@jesterinvestor`;
 
     try {
       // Copy to clipboard so user can paste if the miniapp doesn't accept prefilled text
@@ -198,6 +199,7 @@ export default function InfoPage() {
                 <strong>Add directly to OpenTDB</strong>: Click <em>Add directly to OpenTDB</em> to open the OpenTDB submission page. Fill the OpenTDB form manually — no autofill is provided.
               </li>
             </ul>
+            <p className="mt-3 text-sm text-gray-600">Casted questions will be reviewed and, when accepted, added to Triviacast on a weekly cadence.</p>
           </div>
           <div className="mt-4 flex items-center gap-3">
             <button
