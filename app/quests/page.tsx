@@ -156,6 +156,13 @@ export default function QuestsPage() {
 
   // Gasless claim removed.
 
+  // Determine follow-quest visibility:
+  // - hide if user already follows the target (alreadyFollowingJester === true) -> show a small 'already follow' message (same as before)
+  // - hide if user already claimed the follow reward (claimedFollowJester)
+  // - hide if user has >= FOLLOW_IQ_CAP iQ
+  const userHasTooMuchIQ = (iqPoints ?? 0) >= FOLLOW_IQ_CAP;
+  const followQuestVisible = !claimedFollowJester && alreadyFollowingJester !== true && !userHasTooMuchIQ;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] py-6 sm:py-10">
       <div className="max-w-3xl mx-auto px-3 sm:px-6">
@@ -168,7 +175,7 @@ export default function QuestsPage() {
           )}
         </div>
 
-        {/* Removed the Base mainnet badge / network switch UI per request */}
+        {/* Network badge removed per request */}
 
         <div className="space-y-4">
           {/* Quests that can be claimed directly by user without relayer. */}
@@ -217,86 +224,76 @@ export default function QuestsPage() {
             <span className="opacity-80">Open Warpcast, then come back and press Claim.</span>
           </div>
 
+          {/* Follow quest rendering:
+              - If user already follows, keep the previous small "quest hidden" message.
+              - Otherwise, only render the full Follow QuestCard + CTA when followQuestVisible === true.
+              - If followQuestVisible is false (e.g., user has >= FOLLOW_IQ_CAP or already claimed), hide it entirely.
+          */}
           {alreadyFollowingJester === true ? (
             <div className="p-4 bg-white/70 border-2 border-[#DC8291] rounded-lg text-xs text-[#5a3d5c]">
               ✅ You already follow @jesterinvestor — quest hidden.
             </div>
           ) : (
             <>
-              <QuestCard
-                title="Follow @jesterinvestor"
-                emoji="👤"
-                description="Follow @jesterinvestor on Farcaster (manual trust now)."
-                reward="+50 iQ"
-                claimed={claimedFollowJester}
-                // permanently disabled for users who already claimed OR users who have >= FOLLOW_IQ_CAP iQ
-                disabled={
-                  claimedFollowJester ||
-                  !address ||
-                  !!error ||
-                  switchingChain ||
-                  !isFollowMarkedToday() ||
-                  checkingFollow ||
-                  ((iqPoints ?? 0) >= FOLLOW_IQ_CAP)
-                }
-                onClaim={async () => {
-                  setInlineError(null);
-                  // prevent claim for users that already have >= FOLLOW_IQ_CAP
-                  if ((iqPoints ?? 0) >= FOLLOW_IQ_CAP) {
-                    showToast(`Users with ${FOLLOW_IQ_CAP} or more iQ cannot claim the Follow reward`, 'info');
-                    return;
-                  }
-                  const ok = await ensureOnBase();
-                  if (!ok) return;
-                  await claimFollowJester();
-                  try {
-                    window.dispatchEvent(new Event('triviacast:questClaimed'));
-                    window.dispatchEvent(new Event('triviacast:iqUpdated'));
-                    window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+50 iQ claimed' } }));
-                  } catch {}
-                }}
-                loading={loading || checkingFollow}
-              />
-              <div className="text-xs -mt-3 mb-4 text-[#5a3d5c] flex items-center gap-3">
-                <div className="relative">
-                  <button
-                    type="button"
-                    aria-label="Follow now"
-                    className={`btn-cta ${isFollowMarkedToday() ? '' : 'pulsing'}`}
-                    onClick={() => {
-                      // block opening/marking if user already has >= FOLLOW_IQ_CAP
-                      if ((iqPoints ?? 0) >= FOLLOW_IQ_CAP) {
-                        showToast(`Users with ${FOLLOW_IQ_CAP} or more iQ cannot claim the Follow reward`, 'info');
-                        return;
-                      }
-                      // local mark for today's follow action
-                      if (isFollowMarkedToday()) {
-                        showToast('Follow action already recorded for today', 'info');
-                      } else {
-                        markFollowDone();
-                        showToast('Follow action recorded — Claim enabled for today', 'success');
-                      }
-                      try { window.open('https://farcaster.xyz/jesterinvestor', '_blank', 'noopener'); } catch {}
-                      setFollowBurst(true);
-                      setTimeout(() => setFollowBurst(false), 900);
+              {followQuestVisible ? (
+                <>
+                  <QuestCard
+                    title="Follow @jesterinvestor"
+                    emoji="👤"
+                    description="Follow @jesterinvestor on Farcaster (manual trust now)."
+                    reward="+50 iQ"
+                    claimed={claimedFollowJester}
+                    // keep disabled guards for claim action (e.g., no address, errors, checking)
+                    disabled={
+                      claimedFollowJester ||
+                      !address ||
+                      !!error ||
+                      switchingChain ||
+                      !isFollowMarkedToday() ||
+                      checkingFollow
+                    }
+                    onClaim={async () => {
+                      setInlineError(null);
+                      const ok = await ensureOnBase();
+                      if (!ok) return;
+                      await claimFollowJester();
+                      try {
+                        window.dispatchEvent(new Event('triviacast:questClaimed'));
+                        window.dispatchEvent(new Event('triviacast:iqUpdated'));
+                        window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+50 iQ claimed' } }));
+                      } catch {}
                     }}
-                    disabled={checkingFollow || isFollowMarkedToday() || claimedFollowJester || ((iqPoints ?? 0) >= FOLLOW_IQ_CAP)}
-                  >
-                    <span className="cta-emoji">👤</span>
-                    {checkingFollow ? 'Checking…' : 'Follow now'}
-                  </button>
-                  {followBurst && <span className="emoji-burst">🎉</span>}
-                </div>
-                <span className="opacity-80">
-                  { checkingFollow
-                    ? 'Verifying existing follow…'
-                    : ((iqPoints ?? 0) >= FOLLOW_IQ_CAP
-                        ? `Not available if you have ${FOLLOW_IQ_CAP} or more iQ points.`
-                        : 'Open Farcaster to follow, then come back and press Claim.'
-                      )
-                  }
-                </span>
-              </div>
+                    loading={loading || checkingFollow}
+                  />
+                  <div className="text-xs -mt-3 mb-4 text-[#5a3d5c] flex items-center gap-3">
+                    <div className="relative">
+                      <button
+                        type="button"
+                        aria-label="Follow now"
+                        className={`btn-cta ${isFollowMarkedToday() ? '' : 'pulsing'}`}
+                        onClick={() => {
+                          // local mark for today's follow action
+                          if (isFollowMarkedToday()) {
+                            showToast('Follow action already recorded for today', 'info');
+                          } else {
+                            markFollowDone();
+                            showToast('Follow action recorded — Claim enabled for today', 'success');
+                          }
+                          try { window.open('https://farcaster.xyz/jesterinvestor', '_blank', 'noopener'); } catch {}
+                          setFollowBurst(true);
+                          setTimeout(() => setFollowBurst(false), 900);
+                        }}
+                        disabled={checkingFollow || isFollowMarkedToday() || claimedFollowJester}
+                      >
+                        <span className="cta-emoji">👤</span>
+                        {checkingFollow ? 'Checking…' : 'Follow now'}
+                      </button>
+                      {followBurst && <span className="emoji-burst">🎉</span>}
+                    </div>
+                    <span className="opacity-80">{checkingFollow ? 'Verifying existing follow…' : 'Open Farcaster to follow, then come back and press Claim.'}</span>
+                  </div>
+                </>
+              ) : null}
             </>
           )}
 
