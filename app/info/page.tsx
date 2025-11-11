@@ -41,7 +41,14 @@ export default function InfoPage() {
 
   // Build a clean compose message without the miniapp link to avoid compose/profile preview issues
   const TRIVIACAST_INFO = "https://triviacast.xyz/info";
-  const message = `Triviacast question: ${form.question}\nCorrect: ${form.correct_answer}\nIncorrect: ${incorrect.join(", ")}\n@jesterinvestor\nUsers can add their own questions at: ${TRIVIACAST_INFO}`;
+  let message = `Triviacast question: ${form.question}\nCorrect: ${form.correct_answer}`;
+  if (incorrect.length) {
+    message += `\nIncorrect: ${incorrect.join(", ")}`;
+  }
+  if (form.reference && form.reference.trim()) {
+    message += `\nReference: ${form.reference.trim()}`;
+  }
+  message += `\n@jesterinvestor\nUsers can add their own questions at: ${TRIVIACAST_INFO}`;
 
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -103,7 +110,7 @@ export default function InfoPage() {
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-xl font-bold mb-2 text-purple-600">Add a Trivia Question (OpenTDB format)</h2>
-              <p className="text-sm text-gray-500 mb-1 italic">Thanks to OpenTBD for the open question format.</p>
+              <p className="text-sm text-gray-500 mb-1 italic">Thanks to OpenTDB for the open question format.</p>
             </div>
             <div className="ml-4 flex-shrink-0">
               {/* Subtle OpenTDB logo — drop the file into public as /opentdb-logo.png to show */}
@@ -214,7 +221,7 @@ export default function InfoPage() {
             <p className="mt-2">You have a few options to share or submit the question you create:</p>
             <ul className="list-disc pl-5 mt-2">
               <li>
-                <strong>Cast to Farcaster</strong>: Click <em>Cast to Farcaster</em> to copy a ready-to-post message that mentions <code>@jesterinvestor</code> and open the Warpcast composer. If the composer doesn't prefill the message, paste from your clipboard into the compose box.
+                <strong>Copy message</strong>: Click <em>Copy message</em> to copy a ready-to-post message that mentions <code>@jesterinvestor</code>. Paste it into Warpcast (Compose) to post.
               </li>
               <li className="mt-1">
                 <strong>Add directly to OpenTDB</strong>: Click <em>Add directly to OpenTDB</em> to open the OpenTDB submission page. Fill the OpenTDB form manually — no autofill is provided.
