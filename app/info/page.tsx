@@ -1,9 +1,128 @@
 "use client";
 
+import React, { useState } from "react";
 import Image from "next/image";
 import HiddenMintButton from "@/components/HiddenMintButton";
 
 export default function InfoPage() {
+  const DEFAULT_FORM = {
+    category: "",
+    difficulty: "easy",
+    type: "multiple",
+    question: "",
+    correct_answer: "",
+    incorrect_answers: "",
+  };
+
+  const [form, setForm] = useState(DEFAULT_FORM);
+
+  const exportToFile = () => {
+    try {
+      const incorrect = form.incorrect_answers
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      const payload = {
+        category: form.category,
+        difficulty: form.difficulty,
+        type: form.type,
+        question: form.question,
+        correct_answer: form.correct_answer,
+        incorrect_answers: incorrect,
+      };
+
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `opentdb_question_${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      // graceful no-op in UI; could add toast later
+      // eslint-disable-next-line no-console
+      console.error("Failed to export question:", err);
+    }
+  };
+
+  const FARCASTER_MINIAPP = "https://farcaster.xyz/miniapps/UmWywlPILouA/triviacast";
+
+  const canCast = form.question.trim() !== "" && form.correct_answer.trim() !== "";
+
+  const castToFarcaster = async () => {
+    if (!canCast) {
+      // simple guard
+      // eslint-disable-next-line no-alert
+      alert("Please fill at least the question and correct answer before casting.");
+      return;
+    }
+
+    const incorrect = form.incorrect_answers
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const message = `Triviacast question: ${form.question}\nCorrect: ${form.correct_answer}\nIncorrect: ${incorrect.join(", ")}\n@jesterinvestor ${FARCASTER_MINIAPP}`;
+
+    try {
+      // Copy to clipboard so user can paste if the miniapp doesn't accept prefilled text
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(message);
+      }
+    } catch (err) {
+      // ignore clipboard failures
+      // eslint-disable-next-line no-console
+      console.error("Clipboard write failed", err);
+    }
+
+    // Try opening the miniapp with prefilled text param (best-effort)
+    const url = `${FARCASTER_MINIAPP}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+
+    // Inform the user that the message was copied
+    // eslint-disable-next-line no-alert
+    alert("Cast message copied to clipboard and opening Farcaster miniapp. If the message is not prefilled, paste it into the miniapp to post.");
+  };
+
+  const OPEN_TDB_URL = "https://opentdb.com/trivia_add_question.php";
+
+  const openOpenTDB = async () => {
+    // Prepare payload similar to OpenTDB form fields
+    const incorrect = form.incorrect_answers
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const payload = {
+      category: form.category,
+      difficulty: form.difficulty,
+      type: form.type,
+      question: form.question,
+      correct_answer: form.correct_answer,
+      incorrect_answers: incorrect,
+    };
+
+    const message = `OpenTDB question payload:\n${JSON.stringify(payload, null, 2)}`;
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(message);
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Clipboard write failed", err);
+    }
+
+    // Open OpenTDB add question page in new tab. User should paste the payload into the form manually.
+    window.open(OPEN_TDB_URL, "_blank", "noopener,noreferrer");
+
+    // Inform the user what to do next
+    // eslint-disable-next-line no-alert
+    alert("Prepared OpenTDB payload copied to clipboard. The OpenTDB add question page is opening — paste the payload into the appropriate fields.");
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
@@ -139,6 +258,122 @@ export default function InfoPage() {
           >
             <img src="https://tip.md/badge.svg" alt="Tip in Crypto" height={24} />
           </a>
+        </div>
+
+        {/* OpenTDB-like Add Question form */}
+        <div className="mb-6 p-4 bg-white rounded-xl shadow w-full max-w-2xl border">
+          <h2 className="text-xl font-bold mb-2 text-purple-600">Add a Trivia Question (OpenTDB format)</h2>
+          <p className="text-sm text-gray-600 mb-3">Fill the fields and export a JSON file compatible with OpenTDB question format.</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label className="flex flex-col text-sm text-gray-700">
+              Category
+              <input
+                className="mt-1 p-2 border rounded"
+                name="category"
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                placeholder="e.g. Science: Computers"
+              />
+            </label>
+
+            <label className="flex flex-col text-sm text-gray-700">
+              Difficulty
+              <select
+                className="mt-1 p-2 border rounded"
+                name="difficulty"
+                value={form.difficulty}
+                onChange={(e) => setForm({ ...form, difficulty: e.target.value })}
+              >
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </label>
+
+            <label className="flex flex-col text-sm text-gray-700">
+              Type
+              <select
+                className="mt-1 p-2 border rounded"
+                name="type"
+                value={form.type}
+                onChange={(e) => setForm({ ...form, type: e.target.value })}
+              >
+                <option value="multiple">Multiple Choice</option>
+                <option value="boolean">True / False</option>
+              </select>
+            </label>
+
+            <label className="flex flex-col text-sm text-gray-700">
+              Correct answer
+              <input
+                className="mt-1 p-2 border rounded"
+                name="correct_answer"
+                value={form.correct_answer}
+                onChange={(e) => setForm({ ...form, correct_answer: e.target.value })}
+                placeholder="Correct answer text"
+              />
+            </label>
+          </div>
+
+          <label className="flex flex-col text-sm text-gray-700 mt-3">
+            Question
+            <textarea
+              className="mt-1 p-2 border rounded"
+              name="question"
+              value={form.question}
+              onChange={(e) => setForm({ ...form, question: e.target.value })}
+              rows={3}
+              placeholder="Type the question here"
+            />
+          </label>
+
+          <label className="flex flex-col text-sm text-gray-700 mt-3">
+            Incorrect answers (comma-separated)
+            <input
+              className="mt-1 p-2 border rounded"
+              name="incorrect_answers"
+              value={form.incorrect_answers}
+              onChange={(e) => setForm({ ...form, incorrect_answers: e.target.value })}
+              placeholder="e.g. red, blue, green"
+            />
+          </label>
+
+          <div className="mt-4 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => exportToFile()}
+              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+            >
+              Export as JSON
+            </button>
+            <button
+              type="button"
+              onClick={() => castToFarcaster()}
+              disabled={!canCast}
+              className={`px-4 py-2 rounded text-white ${canCast ? 'bg-fuchsia-600 hover:bg-fuchsia-700' : 'bg-gray-300 cursor-not-allowed'}`}
+              title={canCast ? 'Cast this question to Farcaster (opens miniapp and copies message)' : 'Fill question and correct answer to enable casting'}
+            >
+              Cast to Farcaster
+            </button>
+            <button
+              type="button"
+              onClick={() => openOpenTDB()}
+              disabled={!canCast}
+              className={`px-4 py-2 rounded text-white ${canCast ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-gray-300 cursor-not-allowed'}`}
+              title={canCast ? 'Open OpenTDB add question page and copy payload to clipboard' : 'Fill question and correct answer to enable this action'}
+            >
+              Add directly to OpenTDB
+            </button>
+            <button
+              type="button"
+              onClick={() => setForm(DEFAULT_FORM)}
+              className="px-3 py-2 border rounded bg-white"
+            >
+              Reset
+            </button>
+            <span className="text-sm text-gray-500">Downloads a file named like <em>opentdb_question_*.json</em></span>
+          </div>
         </div>
 
         <footer className="mt-8 text-center text-xs text-gray-400">
