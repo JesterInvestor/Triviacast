@@ -225,77 +225,80 @@ export default function QuestsPage() {
           </div>
 
           {/* Follow quest rendering:
-              - If user already follows, keep the previous small "quest hidden" message.
-              - Otherwise, only render the full Follow QuestCard + CTA when followQuestVisible === true.
-              - If followQuestVisible is false (e.g., user has >= FOLLOW_IQ_CAP or already claimed), hide it entirely.
+              - show a small "already follow" message when alreadyFollowingJester === true
+              - render the Claim QuestCard only when followQuestVisible === true (claim and card are gated)
+              - always render the "Follow now" CTA button so users can open Farcaster regardless of gating
           */}
-          {alreadyFollowingJester === true ? (
+          {alreadyFollowingJester === true && (
             <div className="p-4 bg-white/70 border-2 border-[#DC8291] rounded-lg text-xs text-[#5a3d5c]">
               ✅ You already follow @jesterinvestor — quest hidden.
             </div>
-          ) : (
+          )}
+
+          {/* Claim card: only visible when user is eligible to claim (gated) */}
+          {followQuestVisible && (
             <>
-              {followQuestVisible ? (
-                <>
-                  <QuestCard
-                    title="Follow @jesterinvestor"
-                    emoji="👤"
-                    description="Follow @jesterinvestor on Farcaster (manual trust now)."
-                    reward="+50 iQ"
-                    claimed={claimedFollowJester}
-                    // keep disabled guards for claim action (e.g., no address, errors, checking)
-                    disabled={
-                      claimedFollowJester ||
-                      !address ||
-                      !!error ||
-                      switchingChain ||
-                      !isFollowMarkedToday() ||
-                      checkingFollow
-                    }
-                    onClaim={async () => {
-                      setInlineError(null);
-                      const ok = await ensureOnBase();
-                      if (!ok) return;
-                      await claimFollowJester();
-                      try {
-                        window.dispatchEvent(new Event('triviacast:questClaimed'));
-                        window.dispatchEvent(new Event('triviacast:iqUpdated'));
-                        window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+50 iQ claimed' } }));
-                      } catch {}
-                    }}
-                    loading={loading || checkingFollow}
-                  />
-                  <div className="text-xs -mt-3 mb-4 text-[#5a3d5c] flex items-center gap-3">
-                    <div className="relative">
-                      <button
-                        type="button"
-                        aria-label="Follow now"
-                        className={`btn-cta ${isFollowMarkedToday() ? '' : 'pulsing'}`}
-                        onClick={() => {
-                          // local mark for today's follow action
-                          if (isFollowMarkedToday()) {
-                            showToast('Follow action already recorded for today', 'info');
-                          } else {
-                            markFollowDone();
-                            showToast('Follow action recorded — Claim enabled for today', 'success');
-                          }
-                          try { window.open('https://farcaster.xyz/jesterinvestor', '_blank', 'noopener'); } catch {}
-                          setFollowBurst(true);
-                          setTimeout(() => setFollowBurst(false), 900);
-                        }}
-                        disabled={checkingFollow || isFollowMarkedToday() || claimedFollowJester}
-                      >
-                        <span className="cta-emoji">👤</span>
-                        {checkingFollow ? 'Checking…' : 'Follow now'}
-                      </button>
-                      {followBurst && <span className="emoji-burst">🎉</span>}
-                    </div>
-                    <span className="opacity-80">{checkingFollow ? 'Verifying existing follow…' : 'Open Farcaster to follow, then come back and press Claim.'}</span>
-                  </div>
-                </>
-              ) : null}
+              <QuestCard
+                title="Follow @jesterinvestor"
+                emoji="👤"
+                description="Follow @jesterinvestor on Farcaster (manual trust now)."
+                reward="+50 iQ"
+                claimed={claimedFollowJester}
+                // gated: the claim (QuestCard) is disabled when not eligible to claim
+                disabled={
+                  claimedFollowJester ||
+                  !address ||
+                  !!error ||
+                  switchingChain ||
+                  !isFollowMarkedToday() ||
+                  checkingFollow
+                }
+                onClaim={async () => {
+                  setInlineError(null);
+                  const ok = await ensureOnBase();
+                  if (!ok) return;
+                  await claimFollowJester();
+                  try {
+                    window.dispatchEvent(new Event('triviacast:questClaimed'));
+                    window.dispatchEvent(new Event('triviacast:iqUpdated'));
+                    window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+50 iQ claimed' } }));
+                  } catch {}
+                }}
+                loading={loading || checkingFollow}
+              />
             </>
           )}
+
+          {/* Follow-now CTA: always rendered and always clickable (per request).
+              This button just records the local mark and opens Farcaster; it is NOT the Claim action.
+          */}
+          <div className="text-xs -mt-3 mb-4 text-[#5a3d5c] flex items-center gap-3">
+            <div className="relative">
+              <button
+                type="button"
+                aria-label="Follow now"
+                className={`btn-cta ${isFollowMarkedToday() ? '' : 'pulsing'}`}
+                onClick={() => {
+                  // Allow clicking always. Record a local mark if not already set and open Farcaster.
+                  if (isFollowMarkedToday()) {
+                    showToast('Follow action already recorded for today', 'info');
+                  } else {
+                    try { markFollowDone(); } catch {}
+                    showToast('Follow action recorded — Claim enabled for today', 'success');
+                  }
+                  try { window.open('https://farcaster.xyz/jesterinvestor', '_blank', 'noopener'); } catch {}
+                  setFollowBurst(true);
+                  setTimeout(() => setFollowBurst(false), 900);
+                }}
+                // intentionally always clickable — do not gate with checkingFollow/isFollowMarkedToday/iq/etc.
+              >
+                <span className="cta-emoji">👤</span>
+                {checkingFollow ? 'Checking…' : 'Follow now'}
+              </button>
+              {followBurst && <span className="emoji-burst">🎉</span>}
+            </div>
+            <span className="opacity-80">{checkingFollow ? 'Verifying existing follow…' : 'Open Farcaster to follow, then come back and press Claim (if eligible).'}</span>
+          </div>
 
           {/* Daily claim: +1 iQ */}
           <QuestCard
