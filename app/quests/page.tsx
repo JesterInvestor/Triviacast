@@ -240,7 +240,7 @@ export default function QuestsPage() {
                   <QuestCard
                     title="Follow @jesterinvestor"
                     emoji="👤"
-                    description="Follow @jesterinvestor on Farcaster (manual trust now)."
+                    description="Follow @jesterinvestor on Farcaster"
                     reward="+50 iQ"
                     claimed={claimedFollowJester}
                     // keep disabled guards for claim action (e.g., no address, errors, checking)
