@@ -239,6 +239,16 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
           <h1 className="text-2xl sm:text-4xl font-bold text-center text-[#2d1b2e]">
             Leaderboard
           </h1>
+          {limitedLeaderboard.length > 0 && (
+            <div className="ml-2 flex flex-col items-center justify-center">
+              <div className="px-2 py-1 rounded-lg bg-[#FFE4EC] border border-[#F4A6B7] text-[10px] sm:text-xs font-semibold text-[#5a3d5c] tracking-wide">
+                Total Players
+              </div>
+              <div className="mt-1 text-lg sm:text-xl font-extrabold text-[#DC8291] drop-shadow-sm">
+                {leaderboard.length.toLocaleString()}
+              </div>
+            </div>
+          )}
           {/* Export CSV of usernames -> addresses */}
           {sortedLeaderboard.length > 0 && (
             <button
