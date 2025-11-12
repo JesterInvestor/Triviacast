@@ -225,7 +225,7 @@ export default function QuestsPage() {
               </button>
               {castBurst && <span className="emoji-burst">✨</span>}
             </div>
-            <span className="opacity-80">Open Warpcast, then come back and press Claim.</span>
+            <span className="opacity-80">Click Cast Now, and Cast. Then you can claim another +1 iQ.</span>
           </div>
           {!hasMinimumIQ && (
             <div className="-mt-2 mb-3 text-xs text-[#b14f5f]">Requires at least 54 iQ to participate.</div>
