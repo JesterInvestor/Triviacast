@@ -39,48 +39,47 @@ export default function InfoPage() {
       .map((s) => (s || "").trim())
       .filter(Boolean);
 
-  // Build a clean compose message without the miniapp link to avoid compose/profile preview issues
-  const TRIVIACAST_INFO = "https://triviacast.xyz/info";
-  let message = `Triviacast question: ${form.question}`;
-  if (form.category && form.category.trim()) {
-    message += `\nCategory: ${form.category.trim()}`;
-  }
-  // Difficulty always present (defaults to easy)
-  message += `\nDifficulty: ${form.difficulty}`;
-  message += `\nCorrect: ${form.correct_answer}`;
-  if (incorrect.length) {
-    message += `\nIncorrect: ${incorrect.join(", ")}`;
-  }
-  if (form.reference && form.reference.trim()) {
-    message += `\nReference: ${form.reference.trim()}`;
-  }
-  message += `\n@jesterinvestor.farcaster.eth\nUsers can add their own questions at: ${TRIVIACAST_INFO}`;
+    // Build a clean compose message without the miniapp link to avoid compose/profile preview issues
+    const TRIVIACAST_INFO = "https://triviacast.xyz/info";
+    let message = `Triviacast question: ${form.question}`;
+    if (form.category && form.category.trim()) {
+      message += `\nCategory: ${form.category.trim()}`;
+    }
+    // Difficulty always present (defaults to easy)
+    message += `\nDifficulty: ${form.difficulty}`;
+    message += `\nCorrect: ${form.correct_answer}`;
+    if (incorrect.length) {
+      message += `\nIncorrect: ${incorrect.join(", ")}`;
+    }
+    if (form.reference && form.reference.trim()) {
+      message += `\nReference: ${form.reference.trim()}`;
+    }
+    message += `\n@jesterinvestor.farcaster.eth\nUsers can add their own questions at: ${TRIVIACAST_INFO}`;
 
-      try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          await navigator.clipboard.writeText(message);
-          setCopied(true);
-          // also call alert as a fallback for environments that still support it
-          try {
-            // eslint-disable-next-line no-alert
-            alert("Copied to clipboard");
-          } catch (e) {
-            // ignore
-          }
-          // hide the inline badge after 3s
-          setTimeout(() => setCopied(false), 3000);
-        } else {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(message);
+        setCopied(true);
+        // also call alert as a fallback for environments that still support it
+        try {
           // eslint-disable-next-line no-alert
-          alert("Clipboard not available — please select and copy the message manually.");
+          alert("Copied to clipboard");
+        } catch (e) {
+          // ignore
         }
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error("Clipboard write failed", err);
+        // hide the inline badge after 3s
+        setTimeout(() => setCopied(false), 3000);
+      } else {
         // eslint-disable-next-line no-alert
-        alert("Failed to copy message to clipboard.");
+        alert("Clipboard not available — please select and copy the message manually.");
       }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Clipboard write failed", err);
+      // eslint-disable-next-line no-alert
+      alert("Failed to copy message to clipboard.");
+    }
   };
-
 
   const OPEN_TDB_URL = "https://opentdb.com/trivia_add_question.php";
 
@@ -112,7 +111,7 @@ export default function InfoPage() {
         </div>
 
         <div className="mb-4 text-lg text-gray-800 text-center">
-          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed memory and wit while you earn bragging rights and on chain rewards. Connect your wallet show your Farcaster profile and climb the leaderboard. Every question is open source and crafted to be fair fun and fast.
+          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed memory and wit while you earn bragging rights and on chain rewards. Connect your wallet show your Farcaster[...]
         </div>
 
         <div className="mb-4 text-lg text-fuchsia-800 font-semibold text-center">
@@ -245,7 +244,7 @@ export default function InfoPage() {
             <p className="mt-2">You have a few options to share or submit the question you create:</p>
             <ul className="list-disc pl-5 mt-2">
               <li>
-                <strong>Copy message</strong>: Click <em>Copy message</em> to copy a ready-to-post message that mentions <code>@jesterinvestor.farcaster.eth</code>. Paste it into Warpcast (Compose) to post.
+                <strong>Copy message</strong>: Click <em>Copy message</em> to copy a ready-to-post message that mentions <code>@jesterinvestor.farcaster.eth</code>. Paste it into Warpcast (Compose) to[...]
               </li>
               <li className="mt-1">
                 <strong>Add directly to OpenTDB</strong>: Click <em>Add directly to OpenTDB</em> to open the OpenTDB submission page. Fill the OpenTDB form manually — no autofill is provided.
@@ -323,7 +322,7 @@ export default function InfoPage() {
 
         <div className="mb-6 p-4 bg-blue-50 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-blue-700">Quests and Jackpot</h2>
-          <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward speed accuracy and persistence.</p>
+          <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward[...]
           <ul className="list-disc pl-6 text-gray-700 mt-2">
             <li>Daily Quest complete a short set of questions every day to earn bonus T Points</li>
             <li>Weekly Quest finish a longer challenge for rare rewards and leaderboard boosts</li>
@@ -375,6 +374,36 @@ export default function InfoPage() {
             with a quick message after a great quiz show or share a hot take from your profile
           </p>
           <p className="mt-2 text-gray-700">Got a trivia fact idea feature request or a perfect meme. Cast it our way and we may feature it in a quest.</p>
+
+          {/* Fancy Follow button */}
+          <div className="mt-4 flex flex-col sm:flex-row items-center sm:items-start gap-3">
+            <a
+              href="https://farcaster.xyz/triviacast"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Follow Triviacast on Farcaster"
+              title="Follow Triviacast on Farcaster"
+              className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-fuchsia-600 via-pink-500 to-amber-400 text-white font-semibold rounded-full shadow-2xl hover:scale-[1.03] hover:-translate-y-0.5 transform transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-fuchsia-300"
+            >
+              {/* simple rocket / follow icon */}
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M2 21l1-7 7-1 10-10-3 10-10 7-5 1z" fill="rgba(255,255,255,0.18)"></path>
+                <path d="M16 3l5 5-10 10-5 1 1-5 10-11z" stroke="white" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" fill="none"></path>
+                <path d="M7 17l4 4" stroke="white" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round"></path>
+              </svg>
+              <span className="whitespace-nowrap">Follow Triviacast</span>
+            </a>
+
+            <a
+              href="https://warpcast.com/jesterinvestor"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 border rounded-full bg-white text-fuchsia-600 shadow hover:shadow-md transition"
+              title="Visit @jesterinvestor on Warpcast"
+            >
+              View @jesterinvestor
+            </a>
+          </div>
         </div>
 
         <div className="mb-6 p-4 bg-white rounded-xl shadow w-full max-w-2xl border flex items-center justify-between gap-3">
