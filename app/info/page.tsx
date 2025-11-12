@@ -87,6 +87,7 @@ export default function InfoPage() {
     // Open OpenTDB add question page in a new tab. The OpenTDB form must be filled manually.
     window.open(OPEN_TDB_URL, "_blank", "noopener,noreferrer");
   };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
@@ -111,7 +112,7 @@ export default function InfoPage() {
         </div>
 
         <div className="mb-4 text-lg text-gray-800 text-center">
-          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed memory and wit while you earn bragging rights and on chain rewards. Connect your wallet show your Farcaster[...]
+          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and on-chain rewards. Connect your wallet and show your Farcaster profile to participate.
         </div>
 
         <div className="mb-4 text-lg text-fuchsia-800 font-semibold text-center">
@@ -244,7 +245,7 @@ export default function InfoPage() {
             <p className="mt-2">You have a few options to share or submit the question you create:</p>
             <ul className="list-disc pl-5 mt-2">
               <li>
-                <strong>Copy message</strong>: Click <em>Copy message</em> to copy a ready-to-post message that mentions <code>@jesterinvestor.farcaster.eth</code>. Paste it into Warpcast (Compose) to[...]
+                <strong>Copy message</strong>: Click <em>Copy message</em> to copy a ready-to-post message that mentions <code>@jesterinvestor.farcaster.eth</code>. Paste it into Warpcast (Compose).
               </li>
               <li className="mt-1">
                 <strong>Add directly to OpenTDB</strong>: Click <em>Add directly to OpenTDB</em> to open the OpenTDB submission page. Fill the OpenTDB form manually — no autofill is provided.
@@ -253,29 +254,33 @@ export default function InfoPage() {
             <p className="mt-3 text-sm text-gray-600">Casted questions will be reviewed and, when accepted, added to Triviacast on a weekly cadence.</p>
             <p className="mt-2 text-sm text-gray-600">Readers: you can add your own questions at <a href="https://triviacast.xyz/info" className="underline">triviacast.xyz/info</a>.</p>
           </div>
+
           <div className="mt-4 flex items-center gap-3">
             <button
               type="button"
               onClick={() => castToFarcaster()}
               disabled={!canCast}
-              className={`px-4 py-2 rounded text-white ${canCast ? 'bg-fuchsia-600 hover:bg-fuchsia-700' : 'bg-gray-300 cursor-not-allowed'}`}
-              title={canCast ? 'Copy prepared cast message to clipboard' : 'Fill question and correct answer to enable copying'}
+              className={`px-4 py-2 rounded text-white ${canCast ? "bg-fuchsia-600 hover:bg-fuchsia-700" : "bg-gray-300 cursor-not-allowed"}`}
+              title={canCast ? "Copy prepared cast message to clipboard" : "Fill question and correct answer to enable copying"}
             >
               Copy message
             </button>
+
             {copied && (
               <div className="ml-2 inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm">
                 Copied to clipboard
               </div>
             )}
+
             <button
               type="button"
               onClick={() => openOpenTDB()}
-              className={`px-4 py-2 rounded text-white bg-yellow-600 hover:bg-yellow-700`}
-              title={'Open OpenTDB add question page'}
+              className="px-4 py-2 rounded text-white bg-yellow-600 hover:bg-yellow-700"
+              title="Open OpenTDB add question page"
             >
               Add directly to OpenTDB
             </button>
+
             <button
               type="button"
               onClick={() => setForm(DEFAULT_FORM)}
@@ -289,8 +294,8 @@ export default function InfoPage() {
         <div className="mb-6 p-4 bg-gradient-to-r from-pink-100 to-blue-100 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-purple-600">How to Play</h2>
           <ul className="list-disc pl-6 text-gray-700">
-            <li>Connect your Base wallet no brain wallet required</li>
-            <li>Answer timed trivia drawn from open source sets Speed and accuracy score you higher</li>
+            <li>Connect your Base wallet — no brain wallet required</li>
+            <li>Answer timed trivia drawn from open source sets — speed and accuracy score you higher</li>
             <li>Earn T Points for correct answers and win bonus points for streaks</li>
             <li>See your Farcaster profile and avatar on the leaderboard in real time</li>
             <li>Claim your rewards on chain and show off your trivia skill</li>
@@ -300,13 +305,13 @@ export default function InfoPage() {
 
         <div className="mb-6 p-4 bg-white rounded-xl shadow w-full max-w-2xl border">
           <h2 className="text-xl font-bold mb-2 text-purple-600">How to Challenge a Friend</h2>
-          <p className="text-gray-700">Want to dare a friend. Here is the quick flow</p>
+          <p className="text-gray-700">Want to dare a friend? Here is the quick flow:</p>
           <ol className="list-decimal pl-6 text-gray-700 mt-2">
             <li>Open the Challenge page and search for your friend by Farcaster handle</li>
             <li>Select their profile and click Play Quiz</li>
-            <li>After you finish the quiz you will see a preview message that mentions them edit it if you want</li>
+            <li>After you finish the quiz you will see a preview message that mentions them — edit it if you want</li>
             <li>Post the cast from your account using Base or Farcaster or copy the message to share manually</li>
-            <li>Your friend will be mentioned in the cast and the challenge begins May the best brain win</li>
+            <li>Your friend will be mentioned in the cast and the challenge begins — may the best brain win</li>
           </ol>
         </div>
 
@@ -322,12 +327,12 @@ export default function InfoPage() {
 
         <div className="mb-6 p-4 bg-blue-50 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-blue-700">Quests and Jackpot</h2>
-          <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward[...]
+          <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward players and unlock bonuses.</p>
           <ul className="list-disc pl-6 text-gray-700 mt-2">
-            <li>Daily Quest complete a short set of questions every day to earn bonus T Points</li>
-            <li>Weekly Quest finish a longer challenge for rare rewards and leaderboard boosts</li>
-            <li>Event Quest show up for limited time themed quizzes with special prizes</li>
-            <li>Jackpot coming soon for top players and quest masters Stay tuned for the official launch on Warpcast and in app</li>
+            <li>Daily Quest — complete a short set of questions every day to earn bonus T Points</li>
+            <li>Weekly Quest — finish a longer challenge for rare rewards and leaderboard boosts</li>
+            <li>Event Quest — limited-time themed quizzes with special prizes</li>
+            <li>Jackpot — coming soon for top players and quest masters. Stay tuned for the official launch on Warpcast and in-app</li>
           </ul>
         </div>
 
@@ -341,7 +346,7 @@ export default function InfoPage() {
             <li>Hit three in a row for a 500 bonus</li>
             <li>Hit five in a row for a 1000 bonus</li>
             <li>Perfect ten in a row for a 2000 bonus and eternal bragging rights</li>
-            <li>T Points unlock quests boosts and eligibility for token drops and jackpot events</li>
+            <li>T Points unlock quests, boosts and eligibility for token drops and jackpot events</li>
           </ul>
         </div>
 
@@ -373,7 +378,7 @@ export default function InfoPage() {
             </a>{" "}
             with a quick message after a great quiz show or share a hot take from your profile
           </p>
-          <p className="mt-2 text-gray-700">Got a trivia fact idea feature request or a perfect meme. Cast it our way and we may feature it in a quest.</p>
+          <p className="mt-2 text-gray-700">Got a trivia fact idea, feature request, or a perfect meme? Cast it our way and we may feature it in a quest.</p>
 
           {/* Fancy Follow button */}
           <div className="mt-4 flex flex-col sm:flex-row items-center sm:items-start gap-3">
@@ -421,8 +426,6 @@ export default function InfoPage() {
             <img src="https://tip.md/badge.svg" alt="Tip in Crypto" height={24} />
           </a>
         </div>
-
-        
 
         <footer className="mt-8 text-center text-xs text-gray-400">
           Triviacast © 2025. May your answers be quick and your points be plenty. Rocket fuel not included
