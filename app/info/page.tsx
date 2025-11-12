@@ -11,7 +11,7 @@ export default function InfoPage() {
     type: "multiple",
     question: "",
     correct_answer: "",
-    incorrect_answers: "",
+    incorrect_answers: ["", "", ""],
     reference: "",
   };
 
@@ -35,9 +35,8 @@ export default function InfoPage() {
       return;
     }
 
-    const incorrect = form.incorrect_answers
-      .split(",")
-      .map((s) => s.trim())
+    const incorrect = (form.incorrect_answers || [])
+      .map((s) => (s || "").trim())
       .filter(Boolean);
 
   // Build a clean compose message without the miniapp link to avoid compose/profile preview issues
@@ -210,14 +209,24 @@ export default function InfoPage() {
           </label>
 
           <label className="flex flex-col text-sm text-gray-700 mt-3">
-            Incorrect answers (comma-separated)
-            <input
-              className="mt-1 p-2 border rounded"
-              name="incorrect_answers"
-              value={form.incorrect_answers}
-              onChange={(e) => setForm({ ...form, incorrect_answers: e.target.value })}
-              placeholder="e.g. red, blue, green"
-            />
+            Incorrect answers (up to 3)
+            <div className="mt-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {[0, 1, 2].map((i) => (
+                <input
+                  key={i}
+                  className="p-2 border rounded"
+                  name={`incorrect_${i}`}
+                  value={form.incorrect_answers?.[i] ?? ""}
+                  onChange={(e) => {
+                    const arr = Array.isArray(form.incorrect_answers) ? [...form.incorrect_answers] : ["", "", ""];
+                    arr[i] = e.target.value;
+                    setForm({ ...form, incorrect_answers: arr });
+                  }}
+                  placeholder={`Incorrect ${i + 1}`}
+                />
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Provide up to three incorrect answers for the multiple-choice question.</p>
           </label>
 
           <label className="flex flex-col text-sm text-gray-700 mt-3">
