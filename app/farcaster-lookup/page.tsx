@@ -253,8 +253,13 @@ export default function FarcasterLookupPage() {
                         const challengeLink = 'https://triviacast.xyz/farcaster-lookup';
                         const pointsStr = Number(computedTPoints).toLocaleString();
                         // Spiced / playful default message
-                        const defaultText = cleanHandle
-                          ? `@${cleanHandle}.farcaster.eth — I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`
+                        // Only add .farcaster.eth if the handle does not already end with .eth
+                        let mention = cleanHandle;
+                        if (mention && !mention.toLowerCase().endsWith('.eth')) {
+                          mention = `${mention}.farcaster.eth`;
+                        }
+                        const defaultText = mention
+                          ? `@${mention} — I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`
                           : `I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`;
                         setPreviewText(defaultText);
                         setPreviewLink(challengeLink);
