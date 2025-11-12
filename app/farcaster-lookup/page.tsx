@@ -125,8 +125,8 @@ export default function FarcasterLookupPage() {
         <WagmiWalletConnect />
         <ShareButton
           url={buildPlatformShareUrl(
-            'Think you can outsmart your friends? Take the Challenge on the Challenge page — powered by neynar! https://triviacast.xyz/farcaster-lookup',
-            ['https://triviacast.xyz/farcaster-lookup'],
+            'Think you can outsmart your friends? Take the Challenge on Triviacast — https://triviacast.xyz',
+            ['https://triviacast.xyz'],
             { action: 'share' }
           )}
           className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[40px]"
@@ -260,8 +260,8 @@ export default function FarcasterLookupPage() {
                         const computedTPoints = typeof (res as any)?.details?.tPoints === 'number'
                           ? (res as any).details.tPoints
                           : (res.score ?? 0) * 1000;
-                        // Use the Triviacast Challenge page link for share links (clickable HTTPS).
-                        const challengeLink = 'https://triviacast.xyz/farcaster-lookup';
+                        // Use the Triviacast base site for share links (clickable HTTPS).
+                        const challengeLink = 'https://triviacast.xyz';
                         const pointsStr = Number(computedTPoints).toLocaleString();
                         // Spiced / playful default message
                         // Only add .farcaster.eth if the handle does not already end with .eth
