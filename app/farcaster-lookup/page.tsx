@@ -208,8 +208,13 @@ export default function FarcasterLookupPage() {
                               // populate lookup with this username and trigger lookup
                               const uname = p.username ? String(p.username).replace(/^@/, '') : '';
                               if (uname) {
-                                setUsername(uname);
-                                setTimeout(() => lookup(), 40);
+                                setUsername(prev => {
+                                  // If the username is different, trigger lookup after state update
+                                  if (prev !== uname) {
+                                    setTimeout(() => lookup(), 0);
+                                  }
+                                  return uname;
+                                });
                               }
                             }}
                           >
