@@ -3,7 +3,6 @@
 import Image from "next/image";
 import ClientOnlyWidgets from "@/components/ClientOnlyWidgets";
 import Quiz from "@/components/Quiz";
-import HiddenMintButton from "@/components/HiddenMintButton";
 
 export default function Home() {
   return (
@@ -81,8 +80,6 @@ export default function Home() {
           Triviacast © 2025. May your answers be quick and your points be plenty. Rocket fuel not included
         </footer>
       </div>
-
-      <HiddenMintButton />
     </div>
   );
 }
