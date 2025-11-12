@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import HiddenMintButton from "@/components/HiddenMintButton";
 
@@ -25,6 +25,7 @@ export default function InfoPage() {
   const WARPCAST_HOME = "https://warpcast.com";
 
   const canCast = form.question.trim() !== "" && form.correct_answer.trim() !== "";
+  const [copied, setCopied] = useState(false);
 
   const castToFarcaster = async () => {
     if (!canCast) {
@@ -59,8 +60,16 @@ export default function InfoPage() {
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
           await navigator.clipboard.writeText(message);
-          // eslint-disable-next-line no-alert
-          alert("Copied to clipboard");
+          setCopied(true);
+          // also call alert as a fallback for environments that still support it
+          try {
+            // eslint-disable-next-line no-alert
+            alert("Copied to clipboard");
+          } catch (e) {
+            // ignore
+          }
+          // hide the inline badge after 3s
+          setTimeout(() => setCopied(false), 3000);
         } else {
           // eslint-disable-next-line no-alert
           alert("Clipboard not available — please select and copy the message manually.");
@@ -246,6 +255,11 @@ export default function InfoPage() {
             >
               Copy message
             </button>
+            {copied && (
+              <div className="ml-2 inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm">
+                Copied to clipboard
+              </div>
+            )}
             <button
               type="button"
               onClick={() => openOpenTDB()}
