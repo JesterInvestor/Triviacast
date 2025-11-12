@@ -50,6 +50,14 @@ export default function FarcasterLookupPage() {
   // NOTE: intentionally not auto-prefilling the lookup from URL params.
   // Shares should point to the canonical site only (https://triviacast.xyz).
 
+  // When username changes (from View or dropdown), trigger lookup automatically (if not empty)
+  useEffect(() => {
+    if (username && username.trim() !== "") {
+      lookup();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [username]);
+
   const lookup = async () => {
     setLoading(true);
     setError(null);
@@ -163,7 +171,11 @@ export default function FarcasterLookupPage() {
           <div className="flex flex-col items-center gap-2 w-full max-w-md bg-white rounded-xl border-2 border-[#F4A6B7] shadow-md px-4 py-4">
             <NeynarUserDropdown value={username} onChange={setUsername} />
             <button
-              onClick={lookup}
+              onClick={() => {
+                if (username && username.trim() !== "") {
+                  lookup();
+                }
+              }}
               disabled={loading}
               className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg transition shadow-md w-full"
             >
@@ -205,16 +217,10 @@ export default function FarcasterLookupPage() {
                           <button
                             className="flex-1 bg-[#F4A6B7] text-white text-xs py-1 rounded"
                             onClick={() => {
-                              // populate lookup with this username and trigger lookup
+                              // populate lookup with this username; lookup will be triggered by useEffect
                               const uname = p.username ? String(p.username).replace(/^@/, '') : '';
                               if (uname) {
-                                setUsername(prev => {
-                                  // If the username is different, trigger lookup after state update
-                                  if (prev !== uname) {
-                                    setTimeout(() => lookup(), 0);
-                                  }
-                                  return uname;
-                                });
+                                setUsername(uname);
                               }
                             }}
                           >
