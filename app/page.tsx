@@ -33,7 +33,7 @@ export default function Home() {
 
           {/* Short subtitle */}
           <p className="mt-2 text-sm text-[#5a3d5c] text-center max-w-xl">
-            1)Play Quiz 2)If you like it, go to Quests🗺️ 3)Challenge Friend 🎯 4)Cast your own Question ℹ️
+            1)Play Quiz 2)If you like it, go to Quests🗺️ 3)Challenge Friend 🎯 4)Cast your own Question ℹ️ Get 100,000 T points and 70 iQ to play $TRIV Jackpot
           </p>
         </div>
 
