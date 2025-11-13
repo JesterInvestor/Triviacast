@@ -125,7 +125,7 @@ export default function FarcasterLookupPage() {
         <WagmiWalletConnect />
         <ShareButton
           url={buildPlatformShareUrl(
-            'Think you can outsmart your friends? Take the Challenge on Triviacast — https://triviacast.xyz',
+            'Think you can outsmart your friends? Challenge a random and find new friends! Take the Challenge on Triviacast — https://triviacast.xyz',
             ['https://triviacast.xyz'],
             { action: 'share' }
           )}
@@ -270,7 +270,7 @@ export default function FarcasterLookupPage() {
                           mention = `${mention}.farcaster.eth`;
                         }
                         const defaultText = mention
-                          ? `@${mention} — I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`
+                          ? `@${mention} — I just played Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`
                           : `I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`;
                         setPreviewText(defaultText);
                         setPreviewLink(challengeLink);
