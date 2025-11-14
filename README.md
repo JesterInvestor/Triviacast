@@ -20,8 +20,10 @@ A Next.js-based trivia quiz mini-game that encourages users to answer questions 
 
 ## Features
 
-- **Timed Quiz Format**: 5-minute quiz with 10 trivia questions
+- **Multiple Question Sources**: Toggle between General Knowledge (OpenTDB) and Farcaster Knowledge (Local)
+- **Timed Quiz Format**: 1-minute quiz with 10 trivia questions
 - **Open Trivia Database Integration**: Fetches questions from OpenTDB API
+- **Farcaster-Themed Questions**: 100+ curated questions about Farcaster, the protocol, creators, and ecosystem
 - **Real-time Scoring**: Instant feedback on answers with score tracking
 - **T Points & Leaderboard**: Earn points for correct answers with streak bonuses
 - **Smart Contract Integration**: Optional blockchain storage for T points (Base Sepolia)
@@ -77,13 +79,22 @@ npm run dev
 
 ## Quiz Features
 
+### Question Sources
+
+The quiz supports two question sources that can be toggled before starting a quiz:
+
+1. **General Knowledge (OpenTDB)**: Questions from the Open Trivia Database covering various topics
+2. **Farcaster Knowledge (Local)**: Curated questions about Farcaster, the protocol, creators, and ecosystem
+
+To switch between sources, use the toggle on the main quiz page before starting. If you try to switch during an active quiz, you'll be prompted to confirm as it will restart the quiz.
+
 ### Timer System
-- 5-minute overall time limit for the entire quiz
+- 1-minute overall time limit for the entire quiz
 - Visual timer with color-coded warnings (green → yellow → red)
 - Automatic quiz completion when time expires
 
 ### Question Display
-- Questions fetched from Open Trivia Database
+- Questions fetched from Open Trivia Database or local Farcaster questions
 - Multiple choice format with 4 options
 - HTML entity decoding for special characters
 - Randomized answer order for each question
@@ -97,6 +108,10 @@ npm run dev
 - Detailed results page with answer review
 - Performance feedback based on percentage score
 - Visual indicators for correct/incorrect answers
+
+### Adding Custom Questions
+
+You can add your own Farcaster-themed questions by editing `public/data/farcaster_questions.json`. See [docs/QUESTIONS.md](./docs/QUESTIONS.md) for detailed instructions on the question format and best practices.
 
 ## Technology Stack
 
@@ -153,16 +168,19 @@ See [WAGMI_INTEGRATION.md](./WAGMI_INTEGRATION.md) for detailed wagmi setup and 
 
 ### GET `/api/questions`
 
-Fetches trivia questions from Open Trivia Database.
+Fetches trivia questions from Open Trivia Database or local Farcaster questions.
 
 **Query Parameters:**
 - `amount` (default: 10): Number of questions to fetch
-- `difficulty` (default: medium): Question difficulty (easy, medium, hard)
-- `category` (optional): Question category ID
+- `source` (default: 'opentdb'): Question source ('opentdb' or 'farcaster')
+- `difficulty` (optional): Question difficulty (easy, medium, hard) - OpenTDB only
+- `category` (optional): Question category ID - OpenTDB only
+- `tags` (optional): Comma-separated tags for filtering - Farcaster only
 
-**Example:**
+**Examples:**
 ```
-GET /api/questions?amount=10&difficulty=medium
+GET /api/questions?amount=10&source=opentdb&difficulty=medium
+GET /api/questions?amount=10&source=farcaster&tags=hard,protocol
 ```
 
 ## Project Structure

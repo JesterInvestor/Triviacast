@@ -1,0 +1,802 @@
+[
+  {
+    "id": "farcaster_001",
+    "question": "What is the name of the decentralized social protocol that Farcaster is built on?",
+    "options": ["Ethereum", "Farcaster Protocol", "Snapchain", "IPFS"],
+    "answer": 1,
+    "explanation": "Farcaster is a decentralized social protocol that enables users to own their social identity and data.",
+    "tags": ["farcaster", "protocol", "basics"]
+  },
+  {
+    "id": "farcaster_002",
+    "question": "Who is the founder of Farcaster?",
+    "options": ["Vitalik Buterin", "Dan Romero", "Jesse Pollak", "Mark Zuckerberg"],
+    "answer": 1,
+    "explanation": "Dan Romero, former VP of Coinbase, is the co-founder of Farcaster along with Varun Srinivasan.",
+    "tags": ["farcaster", "creators", "founders"]
+  },
+  {
+    "id": "farcaster_003",
+    "question": "What is the primary client application for Farcaster?",
+    "options": ["Twitter", "Discord", "Warpcast", "Telegram"],
+    "answer": 2,
+    "explanation": "Warpcast is the main client application for accessing the Farcaster protocol.",
+    "tags": ["farcaster", "basics", "warpcast"]
+  },
+  {
+    "id": "farcaster_004",
+    "question": "What blockchain does Farcaster use for identity registration?",
+    "options": ["Ethereum Mainnet", "Polygon", "Optimism", "Base"],
+    "answer": 2,
+    "explanation": "Farcaster uses Optimism (an Ethereum L2) for on-chain identity registration.",
+    "tags": ["farcaster", "protocol", "blockchain"]
+  },
+  {
+    "id": "farcaster_005",
+    "question": "What are posts called on Farcaster?",
+    "options": ["Tweets", "Posts", "Casts", "Snaps"],
+    "answer": 2,
+    "explanation": "On Farcaster, posts are called 'casts', playing on the platform's name.",
+    "tags": ["farcaster", "basics", "terminology"]
+  },
+  {
+    "id": "farcaster_006",
+    "question": "What does 'FC' commonly stand for in the Farcaster community?",
+    "options": ["Fast Cast", "Farcaster", "Friend Circle", "Follow Count"],
+    "answer": 1,
+    "explanation": "FC is the common abbreviation for Farcaster used throughout the community.",
+    "tags": ["farcaster", "basics", "terminology"]
+  },
+  {
+    "id": "farcaster_007",
+    "question": "What feature allows users to create sub-communities on Farcaster?",
+    "options": ["Groups", "Channels", "Circles", "Forums"],
+    "answer": 1,
+    "explanation": "Channels allow users to create and join topic-specific communities on Farcaster.",
+    "tags": ["farcaster", "features", "channels"]
+  },
+  {
+    "id": "farcaster_008",
+    "question": "What is a Frame on Farcaster?",
+    "options": ["A photo border", "An interactive mini-app in casts", "A profile picture", "A video format"],
+    "answer": 1,
+    "explanation": "Frames are interactive applications that can be embedded directly in casts, enabling rich experiences.",
+    "tags": ["farcaster", "frames", "features"]
+  },
+  {
+    "id": "farcaster_009",
+    "question": "Which company backs Farcaster?",
+    "options": ["Meta", "Coinbase Ventures", "a16z", "Paradigm"],
+    "answer": 2,
+    "explanation": "a16z (Andreessen Horowitz) led a $30M funding round for Farcaster in 2022.",
+    "tags": ["farcaster", "funding", "creators"]
+  },
+  {
+    "id": "farcaster_010",
+    "question": "What is the purpose of storage rent on Farcaster?",
+    "options": ["To pay developers", "To prevent spam and ensure sustainable storage", "To buy NFTs", "To tip creators"],
+    "answer": 1,
+    "explanation": "Storage rent helps prevent spam and ensures the network can sustainably store user data.",
+    "tags": ["farcaster", "protocol", "economics"]
+  },
+  {
+    "id": "farcaster_011",
+    "question": "What protocol does Farcaster use for decentralized data storage?",
+    "options": ["IPFS", "Arweave", "Hubs", "Filecoin"],
+    "answer": 2,
+    "explanation": "Farcaster Hubs are the peer-to-peer network that stores and replicates user data.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_012",
+    "question": "What is the maximum length of a cast in characters?",
+    "options": ["140", "280", "320", "500"],
+    "answer": 2,
+    "explanation": "Casts on Farcaster can be up to 320 characters long.",
+    "tags": ["farcaster", "basics", "hard"]
+  },
+  {
+    "id": "farcaster_013",
+    "question": "What technology enables 'Sign in with Farcaster'?",
+    "options": ["OAuth", "Cryptographic signatures", "Email verification", "Phone number"],
+    "answer": 1,
+    "explanation": "Farcaster uses cryptographic signatures for authentication, eliminating the need for OAuth.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_014",
+    "question": "What is a 'recast' on Farcaster?",
+    "options": ["Editing a cast", "Sharing someone else's cast", "Deleting a cast", "Blocking a user"],
+    "answer": 1,
+    "explanation": "A recast is similar to a retweet - sharing someone else's cast to your followers.",
+    "tags": ["farcaster", "basics", "terminology"]
+  },
+  {
+    "id": "farcaster_015",
+    "question": "Which L2 network did Farcaster migrate to in 2023?",
+    "options": ["Arbitrum", "Base", "zkSync", "Optimism"],
+    "answer": 3,
+    "explanation": "Farcaster was already on Optimism and continues to use it for identity management.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_016",
+    "question": "What is the FID?",
+    "options": ["Farcaster ID", "Follow ID", "Frame ID", "Feed ID"],
+    "answer": 0,
+    "explanation": "FID stands for Farcaster ID - your unique identifier on the protocol.",
+    "tags": ["farcaster", "protocol", "basics"]
+  },
+  {
+    "id": "farcaster_017",
+    "question": "What does 'permissionless' mean in the context of Farcaster?",
+    "options": ["No rules", "Anyone can build on it", "Free to use", "Anonymous only"],
+    "answer": 1,
+    "explanation": "Permissionless means anyone can build apps and clients on Farcaster without needing approval.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_018",
+    "question": "What is Neynar?",
+    "options": ["A Farcaster bot", "Infrastructure provider for Farcaster", "A Frame builder", "A channel"],
+    "answer": 1,
+    "explanation": "Neynar provides infrastructure and APIs for developers building on Farcaster.",
+    "tags": ["farcaster", "ecosystem", "hard"]
+  },
+  {
+    "id": "farcaster_019",
+    "question": "What are App Keys on Farcaster?",
+    "options": ["Password managers", "Delegated signing keys", "API tokens", "NFT keys"],
+    "answer": 1,
+    "explanation": "App Keys allow applications to post on behalf of users with their permission.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_020",
+    "question": "What is the native token symbol planned for Farcaster?",
+    "options": ["WARP", "CAST", "FC", "No native token planned"],
+    "answer": 3,
+    "explanation": "Farcaster does not currently have plans for a native token - it uses ETH for storage payments.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_021",
+    "question": "Who is @dwr on Farcaster?",
+    "options": ["A bot", "Dan Romero", "A developer tool", "A channel"],
+    "answer": 1,
+    "explanation": "@dwr is Dan Romero's username on Farcaster, one of the co-founders.",
+    "tags": ["farcaster", "creators", "founders"]
+  },
+  {
+    "id": "farcaster_022",
+    "question": "What is the purpose of Farcaster Frames?",
+    "options": ["Profile decorations", "Interactive apps in feeds", "NFT galleries", "Video players"],
+    "answer": 1,
+    "explanation": "Frames enable interactive applications and experiences directly within the social feed.",
+    "tags": ["farcaster", "frames", "features"]
+  },
+  {
+    "id": "farcaster_023",
+    "question": "Which of these is NOT a Farcaster client?",
+    "options": ["Warpcast", "Supercast", "Farcord", "Farcaster"],
+    "answer": 2,
+    "explanation": "Farcord is not a real Farcaster client. Warpcast, Supercast, and others are real clients.",
+    "tags": ["farcaster", "ecosystem", "hard"]
+  },
+  {
+    "id": "farcaster_024",
+    "question": "What year was Farcaster founded?",
+    "options": ["2019", "2020", "2021", "2022"],
+    "answer": 1,
+    "explanation": "Farcaster was founded in 2020 by Dan Romero and Varun Srinivasan.",
+    "tags": ["farcaster", "creators", "history"]
+  },
+  {
+    "id": "farcaster_025",
+    "question": "What does 'sufficiently decentralized' mean for Farcaster?",
+    "options": ["Completely decentralized", "Hybrid approach balancing UX and decentralization", "Centralized", "Blockchain only"],
+    "answer": 1,
+    "explanation": "Farcaster aims for sufficient decentralization - enough to prevent capture while maintaining good UX.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_026",
+    "question": "What is Purple on Farcaster?",
+    "options": ["A color theme", "A DAO for the community", "A bot", "A Frame"],
+    "answer": 1,
+    "explanation": "Purple is a community-driven DAO that supports the Farcaster ecosystem.",
+    "tags": ["farcaster", "ecosystem", "community"]
+  },
+  {
+    "id": "farcaster_027",
+    "question": "What are 'power badges' on Warpcast?",
+    "options": ["NFTs", "Verification marks for active users", "Premium features", "Admin tools"],
+    "answer": 1,
+    "explanation": "Power badges are given to active, high-quality users to help curate content.",
+    "tags": ["farcaster", "warpcast", "features"]
+  },
+  {
+    "id": "farcaster_028",
+    "question": "What is the cost to register a Farcaster account?",
+    "options": ["Free", "~$5-10 in ETH for storage", "$1", "$100"],
+    "answer": 1,
+    "explanation": "Registration requires payment for on-chain storage rent, typically a few dollars in ETH.",
+    "tags": ["farcaster", "protocol", "economics"]
+  },
+  {
+    "id": "farcaster_029",
+    "question": "What is 'Snapchain' in Farcaster?",
+    "options": ["A sidechain", "The main data layer", "A wallet", "A channel"],
+    "answer": 1,
+    "explanation": "Snapchain is Farcaster's consensus mechanism for ordering messages and preventing conflicts.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_030",
+    "question": "Which feature allows tipping on Farcaster?",
+    "options": ["Warps", "Direct payments", "Various Frame-based tipping apps", "No tipping"],
+    "answer": 2,
+    "explanation": "Multiple Frame-based applications enable tipping and payments within Farcaster.",
+    "tags": ["farcaster", "features", "frames"]
+  },
+  {
+    "id": "farcaster_031",
+    "question": "Who is @v on Farcaster?",
+    "options": ["A bot", "Varun Srinivasan", "Vitalik Buterin", "A developer"],
+    "answer": 1,
+    "explanation": "@v is Varun Srinivasan, co-founder and CTO of Farcaster.",
+    "tags": ["farcaster", "creators", "founders"]
+  },
+  {
+    "id": "farcaster_032",
+    "question": "What programming language is the Farcaster Hub written in?",
+    "options": ["JavaScript", "Rust", "TypeScript", "Go"],
+    "answer": 2,
+    "explanation": "The Farcaster Hub (Hubble) is primarily written in TypeScript.",
+    "tags": ["farcaster", "protocol", "hard", "technical"]
+  },
+  {
+    "id": "farcaster_033",
+    "question": "What is the Farcaster 'recovery address'?",
+    "options": ["Email backup", "Ethereum address for account recovery", "Password reset", "Phone number"],
+    "answer": 1,
+    "explanation": "The recovery address is an Ethereum address that can be used to recover your Farcaster account.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_034",
+    "question": "What does it mean to 'like' on Farcaster?",
+    "options": ["React with emoji", "Show appreciation for a cast", "Follow someone", "Recast"],
+    "answer": 1,
+    "explanation": "Liking (also called reacting) shows appreciation for content on Farcaster.",
+    "tags": ["farcaster", "basics", "terminology"]
+  },
+  {
+    "id": "farcaster_035",
+    "question": "What is the Farcaster Foundation?",
+    "options": ["A charity", "Doesn't exist yet", "Community organization", "Protocol governance body"],
+    "answer": 1,
+    "explanation": "There is no formal Farcaster Foundation currently; the protocol is developed by Merkle Manufactory.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_036",
+    "question": "What makes Farcaster different from Twitter?",
+    "options": ["Character limit", "Users own their identity and data", "Has videos", "Mobile-first"],
+    "answer": 1,
+    "explanation": "The key difference is that users own their social identity and data on Farcaster.",
+    "tags": ["farcaster", "protocol", "basics"]
+  },
+  {
+    "id": "farcaster_037",
+    "question": "What is Merkle Manufactory?",
+    "options": ["A Frame builder", "The company that builds Farcaster", "A channel", "A bot"],
+    "answer": 1,
+    "explanation": "Merkle Manufactory is the company founded by Dan and Varun that develops Farcaster.",
+    "tags": ["farcaster", "creators", "history"]
+  },
+  {
+    "id": "farcaster_038",
+    "question": "Can you delete your casts on Farcaster?",
+    "options": ["No, blockchain is permanent", "Yes, but they may still exist in caches", "Only within 5 minutes", "Only if no one reacted"],
+    "answer": 1,
+    "explanation": "You can delete casts, but they may remain in Hub caches and other clients for a while.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_039",
+    "question": "What is the relationship between Farcaster and Base?",
+    "options": ["Same company", "Base is built on Farcaster", "Farcaster users many Base apps via Frames", "No relationship"],
+    "answer": 2,
+    "explanation": "While separate, many Base blockchain apps integrate with Farcaster through Frames.",
+    "tags": ["farcaster", "ecosystem", "base"]
+  },
+  {
+    "id": "farcaster_040",
+    "question": "What is a 'channel lead' on Farcaster?",
+    "options": ["Channel creator", "Channel moderator", "Most active user", "Bot admin"],
+    "answer": 1,
+    "explanation": "Channel leads are the moderators who manage and curate specific channels.",
+    "tags": ["farcaster", "channels", "features"]
+  },
+  {
+    "id": "farcaster_041",
+    "question": "What famous crypto personality is very active on Farcaster?",
+    "options": ["Vitalik Buterin", "Jesse Pollak", "CZ", "SBF"],
+    "answer": 1,
+    "explanation": "Jesse Pollak, creator of Base, is very active on Farcaster.",
+    "tags": ["farcaster", "creators", "community"]
+  },
+  {
+    "id": "farcaster_042",
+    "question": "How do Frames work technically?",
+    "options": ["JavaScript embeds", "Open Graph meta tags with special extensions", "iframes", "WebSockets"],
+    "answer": 1,
+    "explanation": "Frames use Open Graph meta tags with Farcaster-specific extensions for interactivity.",
+    "tags": ["farcaster", "frames", "hard", "technical"]
+  },
+  {
+    "id": "farcaster_043",
+    "question": "What is the purpose of the Farcaster Hub?",
+    "options": ["Social hub", "Decentralized message storage and propagation", "Payment gateway", "NFT marketplace"],
+    "answer": 1,
+    "explanation": "Hubs store and propagate user messages in a decentralized peer-to-peer network.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_044",
+    "question": "What programming languages are commonly used to build Farcaster apps?",
+    "options": ["Only TypeScript", "TypeScript, JavaScript, Python", "Solidity only", "C++"],
+    "answer": 1,
+    "explanation": "Developers use TypeScript, JavaScript, Python, and other languages to build on Farcaster.",
+    "tags": ["farcaster", "technical", "hard"]
+  },
+  {
+    "id": "farcaster_045",
+    "question": "What is the main benefit of Farcaster being open and permissionless?",
+    "options": ["It's free", "No censorship", "Anyone can build competing clients", "Faster performance"],
+    "answer": 2,
+    "explanation": "The open, permissionless nature allows anyone to build clients and apps without approval.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_046",
+    "question": "What is the Farcaster 'social graph'?",
+    "options": ["Analytics dashboard", "Network of follows and connections", "NFT collection", "Frame gallery"],
+    "answer": 1,
+    "explanation": "The social graph represents the network of who follows whom on Farcaster.",
+    "tags": ["farcaster", "protocol", "basics"]
+  },
+  {
+    "id": "farcaster_047",
+    "question": "Can you have multiple Farcaster accounts?",
+    "options": ["No, one per person", "Yes, but each requires separate registration fee", "Only with approval", "Only 2 maximum"],
+    "answer": 1,
+    "explanation": "You can register multiple FIDs, but each requires paying the storage rent.",
+    "tags": ["farcaster", "protocol", "basics"]
+  },
+  {
+    "id": "farcaster_048",
+    "question": "What is 'farcaster.xyz'?",
+    "options": ["A client app", "The official website and documentation", "A Frame builder", "A marketplace"],
+    "answer": 1,
+    "explanation": "farcaster.xyz is the official website with documentation and information about Farcaster.",
+    "tags": ["farcaster", "basics", "resources"]
+  },
+  {
+    "id": "farcaster_049",
+    "question": "What is the typical response time for casts to propagate?",
+    "options": ["Instant", "1-2 seconds", "10 seconds", "1 minute"],
+    "answer": 1,
+    "explanation": "Casts typically propagate very quickly, within 1-2 seconds across the network.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_050",
+    "question": "What is Pinata in the Farcaster ecosystem?",
+    "options": ["A game", "IPFS and Hub infrastructure provider", "A Frame", "A channel"],
+    "answer": 1,
+    "explanation": "Pinata provides IPFS hosting and Hub infrastructure for Farcaster developers.",
+    "tags": ["farcaster", "ecosystem", "hard"]
+  },
+  {
+    "id": "farcaster_051",
+    "question": "What is the Warpcast mobile app built with?",
+    "options": ["Swift/Kotlin native", "React Native", "Flutter", "Ionic"],
+    "answer": 1,
+    "explanation": "Warpcast mobile apps are built with React Native for cross-platform development.",
+    "tags": ["farcaster", "warpcast", "hard", "technical"]
+  },
+  {
+    "id": "farcaster_052",
+    "question": "What is 'engagement farming' on Farcaster?",
+    "options": ["Good practice", "Creating low-quality content for likes", "Farming game", "NFT minting"],
+    "answer": 1,
+    "explanation": "Engagement farming refers to posting low-quality content solely to get reactions.",
+    "tags": ["farcaster", "community", "culture"]
+  },
+  {
+    "id": "farcaster_053",
+    "question": "What happens when you run out of storage on Farcaster?",
+    "options": ["Account deleted", "Can't post new casts", "Nothing", "Need to buy more"],
+    "answer": 1,
+    "explanation": "If storage runs out, you cannot post new content until you purchase more storage.",
+    "tags": ["farcaster", "protocol", "economics"]
+  },
+  {
+    "id": "farcaster_054",
+    "question": "Who is @jessepollak on Farcaster?",
+    "options": ["Random user", "Creator of Base blockchain at Coinbase", "Farcaster developer", "Channel lead"],
+    "answer": 1,
+    "explanation": "Jesse Pollak is the creator of Base and very active in the Farcaster community.",
+    "tags": ["farcaster", "creators", "base"]
+  },
+  {
+    "id": "farcaster_055",
+    "question": "What is the difference between Farcaster and Lens Protocol?",
+    "options": ["No difference", "Farcaster uses hybrid approach; Lens is fully on-chain", "Lens is older", "Different blockchains"],
+    "answer": 1,
+    "explanation": "Farcaster uses a hybrid approach with off-chain messages, while Lens is more on-chain focused.",
+    "tags": ["farcaster", "protocol", "hard", "comparison"]
+  },
+  {
+    "id": "farcaster_056",
+    "question": "What is 'composability' in the context of Farcaster?",
+    "options": ["Music features", "Ability to build on and integrate with other apps", "Writing long posts", "Creating memes"],
+    "answer": 1,
+    "explanation": "Composability means apps and features can be built on top of each other, creating an ecosystem.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_057",
+    "question": "What are 'threads' on Farcaster?",
+    "options": ["Clothing brand", "Connected series of casts", "Private chats", "Video streams"],
+    "answer": 1,
+    "explanation": "Threads are conversations created by replying to casts, similar to Twitter threads.",
+    "tags": ["farcaster", "basics", "terminology"]
+  },
+  {
+    "id": "farcaster_058",
+    "question": "What is the Farcaster API called?",
+    "options": ["Farcaster API", "Hub API / gRPC", "REST API", "GraphQL"],
+    "answer": 1,
+    "explanation": "Farcaster Hubs expose a gRPC API for accessing protocol data.",
+    "tags": ["farcaster", "protocol", "hard", "technical"]
+  },
+  {
+    "id": "farcaster_059",
+    "question": "Can you edit casts after posting?",
+    "options": ["Yes, anytime", "Yes, within 5 minutes", "No", "Only with premium"],
+    "answer": 2,
+    "explanation": "Currently, casts cannot be edited after posting - you must delete and repost.",
+    "tags": ["farcaster", "features", "basics"]
+  },
+  {
+    "id": "farcaster_060",
+    "question": "What is the main channel for announcements?",
+    "options": ["/warpcast", "/farcaster", "/announcements", "/news"],
+    "answer": 1,
+    "explanation": "/farcaster is the main channel for protocol announcements and updates.",
+    "tags": ["farcaster", "channels", "basics"]
+  },
+  {
+    "id": "farcaster_061",
+    "question": "What does 'gm' mean on Farcaster?",
+    "options": ["Game Master", "Good Morning", "Get Money", "Group Message"],
+    "answer": 1,
+    "explanation": "'gm' stands for 'good morning' and is a common greeting in crypto/web3 culture.",
+    "tags": ["farcaster", "culture", "community"]
+  },
+  {
+    "id": "farcaster_062",
+    "question": "What is Paragraph in relation to Farcaster?",
+    "options": ["Text editor", "Newsletter and blogging platform with Farcaster integration", "Frame type", "Channel"],
+    "answer": 1,
+    "explanation": "Paragraph is a web3 newsletter platform that integrates with Farcaster for distribution.",
+    "tags": ["farcaster", "ecosystem", "creators"]
+  },
+  {
+    "id": "farcaster_063",
+    "question": "What makes a good cast according to community norms?",
+    "options": ["Many hashtags", "Authentic, valuable content", "Lots of emojis", "Tagging influencers"],
+    "answer": 1,
+    "explanation": "The Farcaster community values authentic, thoughtful content over engagement bait.",
+    "tags": ["farcaster", "culture", "community"]
+  },
+  {
+    "id": "farcaster_064",
+    "question": "What is the Frame standard?",
+    "options": ["Photo size", "Open standard for interactive embeds", "Video format", "NFT type"],
+    "answer": 1,
+    "explanation": "The Frame standard is an open specification for creating interactive embeds in casts.",
+    "tags": ["farcaster", "frames", "hard", "technical"]
+  },
+  {
+    "id": "farcaster_065",
+    "question": "Can you import your Twitter followers to Farcaster?",
+    "options": ["Yes, automatically", "No, but tools exist to find Twitter friends", "Yes, manually", "Only with Twitter Blue"],
+    "answer": 1,
+    "explanation": "While not automatic, community tools help you discover which Twitter contacts are on Farcaster.",
+    "tags": ["farcaster", "features", "tools"]
+  },
+  {
+    "id": "farcaster_066",
+    "question": "What is the recommended way to share images on Farcaster?",
+    "options": ["Direct upload", "IPFS links", "Both direct upload and IPFS", "No images allowed"],
+    "answer": 2,
+    "explanation": "Clients support both direct uploads and IPFS links for sharing images.",
+    "tags": ["farcaster", "features", "hard"]
+  },
+  {
+    "id": "farcaster_067",
+    "question": "What is 'based' in Farcaster culture?",
+    "options": ["Using Base blockchain", "Being authentic and true to yourself", "Location-based features", "Membership level"],
+    "answer": 1,
+    "explanation": "'Based' means being authentically yourself, though it's also a pun on Base blockchain.",
+    "tags": ["farcaster", "culture", "community", "base"]
+  },
+  {
+    "id": "farcaster_068",
+    "question": "How does Farcaster handle spam?",
+    "options": ["Manual reporting", "Storage costs and social filtering", "Captcha", "Phone verification"],
+    "answer": 1,
+    "explanation": "Storage costs deter spam, while power badges and social filtering help curate quality content.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_069",
+    "question": "What is 'Farcaster native' mean?",
+    "options": ["Born on Farcaster", "Content created specifically for Farcaster", "Native mobile app", "Official content"],
+    "answer": 1,
+    "explanation": "Farcaster native refers to content and apps built specifically for the platform.",
+    "tags": ["farcaster", "culture", "terminology"]
+  },
+  {
+    "id": "farcaster_070",
+    "question": "What blockchain does Base run on?",
+    "options": ["Its own chain", "Optimism Stack (Ethereum L2)", "Polygon", "Solana"],
+    "answer": 1,
+    "explanation": "Base is built on the Optimism Stack as an Ethereum Layer 2.",
+    "tags": ["farcaster", "base", "blockchain"]
+  },
+  {
+    "id": "farcaster_071",
+    "question": "What is a common way to support creators on Farcaster?",
+    "options": ["Patreon links", "Tipping via Frames", "PayPal", "Venmo"],
+    "answer": 1,
+    "explanation": "Frame-based tipping apps enable direct crypto payments to creators.",
+    "tags": ["farcaster", "creators", "frames", "features"]
+  },
+  {
+    "id": "farcaster_072",
+    "question": "What does 'decentralized' mean for Farcaster?",
+    "options": ["No servers", "No single entity controls the network", "Blockchain only", "Anonymous"],
+    "answer": 1,
+    "explanation": "Decentralized means no single entity can control or censor the network.",
+    "tags": ["farcaster", "protocol", "basics"]
+  },
+  {
+    "id": "farcaster_073",
+    "question": "What is Yup in the Farcaster ecosystem?",
+    "options": ["Agreement emoji", "Social curation protocol that works with Farcaster", "Channel name", "Bot"],
+    "answer": 1,
+    "explanation": "Yup is a cross-platform social curation protocol that integrates with Farcaster.",
+    "tags": ["farcaster", "ecosystem", "hard"]
+  },
+  {
+    "id": "farcaster_074",
+    "question": "How do notifications work on Farcaster?",
+    "options": ["Email only", "Push notifications via clients", "No notifications", "SMS"],
+    "answer": 1,
+    "explanation": "Clients like Warpcast provide push notifications for mentions, replies, and reactions.",
+    "tags": ["farcaster", "features", "basics"]
+  },
+  {
+    "id": "farcaster_075",
+    "question": "What is the vision for Farcaster's future?",
+    "options": ["Replace Twitter", "Be the protocol for social media", "Stay niche", "Become a DAO"],
+    "answer": 1,
+    "explanation": "Farcaster aims to be an open protocol that many social apps can build on.",
+    "tags": ["farcaster", "vision", "protocol"]
+  },
+  {
+    "id": "farcaster_076",
+    "question": "What programming paradigm does Farcaster follow?",
+    "options": ["Monolithic", "Event-driven with CRDTs", "Microservices", "Serverless"],
+    "answer": 1,
+    "explanation": "Farcaster uses an event-driven architecture with CRDTs for conflict resolution.",
+    "tags": ["farcaster", "protocol", "hard", "technical"]
+  },
+  {
+    "id": "farcaster_077",
+    "question": "What is the role of Ethereum in Farcaster?",
+    "options": ["Everything runs on Ethereum", "Only identity registration on Optimism", "No role", "Payment only"],
+    "answer": 1,
+    "explanation": "Ethereum (via Optimism L2) is used only for identity registration; messages are off-chain.",
+    "tags": ["farcaster", "protocol", "hard", "blockchain"]
+  },
+  {
+    "id": "farcaster_078",
+    "question": "Can businesses use Farcaster?",
+    "options": ["No, individuals only", "Yes, many brands and businesses are active", "Only with approval", "Only as advertisers"],
+    "answer": 1,
+    "explanation": "Businesses and brands can and do use Farcaster to engage with the community.",
+    "tags": ["farcaster", "community", "basics"]
+  },
+  {
+    "id": "farcaster_079",
+    "question": "What is the significance of 'purple' in Farcaster culture?",
+    "options": ["Random color", "Associated with Farcaster branding and Purple DAO", "Premium tier", "Warning color"],
+    "answer": 1,
+    "explanation": "Purple is closely associated with Farcaster branding and the Purple DAO community.",
+    "tags": ["farcaster", "culture", "community"]
+  },
+  {
+    "id": "farcaster_080",
+    "question": "How does Farcaster compare to Mastodon?",
+    "options": ["Same thing", "Farcaster is crypto-native with better UX", "Mastodon is better", "Incompatible"],
+    "answer": 1,
+    "explanation": "Both are decentralized social protocols, but Farcaster is crypto-native with different trade-offs.",
+    "tags": ["farcaster", "protocol", "hard", "comparison"]
+  },
+  {
+    "id": "farcaster_081",
+    "question": "What does it mean to have a 'verified' account on Farcaster?",
+    "options": ["Famous person", "Connected Ethereum address", "Paid premium", "Moderator"],
+    "answer": 1,
+    "explanation": "Verification shows which Ethereum addresses are connected to an account.",
+    "tags": ["farcaster", "features", "basics"]
+  },
+  {
+    "id": "farcaster_082",
+    "question": "What is Airstack in the Farcaster ecosystem?",
+    "options": ["Cloud hosting", "Web3 data API provider", "NFT marketplace", "Frame builder"],
+    "answer": 1,
+    "explanation": "Airstack provides APIs for querying social graph and blockchain data including Farcaster.",
+    "tags": ["farcaster", "ecosystem", "hard"]
+  },
+  {
+    "id": "farcaster_083",
+    "question": "What are the most popular channels on Farcaster?",
+    "options": ["/memes /crypto /base", "/farcaster /base /memes", "/general /random /fun", "/news /tech /sports"],
+    "answer": 1,
+    "explanation": "/farcaster, /base, and /memes are among the most active channels.",
+    "tags": ["farcaster", "channels", "community"]
+  },
+  {
+    "id": "farcaster_084",
+    "question": "How does Farcaster handle content moderation?",
+    "options": ["Central team only", "Each client decides their own policies", "Blockchain voting", "No moderation"],
+    "answer": 1,
+    "explanation": "Different clients can implement their own moderation policies while sharing the same protocol.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_085",
+    "question": "What is the typical user demographic on Farcaster?",
+    "options": ["Teenagers", "Crypto/tech enthusiasts", "General public", "Gamers only"],
+    "answer": 1,
+    "explanation": "Farcaster's current user base is primarily crypto and tech enthusiasts.",
+    "tags": ["farcaster", "community", "demographics"]
+  },
+  {
+    "id": "farcaster_086",
+    "question": "What is Sign in with Farcaster (SIWF)?",
+    "options": ["OAuth login", "Authentication using Farcaster identity", "Email login", "Social login"],
+    "answer": 1,
+    "explanation": "SIWF allows users to authenticate on external websites using their Farcaster identity.",
+    "tags": ["farcaster", "features", "hard", "technical"]
+  },
+  {
+    "id": "farcaster_087",
+    "question": "What makes Frames revolutionary?",
+    "options": ["Better images", "Full apps run inside social feed", "Faster loading", "More colors"],
+    "answer": 1,
+    "explanation": "Frames enable full interactive applications to run directly within the social feed.",
+    "tags": ["farcaster", "frames", "innovation"]
+  },
+  {
+    "id": "farcaster_088",
+    "question": "Who can run a Farcaster Hub?",
+    "options": ["Only Merkle Manufactory", "Anyone with technical knowledge", "Approved partners", "Premium users"],
+    "answer": 1,
+    "explanation": "Anyone can run a Hub - the software is open source and permissionless.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_089",
+    "question": "What is the relationship between Warpcast and Farcaster?",
+    "options": ["Same company", "Warpcast is the main client for Farcaster protocol", "Competitors", "Warpcast is older"],
+    "answer": 1,
+    "explanation": "Warpcast is a client built by Merkle Manufactory to access the Farcaster protocol.",
+    "tags": ["farcaster", "warpcast", "basics"]
+  },
+  {
+    "id": "farcaster_090",
+    "question": "What happens to your data if Warpcast shuts down?",
+    "options": ["All data lost", "Data persists on Hubs, accessible via other clients", "Moved to new platform", "Backed up to cloud"],
+    "answer": 1,
+    "explanation": "Since data lives on Hubs, it persists even if individual clients shut down.",
+    "tags": ["farcaster", "protocol", "hard"]
+  },
+  {
+    "id": "farcaster_091",
+    "question": "What is the typical gas fee to register on Farcaster?",
+    "options": ["$0", "$1-5", "$10-20", "$50+"],
+    "answer": 1,
+    "explanation": "Registration costs are typically a few dollars in ETH depending on gas prices and storage.",
+    "tags": ["farcaster", "economics", "basics"]
+  },
+  {
+    "id": "farcaster_092",
+    "question": "What is 'alpha' in Farcaster culture?",
+    "options": ["First letter", "Early/exclusive information", "Alpha version", "Leadership"],
+    "answer": 1,
+    "explanation": "Alpha refers to valuable early information or insights, common in crypto culture.",
+    "tags": ["farcaster", "culture", "terminology"]
+  },
+  {
+    "id": "farcaster_093",
+    "question": "Can you build a competing client to Warpcast?",
+    "options": ["No, against TOS", "Yes, it's encouraged", "Only with permission", "Yes, but difficult"],
+    "answer": 1,
+    "explanation": "Building competing clients is encouraged - that's the point of an open protocol.",
+    "tags": ["farcaster", "protocol", "basics"]
+  },
+  {
+    "id": "farcaster_094",
+    "question": "What is the main developer resource for Farcaster?",
+    "options": ["Reddit", "docs.farcaster.xyz", "Discord", "GitHub Wiki"],
+    "answer": 1,
+    "explanation": "The official documentation at docs.farcaster.xyz is the main developer resource.",
+    "tags": ["farcaster", "resources", "technical"]
+  },
+  {
+    "id": "farcaster_095",
+    "question": "What does 'onchain' mean in Farcaster context?",
+    "options": ["Online", "Recorded on blockchain", "Connected", "Active"],
+    "answer": 1,
+    "explanation": "Onchain refers to data or actions recorded on the blockchain.",
+    "tags": ["farcaster", "terminology", "blockchain"]
+  },
+  {
+    "id": "farcaster_096",
+    "question": "What is the average engagement rate on Farcaster vs Twitter?",
+    "options": ["Much lower", "About the same", "Much higher", "No data"],
+    "answer": 2,
+    "explanation": "Farcaster typically sees higher engagement rates due to smaller, more engaged community.",
+    "tags": ["farcaster", "community", "metrics"]
+  },
+  {
+    "id": "farcaster_097",
+    "question": "What is Drakula in the Farcaster ecosystem?",
+    "options": ["A game", "Video-first Farcaster client", "NFT collection", "Channel"],
+    "answer": 1,
+    "explanation": "Drakula is a video-focused client for Farcaster (discontinued but was notable).",
+    "tags": ["farcaster", "ecosystem", "clients"]
+  },
+  {
+    "id": "farcaster_098",
+    "question": "How do privacy/DMs work on Farcaster?",
+    "options": ["End-to-end encrypted natively", "Direct Messages via Warpcast", "No DMs", "Public only"],
+    "answer": 1,
+    "explanation": "Warpcast and other clients offer DMs, though the protocol itself is public.",
+    "tags": ["farcaster", "features", "privacy"]
+  },
+  {
+    "id": "farcaster_099",
+    "question": "What is the best way to grow on Farcaster?",
+    "options": ["Buy followers", "Post quality content and engage authentically", "Spam hashtags", "Follow everyone"],
+    "answer": 1,
+    "explanation": "Quality content and authentic engagement are valued in the Farcaster community.",
+    "tags": ["farcaster", "community", "growth"]
+  },
+  {
+    "id": "farcaster_100",
+    "question": "What makes Farcaster suitable for Mini Apps?",
+    "options": ["Fast servers", "Frames enable rich interactive experiences", "Large user base", "Low fees"],
+    "answer": 1,
+    "explanation": "Frames make Farcaster ideal for mini apps by allowing interactive experiences in the feed.",
+    "tags": ["farcaster", "frames", "miniapps", "innovation"]
+  }
+]
