@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import WagmiWalletConnect from '@/components/WagmiWalletConnect';
 import { useAccount } from 'wagmi';
 import { callStake, parseTokenAmount, getStakedBalance, isStakingConfigured } from '@/lib/staking';
+import { callSpin, getLastResult, isJackpotConfigured } from '@/lib/jackpot';
 
 function pad(n: number) {
   return n.toString().padStart(2, "0");
@@ -19,6 +20,10 @@ export default function JackpotPage() {
   const [stakedAmount, setStakedAmount] = useState<bigint>(BigInt(0));
   const [txHash, setTxHash] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [spinLoading, setSpinLoading] = useState(false);
+  const [spinTx, setSpinTx] = useState<string | null>(null);
+  const [spinResult, setSpinResult] = useState<{win:boolean; prize: bigint; lastSpinAt: bigint} | null>(null);
+  const [cooldownSec, setCooldownSec] = useState<number | null>(null);
   const STAKE_THRESHOLD = parseTokenAmount('100000');
 
   useEffect(() => {
@@ -36,6 +41,22 @@ export default function JackpotPage() {
       }
     }
     load();
+    // also fetch last spin result
+    (async function () {
+      if (!address || !isJackpotConfigured()) return;
+      try {
+        const res = await getLastResult(address);
+        if (mounted) setSpinResult(res);
+        try {
+          const cd = await (await import('@/lib/jackpot')).getCooldown();
+          if (mounted) setCooldownSec(cd);
+        } catch (e) {
+          console.warn('failed to read cooldown', e);
+        }
+      } catch (e) {
+        console.warn('failed to read last spin', e);
+      }
+    })();
     return () => { mounted = false; };
   }, [address]);
 
@@ -147,22 +168,63 @@ export default function JackpotPage() {
 
                   <button
                     className="px-4 py-2 bg-rose-600 text-white rounded-lg disabled:opacity-60"
-                    disabled={stakedAmount < STAKE_THRESHOLD}
-                    onClick={() => {
-                      if (stakedAmount >= STAKE_THRESHOLD) {
-                        window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: 'You unlocked a spin! (spin implementation pending)' } }));
+                    disabled={stakedAmount < STAKE_THRESHOLD || !isJackpotConfigured() || !address || spinLoading}
+                    onClick={async () => {
+                      if (!address) return;
+                      if (stakedAmount < STAKE_THRESHOLD) return;
+                      setSpinLoading(true);
+                      setSpinTx(null);
+                      try {
+                        const hash = await callSpin();
+                        setSpinTx(hash as string);
+                        // refresh last result
+                        const res = await getLastResult(address);
+                        setSpinResult(res);
+                        window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: 'Spin submitted. Check your wallet/tx for result.' } }));
+                      } catch (e: any) {
+                        console.error('spin failed', e);
+                        window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'error', message: e?.message || String(e) } }));
+                      } finally {
+                        setSpinLoading(false);
                       }
                     }}
                   >
-                    {stakedAmount >= STAKE_THRESHOLD ? 'Spin for Jackpot' : 'Locked'}
+                    {spinLoading ? 'Spinning…' : (stakedAmount >= STAKE_THRESHOLD ? 'Spin for Jackpot' : 'Locked')}
                   </button>
                 </div>
               </div>
             )}
 
-            {txHash && (
-              <div className="mt-3 text-xs text-[#3b3]">Staking tx: <a target="_blank" rel="noreferrer" href={`https://etherscan.io/tx/${txHash}`}>{short(txHash)}</a></div>
-            )}
+                {txHash && (
+                  <div className="mt-3 text-xs text-[#3b3]">Staking tx: <a target="_blank" rel="noreferrer" href={`https://etherscan.io/tx/${txHash}`}>{short(txHash)}</a></div>
+                )}
+
+                {/* Spin result / cooldown */}
+                <div className="w-full mt-4 text-sm text-[#5a3d5c]">
+                  {spinResult ? (
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div>
+                        <div>Last spin: {spinResult.win ? <strong className="text-green-700">WIN</strong> : <strong className="text-rose-600">No win</strong>}</div>
+                        <div>Prize: <strong>{formatHuman(spinResult.prize)}</strong></div>
+                      </div>
+                      <div>
+                        {cooldownSec ? (
+                          (() => {
+                            const last = Number(spinResult.lastSpinAt) * 1000;
+                            const until = last + cooldownSec * 1000;
+                            const remaining = Math.max(0, until - Date.now());
+                            const hrs = Math.floor(remaining / (1000 * 60 * 60));
+                            const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                            const secs = Math.floor((remaining % (1000 * 60)) / 1000);
+                            return remaining > 0 ? <div>Next spin in: <strong>{hrs}h {mins}m {secs}s</strong></div> : <div>Can spin now</div>;
+                          })()
+                        ) : null}
+                      </div>
+                    </div>
+                  ) : (
+                    <div>No spin history</div>
+                  )}
+                </div>
           </div>
         </div>
 
