@@ -18,6 +18,9 @@ const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
 export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: string; score: number; details?: any }) => void } = {}) {
   const sound = useSound();
   const { address: accountAddress, isConnected } = useAccount();
+  const [questionSource, setQuestionSource] = useState<'opentdb' | 'farcaster'>('opentdb');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingSource, setPendingSource] = useState<'opentdb' | 'farcaster'>('opentdb');
   const [quizState, setQuizState] = useState<QuizState>({
     questions: [],
     currentQuestionIndex: 0,
@@ -47,7 +50,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
 
     try {
       // Request easy and medium questions explicitly
-      const response = await fetch('/api/questions?amount=10&difficulty=easy,medium');
+      const response = await fetch(`/api/questions?amount=10&difficulty=easy,medium&source=${questionSource}`);
       const data = await response.json();
 
       if (!response.ok || data?.error) {
@@ -235,6 +238,27 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     setError(null);
   };
 
+  const handleSourceChange = (newSource: 'opentdb' | 'farcaster') => {
+    if (quizState.quizStarted && !quizState.quizCompleted) {
+      // Show confirmation modal if quiz is active
+      setPendingSource(newSource);
+      setShowConfirmModal(true);
+    } else {
+      // Direct change if quiz not started
+      setQuestionSource(newSource);
+    }
+  };
+
+  const confirmSourceChange = () => {
+    setQuestionSource(pendingSource);
+    setShowConfirmModal(false);
+    restartQuiz();
+  };
+
+  const cancelSourceChange = () => {
+    setShowConfirmModal(false);
+  };
+
   // Require wallet connection before showing any quiz UI
   if (!isConnected || !accountAddress) {
     return (
@@ -257,6 +281,36 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
             <Image src="/brain-large.svg" alt="Brain" width={96} height={96} className="w-24 h-24 sm:w-32 sm:h-32" priority />
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-[#2d1b2e]">Trivia Challenge</h1>
+          
+          {/* Question Source Toggle */}
+          <div className="mb-6 p-4 bg-[#FFE4EC] rounded-lg border-2 border-[#F4A6B7]">
+            <label className="block text-sm font-semibold text-[#2d1b2e] mb-3">
+              Question Source
+            </label>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => handleSourceChange('opentdb')}
+                className={`flex-1 sm:flex-initial px-4 py-3 rounded-lg font-medium transition-all ${
+                  questionSource === 'opentdb'
+                    ? 'bg-[#F4A6B7] text-white shadow-lg scale-105'
+                    : 'bg-white text-[#5a3d5c] border-2 border-[#F4A6B7] hover:bg-[#FFE4EC]'
+                }`}
+              >
+                🌍 General Knowledge (OpenTDB)
+              </button>
+              <button
+                onClick={() => handleSourceChange('farcaster')}
+                className={`flex-1 sm:flex-initial px-4 py-3 rounded-lg font-medium transition-all ${
+                  questionSource === 'farcaster'
+                    ? 'bg-[#F4A6B7] text-white shadow-lg scale-105'
+                    : 'bg-white text-[#5a3d5c] border-2 border-[#F4A6B7] hover:bg-[#FFE4EC]'
+                }`}
+              >
+                🎯 Farcaster Knowledge (Local)
+              </button>
+            </div>
+          </div>
+
           <p className="text-[#5a3d5c] mb-8 text-base sm:text-lg">
             ⏱️ Only 1 minute ⏱️<br />
             ⁉️ 10 questions ⁉️<br />
@@ -277,6 +331,32 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
             {loading ? 'Loading...' : 'Start Quiz'}
           </button>
         </div>
+
+        {/* Confirmation Modal */}
+        {showConfirmModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full border-4 border-[#F4A6B7]">
+              <h2 className="text-2xl font-bold mb-4 text-[#2d1b2e]">Confirm Source Change</h2>
+              <p className="text-[#5a3d5c] mb-6">
+                Switching question source will restart the current quiz. Do you want to proceed?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={cancelSourceChange}
+                  className="flex-1 px-4 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold rounded-lg transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmSourceChange}
+                  className="flex-1 px-4 py-3 bg-[#F4A6B7] hover:bg-[#E8949C] text-white font-semibold rounded-lg transition"
+                >
+                  Proceed
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
