@@ -22,7 +22,7 @@ export async function POST(req: Request) {
         if (Array.isArray(arr)) {
           const normalized = arr.map((u: any) => ({
             fid: u.fid,
-            username: u.username ? `@${String(u.username).replace(/^@/, '')}` : undefined,
+            username: u.username ? `@${String(u.username).replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '')}` : undefined,
             displayName: u.display_name || u.displayName || u.name || undefined,
             pfpUrl: u.pfp_url || u.pfpUrl || u.avatar || undefined,
             followers: u.follower_count ?? u.followers ?? 0,
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       if (Array.isArray(arr)) {
         const normalized = arr.map((u: any) => ({
           fid: u.fid,
-          username: u.username ? `@${String(u.username).replace(/^@/, '')}` : undefined,
+          username: u.username ? `@${String(u.username).replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '')}` : undefined,
           displayName: u.display_name || u.displayName || u.name || undefined,
           pfpUrl: u.pfp_url || u.pfpUrl || u.avatar || undefined,
           followers: u.follower_count ?? u.followers ?? 0,

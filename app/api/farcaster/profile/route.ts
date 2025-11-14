@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const address = typeof body?.address === 'string' ? body.address.trim() : null;
-    const username = typeof body?.username === 'string' ? body.username.trim().replace(/^@/, '') : null;
+    const username = typeof body?.username === 'string' ? body.username.trim().replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '') : null;
 
     if (!username && !address) {
       return NextResponse.json({ error: 'username or address required' }, { status: 400 });
@@ -101,7 +101,7 @@ export async function POST(req: Request) {
 function normalizeUserToProfile(user: any, resolvedAddress: string | null) {
   return {
     address: resolvedAddress || undefined,
-    username: user.username ? `@${String(user.username).replace(/^@/, '')}` : undefined,
+    username: user.username ? `@${String(user.username).replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '')}` : undefined,
     pfpUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || undefined,
     displayName: user.display_name || user.displayName || user.name || undefined,
     bio: user.profile?.bio?.text || user.bio || undefined,

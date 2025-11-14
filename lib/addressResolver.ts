@@ -268,7 +268,7 @@ export async function resolveFarcasterProfile(
     if (!Array.isArray(raw) || raw.length === 0) return null;
     const user = raw[0] as Record<string, any>;
 
-    const username = user?.username ? `@${String(user.username).replace(/^@/, '')}` : undefined;
+    const username = user?.username ? `@${String(user.username).replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '')}` : undefined;
 
     // Try a few common fields for pfp/ avatar
     const pfpUrl = user?.pfpUrl || user?.avatar || user?.profile?.pfpUrl || user?.profile?.avatarUrl || undefined;

@@ -54,7 +54,7 @@ export default function InfoPage() {
     if (form.reference && form.reference.trim()) {
       message += `\nReference: ${form.reference.trim()}`;
     }
-    message += `\n@jesterinvestor.farcaster.eth\nUsers can add their own questions at: ${TRIVIACAST_INFO}`;
+    message += `\n@jesterinvestor\nUsers can add their own questions at: ${TRIVIACAST_INFO}`;
 
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -245,7 +245,7 @@ export default function InfoPage() {
             <p className="mt-2">You have a few options to share or submit the question you create:</p>
             <ul className="list-disc pl-5 mt-2">
               <li>
-                <strong>Copy message</strong>: Click <em>Copy message</em> to copy a ready-to-post message that mentions <code>@jesterinvestor.farcaster.eth</code>. Paste it into Warpcast (Compose).
+                <strong>Copy message</strong>: Click <em>Copy message</em> to copy a ready-to-post message that mentions <code>@jesterinvestor</code>. Paste it into Warpcast (Compose).
               </li>
               <li className="mt-1">
                 <strong>Add directly to OpenTDB</strong>: Click <em>Add directly to OpenTDB</em> to open the OpenTDB submission page. Fill the OpenTDB form manually — no autofill is provided.

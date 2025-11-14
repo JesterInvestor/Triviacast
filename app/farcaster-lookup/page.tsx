@@ -218,7 +218,7 @@ export default function FarcasterLookupPage() {
                             className="flex-1 bg-[#F4A6B7] text-white text-xs py-1 rounded"
                             onClick={() => {
                               // populate lookup with this username; lookup will be triggered by useEffect
-                              const uname = p.username ? String(p.username).replace(/^@/, '') : '';
+                              const uname = p.username ? String(p.username).replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '') : '';
                               if (uname) {
                                 setUsername(uname);
                               }
@@ -230,7 +230,7 @@ export default function FarcasterLookupPage() {
                             className="flex-1 border text-xs py-1 rounded"
                             onClick={() => {
                               // open their Neynar profile in a new tab
-                              const user = p.username ? p.username.replace(/^@/, '') : String(p.fid);
+                              const user = p.username ? String(p.username).replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '') : String(p.fid);
                               window.open(`https://warpcast.com/${encodeURIComponent(user)}`, '_blank');
                             }}
                           >
@@ -255,7 +255,8 @@ export default function FarcasterLookupPage() {
                         // Open an editable preview modal so the user can edit the cast text
                         const target = result?.profile?.username || '';
                         // normalize handle so we don't end up with duplicate @ (some sources include '@')
-                        const cleanHandle = target.startsWith('@') ? target.slice(1) : target;
+                        // also strip known ENS/Farcaster suffixes so we only use plain username
+                        const cleanHandle = (target.startsWith('@') ? target.slice(1) : target).replace(/(?:\.farcaster\.eth|\.eth)$/i, '');
                         // Use tPoints from quiz results (includes streak bonuses); fallback to base calc
                         const computedTPoints = typeof (res as any)?.details?.tPoints === 'number'
                           ? (res as any).details.tPoints
@@ -264,11 +265,8 @@ export default function FarcasterLookupPage() {
                         const challengeLink = 'https://triviacast.xyz';
                         const pointsStr = Number(computedTPoints).toLocaleString();
                         // Spiced / playful default message
-                        // Only add .farcaster.eth if the handle does not already end with .eth
-                        let mention = cleanHandle;
-                        if (mention && !mention.toLowerCase().endsWith('.eth')) {
-                          mention = `${mention}.farcaster.eth`;
-                        }
+                        // Use plain @username only (do not append .farcaster.eth)
+                        const mention = cleanHandle;
                         const defaultText = mention
                           ? `@${mention} — I just played Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`
                           : `I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`;

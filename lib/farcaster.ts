@@ -8,9 +8,10 @@ function getBaseUrl(): string {
 
 // Helper to detect if text contains mentions/tagged friends
 function hasTaggedFriends(text: string): boolean {
-  // Check for Farcaster mentions: @username or @username.eth or @username.farcaster.eth
-  // Must be at start of text, after whitespace, or after newline to avoid matching emails
-  const mentionPattern = /(^|\s)@[\w-]+(?:\.(?:eth|farcaster\.eth))?/;
+  // Detect simple @username mentions (treats @username, @username.eth, or @username.farcaster.eth
+  // as mentioning the same username). Keep the match anchored to start/whitespace to avoid
+  // accidentally matching emails.
+  const mentionPattern = /(^|\s)@[\w-]+/;
   return mentionPattern.test(text);
 }
 
