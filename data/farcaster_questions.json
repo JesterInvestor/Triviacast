@@ -1498,5 +1498,1105 @@
     ],
     "explanation": "Eventual consistency means Hubs will reach agreement given enough time for propagation.",
     "tags": ["farcaster", "hard", "technical"]
+  },
+  {
+    "id": 101,
+    "question": "What unique privacy benefit does Farcaster offer over most legacy social platforms?",
+    "choices": {
+      "A": "End-to-end encrypted group DMs by default",
+      "B": "Auto-deleting posts",
+      "C": "You own your identity and social graph, so you can leave and take your data",
+      "D": "Onchain password resets only"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 102,
+    "question": "A true open social graph on Farcaster enables which of these?",
+    "choices": {
+      "A": "ICE compliance",
+      "B": "Biometric login only",
+      "C": "Multiple clients, apps, or bots can read/write to the same graph",
+      "D": "Spam-free feeds guaranteed"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 103,
+    "question": "On Farcaster, you can post as:",
+    "choices": {
+      "A": "Only one verified device",
+      "B": "Only signed-in browser",
+      "C": "Any device with your valid signature/delegate signer key",
+      "D": "Any VPN IP address"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 104,
+    "question": "A core user benefit of mini apps is:",
+    "choices": {
+      "A": "Plug and play VPN",
+      "B": "Interacting directly with games or utilities without ever leaving your feed",
+      "C": "Free fiat deposits",
+      "D": "Instant meme verification"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 105,
+    "question": "What protocol feature lets users recover account access after device loss?",
+    "choices": {
+      "A": "Cold backup phrase only",
+      "B": "Recovery address for FID registry—can rotate custody",
+      "C": "Mod approval",
+      "D": "Email link"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 106,
+    "question": "In Farcaster governance, protocol changes are most likely to be finalized via:",
+    "choices": {
+      "A": "Unilateral decision",
+      "B": "$DEGEN tipping",
+      "C": "Open community RFC then implemented by Merkle",
+      "D": "ETH mainnet vote"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 107,
+    "question": "The “invite flow” often benefits users by:",
+    "choices": {
+      "A": "Getting them free $ETH",
+      "B": "One-time NFT mint",
+      "C": "Bootstrapping users with curated follow graph and trusted channels",
+      "D": "Degen mod promotion"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 108,
+    "question": "Farcaster wallet integration lets you:",
+    "choices": {
+      "A": "Only receive tips",
+      "B": "Receive, send, and store tokens for onchain games, tipping, or experiments",
+      "C": "Transact only in BTC",
+      "D": "Link Twitter account programmatically"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 109,
+    "question": "Which is a direct user benefit of having your FID onchain?",
+    "choices": {
+      "A": "Uncensorable NFTs",
+      "B": "Guaranteed unique identity and public proof of username control",
+      "C": "Instant blue check",
+      "D": "Mod powers"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 110,
+    "question": "What makes moderation on Farcaster different from Twitter or Facebook?",
+    "choices": {
+      "A": "More >1B users",
+      "B": "No voting",
+      "C": "Channels have independent mods and rules, not global censorship",
+      "D": "Only AI bots"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 111,
+    "question": "“Cross-client login” means:",
+    "choices": {
+      "A": "Need to buy Premium",
+      "B": "Same FID and onchain profile works on all compatible Farcaster frontends",
+      "C": "Only desktop login",
+      "D": "Mod approval with ETH"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 112,
+    "question": "A user who gets blocked in one channel can:",
+    "choices": {
+      "A": "Never post",
+      "B": "Appeal to global admin",
+      "C": "Post freely in other channels unless blocked there",
+      "D": "Lose all tokens"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 113,
+    "question": "“Pinning” your favorite cast in a channel is beneficial because:",
+    "choices": {
+      "A": "It deletes old ones",
+      "B": "You earn ETH",
+      "C": "It showcases important info, events, or memes at the top for all members",
+      "D": "Only DMs see it"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 114,
+    "question": "If you forget your password but have your FID’s custody wallet, you can:",
+    "choices": {
+      "A": "Do nothing",
+      "B": "Pay for recovery",
+      "C": "Recover your account by verifying control of the wallet",
+      "D": "Spam support"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 115,
+    "question": "“Open API endpoints” are a benefit because they:",
+    "choices": {
+      "A": "Block spam",
+      "B": "Let anyone build bots, dashboards, or analytic tools over Farcaster’s social graph",
+      "C": "Mint ENS",
+      "D": "Always show memes"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 116,
+    "question": "Farcaster supports what file type in image attachments by default?",
+    "choices": {
+      "A": "MOV",
+      "B": "BMP",
+      "C": "JPEG/PNG",
+      "D": "PSD"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 117,
+    "question": "Why are reactions (+/-) on casts valuable to users?",
+    "choices": {
+      "A": "Decrease spam",
+      "B": "Increase airdrops",
+      "C": "Help filter, surface, or bury content collaboratively",
+      "D": "Always increase tips"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 118,
+    "question": "A frequent use of $DEGEN is:",
+    "choices": {
+      "A": "Channel creation",
+      "B": "Tipping for jokes, games, or support in mini apps",
+      "C": "Storage renewal",
+      "D": "ERC-721 mint fees"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 119,
+    "question": "Verifying an NFT in your profile proves:",
+    "choices": {
+      "A": "Only airdrop eligibility",
+      "B": "Not much",
+      "C": "That you control a specific wallet—useful for reputation or community entry",
+      "D": "Mod status"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 120,
+    "question": "A record of all your channel membership is beneficial because:",
+    "choices": {
+      "A": "Lets you spam",
+      "B": "Triggers mod review",
+      "C": "Lets you jump between communities and keep your social context portable",
+      "D": "Shows only to mods"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 121,
+    "question": "Which is an advantage of delegated signers?",
+    "choices": {
+      "A": "Higher ETH gas use",
+      "B": "Only for bots",
+      "C": "Post and manage casts without revealing main custody key",
+      "D": "Prevent DM sending"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 122,
+    "question": "Farcaster is wallet-agnostic, which means:",
+    "choices": {
+      "A": "Only ETH is supported",
+      "B": "All wallets are mod-only",
+      "C": "You can use any compatible wallet provider for FID control",
+      "D": "Wallet creation mints NFTs"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 123,
+    "question": "Benefit of onchain storage “expiring” after a period:",
+    "choices": {
+      "A": "Increases spam",
+      "B": "Mod-only",
+      "C": "Lowers cost for active users, avoids unnecessary use for abandoned FIDs",
+      "D": "Locks username forever"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 124,
+    "question": "In a cross-app experiment, what’s a true user benefit?",
+    "choices": {
+      "A": "Unique video watermark",
+      "B": "Only main feed access",
+      "C": "New apps can use your profile and follow list without onboarding again",
+      "D": "Lower ETH gas"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 125,
+    "question": "A special benefit of recurring channel invites is:",
+    "choices": {
+      "A": "Storage grant",
+      "B": "Single use only",
+      "C": "Easier for trusted users to onboard many friends to particular communities",
+      "D": "Lower token fees"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 126,
+    "question": "Real-time public feeds allow:",
+    "choices": {
+      "A": "No filtering",
+      "B": "No frame support",
+      "C": "Immediate, global conversation and reaction with zero lag",
+      "D": "Channel lock"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 127,
+    "question": "“Frames” are a benefit because they:",
+    "choices": {
+      "A": "Only work with mods",
+      "B": "Only display memes",
+      "C": "Let users interact with apps or content directly inside a cast—no external links needed",
+      "D": "Create instant NFT drops"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 128,
+    "question": "What critical user benefit does decentralization offer in Farcaster?",
+    "choices": {
+      "A": "No memes",
+      "B": "Lower ETH price",
+      "C": "Censorship resistance and the freedom to pick your client or channel",
+      "D": "Only one username allowed"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 129,
+    "question": "Mini app integration benefits developers because:",
+    "choices": {
+      "A": "All tips go to protocol",
+      "B": "Locked into one client only",
+      "C": "Their apps are exposed to millions instantly via in-feed and channel launches",
+      "D": "Mod approval required"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 130,
+    "question": "The “public follow graph” means:",
+    "choices": {
+      "A": "Only channel mods see followers",
+      "B": "Follows are random",
+      "C": "Anyone can analyze, remix, or explore connections and social relations easily",
+      "D": "Mod badge is required"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 131,
+    "question": "Interoperability with Lens, Nostr, or Bluesky is possible because:",
+    "choices": {
+      "A": "All use Facebook APIs",
+      "B": "Farcaster is designed with open data at its core—protocol bridges can be built",
+      "C": "Wallets are shared",
+      "D": "Only usernames transfer"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 132,
+    "question": "Signing out everywhere means:",
+    "choices": {
+      "A": "Lose all tokens",
+      "B": "Degen ban",
+      "C": "None of your session signers can act anymore, increasing security after device loss",
+      "D": "No mod DMs"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 133,
+    "question": "A wallet connected user benefits by:",
+    "choices": {
+      "A": "Getting mod DMs",
+      "B": "Streamlining tipping, payments, games, and airdrop claims—no manual copying",
+      "C": "Muting all",
+      "D": "Disabling frames"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 134,
+    "question": "The “Channel Lead” role is a benefit because:",
+    "choices": {
+      "A": "Only in DMs",
+      "B": "Same as mod",
+      "C": "They can set or change channel description, rules, and pin top content",
+      "D": "Only frame creators"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 135,
+    "question": "The “nuke user” mod tool means:",
+    "choices": {
+      "A": "Deletes a wallet",
+      "B": "Removes all recent posts by a clear-cut spammer for channel health",
+      "C": "Mints $DEGEN",
+      "D": "Only mods can post"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 136,
+    "question": "Farcaster’s open explorer tools let you:",
+    "choices": {
+      "A": "Pay for cast search",
+      "B": "NFT trading only",
+      "C": "Audit, monitor, and view network-wide trends and new projects",
+      "D": "Reset username"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 137,
+    "question": "Proof-of-humanity mini app integrations allow for:",
+    "choices": {
+      "A": "Free wallet",
+      "B": "Only code",
+      "C": "Verifiable Sybil resistance—helpful for airdrops, private channels, or voting",
+      "D": "Only meme posting"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 138,
+    "question": "Onchain identity means:",
+    "choices": {
+      "A": "Botnets only",
+      "B": "Email required",
+      "C": "No one can forge your follow, cast, or reputation history",
+      "D": "Mod-only"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 139,
+    "question": "Farcaster makes migration to new social apps easy because:",
+    "choices": {
+      "A": "All channels move",
+      "B": "Wallet reset",
+      "C": "You can sign in instantly and rebuild your feed/follows without refollowing everyone",
+      "D": "Only in DMs"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 140,
+    "question": "“Client-agnostic” benefit means:",
+    "choices": {
+      "A": "No bots",
+      "B": "Paid $ETH",
+      "C": "Use any supported frontend without losing your data or community",
+      "D": "Only mobile"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 141,
+    "question": "Tipping tokens directly in a DM is:",
+    "choices": {
+      "A": "For mods only",
+      "B": "Not allowed",
+      "C": "Fast, private, and settles immediately via internal wallet",
+      "D": "Always costs $5"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 142,
+    "question": "The “Trending” tab is advantageous because:",
+    "choices": {
+      "A": "Forces memes",
+      "B": "Realtor ads only",
+      "C": "Surfaces high-quality or hot content algorithmically for quick discovery",
+      "D": "Always global"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 143,
+    "question": "Serverless protocol clients are beneficial because:",
+    "choices": {
+      "A": "Only on Chrome",
+      "B": "Decrease mod speed",
+      "C": "Lower latency, increased privacy, less risk of centralized shutdown",
+      "D": "Only allow DMs"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 144,
+    "question": "Legacy app lock-in doesn’t happen on Farcaster due to:",
+    "choices": {
+      "A": "Open protocol—your friends and content are portable, not stuck in one app",
+      "B": "Memecoin gating",
+      "C": "Only mod rules",
+      "D": "Paywall on registration"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 145,
+    "question": "“Reaction farming” is harder to manipulate on Farcaster because:",
+    "choices": {
+      "A": "Degen tips reset",
+      "B": "DMs are private",
+      "C": "High-quality posting and network Sybil-resistance limit multi-account flooding",
+      "D": "Only allow memes"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 146,
+    "question": "With open API keys, advanced users benefit by:",
+    "choices": {
+      "A": "Posting at cost",
+      "B": "Only for jokes",
+      "C": "Building custom bots, scripts, dashboards, or integrations for their own use",
+      "D": "Blocking mods"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 147,
+    "question": "Channel-based competitions benefit the community by:",
+    "choices": {
+      "A": "Locking tokens",
+      "B": "Creating fun, creative contests, incentivizing participation and engagement",
+      "C": "Degen bans",
+      "D": "Mod-only topics"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 148,
+    "question": "A benefit of global cast visibility is:",
+    "choices": {
+      "A": "All posts are private",
+      "B": "Only mods see",
+      "C": "Discovering new voices and communities quickly",
+      "D": "NFT minting"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 149,
+    "question": "User-controlled data export means:",
+    "choices": {
+      "A": "Always costs $ETH",
+      "B": "Mod grant",
+      "C": "You can keep a backup or move to another app/client at any time",
+      "D": "Degen burn"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 150,
+    "question": "“Meta-moderation” experiments empower users to:",
+    "choices": {
+      "A": "Buy mod roles",
+      "B": "Decrease all tips",
+      "C": "Vote, flag, or review moderation decisions in some open channels",
+      "D": "Only post one cast"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 151,
+    "question": "Unbundling the social graph means:",
+    "choices": {
+      "A": "Paid posts only",
+      "B": "Meme bots",
+      "C": "Single identity can have many contexts, apps, and feeds across platforms",
+      "D": "Only DMs"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 152,
+    "question": "You can reclaim an inactive username after expiry because:",
+    "choices": {
+      "A": "It gets deleted forever",
+      "B": "Only mods can",
+      "C": "Expired and unreclaimed usernames are periodically auctioned/offered back by protocol",
+      "D": "ETH lock"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 153,
+    "question": "Positive outcome of multi-signer delegation:",
+    "choices": {
+      "A": "Only cost increase",
+      "B": "Increases DM tips",
+      "C": "You can post from multiple devices/agents securely without main wallet risk",
+      "D": "Meme lock"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 154,
+    "question": "Farcaster’s “public dev docs” benefit developers by:",
+    "choices": {
+      "A": "Only images allowed",
+      "B": "Hidden behind paywall",
+      "C": "Accessible, auditable reference so anyone can build, not just partners or insiders",
+      "D": "ENS only"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 155,
+    "question": "User benefits of reaction score viewing include:",
+    "choices": {
+      "A": "No change",
+      "B": "Only DMs",
+      "C": "Decide what to read, like, reply to based on transparent public metrics",
+      "D": "Spam purge"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 156,
+    "question": "Mini app “social games” offer users:",
+    "choices": {
+      "A": "Paid airdrops only",
+      "B": "Spam control",
+      "C": "Instant fun, competition, and engagement with low friction—often for token rewards",
+      "D": "Degen mute"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 157,
+    "question": "Layer 2 (Base) support helps users because:",
+    "choices": {
+      "A": "Higher gas",
+      "B": "Lower transaction costs and faster transactions for wallet-based actions",
+      "C": "Meme lock",
+      "D": "Script-only"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 158,
+    "question": "The clear benefit of protocol-based spam labeling is:",
+    "choices": {
+      "A": "User confusion",
+      "B": "Consistent spam fighting system, independent of client or mod bias",
+      "C": "Channel burn",
+      "D": "NFT only"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 159,
+    "question": "User data “portability” means:",
+    "choices": {
+      "A": "One channel only",
+      "B": "Reset on mod assignment",
+      "C": "Migrate username, followers, and content to other apps easily",
+      "D": "Locked to DMs"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 160,
+    "question": "You can participate in protocol beta testing because:",
+    "choices": {
+      "A": "Only by invite",
+      "B": "Paid tips",
+      "C": "Most experiments are public and client-agnostic for all users to join or test",
+      "D": "Meme lock"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 161,
+    "question": "Open moderation logs benefit transparency because:",
+    "choices": {
+      "A": "Private memos",
+      "B": "Anyone can see or audit key actions, bans, or appeals in many channels",
+      "C": "Mod-only meme feeds",
+      "D": "Token grants"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 162,
+    "question": "The “open follow graph export” means:",
+    "choices": {
+      "A": "All DMs public",
+      "B": "Paid API key",
+      "C": "Download or remix relations graph—supports data scientists or social search",
+      "D": "Only mod DMs"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 163,
+    "question": "Airdrop history tied to your FID is beneficial because:",
+    "choices": {
+      "A": "Never public",
+      "B": "Memecoin only",
+      "C": "Reputation for loyalty, eligibility, or special rewards across games/tools",
+      "D": "Mod reset"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 164,
+    "question": "You can “hard block” a user, with the result that:",
+    "choices": {
+      "A": "Only mod DMs",
+      "B": "You never see (and aren’t seen by) that account in public channels/feeds",
+      "C": "Token lost",
+      "D": "All memes show"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 165,
+    "question": "The “frame registry” lets users:",
+    "choices": {
+      "A": "Pay tip",
+      "B": "Meme filter",
+      "C": "Browse, discover, and try new mini apps or utilities directly in-app",
+      "D": "Only post jokes"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 166,
+    "question": "A unique channel ruleset helps users by:",
+    "choices": {
+      "A": "Only tokens",
+      "B": "Spam only",
+      "C": "Letting them choose or create communities with aligned values or interests",
+      "D": "Lock posts"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 167,
+    "question": "The FID-neutrality property means:",
+    "choices": {
+      "A": "Paid reset",
+      "B": "No one—not even Farcaster—can arbitrarily remove your ID without protocol cause",
+      "C": "Meme only",
+      "D": "Mod ban"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 168,
+    "question": "If you’re shadowbanned, the benefit is:",
+    "choices": {
+      "A": "Paid blinding",
+      "B": "Degen mute",
+      "C": "Spam is suppressed for others but your experience isn’t forcibly interrupted",
+      "D": "Token lock"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 169,
+    "question": "Decentralized user search is beneficial because:",
+    "choices": {
+      "A": "Non-searchable",
+      "B": "Paid meme results",
+      "C": "Any client/interface/app/widget can index or surface new profiles their own way",
+      "D": "Only DMs"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 170,
+    "question": "“Custom feeds” benefit power users by:",
+    "choices": {
+      "A": "Locking memes",
+      "B": "Paid features only",
+      "C": "Enabling filtering, subscribing, or exploring content by any combo they choose",
+      "D": "ETH reset"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 171,
+    "question": "Channel invite gating means:",
+    "choices": {
+      "A": "Meme only",
+      "B": "Degen required",
+      "C": "Invite links or passes can regulate access and keep spam/scams out",
+      "D": "Token lock"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 172,
+    "question": "“Pin” in DMs is a benefit because:",
+    "choices": {
+      "A": "Costly",
+      "B": "Mod only",
+      "C": "You can save, reference, and highlight key conversations or wallet info",
+      "D": "Muted for all"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 173,
+    "question": "The “discover” feed helps new users because:",
+    "choices": {
+      "A": "Meme-only",
+      "B": "Spam posts",
+      "C": "Surfaces the best trending content and communities instantly",
+      "D": "Block frame support"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 174,
+    "question": "Farcaster's economic sustainability benefits users by:",
+    "choices": {
+      "A": "Constant reset",
+      "B": "Keeping spam/scams low while letting active users support storage and growth",
+      "C": "Mod tip",
+      "D": "Airdrop only"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 175,
+    "question": "Channel “emoji badges” benefit communities by:",
+    "choices": {
+      "A": "Paid only",
+      "B": "No memes",
+      "C": "Providing expressive visual status, identity, or achievements",
+      "D": "Framed DMs"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 176,
+    "question": "Open source moderation tooling benefits users by:",
+    "choices": {
+      "A": "Token lock",
+      "B": "Meme lock",
+      "C": "More trust, bug testing, and faster innovation; anyone can fork or improve tools",
+      "D": "NFT mint"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 177,
+    "question": "If your Neynar score rises, you benefit by:",
+    "choices": {
+      "A": "Losing memes",
+      "B": "Getting banned",
+      "C": "Unlocking access to more mini apps and community features",
+      "D": "Losing airdrop"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 178,
+    "question": "A unique benefit for channel creators is:",
+    "choices": {
+      "A": "Meme reset",
+      "B": "Only DMs",
+      "C": "Channel’s rules, culture, mods, and branding are all under your governance",
+      "D": "No posts"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 179,
+    "question": "“One-click mini app launch” benefits users by:",
+    "choices": {
+      "A": "NFT gating",
+      "B": "Paywall",
+      "C": "Reduces friction—games/utilities open instantly in their feed",
+      "D": "Only in DMs"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 180,
+    "question": "Eco-system voting on protocol matters means:",
+    "choices": {
+      "A": "Meme lock",
+      "B": "Token loss",
+      "C": "User voices and core devs both weigh in on platform direction",
+      "D": "ETH staking only"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 181,
+    "question": "Wallet-linked usernames benefit identity by:",
+    "choices": {
+      "A": "Meme-only",
+      "B": "Token lock",
+      "C": "Tie your handle to your wallet, making reputation and history provable across apps",
+      "D": "Mod-only"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 182,
+    "question": "Channel “pinned casts” benefit new visitors because:",
+    "choices": {
+      "A": "Only DMs",
+      "B": "Meme lock",
+      "C": "Guide, inform, or welcome newcomers with critical info at the top",
+      "D": "Username reset"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 183,
+    "question": "Posting token offers in /wallet is safe because:",
+    "choices": {
+      "A": "Meme lock",
+      "B": "Mod only",
+      "C": "Others can tip or send tokens within the secure built-in wallet interface",
+      "D": "NFT crash"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 184,
+    "question": "Reaction graph analysis benefits power users by:",
+    "choices": {
+      "A": "Meme-only",
+      "B": "DM tips",
+      "C": "Mapping influence, alliances, or viral loops in the community",
+      "D": "Token reset"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 185,
+    "question": "Channel “role badges” are beneficial because:",
+    "choices": {
+      "A": "Paid meme",
+      "B": "NFT required",
+      "C": "Instantly signal mod, lead, host, or contest winner status to others",
+      "D": "ETH ban"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 186,
+    "question": "Multi-profile support benefits boundary-keeping because:",
+    "choices": {
+      "A": "Only meme creators",
+      "B": "Token gating",
+      "C": "You can separate work, social, meme, or project identities on one wallet",
+      "D": "Frame reset"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 187,
+    "question": "Logging in with any compatible wallet is beneficial because:",
+    "choices": {
+      "A": "Meme-lock",
+      "B": "Only DMs",
+      "C": "Max flexibility—if one wallet loses access, use another",
+      "D": "Channel only"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 188,
+    "question": "Mini app “tip leaderboard” is a benefit because:",
+    "choices": {
+      "A": "Meme ban",
+      "B": "Token reset",
+      "C": "Adds player or user competition and helps highlight donors or active users",
+      "D": "Degen ban"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 189,
+    "question": "Channel-based voting lets users:",
+    "choices": {
+      "A": "Meme-only",
+      "B": "Gain ETH",
+      "C": "Help shape outcomes, events, or culture directly",
+      "D": "Degen tips"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 190,
+    "question": "Pseudonymous identity benefits privacy-conscious users by:",
+    "choices": {
+      "A": "Meme lock",
+      "B": "DM unlock",
+      "C": "No legal name or photo required; control exposure and discoverability",
+      "D": "Token mint"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 191,
+    "question": "“Topic following” benefits info-seekers by:",
+    "choices": {
+      "A": "Meme reset",
+      "B": "Ad targeting",
+      "C": "Get just the content you want—filter out unrelated noise",
+      "D": "Degen airdrop"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 192,
+    "question": "Distributed moderation experiments benefit by:",
+    "choices": {
+      "A": "Meme lock",
+      "B": "Channel ban",
+      "C": "Experimenting with multiple mod structures for innovation and fairness",
+      "D": "Degen burn"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 193,
+    "question": "Casting with attached signatures is a benefit because:",
+    "choices": {
+      "A": "Meme lock",
+      "B": "Mod only",
+      "C": "Every cast is verifiably yours—prevents fakes, forgeries, and spoofed posts",
+      "D": "Degen mute"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 194,
+    "question": "Channel emoji reactions benefit group dynamic by:",
+    "choices": {
+      "A": "Meme reset",
+      "B": "Paid",
+      "C": "Gauge mood, vote, or rally around events in a fun, simple way",
+      "D": "Spam ban"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 195,
+    "question": "Wallet deep links in mini apps benefit game users by:",
+    "choices": {
+      "A": "Only meme bots",
+      "B": "Degen lock",
+      "C": "Trigger token transfers or claims with single click, no copy-pasting",
+      "D": "ENS lock"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 196,
+    "question": "Open API usage monitoring benefits developers by:",
+    "choices": {
+      "A": "Meme-only",
+      "B": "Paid reset",
+      "C": "Track, manage, and fix issues before users notice problems in their bots or apps",
+      "D": "Frame ban"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 197,
+    "question": "Farcaster supports experimenter benefit by:",
+    "choices": {
+      "A": "Meme-only",
+      "B": "Channel mute",
+      "C": "Permissionless—launch and iterate new channels, apps, or bots anytime",
+      "D": "Degen lock"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 198,
+    "question": "Using ENS names with FIDs lets users:",
+    "choices": {
+      "A": "NFT mint",
+      "B": "Token tips only",
+      "C": "Use human-readable usernames everywhere, interop with other Web3 apps",
+      "D": "Frame reset"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 199,
+    "question": "Channel archiving benefits creators by:",
+    "choices": {
+      "A": "Meme reset",
+      "B": "Muted",
+      "C": "Pause growth, rest, or pivot community without deleting history or members",
+      "D": "Token grant"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 200,
+    "question": "Farcaster protocol bounties benefit community by:",
+    "choices": {
+      "A": "NFT burn",
+      "B": "Meme lock",
+      "C": "Anyone can be rewarded for bug fixes, feature ideas, or tools",
+      "D": "ENS ban"
+    },
+    "answer": "C"
   }
 ]
