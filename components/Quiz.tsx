@@ -5,29 +5,46 @@ import React, { useEffect, useMemo, useState } from "react";
 /**
  * components/Quiz.tsx
  *
- * Client-side quiz component that loads a single JSON question bank at runtime:
+ * Client-side quiz component that loads the consolidated question bank at runtime:
  *   public/farcaster_questions.json
  *
- * Requirements:
- * - You said you added all questions to farcaster_questions.json — place that file in your project's public/
- *   folder so it is served at: /farcaster_questions.json
- * - The file must be a JSON array of question objects with this shape:
- *     { id: number, question: string, choices: { A: string, B: string, C: string, D: string }, answer: "A"|"B"|"C"|"D" }
+ * Props:
+ *  - mode?: "farcaster" | "default"
+ *  - onComplete?: (result) => void
+ *      Called when the user finishes the quiz (Finish button or auto-finish on last question).
+ *      result = { score, total, attempted }
+ *  - autoFinishOnLast?: boolean (default: true) — when true, completing the final question triggers onComplete automatically.
  *
  * Behavior:
- * - Fetches /farcaster_questions.json on mount (client-side), validates the array, and requires it when
- *   mode === "farcaster" (shows error UI if fetch/validation fails).
- * - No embedded fallback data is used (per your request).
- * - Supports optional deterministic shuffle via seed, per-question submission, immediate feedback, and simple navigation.
+ *  - Fetches /farcaster_questions.json on mount (client-side), validates the array.
+ *  - Supports deterministic shuffle via seed, per-question submission, immediate feedback, Prev/Next navigation,
+ *    Reveal Answer, Finish button and onComplete callback.
+ *
+ * Requirements:
+ *  - Place your consolidated farcaster_questions.json (all 200 questions) in public/farcaster_questions.json
+ *  - Each question object shape:
+ *      { id: number, question: string, choices: { A: string, B: string, C: string, D: string }, answer: "A"|"B"|"C"|"D" }
  */
 
 type Choices = Record<string, string>;
 
-type Question = {
+export type Question = {
   id: number;
   question: string;
   choices: Choices;
-  answer: string;
+  answer: string; // "A" | "B" | "C" | "D"
+};
+
+type QuizResult = {
+  score: number;
+  total: number;
+  attempted: Record<number, { chosen: string; correct: boolean }>;
+};
+
+type QuizProps = {
+  mode?: "farcaster" | "default";
+  onComplete?: (result: QuizResult) => void;
+  autoFinishOnLast?: boolean;
 };
 
 const FETCH_TIMEOUT_MS = 4000;
@@ -54,13 +71,12 @@ async function fetchQuestions(path: string): Promise<Question[] | null> {
     const data = await res.json();
     if (!Array.isArray(data)) return null;
     const valid = data.every(
-      (it: any) =>
-        it &&
-        typeof it.id === "number" &&
-        typeof it.question === "string" &&
-        it.choices &&
-        typeof it.choices === "object" &&
-        typeof it.answer === "string"
+      (it: unknown) =>
+        !!it &&
+        typeof (it as any).id === "number" &&
+        typeof (it as any).question === "string" &&
+        typeof (it as any).choices === "object" &&
+        typeof (it as any).answer === "string"
     );
     if (!valid) return null;
     return data as Question[];
@@ -86,7 +102,7 @@ const shuffleArray = <T,>(arr: T[], seed?: number) => {
   return a;
 };
 
-export default function Quiz({ mode = "farcaster" }: { mode?: "farcaster" | "default" }) {
+export default function Quiz({ mode = "farcaster", onComplete, autoFinishOnLast = true }: QuizProps) {
   const [questions, setQuestions] = useState<Question[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -117,15 +133,11 @@ export default function Quiz({ mode = "farcaster" }: { mode?: "farcaster" | "def
         return;
       }
 
-      // If in strict farcaster mode, require 200 questions (IDs 1..200 assumed)
+      // In strict 'farcaster' mode we expect the full set (200), but we won't block usage;
+      // we'll surface an explicit error message if count < 200 so maintainers can notice.
       if (mode === "farcaster" && fetched.length < 200) {
-        setError(
-          `Loaded ${fetched.length} questions but farcaster mode expects all 200 questions present in farcaster_questions.json.`
-        );
-        // Still set the loaded questions so user can test; but surface explicit error
-        setQuestions(fetched);
-        setLoading(false);
-        return;
+        setError(`Loaded ${fetched.length} questions but farcaster mode expects 200 items in farcaster_questions.json.`);
+        // still set questions so users can play
       }
 
       setQuestions(fetched);
@@ -143,12 +155,29 @@ export default function Quiz({ mode = "farcaster" }: { mode?: "farcaster" | "def
   }, [questions, shuffled, seed]);
 
   useEffect(() => {
-    // reset when questions change or shuffle config changes
+    // reset when questions or shuffle config changes
     setIndex(0);
     setSelected(null);
     setScore(0);
     setAttempted({});
   }, [questions, shuffled, seed]);
+
+  function invokeOnCompleteIfProvided() {
+    if (!onComplete || !questions) return;
+    const result: QuizResult = {
+      score,
+      total: questions.length,
+      attempted
+    };
+    try {
+      onComplete(result);
+    } catch (e) {
+      // swallow user callback errors to avoid crashing the UI
+      // but log to console for developer visibility
+      // eslint-disable-next-line no-console
+      console.error("Quiz onComplete callback threw:", e);
+    }
+  }
 
   if (loading) {
     return (
@@ -187,22 +216,46 @@ export default function Quiz({ mode = "farcaster" }: { mode?: "farcaster" | "def
 
   const q = displayed[index];
   const tried = attempted[q.id];
+  const isLastQuestion = index === displayed.length - 1;
 
   function submitAnswer() {
     if (!selected) return;
+    // prevent double-scoring
+    if (attempted[q.id]) return;
     const correct = selected === q.answer;
     setAttempted((s) => ({ ...s, [q.id]: { chosen: selected!, correct } }));
     if (correct) setScore((s) => s + 1);
   }
 
-  function nextQuestion() {
+  function goNext() {
+    // auto-submit if user selected answer and hasn't attempted this question
+    if (!tried && selected) submitAnswer();
+    if (isLastQuestion) {
+      // either auto-finish or just stay on last question but call onComplete if configured
+      if (autoFinishOnLast) {
+        // small timeout to ensure state updates for the last submission before calling callback
+        setTimeout(() => {
+          invokeOnCompleteIfProvided();
+        }, 0);
+      }
+      return;
+    }
     setSelected(null);
-    if (index < displayed.length - 1) setIndex((i) => i + 1);
+    setIndex((i) => i + 1);
   }
 
-  function prevQuestion() {
+  function goPrev() {
     setSelected(null);
     if (index > 0) setIndex((i) => i - 1);
+  }
+
+  function finishNow() {
+    // If current not yet attempted but user has selected, submit it first
+    if (!tried && selected) submitAnswer();
+    // call callback after state updates (schedule microtask)
+    setTimeout(() => {
+      invokeOnCompleteIfProvided();
+    }, 0);
   }
 
   return (
@@ -272,16 +325,41 @@ export default function Quiz({ mode = "farcaster" }: { mode?: "farcaster" | "def
         </ul>
 
         <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-          <button onClick={submitAnswer} disabled={!selected || !!tried} style={{ padding: "8px 12px" }}>Submit</button>
-          <button onClick={() => { if (!tried && selected) submitAnswer(); nextQuestion(); }} disabled={index >= displayed.length - 1} style={{ padding: "8px 12px" }}>Next</button>
-          <button onClick={prevQuestion} disabled={index === 0} style={{ padding: "8px 12px" }}>Prev</button>
-          <button onClick={() => { if (!tried) setAttempted((s) => ({ ...s, [q.id]: { chosen: "_revealed", correct: false } })); }} style={{ marginLeft: "auto", padding: "8px 12px" }}>Reveal Answer</button>
+          <button onClick={submitAnswer} disabled={!selected || !!tried} style={{ padding: "8px 12px" }}>
+            Submit
+          </button>
+
+          <button
+            onClick={() => {
+              goNext();
+            }}
+            disabled={isLastQuestion && !autoFinishOnLast}
+            style={{ padding: "8px 12px" }}
+          >
+            Next
+          </button>
+
+          <button onClick={goPrev} disabled={index === 0} style={{ padding: "8px 12px" }}>
+            Prev
+          </button>
+
+          {isLastQuestion ? (
+            <button onClick={finishNow} style={{ marginLeft: "auto", padding: "8px 12px", background: "#0b74ff", color: "white" }}>
+              Finish
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                // reveal answer for this question (does not change score)
+                if (!tried) setAttempted((s) => ({ ...s, [q.id]: { chosen: "_revealed", correct: false } }));
+              }}
+              style={{ marginLeft: "auto", padding: "8px 12px" }}
+            >
+              Reveal Answer
+            </button>
+          )}
         </div>
       </article>
-
-      <footer style={{ marginTop: 16, color: "#666", fontSize: 13 }}>
-        This quiz fetches questions at runtime from <code>/farcaster_questions.json</code>. Make sure that file is deployed into your site's public/ directory.
-      </footer>
     </div>
   );
 }
