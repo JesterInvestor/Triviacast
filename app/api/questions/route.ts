@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getFarcasterQuestions } from '@/lib/questions';
 
 // Small fallback sample set used when the OpenTDB API fails
 const SAMPLE_QUESTIONS = {
@@ -41,6 +42,22 @@ export async function GET(request: Request) {
   // clamp amount to a sensible range (1..50)
   const amount = Math.max(1, Math.min(50, requestedAmount));
   const category = searchParams.get('category') || '';
+  const source = searchParams.get('source') || 'opentdb'; // 'opentdb' or 'farcaster'
+  const tags = searchParams.get('tags')?.split(',').filter(Boolean);
+
+  // Handle Farcaster questions
+  if (source === 'farcaster') {
+    try {
+      const questions = await getFarcasterQuestions(amount, tags);
+      return NextResponse.json({ response_code: 0, results: questions });
+    } catch (error) {
+      console.error('Error loading Farcaster questions:', error);
+      return NextResponse.json(
+        { error: 'Failed to load Farcaster questions' },
+        { status: 500 }
+      );
+    }
+  }
 
   // Build an OpenTDB url WITHOUT specifying difficulty so we get mixed difficulties
   const buildUrl = (count: number) =>

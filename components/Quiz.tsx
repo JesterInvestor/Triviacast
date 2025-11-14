@@ -11,6 +11,7 @@ import QuizResults from './QuizResults';
 
 import { calculateTPoints } from '@/lib/tpoints';
 import type { QuizState } from '@/types/quiz';
+import type { QuestionSource } from '@/types/question';
 
 const QUIZ_TIME_LIMIT = 60; // 1 minute in seconds
 const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
@@ -18,6 +19,9 @@ const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
 export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: string; score: number; details?: any }) => void } = {}) {
   const sound = useSound();
   const { address: accountAddress, isConnected } = useAccount();
+  const [questionSource, setQuestionSource] = useState<QuestionSource>('opentdb');
+  const [pendingSource, setPendingSource] = useState<QuestionSource | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [quizState, setQuizState] = useState<QuizState>({
     questions: [],
     currentQuestionIndex: 0,
@@ -46,8 +50,9 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     }
 
     try {
-      // Request easy and medium questions explicitly
-      const response = await fetch('/api/questions?amount=10&difficulty=easy,medium');
+      // Request questions based on selected source
+      const sourceParam = questionSource === 'farcaster' ? '&source=farcaster' : '';
+      const response = await fetch(`/api/questions?amount=10&difficulty=easy,medium${sourceParam}`);
       const data = await response.json();
 
       if (!response.ok || data?.error) {
@@ -235,6 +240,31 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     setError(null);
   };
 
+  const handleSourceChange = (newSource: QuestionSource) => {
+    if (quizState.quizStarted && !quizState.quizCompleted) {
+      // Quiz is active, show confirmation modal
+      setPendingSource(newSource);
+      setShowConfirmModal(true);
+    } else {
+      // Quiz not active, change immediately
+      setQuestionSource(newSource);
+    }
+  };
+
+  const confirmSourceChange = () => {
+    if (pendingSource) {
+      setQuestionSource(pendingSource);
+      restartQuiz();
+      setPendingSource(null);
+    }
+    setShowConfirmModal(false);
+  };
+
+  const cancelSourceChange = () => {
+    setPendingSource(null);
+    setShowConfirmModal(false);
+  };
+
   // Require wallet connection before showing any quiz UI
   if (!isConnected || !accountAddress) {
     return (
@@ -248,36 +278,102 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     );
   }
 
+  // Confirmation Modal
+  const ConfirmationModal = () => {
+    if (!showConfirmModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+        <div className="bg-white rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full border-4 border-[#F4A6B7]">
+          <h2 className="text-xl sm:text-2xl font-bold mb-4 text-[#2d1b2e]">
+            Switch Question Source?
+          </h2>
+          <p className="text-[#5a3d5c] mb-6 text-sm sm:text-base">
+            Switching question source will restart the current quiz. Your progress will be lost. Are you sure you want to proceed?
+          </p>
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={cancelSourceChange}
+              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg transition"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={confirmSourceChange}
+              className="bg-[#F4A6B7] hover:bg-[#E8949C] text-white font-semibold py-2 px-4 rounded-lg transition"
+            >
+              Proceed
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Pre-start state
   if (!quizState.quizStarted) {
     return (
-      <div className="max-w-2xl mx-auto px-2 sm:px-6">
-        <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 text-center border-4 border-[#F4A6B7]">
-          <div className="mb-6 flex justify-center">
-            <Image src="/brain-large.svg" alt="Brain" width={96} height={96} className="w-24 h-24 sm:w-32 sm:h-32" priority />
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-[#2d1b2e]">Trivia Challenge</h1>
-          <p className="text-[#5a3d5c] mb-8 text-base sm:text-lg">
-            ⏱️ Only 1 minute ⏱️<br />
-            ⁉️ 10 questions ⁉️<br />
-            😎🤓 Endless bragging rights 😎🤓<br />
-            🧠 Ready to prove you're a genius? 🧠
-          </p>
-          {error && (
-            <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#DC8291] text-[#C86D7D] rounded-lg text-sm sm:text-base">
-              {error}
+      <>
+        <ConfirmationModal />
+        <div className="max-w-2xl mx-auto px-2 sm:px-6">
+          {/* Question Source Toggle */}
+          <div className="mb-4 bg-white rounded-lg shadow-lg p-4 border-2 border-[#F4A6B7]">
+            <label htmlFor="question-source" className="block text-sm font-semibold text-[#2d1b2e] mb-2">
+              Question Source
+            </label>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleSourceChange('opentdb')}
+                className={`flex-1 py-2 px-4 rounded-lg font-semibold transition ${
+                  questionSource === 'opentdb'
+                    ? 'bg-[#F4A6B7] text-white'
+                    : 'bg-gray-100 text-[#5a3d5c] hover:bg-gray-200'
+                }`}
+                aria-pressed={questionSource === 'opentdb'}
+              >
+                General Knowledge (OpenTDB)
+              </button>
+              <button
+                onClick={() => handleSourceChange('farcaster')}
+                className={`flex-1 py-2 px-4 rounded-lg font-semibold transition ${
+                  questionSource === 'farcaster'
+                    ? 'bg-[#F4A6B7] text-white'
+                    : 'bg-gray-100 text-[#5a3d5c] hover:bg-gray-200'
+                }`}
+                aria-pressed={questionSource === 'farcaster'}
+              >
+                Farcaster Knowledge (Local)
+              </button>
             </div>
-          )}
-          <button
-            onClick={startQuiz}
-            disabled={loading}
-            aria-disabled={loading}
-            className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-lg transition disabled:opacity-50 shadow-lg w-full sm:w-auto min-h-[56px]"
-          >
-            {loading ? 'Loading...' : 'Start Quiz'}
-          </button>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 text-center border-4 border-[#F4A6B7]">
+            <div className="mb-6 flex justify-center">
+              <Image src="/brain-large.svg" alt="Brain" width={96} height={96} className="w-24 h-24 sm:w-32 sm:h-32" priority />
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-[#2d1b2e]">Trivia Challenge</h1>
+            <p className="text-[#5a3d5c] mb-8 text-base sm:text-lg">
+              ⏱️ Only 1 minute ⏱️<br />
+              ⁉️ 10 questions ⁉️<br />
+              😎🤓 Endless bragging rights 😎🤓<br />
+              🧠 Ready to prove you're a genius? 🧠
+            </p>
+            {error && (
+              <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#DC8291] text-[#C86D7D] rounded-lg text-sm sm:text-base">
+                {error}
+              </div>
+            )}
+            <button
+              onClick={startQuiz}
+              disabled={loading}
+              aria-disabled={loading}
+              className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-lg transition disabled:opacity-50 shadow-lg w-full sm:w-auto min-h-[56px]"
+            >
+              {loading ? 'Loading...' : 'Start Quiz'}
+            </button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -300,7 +396,9 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   const answered = quizState.answers[quizState.currentQuestionIndex] !== null;
 
   return (
-    <div className="max-w-3xl mx-auto px-2 sm:px-6">
+    <>
+      <ConfirmationModal />
+      <div className="max-w-3xl mx-auto px-2 sm:px-6">
       <div className="flex items-center justify-between mb-4">
         <div className="text-sm sm:text-base text-[#5a3d5c] font-semibold">
           Question {quizState.currentQuestionIndex + 1} / {quizState.questions.length}
@@ -343,5 +441,6 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
 
       <QuizQuestion question={currentQuestion} onAnswer={handleAnswer} answered={answered} />
     </div>
+    </>
   );
 }
