@@ -1,427 +1,260 @@
-"use client";
+import React, { useEffect, useMemo, useState } from "react";
+import baseQuestions from "./farcaster_question.json";
+import addendum from "./farcaster_questions_addendum.json";
 
-import React, { useEffect, useRef, useState } from 'react';
-import { useSound } from '@/components/SoundContext';
-import Image from 'next/image';
-import { useAccount } from 'wagmi';
+/**
+ * quiz.tsx
+ *
+ * Full, drop-in React + TypeScript quiz component that:
+ * - Imports the existing farcaster_question.json and the addendum file
+ * - Merges and deduplicates questions (preferring the later file on ID conflict)
+ * - Optionally shuffles questions
+ * - Tracks per-session score and shows immediate feedback
+ *
+ * NOTES:
+ * - Make sure tsconfig.json includes "resolveJsonModule": true and "esModuleInterop": true
+ * - Place this file alongside the two JSON files or update the import paths accordingly
+ */
 
-import Timer from './Timer';
-import QuizQuestion from './QuizQuestion';
-import QuizResults from './QuizResults';
+type Choices = Record<string, string>;
 
-import { calculateTPoints } from '@/lib/tpoints';
-import type { QuizState } from '@/types/quiz';
+type Question = {
+  id: number;
+  question: string;
+  choices: Choices;
+  answer: string; // "A" | "B" | "C" | "D"
+};
 
-const QUIZ_TIME_LIMIT = 60; // 1 minute in seconds
-const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
+const dedupeAndCombine = (a: Question[], b: Question[]) => {
+  const map = new Map<number, Question>();
+  // Prefer items from `a` first, then override with `b` if same id appears in addendum.
+  for (const q of a) map.set(q.id, q);
+  for (const q of b) map.set(q.id, q);
+  // Return by ascending id for stable ordering
+  return Array.from(map.values()).sort((x, y) => x.id - y.id);
+};
 
-export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: string; score: number; details?: any }) => void } = {}) {
-  const sound = useSound();
-  const { address: accountAddress, isConnected } = useAccount();
-  const [questionSource, setQuestionSource] = useState<'opentdb' | 'farcaster'>('opentdb');
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [pendingSource, setPendingSource] = useState<'opentdb' | 'farcaster'>('opentdb');
-  const [quizState, setQuizState] = useState<QuizState>({
-    questions: [],
-    currentQuestionIndex: 0,
-    score: 0,
-    answers: [],
-    timeRemaining: QUIZ_TIME_LIMIT,
-    quizStarted: false,
-    quizCompleted: false,
-    consecutiveCorrect: 0,
-    tPoints: 0,
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-
-  const startQuiz = async () => {
-    setLoading(true);
-    setError(null);
-
-    // Prevent starting if wallet is not connected (defensive guard in addition to disabled button)
-    if (!isConnected || !accountAddress) {
-      setError('Connect your wallet silly');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      // Request easy and medium questions explicitly
-      const response = await fetch(`/api/questions?amount=10&difficulty=easy,medium&source=${questionSource}`);
-      const data = await response.json();
-
-      if (!response.ok || data?.error) {
-        throw new Error(data?.error || 'Failed to load quiz');
-      }
-
-      setQuizState({
-        questions: data.results,
-        currentQuestionIndex: 0,
-        score: 0,
-        answers: new Array(data.results.length).fill(null),
-        timeRemaining: QUIZ_TIME_LIMIT,
-        quizStarted: true,
-        quizCompleted: false,
-        consecutiveCorrect: 0,
-        tPoints: 0,
-      });
-    } catch (err) {
-      setError('Failed to load quiz questions. Please try again.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Main timer
-  useEffect(() => {
-    if (!quizState.quizStarted || quizState.quizCompleted) return;
-
-    const timer = setInterval(() => {
-      setQuizState((prev) => {
-        if (prev.timeRemaining <= 1) {
-          clearInterval(timer);
-          return { ...prev, timeRemaining: 0, quizCompleted: true };
-        }
-        return { ...prev, timeRemaining: prev.timeRemaining - 1 };
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [quizState.quizStarted, quizState.quizCompleted]);
-
-  // Notify parent when quiz completes so callers can show a share/preview flow
-  useEffect(() => {
-    if (!quizState.quizCompleted) return;
-    // Minimal client-side completion flag for quests gating
-    try {
-      // Emit client-side event only; backend relayer disabled.
-      window.dispatchEvent(new Event('triviacast:quizCompleted'));
-    } catch {}
-    try {
-      onComplete?.({
-        quizId: 'triviacast',
-        score: quizState.score,
-        details: {
-          total: quizState.questions.length,
-          tPoints: quizState.tPoints,
-        },
-      });
-    } catch (_) {
-      // ignore downstream errors from consumer
-    }
-    // Only fire when completion state flips to true
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quizState.quizCompleted]);
-
-  // Background music lifecycle: create/cleanup only on quiz lifecycle
-  useEffect(() => {
-    if (quizState.quizStarted && !quizState.quizCompleted) {
-      if (!audioRef.current) {
-        const audio = new Audio('/giggly-bubbles-222533.mp3');
-        audio.loop = true;
-        audio.volume = sound.disabled ? 0 : 0.14;
-        audio.muted = !!sound.disabled;
-        audioRef.current = audio;
-
-        if (!audio.muted) {
-          const playPromise = audio.play();
-          if (playPromise && typeof playPromise.then === 'function') {
-            playPromise
-              .then(() => setIsMusicPlaying(true))
-              .catch(() => setIsMusicPlaying(false));
-          } else {
-            setIsMusicPlaying(!audio.paused);
-          }
-        } else {
-          setIsMusicPlaying(false);
-        }
-      }
-    }
-
-    if (quizState.quizCompleted && audioRef.current) {
-      try {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      } catch (_) {}
-      setIsMusicPlaying(false);
-    }
-
+const shuffleArray = <T,>(arr: T[], seed?: number) => {
+  // Fisher-Yates shuffle. If seed provided, use a simple LCG to pseudo-randomize deterministically.
+  let a = arr.slice();
+  let rand = ((): (() => number) => {
+    if (seed === undefined) return () => Math.random();
+    let s = seed >>> 0;
     return () => {
-      if (audioRef.current) {
-        try {
-          audioRef.current.pause();
-          audioRef.current = null;
-        } catch (_) {
-          audioRef.current = null;
-        }
-      }
+      // simple LCG
+      s = (1664525 * s + 1013904223) >>> 0;
+      return s / 0xffffffff;
     };
-  }, [quizState.quizStarted, quizState.quizCompleted]);
+  })();
 
-  // React to mute/unmute without recreating the audio element
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+
+export default function Quiz() {
+  // Merge and dedupe base + addendum
+  const mergedQuestions = useMemo<Question[]>(
+    () => dedupeAndCombine((baseQuestions as unknown) as Question[], (addendum as unknown) as Question[]),
+    []
+  );
+
+  // UI state
+  const [shuffled, setShuffled] = useState<boolean>(true);
+  const [seed, setSeed] = useState<number | undefined>(undefined); // deterministic shuffle if set
+  const displayedQuestions = useMemo<Question[]>(
+    () => (shuffled ? shuffleArray(mergedQuestions, seed) : mergedQuestions),
+    [mergedQuestions, shuffled, seed]
+  );
+
+  const [index, setIndex] = useState(0);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [score, setScore] = useState(0);
+  const [attempted, setAttempted] = useState<Record<number, { chosen: string; correct: boolean }>>({});
+
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (sound.disabled) {
-      try {
-        audio.muted = true;
-        audio.pause();
-        audio.volume = 0;
-      } catch (_) {}
-      setIsMusicPlaying(false);
-    } else {
-      try {
-        audio.muted = false;
-        audio.volume = 0.14;
-        if (audio.paused) {
-          const playPromise = audio.play();
-          if (playPromise && typeof playPromise.then === 'function') {
-            playPromise
-              .then(() => setIsMusicPlaying(true))
-              .catch(() => setIsMusicPlaying(false));
-          } else {
-            setIsMusicPlaying(!audio.paused);
-          }
-        }
-      } catch (_) {}
+    // Reset session when shuffle or seed changes
+    setIndex(0);
+    setSelected(null);
+    setScore(0);
+    setAttempted({});
+  }, [shuffled, seed, mergedQuestions.length]);
+
+  if (!displayedQuestions || displayedQuestions.length === 0) {
+    return <div>No questions found. Ensure farcaster_question.json and farcaster_questions_addendum.json are present and valid.</div>;
+  }
+
+  const q = displayedQuestions[index];
+
+  function submitAnswer() {
+    if (!selected) return;
+    const correct = selected === q.answer;
+    setAttempted((s) => ({ ...s, [q.id]: { chosen: selected, correct } }));
+    if (correct) setScore((s) => s + 1);
+  }
+
+  function nextQuestion() {
+    setSelected(null);
+    if (index < displayedQuestions.length - 1) {
+      setIndex((i) => i + 1);
     }
-  }, [sound.disabled]);
-
-  const handleAnswer = (answer: string) => {
-    const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
-    const isCorrect = answer === currentQuestion.correct_answer;
-
-    const newAnswers = [...quizState.answers];
-    newAnswers[quizState.currentQuestionIndex] = answer;
-
-    setQuizState((prev) => {
-      const newConsecutive = isCorrect ? prev.consecutiveCorrect + 1 : 0;
-      const earnedPoints = calculateTPoints(newConsecutive, isCorrect, prev.consecutiveCorrect);
-
-      return {
-        ...prev,
-        answers: newAnswers,
-        score: isCorrect ? prev.score + 1 : prev.score,
-        consecutiveCorrect: newConsecutive,
-        tPoints: prev.tPoints + earnedPoints,
-      };
-    });
-
-    // Move to next question or complete quiz
-    setTimeout(() => {
-      setQuizState((prev) => {
-        const lastIndex = prev.questions.length - 1;
-        if (prev.currentQuestionIndex < lastIndex) {
-          return { ...prev, currentQuestionIndex: prev.currentQuestionIndex + 1 };
-        }
-        return { ...prev, quizCompleted: true };
-      });
-    }, 500);
-  };
-
-  const restartQuiz = () => {
-    setQuizState({
-      questions: [],
-      currentQuestionIndex: 0,
-      score: 0,
-      answers: [],
-      timeRemaining: QUIZ_TIME_LIMIT,
-      quizStarted: false,
-      quizCompleted: false,
-      consecutiveCorrect: 0,
-      tPoints: 0,
-    });
-    setError(null);
-  };
-
-  const handleSourceChange = (newSource: 'opentdb' | 'farcaster') => {
-    if (quizState.quizStarted && !quizState.quizCompleted) {
-      // Show confirmation modal if quiz is active
-      setPendingSource(newSource);
-      setShowConfirmModal(true);
-    } else {
-      // Direct change if quiz not started
-      setQuestionSource(newSource);
-    }
-  };
-
-  const confirmSourceChange = () => {
-    setQuestionSource(pendingSource);
-    setShowConfirmModal(false);
-    restartQuiz();
-  };
-
-  const cancelSourceChange = () => {
-    setShowConfirmModal(false);
-  };
-
-  // Require wallet connection before showing any quiz UI
-  if (!isConnected || !accountAddress) {
-    return (
-      <div className="max-w-2xl mx-auto px-2 sm:px-6">
-        <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 text-center border-4 border-[#F4A6B7]">
-          <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#F4A6B7] text-[#5a3d5c] rounded-lg text-sm sm:text-base">
-            🔒 Connect your wallet silly
-          </div>
-        </div>
-      </div>
-    );
   }
 
-  // Pre-start state
-  if (!quizState.quizStarted) {
-    return (
-      <div className="max-w-2xl mx-auto px-2 sm:px-6">
-        <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 text-center border-4 border-[#F4A6B7]">
-          <div className="mb-6 flex justify-center">
-            <Image src="/brain-large.svg" alt="Brain" width={96} height={96} className="w-24 h-24 sm:w-32 sm:h-32" priority />
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-[#2d1b2e]">Trivia Challenge</h1>
-          
-          {/* Question Source Toggle */}
-          <div className="mb-6 p-4 bg-[#FFE4EC] rounded-lg border-2 border-[#F4A6B7]">
-            <label className="block text-sm font-semibold text-[#2d1b2e] mb-3">
-              Question Source
-            </label>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button
-                onClick={() => handleSourceChange('opentdb')}
-                className={`flex-1 sm:flex-initial px-4 py-3 rounded-lg font-medium transition-all ${
-                  questionSource === 'opentdb'
-                    ? 'bg-[#F4A6B7] text-white shadow-lg scale-105'
-                    : 'bg-white text-[#5a3d5c] border-2 border-[#F4A6B7] hover:bg-[#FFE4EC]'
-                }`}
-              >
-                🌍 General Knowledge (OpenTDB)
-              </button>
-              <button
-                onClick={() => handleSourceChange('farcaster')}
-                className={`flex-1 sm:flex-initial px-4 py-3 rounded-lg font-medium transition-all ${
-                  questionSource === 'farcaster'
-                    ? 'bg-[#F4A6B7] text-white shadow-lg scale-105'
-                    : 'bg-white text-[#5a3d5c] border-2 border-[#F4A6B7] hover:bg-[#FFE4EC]'
-                }`}
-              >
-                🎯 Farcaster Knowledge (neynar)
-              </button>
-            </div>
-          </div>
-
-          <p className="text-[#5a3d5c] mb-8 text-base sm:text-lg">
-            ⏱️ Only 1 minute ⏱️<br />
-            ⁉️ 10 questions ⁉️<br />
-            😎🤓 Endless bragging rights 😎🤓<br />
-            🧠 Ready to prove you're a genius? 🧠
-          </p>
-          {error && (
-            <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#DC8291] text-[#C86D7D] rounded-lg text-sm sm:text-base">
-              {error}
-            </div>
-          )}
-          <button
-            onClick={startQuiz}
-            disabled={loading}
-            aria-disabled={loading}
-            className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-lg transition disabled:opacity-50 shadow-lg w-full sm:w-auto min-h-[56px]"
-          >
-            {loading ? 'Loading...' : 'Start Quiz'}
-          </button>
-        </div>
-
-        {/* Confirmation Modal */}
-        {showConfirmModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full border-4 border-[#F4A6B7]">
-              <h2 className="text-2xl font-bold mb-4 text-[#2d1b2e]">Confirm Source Change</h2>
-              <p className="text-[#5a3d5c] mb-6">
-                Switching question source will restart the current quiz. Do you want to proceed?
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={cancelSourceChange}
-                  className="flex-1 px-4 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold rounded-lg transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmSourceChange}
-                  className="flex-1 px-4 py-3 bg-[#F4A6B7] hover:bg-[#E8949C] text-white font-semibold rounded-lg transition"
-                >
-                  Proceed
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
+  function prevQuestion() {
+    setSelected(null);
+    if (index > 0) setIndex((i) => i - 1);
   }
 
-  // Completed state
-  if (quizState.quizCompleted) {
-    return (
-      <QuizResults
-        score={quizState.score}
-        totalQuestions={quizState.questions.length}
-        questions={quizState.questions}
-        answers={quizState.answers}
-        tPoints={quizState.tPoints}
-        onRestart={restartQuiz}
-      />
-    );
+  function revealAnswerText(question: Question) {
+    return `${question.answer}: ${question.choices[question.answer] ?? ""}`;
   }
-
-  // Active quiz state
-  const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
-  const answered = quizState.answers[quizState.currentQuestionIndex] !== null;
 
   return (
-    <div className="max-w-3xl mx-auto px-2 sm:px-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-sm sm:text-base text-[#5a3d5c] font-semibold">
-          Question {quizState.currentQuestionIndex + 1} / {quizState.questions.length}
+    <div style={{ maxWidth: 900, margin: "0 auto", fontFamily: "system-ui, sans-serif", padding: 16 }}>
+      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+        <h2>Farcaster Trivia Quiz</h2>
+        <div>
+          <strong>
+            Score: {score} / {Object.keys(attempted).length}
+          </strong>
         </div>
-        <div className="flex items-center gap-2">
-          <Timer timeRemaining={quizState.timeRemaining} />
+      </header>
+
+      <section style={{ marginBottom: 12, display: "flex", gap: 8 }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={shuffled}
+            onChange={(e) => setShuffled(e.target.checked)}
+            style={{ marginRight: 6 }}
+          />
+          Shuffle questions
+        </label>
+
+        <label style={{ marginLeft: 8 }}>
+          Seed:
+          <input
+            type="number"
+            value={seed ?? ""}
+            onChange={(e) => setSeed(e.target.value === "" ? undefined : Number(e.target.value))}
+            placeholder="optional"
+            style={{ marginLeft: 6, width: 120 }}
+          />
+        </label>
+
+        <div style={{ marginLeft: "auto", fontSize: 14, color: "#555" }}>
+          Question {index + 1} of {displayedQuestions.length} (ID: {q.id})
+        </div>
+      </section>
+
+      <article style={{ border: "1px solid #e6e6e6", borderRadius: 8, padding: 16 }}>
+        <p style={{ marginTop: 0, fontWeight: 600 }}>{q.question}</p>
+
+        <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+          {Object.entries(q.choices).map(([key, text]) => {
+            const attemptedForThis = attempted[q.id];
+            const isChosen = selected === key;
+            const alreadyAnswered = attemptedForThis !== undefined;
+            const correctKey = q.answer;
+            const bg =
+              alreadyAnswered && attemptedForThis.chosen === key
+                ? attemptedForThis.correct
+                  ? "#d4f8d4"
+                  : "#ffd6d6"
+                : isChosen
+                ? "#eef2ff"
+                : "transparent";
+            return (
+              <li key={key} style={{ marginBottom: 8 }}>
+                <label
+                  style={{
+                    display: "block",
+                    padding: "10px 12px",
+                    borderRadius: 6,
+                    background: bg,
+                    border: "1px solid #ddd",
+                    cursor: alreadyAnswered ? "default" : "pointer",
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name={`q-${q.id}`}
+                    value={key}
+                    checked={isChosen}
+                    onChange={() => setSelected(key)}
+                    disabled={alreadyAnswered}
+                    style={{ marginRight: 8 }}
+                  />
+                  <strong>{key}.</strong> <span style={{ marginLeft: 8 }}>{text}</span>
+                  {alreadyAnswered && attemptedForThis.chosen === key && (
+                    <span style={{ marginLeft: 10, fontWeight: 600, color: attemptedForThis.correct ? "green" : "crimson" }}>
+                      {attemptedForThis.correct ? " ✓ Correct" : " ✕ Incorrect"}
+                    </span>
+                  )}
+                  {alreadyAnswered && correctKey === key && (
+                    <span style={{ marginLeft: 8, fontSize: 13, color: "green" }}> (Answer)</span>
+                  )}
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+
+        <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
           <button
-            onPointerUp={() => {
-              const audio = audioRef.current;
-              if (!audio) return;
-              if (!audio.paused) {
-                try { audio.pause(); } catch (_) {}
-                setIsMusicPlaying(false);
-              } else {
-                if (sound.disabled) {
-                  try { sound.set(false); } catch (_) {}
-                }
-                try {
-                  audio.muted = false;
-                  audio.volume = 0.14;
-                  const p = audio.play();
-                  if (p && typeof p.then === 'function') {
-                    p.then(() => setIsMusicPlaying(true)).catch(() => setIsMusicPlaying(false));
-                  } else {
-                    setIsMusicPlaying(!audio.paused);
-                  }
-                } catch (_) {
-                  setIsMusicPlaying(false);
-                }
+            onClick={() => {
+              submitAnswer();
+            }}
+            disabled={selected === null || attempted[q.id] !== undefined}
+            style={{ padding: "8px 12px", cursor: selected === null ? "not-allowed" : "pointer" }}
+          >
+            Submit
+          </button>
+
+          <button
+            onClick={() => {
+              // If already attempted, allow moving on but don't change score
+              if (attempted[q.id] === undefined && selected) submitAnswer();
+              nextQuestion();
+            }}
+            style={{ padding: "8px 12px" }}
+            disabled={index >= displayedQuestions.length - 1}
+          >
+            Next
+          </button>
+
+          <button onClick={prevQuestion} style={{ padding: "8px 12px" }} disabled={index === 0}>
+            Prev
+          </button>
+
+          <button
+            onClick={() => {
+              // reveal correct answer in UI by marking attempted (but not affecting score)
+              if (attempted[q.id] === undefined) {
+                setAttempted((s) => ({ ...s, [q.id]: { chosen: "_revealed", correct: false } }));
               }
             }}
-            aria-pressed={isMusicPlaying}
-            className="ml-2 bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-1.5 px-3 rounded-md text-xs shadow"
-            type="button"
+            style={{ marginLeft: "auto", padding: "8px 12px" }}
           >
-            {isMusicPlaying ? 'Pause Music' : 'Play Music'}
+            Reveal Answer
           </button>
         </div>
-      </div>
+      </article>
 
-      <QuizQuestion question={currentQuestion} onAnswer={handleAnswer} answered={answered} />
+      <footer style={{ marginTop: 12, color: "#666", fontSize: 14 }}>
+        <div>
+          Completed: {Object.keys(attempted).length} / {displayedQuestions.length} — Score: {score}
+        </div>
+        <div style={{ marginTop: 8 }}>
+          Tip: Enable resolveJsonModule in tsconfig.json if imports fail.
+          <div style={{ marginTop: 6 }}>
+            If you want me to push this file and the addendum directly into your repository, tell me the repo (owner/name)
+            and the branch, and I will create a PR with these changes.
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
