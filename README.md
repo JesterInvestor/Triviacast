@@ -77,6 +77,49 @@ npm run dev
 
 ## Quiz Features
 
+### Question Sources
+
+The quiz now supports two question sources:
+
+1. **General Knowledge (OpenTDB)** - Questions from the Open Trivia Database API
+   - Covers a wide range of general trivia topics
+   - Questions are fetched in real-time from https://opentdb.com/api.php
+   - Includes easy and medium difficulty questions
+
+2. **Farcaster Knowledge (Local)** - Curated questions about Farcaster
+   - 100 hand-crafted questions about Farcaster ecosystem
+   - Covers topics like protocol basics, infrastructure, creators, and technical details
+   - Questions stored locally in `data/farcaster_questions.json`
+   - Includes easy, medium, and hard difficulty levels
+
+You can switch between question sources using the toggle on the quiz start screen. If you switch sources during an active quiz, you'll be prompted to confirm that the quiz will restart.
+
+### Adding More Farcaster Questions
+
+To add more Farcaster questions to the local set:
+
+1. Edit the file `data/farcaster_questions.json`
+2. Add new question objects following this structure:
+```json
+{
+  "id": "fc_101",
+  "category": "Farcaster Knowledge",
+  "type": "multiple",
+  "difficulty": "easy|medium|hard",
+  "question": "Your question text here?",
+  "correct_answer": "The correct answer",
+  "incorrect_answers": [
+    "Wrong answer 1",
+    "Wrong answer 2",
+    "Wrong answer 3"
+  ],
+  "explanation": "Optional explanation of the answer",
+  "tags": ["farcaster", "optional-tag"]
+}
+```
+3. Ensure the JSON file remains valid (proper commas, brackets, etc.)
+4. Test your changes by selecting "Farcaster Knowledge" in the quiz
+
 ### Timer System
 - 5-minute overall time limit for the entire quiz
 - Visual timer with color-coded warnings (green → yellow → red)
