@@ -1,14 +1,14 @@
 "use client";
-import React from 'react';
-import WagmiWalletConnect from '@/components/WagmiWalletConnect';
-import ShareButton from '@/components/ShareButton';
-import { buildPlatformShareUrl } from '@/lib/farcaster';
-import { useState, useEffect } from 'react';
-import Quiz from '@/components/Quiz';
-import { useAccount } from 'wagmi';
-import { ProfileCard } from '@/components/ProfileCard';
-import { NeynarCastCard } from '@/components/NeynarCastCard';
-import NeynarUserDropdown from '@/components/NeynarUserDropdown';
+import React from "react";
+import WagmiWalletConnect from "@/components/WagmiWalletConnect";
+import ShareButton from "@/components/ShareButton";
+import { buildPlatformShareUrl } from "@/lib/farcaster";
+import { useState, useEffect } from "react";
+import Quiz from "@/components/Quiz";
+import { useAccount } from "wagmi";
+import { ProfileCard } from "@/components/ProfileCard";
+import { NeynarCastCard } from "@/components/NeynarCastCard";
+import NeynarUserDropdown from "@/components/NeynarUserDropdown";
 // leaderboard removed from lookup page per request
 
 type Cast = {
@@ -31,6 +31,7 @@ type LookupResult = {
     isOwnProfile?: boolean;
     casts?: Cast[];
     fid?: number;
+    raw?: any;
   };
   error?: string;
 } | null;
@@ -43,10 +44,11 @@ export default function FarcasterLookupPage() {
   const [error, setError] = useState<string | null>(null);
   const [quizOpen, setQuizOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewText, setPreviewText] = useState<string>('');
-  const [previewLink, setPreviewLink] = useState<string>('');
+  const [previewText, setPreviewText] = useState<string>("");
+  const [previewLink, setPreviewLink] = useState<string>("");
   const [related, setRelated] = useState<Array<any>>([]);
   const [relatedLoading, setRelatedLoading] = useState(false);
+  const [sdkMissing, setSdkMissing] = useState(false);
   // NOTE: intentionally not auto-prefilling the lookup from URL params.
   // Shares should point to the canonical site only (https://triviacast.xyz).
 
@@ -63,19 +65,19 @@ export default function FarcasterLookupPage() {
     setError(null);
     setResult(null);
     try {
-      if (!username || username.trim() === '') {
-        setError('Please provide a Farcaster username to lookup');
+      if (!username || username.trim() === "") {
+        setError("Please provide a Farcaster username to lookup");
         setLoading(false);
         return;
       }
 
-      const res = await fetch('/api/farcaster/profile', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
+      const res = await fetch("/api/farcaster/profile", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({ username }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || 'lookup failed');
+      if (!res.ok) throw new Error(data?.error || "lookup failed");
       // If the response is a profile object, wrap it as { profile: data }
       if (data && (data.address || data.username) && !data.error) {
         setResult({ profile: data });
@@ -84,7 +86,11 @@ export default function FarcasterLookupPage() {
           const fid = data.raw?.fid || data.fid || null;
           if (fid) {
             setRelatedLoading(true);
-            const r = await fetch('/api/neynar/related', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fid: Number(fid), limit: 6 }) });
+            const r = await fetch("/api/neynar/related", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ fid: Number(fid), limit: 6 }),
+            });
             if (r.ok) {
               const parsed = await r.json();
               setRelated(Array.isArray(parsed.result) ? parsed.result : []);
@@ -106,7 +112,7 @@ export default function FarcasterLookupPage() {
       // Backend relayer disabled; skip on-chain mark.
     } catch (err: unknown) {
       const e = err as { message?: string } | null;
-      setError(e?.message || 'unknown error');
+      setError(e?.message || "unknown error");
     } finally {
       setLoading(false);
     }
@@ -116,6 +122,27 @@ export default function FarcasterLookupPage() {
     // Close both preview and quiz to return to the profile view
     setPreviewOpen(false);
     setQuizOpen(false);
+    setSdkMissing(false);
+  };
+
+  // Helper to open a URL in a new tab with noopener/noreferrer (kept for other non-compose links)
+  const openInNewTab = (url: string) => {
+    try {
+      const a = document.createElement("a");
+      a.href = url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (e) {
+      const newWin = window.open(url, "_blank");
+      if (newWin) {
+        try {
+          newWin.opener = null;
+        } catch {}
+      }
+    }
   };
 
   return (
@@ -125,9 +152,9 @@ export default function FarcasterLookupPage() {
         <WagmiWalletConnect />
         <ShareButton
           url={buildPlatformShareUrl(
-            'Think you can outsmart your friends? Challenge a random and find new friends! Take the Challenge on Triviacast — https://triviacast.xyz',
-            ['https://triviacast.xyz'],
-            { action: 'share' }
+            "Think you can outsmart your friends? Challenge a random and find new friends! Take the Challenge on Triviacast — https://triviacast.xyz",
+            ["https://triviacast.xyz"],
+            { action: "share" }
           )}
           className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 sm:py-2 sm:px-4 rounded-lg transition shadow-md flex items-center gap-2 justify-center min-h-[40px]"
           ariaLabel="Share Challenge page"
@@ -135,8 +162,7 @@ export default function FarcasterLookupPage() {
       </div>
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
-          
-            <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center">
             {/* Small brain icon above header for visual consistency with other pages */}
             <img
               src="/brain-small.svg"
@@ -144,7 +170,9 @@ export default function FarcasterLookupPage() {
               className="w-10 h-10 sm:w-12 sm:h-12 mb-2 drop-shadow"
               loading="lazy"
             />
-            <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e] text-center">Challenge and Find New Friends</h1>
+            <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2d1b2e] text-center">
+              Challenge and Find New Friends
+            </h1>
             <span className="text-xs text-[#5a3d5c] mt-1 inline-flex items-center gap-1">
               powered by
               <a
@@ -158,7 +186,7 @@ export default function FarcasterLookupPage() {
               </a>
               <img src="/neynar.svg" alt="Neynar" className="w-3 h-3 opacity-90" />
             </span>
-            </div>
+          </div>
           <div className="w-full max-w-md bg-white rounded-md border p-3 mt-3 text-sm text-gray-700">
             <strong className="block mb-1">How to challenge a friend</strong>
             <ol className="list-decimal pl-6">
@@ -179,7 +207,7 @@ export default function FarcasterLookupPage() {
               disabled={loading}
               className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-2 px-3 rounded-lg transition shadow-md w-full"
             >
-              {loading ? 'Searching…' : 'Lookup'}
+              {loading ? "Searching…" : "Lookup"}
             </button>
           </div>
           {error && <div className="text-red-600 mt-2">{error}</div>}
@@ -206,10 +234,14 @@ export default function FarcasterLookupPage() {
                     {related.map((p: any) => (
                       <div key={p.fid || p.username} className="flex-shrink-0 w-40 bg-white rounded-lg border p-3 shadow-sm">
                         <div className="flex items-center gap-3 mb-2">
-                          <img src={p.pfpUrl || `https://cdn.stamp.fyi/avatar/${String(p.raw?.custody_address || '')}?s=64`} alt={p.username || p.displayName || 'user'} className="w-10 h-10 rounded-full" />
+                          <img
+                            src={p.pfpUrl || `https://cdn.stamp.fyi/avatar/${String(p.raw?.custody_address || "")}?s=64`}
+                            alt={p.username || p.displayName || "user"}
+                            className="w-10 h-10 rounded-full"
+                          />
                           <div>
                             <div className="text-sm font-bold">{p.displayName || p.username || `FID ${p.fid}`}</div>
-                            <div className="text-xs text-gray-500">{p.username || ''}</div>
+                            <div className="text-xs text-gray-500">{p.username || ""}</div>
                           </div>
                         </div>
                         <div className="text-xs text-gray-500 mb-2">{(p.followers || 0).toLocaleString()} followers</div>
@@ -218,7 +250,7 @@ export default function FarcasterLookupPage() {
                             className="flex-1 bg-[#F4A6B7] text-white text-xs py-1 rounded"
                             onClick={() => {
                               // populate lookup with this username; lookup will be triggered by useEffect
-                              const uname = p.username ? String(p.username).replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '') : '';
+                              const uname = p.username ? String(p.username).replace(/^@/, "").replace(/(?:\.farcaster\.eth|\.eth)$/i, "") : "";
                               if (uname) {
                                 setUsername(uname);
                               }
@@ -230,8 +262,8 @@ export default function FarcasterLookupPage() {
                             className="flex-1 border text-xs py-1 rounded"
                             onClick={() => {
                               // open their Neynar profile in a new tab
-                              const user = p.username ? String(p.username).replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '') : String(p.fid);
-                              window.open(`https://warpcast.com/${encodeURIComponent(user)}`, '_blank');
+                              const user = p.username ? String(p.username).replace(/^@/, "").replace(/(?:\.farcaster\.eth|\.eth)$/i, "") : String(p.fid);
+                              openInNewTab(`https://warpcast.com/${encodeURIComponent(user)}`);
                             }}
                           >
                             Warpcast
@@ -253,23 +285,22 @@ export default function FarcasterLookupPage() {
                         // Close the quiz modal first
                         setQuizOpen(false);
                         // Open an editable preview modal so the user can edit the cast text
-                        const target = result?.profile?.username || '';
+                        const target = result?.profile?.username || "";
                         // normalize handle so we don't end up with duplicate @ (some sources include '@')
                         // also strip known ENS/Farcaster suffixes so we only use plain username
-                        const cleanHandle = (target.startsWith('@') ? target.slice(1) : target).replace(/(?:\.farcaster\.eth|\.eth)$/i, '');
+                        const cleanHandle = (target.startsWith("@") ? target.slice(1) : target).replace(/(?:\.farcaster\.eth|\.eth)$/i, "");
                         // Use tPoints from quiz results (includes streak bonuses); fallback to base calc
-                        const computedTPoints = typeof (res as any)?.details?.tPoints === 'number'
-                          ? (res as any).details.tPoints
-                          : (res.score ?? 0) * 1000;
+                        const computedTPoints =
+                          typeof (res as any)?.details?.tPoints === "number" ? (res as any).details.tPoints : (res.score ?? 0) * 1000;
                         // Use the Triviacast base site for share links (clickable HTTPS).
-                        const challengeLink = 'https://triviacast.xyz';
+                        const challengeLink = "https://triviacast.xyz";
                         const pointsStr = Number(computedTPoints).toLocaleString();
                         // Spiced / playful default message
                         // Use plain @username only (do not append .farcaster.eth)
                         const mention = cleanHandle;
                         const defaultText = mention
-                          ? `@${mention} — I just played Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`
-                          : `I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on the Challenge page — ${challengeLink}`;
+                          ? `@${mention} — I just played Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink}`
+                          : `I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink}`;
                         setPreviewText(defaultText);
                         setPreviewLink(challengeLink);
                         setPreviewOpen(true);
@@ -288,20 +319,55 @@ export default function FarcasterLookupPage() {
                   <div className="w-11/12 max-w-2xl bg-white rounded-lg p-4 shadow-lg" onClick={(e) => e.stopPropagation()}>
                     <h2 className="text-lg font-bold mb-2">Preview your cast</h2>
                     <p className="text-sm text-gray-600 mb-2">Review the message below and post it from your account or copy it to share manually.</p>
-                    <textarea
-                      className="w-full h-32 p-2 border rounded mb-2 bg-gray-50"
-                      value={previewText}
-                      readOnly
-                    />
-                    <p className="text-xs text-gray-500 mb-3">To edit this message before posting, click "Post from my account" — edits should be done in Warpcast's compose box.</p>
+                    <textarea className="w-full h-32 p-2 border rounded mb-2 bg-gray-50" value={previewText} readOnly />
+                    <p className="text-xs text-gray-500 mb-3">To edit this message before posting, click "Post from my account" — edits should be done in the Farcaster composer when available; otherwise copy and paste into Warpcast or Base.</p>
+
+                    {sdkMissing && (
+                      <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                        Farcaster composer not available in this environment. Please copy the message below and paste it into your Warpcast/Base app to post.
+                        <div className="mt-2">
+                          <textarea className="w-full h-20 p-2 border rounded bg-white text-sm" value={`${previewText}${previewLink ? ` ${previewLink}` : ""}`} readOnly />
+                        </div>
+                      </div>
+                    )}
 
                     <div className="flex gap-2 items-center">
                       <button
                         className="bg-[#4F46E5] text-white px-3 py-2 rounded font-semibold"
-                        onClick={() => {
-                          // Open Warpcast compose with the text so the user can post from their account
-                          const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(previewText)}`;
-                          window.open(url, '_blank');
+                        onClick={async () => {
+                          setSdkMissing(false);
+                          // First try to use the Farcaster mini-app SDK compose action.
+                          // This will work when running inside a Farcaster/Neynar mini app and provide the best UX.
+                          try {
+                            // dynamic import so it only runs in browser and only if package is present
+                            // eslint-disable-next-line @typescript-eslint/no-var-requires
+                            const mod = await import("@farcaster/miniapp-sdk");
+                            const sdk = (mod as any).sdk;
+                            if (sdk && sdk.actions && typeof sdk.actions.composeCast === "function") {
+                              const result = await sdk.actions.composeCast({
+                                text: previewText,
+                                embeds: previewLink ? [previewLink] : undefined,
+                              });
+                              // If the user posted a cast, optionally close the preview
+                              if (result?.cast) {
+                                alert("Cast posted");
+                                setPreviewOpen(false);
+                                setPreviewText("");
+                                setPreviewLink("");
+                                setSdkMissing(false);
+                              } else {
+                                // user cancelled composer or didn't post; leave preview open
+                              }
+                              return;
+                            }
+                          } catch (err) {
+                            // Not running inside mini app or SDK not available — fall through to show guidance.
+                          }
+
+                          // IMPORTANT: Do NOT open Warpcast compose in a new tab here.
+                          // On mobile Farcaster, opening a new tab does not work reliably.
+                          // Instead show an inline instruction asking user to copy/paste into their Warpcast/Base app.
+                          setSdkMissing(true);
                         }}
                       >
                         Post from my account
@@ -311,12 +377,12 @@ export default function FarcasterLookupPage() {
                         type="button"
                         className="border px-3 py-2 rounded"
                         onClick={async () => {
-                          const textToCopy = `${previewText}${previewLink ? ` ${previewLink}` : ''}`;
+                          const textToCopy = `${previewText}${previewLink ? ` ${previewLink}` : ""}`;
                           // Try modern clipboard API first
                           try {
                             if (navigator && (navigator as any).clipboard && (navigator as any).clipboard.writeText) {
                               await (navigator as any).clipboard.writeText(textToCopy);
-                              alert('Copied to clipboard');
+                              alert("Copied to clipboard");
                               return;
                             }
                           } catch (err) {
@@ -325,30 +391,32 @@ export default function FarcasterLookupPage() {
 
                           // Fallback for older browsers: create a temporary textarea and execCommand
                           try {
-                            const ta = document.createElement('textarea');
+                            const ta = document.createElement("textarea");
                             ta.value = textToCopy;
                             // Move it off-screen
-                            ta.style.position = 'fixed';
-                            ta.style.left = '-9999px';
+                            ta.style.position = "fixed";
+                            ta.style.left = "-9999px";
                             document.body.appendChild(ta);
                             ta.select();
-                            const ok = document.execCommand('copy');
+                            const ok = document.execCommand("copy");
                             document.body.removeChild(ta);
                             if (ok) {
-                              alert('Copied to clipboard');
+                              alert("Copied to clipboard");
                               return;
                             }
                           } catch (err) {
                             // ignore
                           }
 
-                          alert('Copy failed — please select the text manually and copy.');
+                          alert("Copy failed — please select the text manually and copy.");
                         }}
                       >
                         Copy
                       </button>
 
-                      <button type="button" className="ml-auto text-sm text-gray-600" onClick={handleClosePreview}>Close</button>
+                      <button type="button" className="ml-auto text-sm text-gray-600" onClick={handleClosePreview}>
+                        Close
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -358,13 +426,9 @@ export default function FarcasterLookupPage() {
                 <div className="mt-4 w-full">
                   <h3 className="font-bold text-[#2d1b2e] text-base mb-2">Recent Casts</h3>
                   <ul className="space-y-2">
-                    {result.profile.casts.slice(0,5).map((cast: any, idx: number) => (
+                    {result.profile.casts.slice(0, 5).map((cast: any, idx: number) => (
                       <li key={cast.hash || idx}>
-                        <NeynarCastCard
-                          identifier={cast.hash || ''}
-                          renderEmbeds={true}
-                          type="url"
-                        />
+                        <NeynarCastCard identifier={cast.hash || ""} renderEmbeds={true} type="url" />
                       </li>
                     ))}
                   </ul>
