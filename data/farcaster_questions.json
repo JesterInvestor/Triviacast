@@ -1,1136 +1,1502 @@
 [
   {
-    "id": "fc_101",
+    "id": "fc_001",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "Which function is responsible for broadcasting message root hashes in the Farcaster Hub?",
-    "correct_answer": "submitMessageRoot",
+    "difficulty": "easy",
+    "question": "What is Farcaster?",
+    "correct_answer": "A decentralized social network",
     "incorrect_answers": [
-      "submitCast",
-      "anchorHash",
-      "batchAnnounce"
+      "A cryptocurrency exchange",
+      "A weather forecasting app",
+      "A video streaming platform"
     ],
-    "tags": ["farcaster", "hub", "protocol"]
+    "explanation": "Farcaster is a sufficiently decentralized social network built on Ethereum.",
+    "tags": ["farcaster", "basics"]
   },
   {
-    "id": "fc_102",
+    "id": "fc_002",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "What is the default encoding standard for onchain FID registrations on Farcaster?",
-    "correct_answer": "EIP-712",
+    "difficulty": "easy",
+    "question": "Who is the co-founder of Farcaster?",
+    "correct_answer": "Dan Romero",
     "incorrect_answers": [
-      "ERC-721",
-      "Base32",
-      "SHA-1"
+      "Vitalik Buterin",
+      "Brian Armstrong",
+      "Mark Zuckerberg"
     ],
-    "tags": ["farcaster", "id-registry", "encoding"]
+    "explanation": "Dan Romero (dwr.eth) co-founded Farcaster and previously worked at Coinbase.",
+    "tags": ["farcaster", "founders"]
   },
   {
-    "id": "fc_103",
+    "id": "fc_003",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "As of 2025, which key event triggers a \"storage rent\" renewal for a Farcaster user?",
-    "correct_answer": "Expiry of their existing storage period",
+    "difficulty": "easy",
+    "question": "What is a 'Frame' in Farcaster?",
+    "correct_answer": "An interactive element embedded in casts",
     "incorrect_answers": [
-      "Every 10 casts",
-      "New DM received",
-      "First wallet connect"
+      "A profile picture border",
+      "A type of NFT",
+      "A video format"
     ],
-    "tags": ["farcaster", "storage"]
+    "explanation": "Frames are interactive applications that can be embedded directly in Farcaster casts.",
+    "tags": ["farcaster", "frames"]
   },
   {
-    "id": "fc_104",
+    "id": "fc_004",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "In the Farcaster protocol, what does \"SignerAdd\" signify?",
-    "correct_answer": "Authorization of a new message signer for a user",
+    "difficulty": "easy",
+    "question": "What blockchain is Farcaster primarily built on?",
+    "correct_answer": "Ethereum",
     "incorrect_answers": [
-      "New moderator appointed",
-      "Opt-in to push notifications",
-      "Linking of channels"
-    ],
-    "tags": ["farcaster", "signer"]
-  },
-  {
-    "id": "fc_105",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "Which Farcaster protocol version first enabled delegation of message signing to smart contracts?",
-    "correct_answer": "v2",
-    "incorrect_answers": [
-      "v1.0",
-      "v1.1",
-      "v3-beta"
-    ],
-    "tags": ["farcaster", "protocol", "versions"]
-  },
-  {
-    "id": "fc_106",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "The “USER Data Add” message type is used to:",
-    "correct_answer": "Update user profile info",
-    "incorrect_answers": [
-      "Vote in a DAO",
-      "Mint NFTs",
-      "Update spam label"
-    ],
-    "tags": ["farcaster", "messages", "profile"]
-  },
-  {
-    "id": "fc_107",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "In Farcaster, what’s the technical term for the Merkle root of the Hub’s message log?",
-    "correct_answer": "Message root",
-    "incorrect_answers": [
-      "Genesis hash",
-      "Base root",
-      "FID anchor"
-    ],
-    "tags": ["farcaster", "merkle"]
-  },
-  {
-    "id": "fc_108",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "“Farcaster protocol messages” store which unique identifier for replay protection?",
-    "correct_answer": "Timestamp nonce",
-    "incorrect_answers": [
-      "Random UUID",
-      "Wallet signature string",
-      "Channel salt"
-    ],
-    "tags": ["farcaster", "security"]
-  },
-  {
-    "id": "fc_109",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "What format is used for cast storage serialization in Hub nodes?",
-    "correct_answer": "Protocol Buffers (protobuf)",
-    "incorrect_answers": [
-      "XML",
-      "GraphQL",
-      "ZIP"
-    ],
-    "tags": ["farcaster", "storage", "protobuf"]
-  },
-  {
-    "id": "fc_110",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "Which onchain registry coordinates FID ownership?",
-    "correct_answer": "ID Registry",
-    "incorrect_answers": [
-      "ENS contract",
-      "Message Anchor",
-      "Hubble"
-    ],
-    "tags": ["farcaster", "id-registry"]
-  },
-  {
-    "id": "fc_111",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "Who can perform a “Signer Remove” operation for a user?",
-    "correct_answer": "Only the current authorized signer(s) or owner",
-    "incorrect_answers": [
-      "Any mod",
-      "Protocol core team",
-      "Channel admin"
-    ],
-    "tags": ["farcaster", "signer", "auth"]
-  },
-  {
-    "id": "fc_112",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "As per Farcaster docs, what action does a “farcasterHubReorg” event signal?",
-    "correct_answer": "Hub state fork rolled back",
-    "incorrect_answers": [
-      "Channel split",
-      "Mini app update",
-      "Cast pin cleared"
-    ],
-    "tags": ["farcaster", "events"]
-  },
-  {
-    "id": "fc_113",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "What public endpoint returns all casts for a given user via Neynar?",
-    "correct_answer": "/v2/cast",
-    "incorrect_answers": [
-      "/allCasts",
-      "/userfeed",
-      "/publiccasts"
-    ],
-    "tags": ["farcaster", "api", "neynar"]
-  },
-  {
-    "id": "fc_114",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "In Farcaster’s Base deployment, which is used to index block events?",
-    "correct_answer": "The Onchain Event Gateway",
-    "incorrect_answers": [
-      "Ethereum event logs",
-      "WalletConnect relayer",
-      "L1 Anchor Wrapper"
-    ],
-    "tags": ["farcaster", "infrastructure"]
-  },
-  {
-    "id": "fc_115",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "Farcaster’s “bulkCast” mutation is mostly used for:",
-    "correct_answer": "Posting multiple casts in a single API call",
-    "incorrect_answers": [
-      "Quoting only",
-      "Sending ETH",
-      "Degen airdrop"
-    ],
-    "tags": ["farcaster", "api"]
-  },
-  {
-    "id": "fc_116",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "Which storage key format is used to namespace user data in a Hub’s database?",
-    "correct_answer": "[FID]-[message type]-[timestamp]",
-    "incorrect_answers": [
-      "[FID]-[type]",
-      "[username]:[date]",
-      "[rootHash]/[index]"
-    ],
-    "tags": ["farcaster", "storage", "keys"]
-  },
-  {
-    "id": "fc_117",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "Who is responsible for the Farcaster open RPC API reference?",
-    "correct_answer": "Neynar",
-    "incorrect_answers": [
-      "The community",
-      "Only Merkle",
-      "OpenZeppelin"
-    ],
-    "tags": ["farcaster", "api", "neynar"]
-  },
-  {
-    "id": "fc_118",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "Frame verification logic on clients is typically handled with which technology?",
-    "correct_answer": "EIP-712 signature validation",
-    "incorrect_answers": [
-      "React",
-      "Ethers.js",
-      "MetaMask"
-    ],
-    "tags": ["farcaster", "security", "signatures"]
-  },
-  {
-    "id": "fc_119",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "Farcaster’s Mini App manifest files must be hosted at:",
-    "correct_answer": "A public HTTPS endpoint",
-    "incorrect_answers": [
-      "arweave.net",
-      "app.json",
-      "Only on IPFS"
-    ],
-    "tags": ["farcaster", "miniapp", "manifests"]
-  },
-  {
-    "id": "fc_120",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "What is the function of the “syncEngine” in a Farcaster Hub?",
-    "correct_answer": "Synchronize messages with other Hubs",
-    "incorrect_answers": [
-      "Rebuild wallet",
-      "Serve memes",
-      "Analytics export"
-    ],
-    "tags": ["farcaster", "hub", "sync"]
-  },
-  {
-    "id": "fc_121",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "“Custody events” in Farcaster mean:",
-    "correct_answer": "Ownership changes on the ID registry",
-    "incorrect_answers": [
-      "Staking",
-      "ETH transfer",
-      "Cast deletion"
-    ],
-    "tags": ["farcaster", "custody", "id-registry"]
-  },
-  {
-    "id": "fc_122",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "What is the maximum number of moderator bots allowed per channel as of mid-2025?",
-    "correct_answer": "5",
-    "incorrect_answers": [
-      "No limit",
-      "1",
-      "10"
-    ],
-    "tags": ["farcaster", "channels", "moderation"]
-  },
-  {
-    "id": "fc_123",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "Which entity verifies the verifications (like Twitter handle) on Farcaster profiles?",
-    "correct_answer": "Farcaster Verifications contract",
-    "incorrect_answers": [
-      "Farcaster team",
-      "Twitter itself",
-      "Channel mod"
-    ],
-    "tags": ["farcaster", "verifications", "contracts"]
-  },
-  {
-    "id": "fc_124",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "The “Hub” database uses which technology to enforce immutability of logs?",
-    "correct_answer": "Append-only Merkle tree",
-    "incorrect_answers": [
-      "Datadog",
-      "Docker",
-      "Archive.org"
-    ],
-    "tags": ["farcaster", "merkle", "storage"]
-  },
-  {
-    "id": "fc_125",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "The default way to resolve a Farcaster name to FID is:",
-    "correct_answer": "Read from the ID Registry contract",
-    "incorrect_answers": [
-      "Direct L1 call",
-      "Ping the Hub backend",
-      "ENS reverse lookup"
-    ],
-    "tags": ["farcaster", "id-registry", "resolution"]
-  },
-  {
-    "id": "fc_126",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "What is a “username proof” on Farcaster?",
-    "correct_answer": "Hash proof linking username to signature and FID",
-    "incorrect_answers": [
-      "Proof of work",
-      "NFT token",
-      "Transaction receipt"
-    ],
-    "tags": ["farcaster", "username", "proof"]
-  },
-  {
-    "id": "fc_127",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "Which chain is not currently supported for verifying Farcaster addresses (as of late 2025)?",
-    "correct_answer": "Tron",
-    "incorrect_answers": [
-      "Ethereum mainnet",
+      "Bitcoin",
       "Solana",
-      "Base"
+      "Cardano"
     ],
-    "tags": ["farcaster", "chains"]
+    "explanation": "Farcaster uses Ethereum for identity and key management.",
+    "tags": ["farcaster", "blockchain"]
   },
   {
-    "id": "fc_128",
+    "id": "fc_005",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "“Message pruning” in Farcaster refers to:",
-    "correct_answer": "Dropping old messages to save space",
+    "difficulty": "easy",
+    "question": "What is the main Farcaster client called?",
+    "correct_answer": "Warpcast",
     "incorrect_answers": [
-      "Wallet sums",
-      "Username expiration",
-      "Moderator actions"
+      "Farcaster App",
+      "Castaway",
+      "Farcast"
     ],
-    "tags": ["farcaster", "storage", "pruning"]
-  },
-  {
-    "id": "fc_129",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "The Hub gossips live events with peers using what protocol?",
-    "correct_answer": "Libp2p",
-    "incorrect_answers": [
-      "Relaynet",
-      "TCP direct",
-      "UDPcast"
-    ],
-    "tags": ["farcaster", "network", "libp2p"]
-  },
-  {
-    "id": "fc_130",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "Farcaster’s first testnet prior to Base was:",
-    "correct_answer": "Goerli",
-    "incorrect_answers": [
-      "Kovan",
-      "Ropsten",
-      "Holesky"
-    ],
-    "tags": ["farcaster", "testnet"]
-  },
-  {
-    "id": "fc_131",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "Which part of a Farcaster mini app is responsible for rendering the UI?",
-    "correct_answer": "The frame component hosted by the developer",
-    "incorrect_answers": [
-      "Host site",
-      "IPFS",
-      "Wallet extension"
-    ],
-    "tags": ["farcaster", "miniapp", "ui"]
-  },
-  {
-    "id": "fc_132",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "The “profile snapshot” for identity recovery includes:",
-    "correct_answer": "All user keys, username proof, latest signature",
-    "incorrect_answers": [
-      "ETH address, FID, spam label",
-      "The profile image only",
-      "Only FID"
-    ],
-    "tags": ["farcaster", "recovery"]
-  },
-  {
-    "id": "fc_133",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "What does the ID Registry emit when a new FID is claimed?",
-    "correct_answer": "Register",
-    "incorrect_answers": [
-      "FIDClaimed",
-      "Transfer",
-      "RegisterFID"
-    ],
-    "tags": ["farcaster", "id-registry", "events"]
-  },
-  {
-    "id": "fc_134",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "How are “DMs” in Farcaster structurally stored?",
-    "correct_answer": "Encrypted, off-protocol (currently experimental)",
-    "incorrect_answers": [
-      "On public channels",
-      "In IPFS only",
-      "L1 Ethereum"
-    ],
-    "tags": ["farcaster", "dm", "privacy"]
-  },
-  {
-    "id": "fc_135",
-    "category": "Farcaster Knowledge",
-    "type": "multiple",
-    "difficulty": "hard",
-    "question": "What is the maximum cast reply depth supported in Warpcast/Farcaster clients?",
-    "correct_answer": "10",
-    "incorrect_answers": [
-      "Infinite",
-      "2",
-      "64"
-    ],
+    "explanation": "Warpcast is the primary client for accessing Farcaster, developed by the core team.",
     "tags": ["farcaster", "clients"]
   },
   {
-    "id": "fc_136",
+    "id": "fc_006",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "“FID recovery” after wallet loss is possible by:",
-    "correct_answer": "Using a pre-set recovery address mechanism",
+    "difficulty": "medium",
+    "question": "What is a 'cast' on Farcaster?",
+    "correct_answer": "A post or message",
     "incorrect_answers": [
-      "Contacting support",
-      "Sending $DEGEN",
-      "Channel mod help"
+      "A type of wallet",
+      "A smart contract",
+      "A token"
     ],
-    "tags": ["farcaster", "recovery"]
+    "explanation": "A cast is the Farcaster equivalent of a tweet or post on other social networks.",
+    "tags": ["farcaster", "terminology"]
   },
   {
-    "id": "fc_137",
+    "id": "fc_007",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "Which tool is recommended to build real-time Farcaster dashboards?",
-    "correct_answer": "Neynar Webhooks/Streams",
+    "difficulty": "medium",
+    "question": "What does 'Farcaster ID' (FID) represent?",
+    "correct_answer": "A unique identifier for each user",
     "incorrect_answers": [
-      "Google Sheets",
-      "Notion",
-      "Lens API"
+      "A payment token",
+      "A verification badge",
+      "A post category"
     ],
-    "tags": ["farcaster", "dashboards", "neynar"]
+    "explanation": "Every Farcaster account has a unique numeric FID associated with it.",
+    "tags": ["farcaster", "identity"]
   },
   {
-    "id": "fc_138",
+    "id": "fc_008",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "When is the spam label for a user typically updated?",
-    "correct_answer": "Batch review by Merkle’s anti-abuse system",
+    "difficulty": "medium",
+    "question": "What year was Farcaster launched?",
+    "correct_answer": "2021",
     "incorrect_answers": [
-      "User request",
-      "Mini app trigger",
-      "FID renewal"
+      "2019",
+      "2020",
+      "2022"
     ],
-    "tags": ["farcaster", "moderation", "spam"]
+    "explanation": "Farcaster launched in 2021 as a decentralized social network protocol.",
+    "tags": ["farcaster", "history"]
   },
   {
-    "id": "fc_139",
+    "id": "fc_009",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "Farcaster Hub logs use what timestamp convention?",
-    "correct_answer": "Unix epoch (UTC)",
+    "difficulty": "medium",
+    "question": "What is a 'Channel' on Farcaster?",
+    "correct_answer": "A topic-based community feed",
     "incorrect_answers": [
-      "EST",
-      "ISO-8601 local",
-      "RFC 3339"
+      "A private messaging group",
+      "A video stream",
+      "A NFT collection"
     ],
-    "tags": ["farcaster", "logs", "timestamps"]
+    "explanation": "Channels are community-driven feeds organized around specific topics or interests.",
+    "tags": ["farcaster", "channels"]
   },
   {
-    "id": "fc_140",
+    "id": "fc_010",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "A “far verification” can refer to:",
-    "correct_answer": "A wallet signature attesting to ETH or SOL ownership",
+    "difficulty": "medium",
+    "question": "What protocol does Farcaster use for storing data?",
+    "correct_answer": "Hub protocol with off-chain storage",
     "incorrect_answers": [
-      "Near-verified",
-      "Channel mod badge",
-      "First cast only"
+      "IPFS only",
+      "All on Ethereum mainnet",
+      "Centralized AWS servers"
     ],
-    "tags": ["farcaster", "verifications"]
+    "explanation": "Farcaster uses a hybrid approach with on-chain identity and off-chain data storage via Hubs.",
+    "tags": ["farcaster", "architecture"]
   },
   {
-    "id": "fc_141",
+    "id": "fc_011",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "Farcaster’s “Event Gateway” facilitates:",
-    "correct_answer": "Real-time broadcast/relay of onchain events",
+    "question": "What is the Farcaster 'Hub'?",
+    "correct_answer": "A node that stores and syncs Farcaster data",
     "incorrect_answers": [
-      "Quoting",
-      "Username registration",
-      "Paid tips"
+      "The main website interface",
+      "A cryptocurrency wallet",
+      "A governance token"
     ],
-    "tags": ["farcaster", "event-gateway"]
+    "explanation": "Hubs are nodes that store, validate, and sync Farcaster messages across the network.",
+    "tags": ["farcaster", "hard", "infrastructure"]
   },
   {
-    "id": "fc_142",
+    "id": "fc_012",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "How are onchain channel registrations linked to Farcaster protocol?",
-    "correct_answer": "Onchain Channel Registry contract",
+    "question": "What consensus mechanism does Farcaster use?",
+    "correct_answer": "CRDTs (Conflict-free Replicated Data Types)",
     "incorrect_answers": [
-      "WalletConnect",
-      "Twitter API",
-      "Bun.js"
+      "Proof of Work",
+      "Proof of Stake",
+      "Delegated Proof of Stake"
     ],
-    "tags": ["farcaster", "channels", "contracts"]
+    "explanation": "Farcaster uses CRDTs to achieve eventual consistency across the network without traditional consensus.",
+    "tags": ["farcaster", "hard", "technical"]
   },
   {
-    "id": "fc_143",
+    "id": "fc_013",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "The “trending” tab in Farcaster Channel Feed is powered by:",
-    "correct_answer": "A composite of recency and reaction score",
+    "question": "What is the maximum size of a Farcaster cast?",
+    "correct_answer": "320 characters",
     "incorrect_answers": [
-      "Only likes",
-      "Random posts",
-      "Mini app launches"
+      "140 characters",
+      "280 characters",
+      "500 characters"
     ],
-    "tags": ["farcaster", "feeds", "trending"]
+    "explanation": "Farcaster casts have a 320 character limit, slightly longer than Twitter's original limit.",
+    "tags": ["farcaster", "hard", "specifications"]
   },
   {
-    "id": "fc_144",
+    "id": "fc_014",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "What’s the “root index” in a Farcaster Hub?",
-    "correct_answer": "Merkle tree index for message root",
+    "question": "Which smart contract standard is used for Farcaster ID registry?",
+    "correct_answer": "ERC-721 (NFT)",
     "incorrect_answers": [
-      "Wallet nonce",
-      "Channel ID",
-      "Profile backup"
+      "ERC-20 (Fungible Token)",
+      "ERC-1155 (Multi Token)",
+      "ERC-4337 (Account Abstraction)"
     ],
-    "tags": ["farcaster", "merkle", "index"]
+    "explanation": "Farcaster IDs are represented as ERC-721 NFTs on Ethereum.",
+    "tags": ["farcaster", "hard", "smart-contracts"]
   },
   {
-    "id": "fc_145",
+    "id": "fc_015",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "“Replay attack prevention” in message signing means:",
-    "correct_answer": "Uniqueness enforced via nonces and timestamps",
+    "question": "What is Farcaster's approach to moderation?",
+    "correct_answer": "Client-level moderation, not protocol-level",
     "incorrect_answers": [
-      "Random usernames",
-      "Only bot-safe",
-      "Channel leader signature"
+      "Global protocol-level censorship",
+      "No moderation at all",
+      "AI-only automated moderation"
     ],
-    "tags": ["farcaster", "security", "replay"]
+    "explanation": "Farcaster allows each client to implement their own moderation policies.",
+    "tags": ["farcaster", "hard", "governance"]
   },
   {
-    "id": "fc_146",
+    "id": "fc_016",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "What is the expected minimum Base ETH balance to renew Farcaster storage as of 2025?",
-    "correct_answer": "~0.001–0.005 Base ETH",
+    "question": "What is 'rent' in the Farcaster context?",
+    "correct_answer": "Storage fee for maintaining data on Hubs",
     "incorrect_answers": [
-      "0.5",
-      "1.0",
-      "0"
+      "A monthly subscription to Warpcast",
+      "Gas fees for Ethereum transactions",
+      "A tipping mechanism for content"
     ],
-    "tags": ["farcaster", "economics", "storage"]
+    "explanation": "Users pay rent (in ETH) to store their data on Farcaster Hubs.",
+    "tags": ["farcaster", "hard", "economics"]
   },
   {
-    "id": "fc_147",
+    "id": "fc_017",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "For which critical operation is the storage “expiry” timestamp checked most frequently?",
-    "correct_answer": "Posting any new message",
+    "question": "What programming language is the Farcaster Hub written in?",
+    "correct_answer": "TypeScript",
     "incorrect_answers": [
-      "Channel refresh",
-      "Editing username",
-      "DM opening"
+      "Rust",
+      "Go",
+      "Python"
     ],
+    "explanation": "The Farcaster Hub implementation is written in TypeScript and runs on Node.js.",
+    "tags": ["farcaster", "hard", "technical"]
+  },
+  {
+    "id": "fc_018",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the Farcaster Name Registry (FNR)?",
+    "correct_answer": "A system for registering human-readable usernames",
+    "incorrect_answers": [
+      "A token standard",
+      "A governance system",
+      "A payment processor"
+    ],
+    "explanation": "The FNR allows users to register .eth-like names for their Farcaster accounts.",
+    "tags": ["farcaster", "hard", "identity"]
+  },
+  {
+    "id": "fc_019",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the purpose of 'Signers' in Farcaster?",
+    "correct_answer": "To delegate signing authority to apps without exposing private keys",
+    "incorrect_answers": [
+      "To verify user identity",
+      "To mint NFTs",
+      "To stake tokens"
+    ],
+    "explanation": "Signers allow applications to post on behalf of users without accessing their main private keys.",
+    "tags": ["farcaster", "hard", "security"]
+  },
+  {
+    "id": "fc_020",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "How many Hubs are recommended for a production Farcaster setup?",
+    "correct_answer": "At least 3 for redundancy",
+    "incorrect_answers": [
+      "Only 1 is needed",
+      "Exactly 2",
+      "10 or more"
+    ],
+    "explanation": "Running multiple Hubs provides redundancy and reliability for production applications.",
+    "tags": ["farcaster", "hard", "infrastructure"]
+  },
+  {
+    "id": "fc_021",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "What is the symbol used before a username on Farcaster?",
+    "correct_answer": "@",
+    "incorrect_answers": [
+      "#",
+      "$",
+      "&"
+    ],
+    "explanation": "Farcaster uses @ for mentions, similar to Twitter and other social platforms.",
+    "tags": ["farcaster", "basics"]
+  },
+  {
+    "id": "fc_022",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Can you edit a cast after posting it?",
+    "correct_answer": "No, casts are immutable",
+    "incorrect_answers": [
+      "Yes, within 5 minutes",
+      "Yes, anytime",
+      "Yes, but it shows as edited"
+    ],
+    "explanation": "Like blockchain transactions, casts cannot be edited once posted. You can only delete them.",
+    "tags": ["farcaster", "basics"]
+  },
+  {
+    "id": "fc_023",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What is the 'Warps' feature in Warpcast?",
+    "correct_answer": "NFT collectibles and achievements",
+    "incorrect_answers": [
+      "A payment system",
+      "A video feature",
+      "Private messaging"
+    ],
+    "explanation": "Warps are collectible NFTs that represent achievements and milestones on Warpcast.",
+    "tags": ["farcaster", "warpcast"]
+  },
+  {
+    "id": "fc_024",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What network are Farcaster storage fees paid on?",
+    "correct_answer": "Optimism",
+    "incorrect_answers": [
+      "Ethereum Mainnet",
+      "Polygon",
+      "Arbitrum"
+    ],
+    "explanation": "Farcaster uses Optimism (Layer 2) for storage payments to reduce costs.",
+    "tags": ["farcaster", "layer2"]
+  },
+  {
+    "id": "fc_025",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What is 'Neynar'?",
+    "correct_answer": "A Farcaster infrastructure provider and API service",
+    "incorrect_answers": [
+      "A Farcaster alternative client",
+      "A token on Farcaster",
+      "A moderation tool"
+    ],
+    "explanation": "Neynar provides APIs and infrastructure for developers building on Farcaster.",
+    "tags": ["farcaster", "infrastructure"]
+  },
+  {
+    "id": "fc_026",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "How many free storage units does a new Farcaster account get?",
+    "correct_answer": "3 storage units",
+    "incorrect_answers": [
+      "1 storage unit",
+      "5 storage units",
+      "10 storage units"
+    ],
+    "explanation": "New accounts receive 3 storage units, with each unit supporting a certain number of casts.",
     "tags": ["farcaster", "storage"]
   },
   {
-    "id": "fc_148",
+    "id": "fc_027",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "“Mini app manifests” must include which property as mandatory?",
-    "correct_answer": "App ID and entry URL",
+    "difficulty": "medium",
+    "question": "What is 'Farcord'?",
+    "correct_answer": "A Discord-like interface for Farcaster",
     "incorrect_answers": [
-      "App logo",
-      "Token ticker",
-      "IPFS hash"
+      "A Farcaster token",
+      "A Frame type",
+      "A moderation bot"
     ],
-    "tags": ["farcaster", "miniapp", "manifests"]
+    "explanation": "Farcord is a third-party client that provides a Discord-like experience for Farcaster.",
+    "tags": ["farcaster", "clients"]
   },
   {
-    "id": "fc_149",
+    "id": "fc_028",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "The Farcaster Channel Registry contract primarily emits:",
-    "correct_answer": "ChannelCreated, ChannelUpdated, ChannelTransferred",
+    "question": "What is the Farcaster protocol version currently in use?",
+    "correct_answer": "Version 2 (Hubble)",
     "incorrect_answers": [
-      "OnRegister",
-      "ActivityLog",
-      "ChannelVote"
+      "Version 1 (Legacy)",
+      "Version 3 (Alpha)",
+      "Version 0.5 (Beta)"
     ],
-    "tags": ["farcaster", "channels", "contracts"]
+    "explanation": "Farcaster migrated to Version 2 (Hubble) which improved scalability and features.",
+    "tags": ["farcaster", "hard", "technical"]
   },
   {
-    "id": "fc_150",
+    "id": "fc_029",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "“Developer signers” are recommended for:",
-    "correct_answer": "Application bots, test services, and mini apps",
+    "question": "What is the maximum number of reactions a cast can receive?",
+    "correct_answer": "Unlimited",
     "incorrect_answers": [
-      "All main accounts",
-      "ETH wallet swaps",
-      "Username proof"
+      "1,000",
+      "10,000",
+      "100,000"
     ],
-    "tags": ["farcaster", "signers", "developer"]
+    "explanation": "There is no limit to the number of reactions (likes, recasts) a cast can receive.",
+    "tags": ["farcaster", "hard", "specifications"]
   },
   {
-    "id": "fc_151",
+    "id": "fc_030",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "The “embed” parameter in cast URLs is used for:",
-    "correct_answer": "Embedding media/resources in posts and frames",
+    "question": "Which L2 solution does Farcaster use for onchain interactions?",
+    "correct_answer": "Base",
     "incorrect_answers": [
-      "Redirect",
-      "Pinning",
-      "Channel boosts"
+      "Arbitrum",
+      "zkSync",
+      "Starknet"
     ],
-    "tags": ["farcaster", "urls", "embed"]
+    "explanation": "Farcaster heavily integrates with Base, Coinbase's Layer 2 solution.",
+    "tags": ["farcaster", "hard", "layer2"]
   },
   {
-    "id": "fc_152",
-    "category": "Farcaster Knowledge",
+    "id": "fc_031",
+    "category": "Farcaster Creators",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "What format must a Farcaster frame’s signature response use?",
-    "correct_answer": "EIP-712-compliant JSON",
+    "difficulty": "medium",
+    "question": "Who created the popular 'Paragraph' publishing platform on Farcaster?",
+    "correct_answer": "The Paragraph team",
     "incorrect_answers": [
-      "ASCII",
-      "raw",
-      ".sol Extension"
+      "Dan Romero",
+      "Varun Srinivasan",
+      "Vitalik Buterin"
     ],
-    "tags": ["farcaster", "signatures", "eip-712"]
+    "explanation": "Paragraph is a decentralized publishing platform that integrates with Farcaster.",
+    "tags": ["farcaster", "creators", "ecosystem"]
   },
   {
-    "id": "fc_153",
-    "category": "Farcaster Knowledge",
+    "id": "fc_032",
+    "category": "Farcaster Creators",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "Which party resolves disputes in channel ownership transfers?",
-    "correct_answer": "The Channel Registry contract",
+    "difficulty": "medium",
+    "question": "What is 'Yup' in the Farcaster ecosystem?",
+    "correct_answer": "A social rewards protocol",
     "incorrect_answers": [
-      "OpenSea",
-      "Ethereans",
-      "Warpcast support"
+      "A video sharing app",
+      "A wallet provider",
+      "A moderation tool"
     ],
-    "tags": ["farcaster", "channels", "disputes"]
+    "explanation": "Yup rewards users for their social activity across multiple platforms including Farcaster.",
+    "tags": ["farcaster", "creators", "ecosystem"]
   },
   {
-    "id": "fc_154",
-    "category": "Farcaster Knowledge",
+    "id": "fc_033",
+    "category": "Farcaster Creators",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "Channels with “private” status have which extra feature?",
-    "correct_answer": "Invite/review-only membership",
+    "difficulty": "medium",
+    "question": "Who is 'dwr.eth'?",
+    "correct_answer": "Dan Romero, co-founder of Farcaster",
     "incorrect_answers": [
-      "Auto-muting",
-      "Degen tips",
-      "NFT gating"
+      "A popular NFT artist",
+      "A crypto influencer",
+      "A security researcher"
     ],
-    "tags": ["farcaster", "channels", "privacy"]
+    "explanation": "dwr.eth is Dan Romero's handle, one of Farcaster's co-founders.",
+    "tags": ["farcaster", "creators", "founders"]
   },
   {
-    "id": "fc_155",
-    "category": "Farcaster Knowledge",
+    "id": "fc_034",
+    "category": "Farcaster Creators",
     "type": "multiple",
-    "difficulty": "hard",
-    "question": "Who first proposed the “dual signature” approach for delegated key rotation?",
-    "correct_answer": "lostkobrakai",
+    "difficulty": "medium",
+    "question": "What is 'Purple DAO'?",
+    "correct_answer": "A community DAO supporting Farcaster ecosystem",
     "incorrect_answers": [
-      "dev0",
-      "dwr",
-      "Merkle DAO"
+      "A token",
+      "A NFT collection",
+      "A moderation team"
     ],
-    "tags": ["farcaster", "security", "history"]
+    "explanation": "Purple DAO is a community organization that supports and funds Farcaster projects.",
+    "tags": ["farcaster", "creators", "dao"]
   },
   {
-    "id": "fc_156",
+    "id": "fc_035",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Who created 'Farcaster Wrapped'?",
+    "correct_answer": "Community developers",
+    "incorrect_answers": [
+      "The Warpcast team",
+      "Spotify",
+      "Dan Romero"
+    ],
+    "explanation": "Farcaster Wrapped is a community-created year-in-review tool, inspired by Spotify Wrapped.",
+    "tags": ["farcaster", "creators", "community"]
+  },
+  {
+    "id": "fc_036",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is 'Airstack' used for in Farcaster?",
+    "correct_answer": "API for querying on-chain and social data",
+    "incorrect_answers": [
+      "A cloud storage solution",
+      "A video streaming service",
+      "A wallet app"
+    ],
+    "explanation": "Airstack provides developer APIs for querying Farcaster social graph and blockchain data.",
+    "tags": ["farcaster", "creators", "hard", "infrastructure"]
+  },
+  {
+    "id": "fc_037",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Who is Varun Srinivasan?",
+    "correct_answer": "Co-founder and technical lead of Farcaster",
+    "incorrect_answers": [
+      "CEO of Coinbase",
+      "Creator of Ethereum",
+      "Lead of Warpcast marketing"
+    ],
+    "explanation": "Varun (also known as v) is a co-founder of Farcaster and leads technical development.",
+    "tags": ["farcaster", "creators", "hard", "founders"]
+  },
+  {
+    "id": "fc_038",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is 'Searchcaster'?",
+    "correct_answer": "A search engine for Farcaster content",
+    "incorrect_answers": [
+      "A podcast hosting platform",
+      "An NFT marketplace",
+      "A token price tracker"
+    ],
+    "explanation": "Searchcaster enables full-text search across all Farcaster casts and profiles.",
+    "tags": ["farcaster", "creators", "hard", "tools"]
+  },
+  {
+    "id": "fc_039",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the 'Jam' protocol on Farcaster?",
+    "correct_answer": "A social tipping and rewards system",
+    "incorrect_answers": [
+      "A music streaming app",
+      "A video conferencing tool",
+      "A DAO voting mechanism"
+    ],
+    "explanation": "Jam enables tipping and social rewards within the Farcaster ecosystem.",
+    "tags": ["farcaster", "creators", "hard", "ecosystem"]
+  },
+  {
+    "id": "fc_040",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What does 'Tiles' refer to in Farcaster?",
+    "correct_answer": "A visual frame format for displaying data",
+    "incorrect_answers": [
+      "A puzzle game",
+      "A NFT collection",
+      "A storage metric"
+    ],
+    "explanation": "Tiles are a frame format that displays information in a grid-like visual layout.",
+    "tags": ["farcaster", "creators", "hard", "frames"]
+  },
+  {
+    "id": "fc_041",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What is 'Launchcaster'?",
+    "correct_answer": "A platform for discovering new Farcaster projects",
+    "incorrect_answers": [
+      "A rocket ship NFT collection",
+      "A token launchpad",
+      "A video game"
+    ],
+    "explanation": "Launchcaster helps users discover and explore new projects in the Farcaster ecosystem.",
+    "tags": ["farcaster", "creators", "discovery"]
+  },
+  {
+    "id": "fc_042",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What is 'Unlonely'?",
+    "correct_answer": "A live streaming platform on Farcaster",
+    "incorrect_answers": [
+      "A dating app",
+      "A mental health bot",
+      "A community support group"
+    ],
+    "explanation": "Unlonely is a live streaming platform built for the Farcaster community.",
+    "tags": ["farcaster", "creators", "streaming"]
+  },
+  {
+    "id": "fc_043",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What is 'Wildcard'?",
+    "correct_answer": "A Farcaster client focused on discovery",
+    "incorrect_answers": [
+      "A poker game",
+      "An NFT marketplace",
+      "A random cast generator"
+    ],
+    "explanation": "Wildcard is an alternative Farcaster client with unique discovery features.",
+    "tags": ["farcaster", "creators", "clients"]
+  },
+  {
+    "id": "fc_044",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What is 'Highlights' on Farcaster?",
+    "correct_answer": "A curation tool for saving best content",
+    "incorrect_answers": [
+      "A hair coloring NFT project",
+      "A photo editing app",
+      "A video clips feature"
+    ],
+    "explanation": "Highlights allows users to save and curate their favorite Farcaster content.",
+    "tags": ["farcaster", "creators", "curation"]
+  },
+  {
+    "id": "fc_045",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is 'Farcaster Improvement Proposal' (FIP)?",
+    "correct_answer": "A process for proposing protocol changes",
+    "incorrect_answers": [
+      "A token distribution mechanism",
+      "A moderation framework",
+      "A bug bounty program"
+    ],
+    "explanation": "FIPs are the formal process for suggesting improvements to the Farcaster protocol.",
+    "tags": ["farcaster", "creators", "hard", "governance"]
+  },
+  {
+    "id": "fc_046",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is 'Eventcaster'?",
+    "correct_answer": "An event management and discovery platform",
+    "incorrect_answers": [
+      "A podcast platform",
+      "A news aggregator",
+      "A weather app"
+    ],
+    "explanation": "Eventcaster helps communities organize and discover events on Farcaster.",
+    "tags": ["farcaster", "creators", "hard", "events"]
+  },
+  {
+    "id": "fc_047",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the 'Farcaster OG Badge'?",
+    "correct_answer": "A recognition for early Farcaster adopters",
+    "incorrect_answers": [
+      "A token reward",
+      "A verification checkmark",
+      "A premium subscription"
+    ],
+    "explanation": "The OG badge recognizes users who joined Farcaster in its early days.",
+    "tags": ["farcaster", "creators", "hard", "badges"]
+  },
+  {
+    "id": "fc_048",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is 'Backdrop Build'?",
+    "correct_answer": "A platform for funding Farcaster projects",
+    "incorrect_answers": [
+      "A photo background tool",
+      "A stage design app",
+      "A video editing suite"
+    ],
+    "explanation": "Backdrop Build provides funding and support for Farcaster ecosystem projects.",
+    "tags": ["farcaster", "creators", "hard", "funding"]
+  },
+  {
+    "id": "fc_049",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What does 'Pinata' provide for Farcaster developers?",
+    "correct_answer": "IPFS and media hosting infrastructure",
+    "incorrect_answers": [
+      "A piñata NFT collection",
+      "A party planning app",
+      "A games platform"
+    ],
+    "explanation": "Pinata offers IPFS storage and media hosting services for Farcaster applications.",
+    "tags": ["farcaster", "creators", "hard", "infrastructure"]
+  },
+  {
+    "id": "fc_050",
+    "category": "Farcaster Creators",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is 'Bountycaster'?",
+    "correct_answer": "A platform for posting and completing bounties",
+    "incorrect_answers": [
+      "A hunter game",
+      "A reward token",
+      "A moderation tool"
+    ],
+    "explanation": "Bountycaster enables users to post tasks/bounties and reward others for completing them.",
+    "tags": ["farcaster", "creators", "hard", "bounties"]
+  },
+  {
+    "id": "fc_051",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "What is the main purpose of Channels on Farcaster?",
+    "correct_answer": "To organize content by topic",
+    "incorrect_answers": [
+      "To create private groups",
+      "To sell NFTs",
+      "To stream videos"
+    ],
+    "explanation": "Channels help organize Farcaster content around specific topics and communities.",
+    "tags": ["farcaster", "channels"]
+  },
+  {
+    "id": "fc_052",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Can you delete a cast after posting?",
+    "correct_answer": "Yes, but it may remain in some caches",
+    "incorrect_answers": [
+      "No, never",
+      "Yes, completely and permanently",
+      "Only within 1 minute"
+    ],
+    "explanation": "You can delete casts, but they may persist in some caches or archives.",
+    "tags": ["farcaster", "basics"]
+  },
+  {
+    "id": "fc_053",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What is a 'Recast' on Farcaster?",
+    "correct_answer": "Sharing someone else's cast to your followers",
+    "incorrect_answers": [
+      "Editing your own cast",
+      "Deleting a cast",
+      "Reporting inappropriate content"
+    ],
+    "explanation": "Recasting is similar to retweeting - sharing someone's content with your audience.",
+    "tags": ["farcaster", "features"]
+  },
+  {
+    "id": "fc_054",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What does 'Power Badge' represent on Warpcast?",
+    "correct_answer": "Active and trusted community member status",
+    "incorrect_answers": [
+      "Premium subscription",
+      "Token holder status",
+      "Developer verification"
+    ],
+    "explanation": "Power Badge recognizes active, trusted members who contribute positively to the community.",
+    "tags": ["farcaster", "verification"]
+  },
+  {
+    "id": "fc_055",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What is the Farcaster username format?",
+    "correct_answer": "@username or username.eth",
+    "incorrect_answers": [
+      "Only @username",
+      "Only username.eth",
+      "#username"
+    ],
+    "explanation": "Farcaster supports both simple @username handles and ENS names like username.eth.",
+    "tags": ["farcaster", "identity"]
+  },
+  {
+    "id": "fc_056",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "What’s the typical time window for trending-ranking epochs on Farcaster?",
-    "correct_answer": "6 hours",
+    "question": "What is the typical cost to register a Farcaster account?",
+    "correct_answer": "Around $5-10 in ETH (plus gas)",
     "incorrect_answers": [
-      "1 hour",
+      "Free",
+      "100 ETH",
+      "0.1 BTC"
+    ],
+    "explanation": "Registering a Farcaster ID requires paying a small fee in ETH, typically $5-10 plus gas.",
+    "tags": ["farcaster", "hard", "onboarding"]
+  },
+  {
+    "id": "fc_057",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is 'Warpcast Pro'?",
+    "correct_answer": "A premium tier with advanced features",
+    "incorrect_answers": [
+      "A developer tool",
+      "A token",
+      "A separate app"
+    ],
+    "explanation": "Warpcast Pro offers additional features like analytics and priority support.",
+    "tags": ["farcaster", "hard", "subscription"]
+  },
+  {
+    "id": "fc_058",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "How does Farcaster handle spam and abuse?",
+    "correct_answer": "Through client-level filters and community reporting",
+    "incorrect_answers": [
+      "Automatic AI censorship",
+      "Central authority banning",
+      "No spam controls"
+    ],
+    "explanation": "Farcaster uses decentralized moderation with client-level filtering and user reports.",
+    "tags": ["farcaster", "hard", "moderation"]
+  },
+  {
+    "id": "fc_059",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the relationship between Farcaster and Base?",
+    "correct_answer": "Base is a preferred L2 for Farcaster apps",
+    "incorrect_answers": [
+      "Farcaster owns Base",
+      "They are competitors",
+      "No relationship"
+    ],
+    "explanation": "Base (Coinbase's L2) is heavily integrated with Farcaster for onchain features.",
+    "tags": ["farcaster", "hard", "layer2"]
+  },
+  {
+    "id": "fc_060",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What makes Farcaster 'sufficiently decentralized'?",
+    "correct_answer": "No single entity can control the network",
+    "incorrect_answers": [
+      "It uses Bitcoin",
+      "Everything is on Ethereum mainnet",
+      "It has a governance token"
+    ],
+    "explanation": "Farcaster achieves sufficient decentralization through its distributed hub architecture and open protocol.",
+    "tags": ["farcaster", "hard", "decentralization"]
+  },
+  {
+    "id": "fc_061",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the maximum number of accounts one Ethereum address can control?",
+    "correct_answer": "Multiple, by owning multiple FID NFTs",
+    "incorrect_answers": [
+      "Only one",
+      "Exactly two",
+      "Unlimited from one address"
+    ],
+    "explanation": "An Ethereum address can own multiple Farcaster ID (FID) NFTs, each representing a different account.",
+    "tags": ["farcaster", "hard", "technical"]
+  },
+  {
+    "id": "fc_062",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What technology enables Frames to be interactive?",
+    "correct_answer": "Open Graph meta tags and POST requests",
+    "incorrect_answers": [
+      "WebSocket connections",
+      "Smart contracts only",
+      "JavaScript embedding"
+    ],
+    "explanation": "Frames use Open Graph protocol with POST requests to create interactive experiences.",
+    "tags": ["farcaster", "hard", "frames"]
+  },
+  {
+    "id": "fc_063",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is 'Message Data' in Farcaster protocol?",
+    "correct_answer": "The structured data format for all Farcaster actions",
+    "incorrect_answers": [
+      "Private messages between users",
+      "Error logs",
+      "Transaction receipts"
+    ],
+    "explanation": "Message Data is the core data structure that represents all actions on Farcaster.",
+    "tags": ["farcaster", "hard", "technical"]
+  },
+  {
+    "id": "fc_064",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "How long does it take for a cast to propagate across all Hubs?",
+    "correct_answer": "Usually seconds to minutes",
+    "incorrect_answers": [
+      "Instantly (milliseconds)",
       "24 hours",
-      "Random"
+      "1 week"
     ],
-    "tags": ["farcaster", "trending"]
+    "explanation": "Farcaster uses eventual consistency, with casts typically propagating within seconds to minutes.",
+    "tags": ["farcaster", "hard", "technical"]
   },
   {
-    "id": "fc_157",
+    "id": "fc_065",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "Casts with mini app actions are visually denoted by:",
-    "correct_answer": "Special frame/card UI",
+    "question": "What happens if you run out of storage on Farcaster?",
+    "correct_answer": "Old casts may be pruned to make room",
     "incorrect_answers": [
-      "Blue badge",
-      "$DEGEN sticker",
-      "Toast notifications"
+      "Your account is deleted",
+      "You can't cast anymore permanently",
+      "Nothing, storage is unlimited"
     ],
-    "tags": ["farcaster", "ui", "miniapp"]
+    "explanation": "When storage is full, the oldest messages may be pruned to accommodate new ones.",
+    "tags": ["farcaster", "hard", "storage"]
   },
   {
-    "id": "fc_158",
+    "id": "fc_066",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "In protocol terms, “Custody address” means:",
-    "correct_answer": "The onchain holder of the FID",
+    "question": "What is 'FIP-2' about?",
+    "correct_answer": "Protocol improvement proposal (specific details vary)",
     "incorrect_answers": [
-      "Cast author wallet",
-      "Only hot wallet",
-      "NFT looking glass"
+      "A token standard",
+      "A second version of Farcaster",
+      "A Frame specification"
     ],
-    "tags": ["farcaster", "custody"]
+    "explanation": "FIP-2 is a Farcaster Improvement Proposal that suggests changes to the protocol.",
+    "tags": ["farcaster", "hard", "governance"]
   },
   {
-    "id": "fc_159",
+    "id": "fc_067",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "Which endpoint fetches the mini app catalog via Neynar?",
-    "correct_answer": "/v2/miniapps",
+    "question": "What cryptographic algorithm does Farcaster use for signatures?",
+    "correct_answer": "EdDSA (Ed25519)",
     "incorrect_answers": [
-      "/miniapps/all",
-      "/framecatalog",
-      "/catalogue"
+      "RSA",
+      "ECDSA only",
+      "SHA-256"
     ],
-    "tags": ["farcaster", "api", "miniapp"]
+    "explanation": "Farcaster uses EdDSA with Ed25519 for efficient and secure message signatures.",
+    "tags": ["farcaster", "hard", "cryptography"]
   },
   {
-    "id": "fc_160",
+    "id": "fc_068",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "“Delete cast” in protocol context is handled by:",
-    "correct_answer": "A delete message signed by current authorized signer",
+    "question": "Can you transfer your Farcaster ID (FID) to another wallet?",
+    "correct_answer": "Yes, by transferring the NFT",
     "incorrect_answers": [
-      "Only mods",
-      "Hub admin",
-      "Onchain revert"
+      "No, it's permanently bound",
+      "Only with admin approval",
+      "Only once per year"
     ],
-    "tags": ["farcaster", "messages", "delete"]
+    "explanation": "Since FIDs are ERC-721 NFTs, they can be transferred like any other NFT.",
+    "tags": ["farcaster", "hard", "identity"]
   },
   {
-    "id": "fc_161",
+    "id": "fc_069",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "What’s required for a mini app to be “featured” on Farcaster?",
-    "correct_answer": "Approval by Farcaster core team or Surfacing in trending list",
+    "question": "What is the role of 'fname' in Farcaster?",
+    "correct_answer": "It's the user-friendly username",
     "incorrect_answers": [
-      "$DEGEN payment",
-      "Airdrop",
-      "ENS name"
+      "First name field",
+      "File name for attachments",
+      "Frame name identifier"
     ],
-    "tags": ["farcaster", "miniapp", "featured"]
+    "explanation": "fname is the human-readable username associated with a Farcaster ID.",
+    "tags": ["farcaster", "hard", "identity"]
   },
   {
-    "id": "fc_162",
+    "id": "fc_070",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "The function “SetRecoveryAddress” in the ID Registry is for:",
-    "correct_answer": "Assigning an address able to recover FID custody",
+    "question": "What is 'Hubble'?",
+    "correct_answer": "The implementation of a Farcaster Hub",
     "incorrect_answers": [
-      "ENS swap",
-      "Username reset",
-      "Tip automation"
+      "A space-themed NFT project",
+      "A telescope app",
+      "A token ticker"
     ],
-    "tags": ["farcaster", "id-registry", "recovery"]
+    "explanation": "Hubble is the official implementation of the Farcaster Hub software.",
+    "tags": ["farcaster", "hard", "infrastructure"]
   },
   {
-    "id": "fc_163",
+    "id": "fc_071",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "“Farcaster Open API” allows what max API key rotation per month by default?",
-    "correct_answer": "Up to 5",
+    "question": "What is the purpose of 'User Data' messages?",
+    "correct_answer": "To store profile information like bio and pfp",
     "incorrect_answers": [
-      "None",
-      "One",
-      "99"
+      "To track analytics",
+      "To store private keys",
+      "To log errors"
     ],
-    "tags": ["farcaster", "api", "keys"]
+    "explanation": "User Data messages contain profile metadata such as display name, bio, and profile picture.",
+    "tags": ["farcaster", "hard", "technical"]
   },
   {
-    "id": "fc_164",
+    "id": "fc_072",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "In a multi-Hub scenario, how is convergence to protocol state ensured?",
-    "correct_answer": "Merkle root synchronization and conflict resolution by latest signature",
+    "question": "How many storage units does each cast consume?",
+    "correct_answer": "1 unit per cast",
     "incorrect_answers": [
-      "Ethereum anchoring",
-      "Snapshot poll",
-      "DNS flush"
+      "0.5 units",
+      "2 units",
+      "It varies by length"
     ],
-    "tags": ["farcaster", "consensus", "merkle"]
+    "explanation": "Each cast consumes one storage unit, regardless of content length (up to the limit).",
+    "tags": ["farcaster", "hard", "storage"]
   },
   {
-    "id": "fc_165",
+    "id": "fc_073",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "The “Verifier” in channel join flow does what?",
-    "correct_answer": "Checks membership status and invite validity",
+    "question": "What is a 'Verification' in Farcaster?",
+    "correct_answer": "Proof of Ethereum address ownership",
     "incorrect_answers": [
-      "Tips $DEGEN",
-      "Forces a wallet connect",
-      "Sets mod privileges"
+      "A blue checkmark",
+      "Identity verification document",
+      "Email confirmation"
     ],
-    "tags": ["farcaster", "channels", "verifier"]
+    "explanation": "Verifications cryptographically link Ethereum addresses to a Farcaster account.",
+    "tags": ["farcaster", "hard", "identity"]
   },
   {
-    "id": "fc_166",
+    "id": "fc_074",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "What’s required in a message chain to prune old casts in Hub storage?",
-    "correct_answer": "Message chain anchors and signature proof",
+    "question": "What does 'pruning' mean in Farcaster?",
+    "correct_answer": "Removing old messages to free storage",
     "incorrect_answers": [
-      "Linked NFTs",
-      "Profile mod badge",
-      "Exhibit reaction score lower than -5"
+      "Banning users",
+      "Deleting spam",
+      "Archiving channels"
     ],
-    "tags": ["farcaster", "pruning", "storage"]
+    "explanation": "Pruning is the automatic removal of old messages when storage limits are reached.",
+    "tags": ["farcaster", "hard", "storage"]
   },
   {
-    "id": "fc_167",
+    "id": "fc_075",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "“Attachment validation” for images works by checking:",
-    "correct_answer": "File type and content hash signature",
+    "question": "What is 'fname rental'?",
+    "correct_answer": "Annual payment to maintain your username",
     "incorrect_answers": [
-      "Channel allowlist",
-      "Only pixel size",
-      "ETH balance"
+      "Renting usernames to others",
+      "Temporary username changes",
+      "A NFT marketplace"
     ],
-    "tags": ["farcaster", "attachments", "validation"]
+    "explanation": "Usernames (fnames) require annual renewal payments to prevent squatting.",
+    "tags": ["farcaster", "hard", "identity"]
   },
   {
-    "id": "fc_168",
+    "id": "fc_076",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "The primary onchain event for username transfer is:",
-    "correct_answer": "TransferUsername",
+    "question": "Can you run a Hub without an Ethereum node?",
+    "correct_answer": "Yes, using RPC providers",
     "incorrect_answers": [
-      "WalletConnect",
-      "SEND",
-      "ENS record"
+      "No, you must run a full node",
+      "Only in testnet",
+      "Only with special permission"
     ],
-    "tags": ["farcaster", "username", "events"]
+    "explanation": "Hubs can connect to Ethereum via RPC providers like Infura or Alchemy.",
+    "tags": ["farcaster", "hard", "infrastructure"]
   },
   {
-    "id": "fc_169",
+    "id": "fc_077",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "Experimental “GM streaks” bots typically keep track of:",
-    "correct_answer": "Consecutive daily casts by user",
+    "question": "What is 'Direct Cast'?",
+    "correct_answer": "Private messaging between users",
     "incorrect_answers": [
-      "Wallet tips",
-      "Channel mods",
-      "Degen airdrop count"
+      "Broadcasting to all followers",
+      "Streaming video live",
+      "Instant payment"
     ],
-    "tags": ["farcaster", "bots", "streaks"]
+    "explanation": "Direct Casts are Farcaster's private messaging feature for one-on-one communication.",
+    "tags": ["farcaster", "hard", "features"]
   },
   {
-    "id": "fc_170",
+    "id": "fc_078",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "“Bulk Tip” on certain Farcaster mini apps is executed via what mechanism?",
-    "correct_answer": "Batched token transfer transaction",
+    "question": "What is the gas cost typically for registering a Farcaster ID?",
+    "correct_answer": "Varies, but usually $1-5 depending on gas prices",
     "incorrect_answers": [
-      "Zapier",
-      "Framer",
-      "Slack bridge"
+      "Always free",
+      "Exactly 0.1 ETH",
+      "$100+"
     ],
-    "tags": ["farcaster", "tips", "transactions"]
+    "explanation": "Gas costs for FID registration fluctuate with Ethereum network conditions.",
+    "tags": ["farcaster", "hard", "costs"]
   },
   {
-    "id": "fc_171",
+    "id": "fc_079",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "Appframe manifest validation errors are displayed where?",
-    "correct_answer": "Mini app dev dashboard",
+    "question": "What is 'Message Hash' used for?",
+    "correct_answer": "Unique identifier for each message",
     "incorrect_answers": [
-      "Nowhere",
-      "Private channel",
-      "Wallet logs"
+      "Password storage",
+      "Encryption key",
+      "Image compression"
     ],
-    "tags": ["farcaster", "miniapp", "validation"]
+    "explanation": "Message hashes uniquely identify each message in the Farcaster network.",
+    "tags": ["farcaster", "hard", "technical"]
   },
   {
-    "id": "fc_172",
+    "id": "fc_080",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "“Hub Connect” can be used for:",
-    "correct_answer": "Peer-to-peer Hub replication",
+    "question": "What happens to your data if all Hubs go offline?",
+    "correct_answer": "It can be recovered from any remaining Hub or backup",
     "incorrect_answers": [
-      "Reacting to memes",
-      "Only wallet linking",
-      "ETH swaps"
+      "All data is permanently lost",
+      "It's recovered from Ethereum",
+      "Nothing, data lives on chain"
     ],
-    "tags": ["farcaster", "hub", "replication"]
+    "explanation": "Farcaster's distributed nature means data can be recovered from any operational Hub.",
+    "tags": ["farcaster", "hard", "resilience"]
   },
   {
-    "id": "fc_173",
+    "id": "fc_081",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "Mini app analytics can be found at:",
-    "correct_answer": "App’s analytics tab in developer dashboard",
+    "question": "What is 'Add verification' used for on Farcaster?",
+    "correct_answer": "Linking additional Ethereum addresses to your account",
     "incorrect_answers": [
-      "/product",
-      "/wallet",
-      "ETH explorer"
+      "Getting a blue checkmark",
+      "Verifying email",
+      "KYC compliance"
     ],
-    "tags": ["farcaster", "miniapp", "analytics"]
+    "explanation": "Add verification allows you to prove ownership of multiple Ethereum addresses.",
+    "tags": ["farcaster", "hard", "identity"]
   },
   {
-    "id": "fc_174",
+    "id": "fc_082",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "Maximum payload for a signed Farcaster frame as of 2025?",
-    "correct_answer": "2kb",
+    "question": "What is the main advantage of Farcaster's hybrid architecture?",
+    "correct_answer": "Balance between decentralization and performance",
     "incorrect_answers": [
-      "1kb",
-      "500 bytes",
-      "10kb"
+      "Lower costs than fully centralized",
+      "Easier to moderate",
+      "Faster than Layer 2s"
     ],
-    "tags": ["farcaster", "frame", "limits"]
+    "explanation": "Hybrid architecture provides decentralization benefits while maintaining good performance.",
+    "tags": ["farcaster", "hard", "architecture"]
   },
   {
-    "id": "fc_175",
+    "id": "fc_083",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "“FID expiration” can trigger:",
-    "correct_answer": "Account being marked inactive",
+    "question": "Can you delete your Farcaster account permanently?",
+    "correct_answer": "You can stop using it, but the FID NFT remains",
     "incorrect_answers": [
-      "Spam label 0",
-      "Channel reset",
-      "Unarchive private channel"
+      "Yes, completely and immediately",
+      "No, accounts are permanent forever",
+      "Only with admin approval"
     ],
-    "tags": ["farcaster", "fid", "expiration"]
+    "explanation": "You can abandon an account, but the FID NFT and on-chain data persist.",
+    "tags": ["farcaster", "hard", "identity"]
   },
   {
-    "id": "fc_176",
+    "id": "fc_084",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "“Username owner” and “FID owner” must:",
-    "correct_answer": "Can be different, but linked by proof",
+    "question": "What is the theoretical maximum number of Farcaster accounts?",
+    "correct_answer": "Limited by uint256 (essentially unlimited)",
     "incorrect_answers": [
-      "Always match",
-      "Be onchain only",
-      "Never rotate"
+      "1 million",
+      "100 million",
+      "Exactly 21 million"
     ],
-    "tags": ["farcaster", "username", "fid"]
+    "explanation": "FIDs are uint256 numbers, providing an astronomically large number of possible accounts.",
+    "tags": ["farcaster", "hard", "technical"]
   },
   {
-    "id": "fc_177",
+    "id": "fc_085",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "Fastest method to check if a cast is a reply:",
-    "correct_answer": "Check for parentCastHash in message data",
+    "question": "What is 'Reaction' message type?",
+    "correct_answer": "Likes and other emoji responses to casts",
     "incorrect_answers": [
-      "Read bio",
-      "ENS profile",
-      "Tip flag"
+      "Reply to a cast",
+      "Report abuse",
+      "Chemical reactions"
     ],
-    "tags": ["farcaster", "messages", "reply"]
+    "explanation": "Reaction messages represent likes and emoji responses in Farcaster.",
+    "tags": ["farcaster", "hard", "technical"]
   },
   {
-    "id": "fc_178",
+    "id": "fc_086",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "The “Cast Like” protocol message is stored as:",
-    "correct_answer": "Reaction message (REACTION_ADD/LIKE)",
+    "question": "What is the benefit of running your own Hub?",
+    "correct_answer": "Full control and data sovereignty",
     "incorrect_answers": [
-      "Reaction type 2",
-      "Onchain NFT",
-      "Only client memory"
+      "Earn money from hosting",
+      "Free storage",
+      "Special features"
     ],
-    "tags": ["farcaster", "reactions"]
+    "explanation": "Running your own Hub gives you complete control over your data and access.",
+    "tags": ["farcaster", "hard", "infrastructure"]
   },
   {
-    "id": "fc_179",
+    "id": "fc_087",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "Farcaster “frame history” is persisted by:",
-    "correct_answer": "Hub side indexed storage",
+    "question": "What is 'Link message' in Farcaster?",
+    "correct_answer": "Following/unfollowing actions",
     "incorrect_answers": [
-      "ENS subgraph",
-      "Mini app",
-      "Wallet backup"
+      "Adding URLs to casts",
+      "Connecting wallets",
+      "NFT linking"
     ],
-    "tags": ["farcaster", "frame", "history"]
+    "explanation": "Link messages represent social graph actions like follows and unfollows.",
+    "tags": ["farcaster", "hard", "technical"]
   },
   {
-    "id": "fc_180",
+    "id": "fc_088",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "Which endpoint lists all joins to a channel?",
-    "correct_answer": "/v2/channel/{id}/members",
+    "question": "What determines the order of casts in your feed?",
+    "correct_answer": "Client-specific algorithms",
     "incorrect_answers": [
-      "/channel/joined",
-      "/user/joinhistory",
-      "/whoami"
+      "Chronological only",
+      "Random order",
+      "Blockchain ordering"
     ],
-    "tags": ["farcaster", "api", "channels"]
+    "explanation": "Each client can implement its own feed algorithm, from chronological to engagement-based.",
+    "tags": ["farcaster", "hard", "algorithms"]
   },
   {
-    "id": "fc_181",
+    "id": "fc_089",
     "category": "Farcaster Knowledge",
     "type": "multiple",
     "difficulty": "hard",
-    "question": "“Feed algorithms” on Farcaster can be customized with:",
-    "correct_answer": "Client-supported options or filters",
+    "question": "What is the purpose of storage 'rent' in Farcaster?",
+    "correct_answer": "To prevent spam and fund infrastructure",
     "incorrect_answers": [
-      "Degen tips",
-      "Wallet options",
-      "Channel lead"
+      "To generate profit",
+      "To pay validators",
+      "To buy tokens"
     ],
-    "tags": ["farcaster", "feeds", "algorithms"]
+    "explanation": "Storage rent discourages spam and helps fund the Hub infrastructure costs.",
+    "tags": ["farcaster", "hard", "economics"]
+  },
+  {
+    "id": "fc_090",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is 'gRPC' in the context of Farcaster?",
+    "correct_answer": "API protocol for Hub communication",
+    "incorrect_answers": [
+      "A token ticker",
+      "A Frame type",
+      "A moderation tool"
+    ],
+    "explanation": "gRPC is the remote procedure call protocol used for Hub APIs.",
+    "tags": ["farcaster", "hard", "technical"]
+  },
+  {
+    "id": "fc_091",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the typical latency for reading data from a Hub?",
+    "correct_answer": "Milliseconds to low seconds",
+    "incorrect_answers": [
+      "Minutes",
+      "Hours",
+      "Instant (microseconds)"
+    ],
+    "explanation": "Hub reads are fast, typically responding in milliseconds to a few seconds.",
+    "tags": ["farcaster", "hard", "performance"]
+  },
+  {
+    "id": "fc_092",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Can you change your FID after registration?",
+    "correct_answer": "No, FIDs are permanent",
+    "incorrect_answers": [
+      "Yes, once per year",
+      "Yes, for a fee",
+      "Yes, anytime"
+    ],
+    "explanation": "Farcaster IDs are permanent identifiers that cannot be changed.",
+    "tags": ["farcaster", "hard", "identity"]
+  },
+  {
+    "id": "fc_093",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the relationship between custody address and FID?",
+    "correct_answer": "Custody address owns and controls the FID NFT",
+    "incorrect_answers": [
+      "They are the same thing",
+      "No relationship",
+      "Custody address is generated from FID"
+    ],
+    "explanation": "The custody address is the Ethereum address that owns the FID NFT.",
+    "tags": ["farcaster", "hard", "identity"]
+  },
+  {
+    "id": "fc_094",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is 'Snapchain' in Farcaster's roadmap?",
+    "correct_answer": "A potential Layer 3 solution for Farcaster",
+    "incorrect_answers": [
+      "A photo sharing feature",
+      "A fast snapshot tool",
+      "A backup system"
+    ],
+    "explanation": "Snapchain is a proposed Layer 3 blockchain specifically designed for Farcaster.",
+    "tags": ["farcaster", "hard", "future"]
+  },
+  {
+    "id": "fc_095",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the recommended way to handle private keys for Farcaster?",
+    "correct_answer": "Use signers and hardware wallets for custody",
+    "incorrect_answers": [
+      "Store in plaintext",
+      "Email them to yourself",
+      "Write on paper only"
+    ],
+    "explanation": "Best practice is using signers for app access while keeping custody keys in hardware wallets.",
+    "tags": ["farcaster", "hard", "security"]
+  },
+  {
+    "id": "fc_096",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the purpose of 'App Keys' in Farcaster?",
+    "correct_answer": "To authorize specific apps to post on your behalf",
+    "incorrect_answers": [
+      "To unlock premium features",
+      "To encrypt messages",
+      "To buy storage"
+    ],
+    "explanation": "App Keys (signers) let apps act on your behalf without exposing your main keys.",
+    "tags": ["farcaster", "hard", "security"]
+  },
+  {
+    "id": "fc_097",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What happens if you lose access to your custody address?",
+    "correct_answer": "You lose control of your Farcaster account",
+    "incorrect_answers": [
+      "Customer support can recover it",
+      "You can reset with email",
+      "Nothing, accounts are backed up"
+    ],
+    "explanation": "Losing custody address access means losing account control - there's no recovery mechanism.",
+    "tags": ["farcaster", "hard", "security"]
+  },
+  {
+    "id": "fc_098",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the maximum number of signers per account?",
+    "correct_answer": "Multiple, but limited to prevent abuse",
+    "incorrect_answers": [
+      "Exactly 1",
+      "Unlimited",
+      "5 maximum"
+    ],
+    "explanation": "Accounts can have multiple signers, but there are practical limits to prevent spam.",
+    "tags": ["farcaster", "hard", "security"]
+  },
+  {
+    "id": "fc_099",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is 'OP Stack' and how does it relate to Farcaster?",
+    "correct_answer": "It powers Optimism, which Farcaster uses for payments",
+    "incorrect_answers": [
+      "Farcaster's proprietary technology",
+      "A development toolkit for Frames",
+      "A Hub implementation"
+    ],
+    "explanation": "OP Stack is the technology behind Optimism, which Farcaster uses for cost-efficient payments.",
+    "tags": ["farcaster", "hard", "infrastructure"]
+  },
+  {
+    "id": "fc_100",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What does 'eventual consistency' mean in Farcaster?",
+    "correct_answer": "All Hubs eventually sync to the same state",
+    "incorrect_answers": [
+      "Data is immediately consistent everywhere",
+      "Some data may never sync",
+      "Consistency is not guaranteed"
+    ],
+    "explanation": "Eventual consistency means Hubs will reach agreement given enough time for propagation.",
+    "tags": ["farcaster", "hard", "technical"]
   }
 ]
