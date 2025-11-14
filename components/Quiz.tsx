@@ -1,19 +1,24 @@
+"use client";
+
 import React, { useEffect, useMemo, useState } from "react";
-import baseQuestions from "./farcaster_question.json";
-import addendum from "./farcaster_questions_addendum.json";
 
 /**
- * quiz.tsx
+ * components/Quiz.tsx
  *
- * Full, drop-in React + TypeScript quiz component that:
- * - Imports the existing farcaster_question.json and the addendum file
- * - Merges and deduplicates questions (preferring the later file on ID conflict)
- * - Optionally shuffles questions
- * - Tracks per-session score and shows immediate feedback
+ * Client-side quiz component that loads a single JSON question bank at runtime:
+ *   public/farcaster_questions.json
  *
- * NOTES:
- * - Make sure tsconfig.json includes "resolveJsonModule": true and "esModuleInterop": true
- * - Place this file alongside the two JSON files or update the import paths accordingly
+ * Requirements:
+ * - You said you added all questions to farcaster_questions.json — place that file in your project's public/
+ *   folder so it is served at: /farcaster_questions.json
+ * - The file must be a JSON array of question objects with this shape:
+ *     { id: number, question: string, choices: { A: string, B: string, C: string, D: string }, answer: "A"|"B"|"C"|"D" }
+ *
+ * Behavior:
+ * - Fetches /farcaster_questions.json on mount (client-side), validates the array, and requires it when
+ *   mode === "farcaster" (shows error UI if fetch/validation fails).
+ * - No embedded fallback data is used (per your request).
+ * - Supports optional deterministic shuffle via seed, per-question submission, immediate feedback, and simple navigation.
  */
 
 type Choices = Record<string, string>;
@@ -22,31 +27,58 @@ type Question = {
   id: number;
   question: string;
   choices: Choices;
-  answer: string; // "A" | "B" | "C" | "D"
+  answer: string;
 };
 
-const dedupeAndCombine = (a: Question[], b: Question[]) => {
-  const map = new Map<number, Question>();
-  // Prefer items from `a` first, then override with `b` if same id appears in addendum.
-  for (const q of a) map.set(q.id, q);
-  for (const q of b) map.set(q.id, q);
-  // Return by ascending id for stable ordering
-  return Array.from(map.values()).sort((x, y) => x.id - y.id);
-};
+const FETCH_TIMEOUT_MS = 4000;
+
+function timeoutPromise<T>(ms: number, p: Promise<T>) {
+  return new Promise<T>((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error("timeout")), ms);
+    p
+      .then((v) => {
+        clearTimeout(t);
+        resolve(v);
+      })
+      .catch((err) => {
+        clearTimeout(t);
+        reject(err);
+      });
+  });
+}
+
+async function fetchQuestions(path: string): Promise<Question[] | null> {
+  try {
+    const res = await timeoutPromise(FETCH_TIMEOUT_MS, fetch(path));
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!Array.isArray(data)) return null;
+    const valid = data.every(
+      (it: any) =>
+        it &&
+        typeof it.id === "number" &&
+        typeof it.question === "string" &&
+        it.choices &&
+        typeof it.choices === "object" &&
+        typeof it.answer === "string"
+    );
+    if (!valid) return null;
+    return data as Question[];
+  } catch {
+    return null;
+  }
+}
 
 const shuffleArray = <T,>(arr: T[], seed?: number) => {
-  // Fisher-Yates shuffle. If seed provided, use a simple LCG to pseudo-randomize deterministically.
-  let a = arr.slice();
-  let rand = ((): (() => number) => {
-    if (seed === undefined) return () => Math.random();
+  const a = arr.slice();
+  let rand = Math.random;
+  if (seed !== undefined) {
     let s = seed >>> 0;
-    return () => {
-      // simple LCG
+    rand = () => {
       s = (1664525 * s + 1013904223) >>> 0;
       return s / 0xffffffff;
     };
-  })();
-
+  }
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(rand() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
@@ -54,52 +86,118 @@ const shuffleArray = <T,>(arr: T[], seed?: number) => {
   return a;
 };
 
-export default function Quiz() {
-  // Merge and dedupe base + addendum
-  const mergedQuestions = useMemo<Question[]>(
-    () => dedupeAndCombine((baseQuestions as unknown) as Question[], (addendum as unknown) as Question[]),
-    []
-  );
+export default function Quiz({ mode = "farcaster" }: { mode?: "farcaster" | "default" }) {
+  const [questions, setQuestions] = useState<Question[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // UI state
-  const [shuffled, setShuffled] = useState<boolean>(true);
-  const [seed, setSeed] = useState<number | undefined>(undefined); // deterministic shuffle if set
-  const displayedQuestions = useMemo<Question[]>(
-    () => (shuffled ? shuffleArray(mergedQuestions, seed) : mergedQuestions),
-    [mergedQuestions, shuffled, seed]
-  );
-
+  const [shuffled, setShuffled] = useState(true);
+  const [seed, setSeed] = useState<number | undefined>(undefined);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [attempted, setAttempted] = useState<Record<number, { chosen: string; correct: boolean }>>({});
 
   useEffect(() => {
-    // Reset session when shuffle or seed changes
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    (async () => {
+      const fetched = await fetchQuestions("/farcaster_questions.json");
+
+      if (cancelled) return;
+
+      if (!fetched) {
+        setError(
+          "Failed to load /farcaster_questions.json. Ensure the file exists in public/farcaster_questions.json and is a valid JSON array of questions."
+        );
+        setLoading(false);
+        return;
+      }
+
+      // If in strict farcaster mode, require 200 questions (IDs 1..200 assumed)
+      if (mode === "farcaster" && fetched.length < 200) {
+        setError(
+          `Loaded ${fetched.length} questions but farcaster mode expects all 200 questions present in farcaster_questions.json.`
+        );
+        // Still set the loaded questions so user can test; but surface explicit error
+        setQuestions(fetched);
+        setLoading(false);
+        return;
+      }
+
+      setQuestions(fetched);
+      setLoading(false);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mode]);
+
+  const displayed = useMemo(() => {
+    if (!questions) return [];
+    return shuffled ? shuffleArray(questions, seed) : questions;
+  }, [questions, shuffled, seed]);
+
+  useEffect(() => {
+    // reset when questions change or shuffle config changes
     setIndex(0);
     setSelected(null);
     setScore(0);
     setAttempted({});
-  }, [shuffled, seed, mergedQuestions.length]);
+  }, [questions, shuffled, seed]);
 
-  if (!displayedQuestions || displayedQuestions.length === 0) {
-    return <div>No questions found. Ensure farcaster_question.json and farcaster_questions_addendum.json are present and valid.</div>;
+  if (loading) {
+    return (
+      <div style={{ padding: 20 }}>
+        <h2>Farcaster Quiz</h2>
+        <p>Loading questions...</p>
+      </div>
+    );
   }
 
-  const q = displayedQuestions[index];
+  if (error && !questions) {
+    return (
+      <div style={{ padding: 20 }}>
+        <h2>Farcaster Quiz — Error</h2>
+        <p style={{ color: "crimson" }}>{error}</p>
+        <div style={{ marginTop: 12 }}>
+          Checklist:
+          <ul>
+            <li>Place the file at: <code>public/farcaster_questions.json</code></li>
+            <li>Ensure it's a JSON array of objects: id, question, choices, answer</li>
+            <li>For full farcaster mode, include all 200 questions (IDs 1–200)</li>
+          </ul>
+        </div>
+      </div>
+    );
+  }
+
+  if (!questions || displayed.length === 0) {
+    return (
+      <div style={{ padding: 20 }}>
+        <h2>Farcaster Quiz</h2>
+        <p>No questions were loaded. Ensure /farcaster_questions.json is reachable and valid.</p>
+      </div>
+    );
+  }
+
+  const q = displayed[index];
+  const tried = attempted[q.id];
 
   function submitAnswer() {
     if (!selected) return;
     const correct = selected === q.answer;
-    setAttempted((s) => ({ ...s, [q.id]: { chosen: selected, correct } }));
+    setAttempted((s) => ({ ...s, [q.id]: { chosen: selected!, correct } }));
     if (correct) setScore((s) => s + 1);
   }
 
   function nextQuestion() {
     setSelected(null);
-    if (index < displayedQuestions.length - 1) {
-      setIndex((i) => i + 1);
-    }
+    if (index < displayed.length - 1) setIndex((i) => i + 1);
   }
 
   function prevQuestion() {
@@ -107,95 +205,66 @@ export default function Quiz() {
     if (index > 0) setIndex((i) => i - 1);
   }
 
-  function revealAnswerText(question: Question) {
-    return `${question.answer}: ${question.choices[question.answer] ?? ""}`;
-  }
-
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", fontFamily: "system-ui, sans-serif", padding: 16 }}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <h2>Farcaster Trivia Quiz</h2>
-        <div>
-          <strong>
-            Score: {score} / {Object.keys(attempted).length}
-          </strong>
+    <div style={{ maxWidth: 900, margin: "0 auto", fontFamily: "Inter, system-ui, sans-serif", padding: 16 }}>
+      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2 style={{ margin: 0 }}>{mode === "farcaster" ? "Farcaster Knowledge Quiz" : "Trivia Quiz"}</h2>
+        <div style={{ textAlign: "right" }}>
+          <div>Loaded questions: <strong>{displayed.length}</strong></div>
+          <div>Score: <strong>{score}</strong> / <strong>{Object.keys(attempted).length}</strong></div>
         </div>
       </header>
 
-      <section style={{ marginBottom: 12, display: "flex", gap: 8 }}>
-        <label>
-          <input
-            type="checkbox"
-            checked={shuffled}
-            onChange={(e) => setShuffled(e.target.checked)}
-            style={{ marginRight: 6 }}
-          />
-          Shuffle questions
-        </label>
+      {error && (
+        <div style={{ marginTop: 12, color: "orange" }}>
+          <strong>Note:</strong> {error}
+        </div>
+      )}
 
-        <label style={{ marginLeft: 8 }}>
+      <section style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
+        <label>
+          <input type="checkbox" checked={shuffled} onChange={(e) => setShuffled(e.target.checked)} /> Shuffle
+        </label>
+        <label>
           Seed:
           <input
             type="number"
             value={seed ?? ""}
             onChange={(e) => setSeed(e.target.value === "" ? undefined : Number(e.target.value))}
             placeholder="optional"
-            style={{ marginLeft: 6, width: 120 }}
+            style={{ marginLeft: 8, width: 120 }}
           />
         </label>
-
-        <div style={{ marginLeft: "auto", fontSize: 14, color: "#555" }}>
-          Question {index + 1} of {displayedQuestions.length} (ID: {q.id})
+        <div style={{ marginLeft: "auto", color: "#666" }}>
+          {index + 1} / {displayed.length} (ID: {q.id})
         </div>
       </section>
 
-      <article style={{ border: "1px solid #e6e6e6", borderRadius: 8, padding: 16 }}>
+      <article style={{ marginTop: 12, border: "1px solid #eee", padding: 16, borderRadius: 8 }}>
         <p style={{ marginTop: 0, fontWeight: 600 }}>{q.question}</p>
-
         <ul style={{ listStyle: "none", paddingLeft: 0 }}>
-          {Object.entries(q.choices).map(([key, text]) => {
-            const attemptedForThis = attempted[q.id];
-            const isChosen = selected === key;
-            const alreadyAnswered = attemptedForThis !== undefined;
-            const correctKey = q.answer;
-            const bg =
-              alreadyAnswered && attemptedForThis.chosen === key
-                ? attemptedForThis.correct
-                  ? "#d4f8d4"
-                  : "#ffd6d6"
-                : isChosen
-                ? "#eef2ff"
-                : "transparent";
+          {Object.entries(q.choices).map(([k, v]) => {
+            const isSelected = selected === k;
+            const bg = tried ? (tried.chosen === k ? (tried.correct ? "#e6ffed" : "#ffecec") : "transparent") : isSelected ? "#eef2ff" : "transparent";
             return (
-              <li key={key} style={{ marginBottom: 8 }}>
-                <label
-                  style={{
-                    display: "block",
-                    padding: "10px 12px",
-                    borderRadius: 6,
-                    background: bg,
-                    border: "1px solid #ddd",
-                    cursor: alreadyAnswered ? "default" : "pointer",
-                  }}
-                >
+              <li key={k} style={{ marginBottom: 8 }}>
+                <label style={{ display: "block", padding: 10, borderRadius: 6, border: "1px solid #ddd", background: bg, cursor: tried ? "default" : "pointer" }}>
                   <input
                     type="radio"
                     name={`q-${q.id}`}
-                    value={key}
-                    checked={isChosen}
-                    onChange={() => setSelected(key)}
-                    disabled={alreadyAnswered}
+                    value={k}
+                    checked={isSelected}
+                    onChange={() => setSelected(k)}
+                    disabled={!!tried}
                     style={{ marginRight: 8 }}
                   />
-                  <strong>{key}.</strong> <span style={{ marginLeft: 8 }}>{text}</span>
-                  {alreadyAnswered && attemptedForThis.chosen === key && (
-                    <span style={{ marginLeft: 10, fontWeight: 600, color: attemptedForThis.correct ? "green" : "crimson" }}>
-                      {attemptedForThis.correct ? " ✓ Correct" : " ✕ Incorrect"}
+                  <strong>{k}.</strong> <span style={{ marginLeft: 8 }}>{v}</span>
+                  {tried && tried.chosen === k && (
+                    <span style={{ marginLeft: 10, color: tried.correct ? "green" : "crimson", fontWeight: 600 }}>
+                      {tried.correct ? " ✓ Correct" : " ✕ Incorrect"}
                     </span>
                   )}
-                  {alreadyAnswered && correctKey === key && (
-                    <span style={{ marginLeft: 8, fontSize: 13, color: "green" }}> (Answer)</span>
-                  )}
+                  {tried && q.answer === k && <span style={{ marginLeft: 8, color: "green" }}> (Answer)</span>}
                 </label>
               </li>
             );
@@ -203,57 +272,15 @@ export default function Quiz() {
         </ul>
 
         <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-          <button
-            onClick={() => {
-              submitAnswer();
-            }}
-            disabled={selected === null || attempted[q.id] !== undefined}
-            style={{ padding: "8px 12px", cursor: selected === null ? "not-allowed" : "pointer" }}
-          >
-            Submit
-          </button>
-
-          <button
-            onClick={() => {
-              // If already attempted, allow moving on but don't change score
-              if (attempted[q.id] === undefined && selected) submitAnswer();
-              nextQuestion();
-            }}
-            style={{ padding: "8px 12px" }}
-            disabled={index >= displayedQuestions.length - 1}
-          >
-            Next
-          </button>
-
-          <button onClick={prevQuestion} style={{ padding: "8px 12px" }} disabled={index === 0}>
-            Prev
-          </button>
-
-          <button
-            onClick={() => {
-              // reveal correct answer in UI by marking attempted (but not affecting score)
-              if (attempted[q.id] === undefined) {
-                setAttempted((s) => ({ ...s, [q.id]: { chosen: "_revealed", correct: false } }));
-              }
-            }}
-            style={{ marginLeft: "auto", padding: "8px 12px" }}
-          >
-            Reveal Answer
-          </button>
+          <button onClick={submitAnswer} disabled={!selected || !!tried} style={{ padding: "8px 12px" }}>Submit</button>
+          <button onClick={() => { if (!tried && selected) submitAnswer(); nextQuestion(); }} disabled={index >= displayed.length - 1} style={{ padding: "8px 12px" }}>Next</button>
+          <button onClick={prevQuestion} disabled={index === 0} style={{ padding: "8px 12px" }}>Prev</button>
+          <button onClick={() => { if (!tried) setAttempted((s) => ({ ...s, [q.id]: { chosen: "_revealed", correct: false } })); }} style={{ marginLeft: "auto", padding: "8px 12px" }}>Reveal Answer</button>
         </div>
       </article>
 
-      <footer style={{ marginTop: 12, color: "#666", fontSize: 14 }}>
-        <div>
-          Completed: {Object.keys(attempted).length} / {displayedQuestions.length} — Score: {score}
-        </div>
-        <div style={{ marginTop: 8 }}>
-          Tip: Enable resolveJsonModule in tsconfig.json if imports fail.
-          <div style={{ marginTop: 6 }}>
-            If you want me to push this file and the addendum directly into your repository, tell me the repo (owner/name)
-            and the branch, and I will create a PR with these changes.
-          </div>
-        </div>
+      <footer style={{ marginTop: 16, color: "#666", fontSize: 13 }}>
+        This quiz fetches questions at runtime from <code>/farcaster_questions.json</code>. Make sure that file is deployed into your site's public/ directory.
       </footer>
     </div>
   );
