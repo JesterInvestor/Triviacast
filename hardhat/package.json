@@ -5,6 +5,7 @@
   "scripts": {
     "build": "hardhat compile",
     "clean": "hardhat clean",
+    "test": "hardhat test",
     "deploy:base-sepolia": "hardhat run scripts/deploy.ts --network baseSepolia",
     "verify:base-sepolia": "hardhat verify --network baseSepolia",
     "deploy:base": "hardhat run scripts/deploy.ts --network base",

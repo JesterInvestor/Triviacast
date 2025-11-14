@@ -12,6 +12,14 @@ const STAKING_ABI = [
     stateMutability: "nonpayable",
     type: "function",
   }
+  ,
+  {
+    inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  }
 ] as const;
 
 const STAKING_ADDRESS = process.env.NEXT_PUBLIC_STAKING_ADDRESS;
@@ -123,4 +131,21 @@ export async function callStake(amount: bigint | number): Promise<`0x${string}`>
   const hash = await writeContract(wagmiConfig, request);
   await waitForTransactionReceipt(wagmiConfig, { hash, chainId: activeChain.id });
   return hash;
+}
+
+export async function getStakedBalance(owner: string): Promise<bigint> {
+  if (!isStakingConfigured()) return BigInt(0);
+  try {
+    const result = await readContract(wagmiConfig, {
+      address: STAKING_ADDRESS as `0x${string}`,
+      abi: STAKING_ABI as any,
+      functionName: 'balanceOf',
+      args: [owner as `0x${string}`],
+      chainId: activeChain.id,
+    });
+    return BigInt(result as unknown as bigint);
+  } catch (e) {
+    console.error('getStakedBalance failed', e);
+    return BigInt(0);
+  }
 }
