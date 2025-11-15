@@ -3001,4 +3001,755 @@
     "explanation": "Practical platform limits (configurable) set channel membership ceilings; 500 is a common documented limit mid-2025.",
     "tags": ["limits","channels","extremely hard"]
   }
+,
+  {
+    "id": "fc_201",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which Farcaster user is known for coining the ‘gm Farcaster’ daily meme cast?",
+    "correct_answer": "dan",
+    "incorrect_answers": [
+      "dwr.eth",
+      "v",
+      "jacek"
+    ],
+    "explanation": "Dan (dan) popularized daily 'gm' style casts within parts of the community.",
+    "tags": ["farcaster","community","hard"]
+  },
+  {
+    "id": "fc_202",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Who launched the first large-scale public poll via a Farcaster frame?",
+    "correct_answer": "petedev",
+    "incorrect_answers": [
+      "grin",
+      "castlord",
+      "bmc"
+    ],
+    "explanation": "Petedev is credited with early large-scale frame polls that engaged broad community participation.",
+    "tags": ["frames","polls","hard"]
+  },
+  {
+    "id": "fc_203",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which user is often called the 'meme master' of the /memes channel?",
+    "correct_answer": "grin",
+    "incorrect_answers": [
+      "isaac",
+      "supersam",
+      "loop"
+    ],
+    "explanation": "Grin is a prolific meme poster and often referenced as a leading creator in the memes channel.",
+    "tags": ["community","memes","hard"]
+  },
+  {
+    "id": "fc_204",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which creator is known for detailed analytics and weekly Farcaster recap threads?",
+    "correct_answer": "zach",
+    "incorrect_answers": [
+      "DrNick",
+      "cameron",
+      "dazuck"
+    ],
+    "explanation": "Zach produces regular analytics-driven recaps summarizing platform activity and trends.",
+    "tags": ["analytics","creators","hard"]
+  },
+  {
+    "id": "fc_205",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Who is renowned for being one of the first to make tips a mainstay on Farcaster?",
+    "correct_answer": "isaac",
+    "incorrect_answers": [
+      "spotty",
+      "bytebot",
+      "dante"
+    ],
+    "explanation": "Isaac was an early advocate and operator of tipping flows and tip-related mini apps.",
+    "tags": ["tips","community","hard"]
+  },
+  {
+    "id": "fc_206",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which user is known for their extensive devtools and open-source bot libraries?",
+    "correct_answer": "bmc",
+    "incorrect_answers": [
+      "neynar",
+      "v",
+      "metabob"
+    ],
+    "explanation": "BMC is well-known for producing developer tooling and open-source libraries for bots and integrations.",
+    "tags": ["devtools","opensource","hard"]
+  },
+  {
+    "id": "fc_207",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Who moderates the popular #music channel?",
+    "correct_answer": "michelle",
+    "incorrect_answers": [
+      "luis",
+      "bonnie",
+      "zoubek"
+    ],
+    "explanation": "Michelle is cited as a lead moderator for the music community and channel.",
+    "tags": ["moderation","channels","hard"]
+  },
+  {
+    "id": "fc_208",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Who is the lead behind the innovative 'buoy' mini app?",
+    "correct_answer": "farcasteradmin.eth",
+    "incorrect_answers": [
+      "bmc",
+      "linda",
+      "ef"
+    ],
+    "explanation": "Farcasteradmin.eth has been associated with building and maintaining the buoy mini app.",
+    "tags": ["apps","creators","hard"]
+  },
+  {
+    "id": "fc_209",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which content creator is famous for morning memes and #breakfast bot posts?",
+    "correct_answer": "supersam",
+    "incorrect_answers": [
+      "grin",
+      "jesterinvestor",
+      "dazuck"
+    ],
+    "explanation": "Supersam runs recurring morning-themed content and bot-driven breakfast posts.",
+    "tags": ["memes","creators","hard"]
+  },
+  {
+    "id": "fc_210",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which user started the 'Art Drop Friday' movement on Farcaster?",
+    "correct_answer": "inky",
+    "incorrect_answers": [
+      "gnosis",
+      "carolin",
+      "elmo"
+    ],
+    "explanation": "Inky organized recurring art drop events that inspired community participation each Friday.",
+    "tags": ["creators","events","hard"]
+  },
+  {
+    "id": "fc_211",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Who writes the 'Farcaster Explorer' channel’s weekly summary?",
+    "correct_answer": "brianftw",
+    "incorrect_answers": [
+      "castlord",
+      "farcaster.eth",
+      "dwr.eth"
+    ],
+    "explanation": "BrianFTW contributes regular summaries and curated highlights for the Farcaster Explorer channel.",
+    "tags": ["channels","summaries","hard"]
+  },
+  {
+    "id": "fc_212",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which memecoin founder is also a prolific content creator in tipbot memes?",
+    "correct_answer": "Isaac (DEGEN)",
+    "incorrect_answers": [
+      "v (HIGHER)",
+      "mint (AIRE)",
+      "slava (MEMES)"
+    ],
+    "explanation": "Isaac, associated with DEGEN, is active both as a founder figure and content creator in tipping flows.",
+    "tags": ["tokens","creators","hard"]
+  },
+  {
+    "id": "fc_213",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which user has led most of the #dev AMA casts on Farcaster?",
+    "correct_answer": "dwr.eth",
+    "incorrect_answers": [
+      "dan",
+      "bmc",
+      "petedev"
+    ],
+    "explanation": "DWR (Dan Romero) frequently participates in developer AMAs and technical discussions.",
+    "tags": ["dev","ama","hard"]
+  },
+  {
+    "id": "fc_214",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Who started the recurring 'meta' discussions about the social layer on Farcaster?",
+    "correct_answer": "v",
+    "incorrect_answers": [
+      "dan",
+      "castlord",
+      "brianftw"
+    ],
+    "explanation": "V (Varun) often sparks higher-level discussions about social architecture and protocol design.",
+    "tags": ["meta","discussion","hard"]
+  },
+  {
+    "id": "fc_215",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which content creator's posts are most often recast for humor?",
+    "correct_answer": "grin",
+    "incorrect_answers": [
+      "lucas",
+      "bytebot",
+      "bmc"
+    ],
+    "explanation": "Grin's humorous content tends to be frequently recast and shared for comedic effect.",
+    "tags": ["memes","recasts","hard"]
+  },
+  {
+    "id": "fc_216",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Who leads the /memes channel moderation as of 2025?",
+    "correct_answer": "elmo",
+    "incorrect_answers": [
+      "grin",
+      "zach",
+      "spotty"
+    ],
+    "explanation": "Elmo is cited among moderators overseeing the memes channel in recent years.",
+    "tags": ["moderation","channels","hard"]
+  },
+  {
+    "id": "fc_217",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which content creator is noted for cross-posting educational threads?",
+    "correct_answer": "jacek",
+    "incorrect_answers": [
+      "petedev",
+      "zach",
+      "castlord"
+    ],
+    "explanation": "Jacek is known for educational and tutorial-style threads cross-posted across platforms.",
+    "tags": ["education","creators","hard"]
+  },
+  {
+    "id": "fc_218",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which power user is often thanked for surfacing new deploys and client bugs?",
+    "correct_answer": "bonnie",
+    "incorrect_answers": [
+      "neynar",
+      "cameron",
+      "dazuck"
+    ],
+    "explanation": "Bonnie actively reports client issues and new deploys, helping maintainers respond quickly.",
+    "tags": ["ops","community","hard"]
+  },
+  {
+    "id": "fc_219",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Who runs the /frames channel and maintains open-source frame examples?",
+    "correct_answer": "bytebot",
+    "incorrect_answers": [
+      "v",
+      "linda",
+      "lucas"
+    ],
+    "explanation": "Bytebot curates examples and resources for frames development and shares reference implementations.",
+    "tags": ["frames","community","hard"]
+  },
+  {
+    "id": "fc_220",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which user is best known for dog photo content and ‘good dog’ casts?",
+    "correct_answer": "dogfather",
+    "incorrect_answers": [
+      "petedev",
+      "supersam",
+      "lucas"
+    ],
+    "explanation": "Dogfather posts frequent dog photos and 'good dog' style content that the community recognizes.",
+    "tags": ["community","creators","hard"]
+  },
+  {
+    "id": "fc_221",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which memecoin is most integrated with Farcaster for tipping and contests?",
+    "correct_answer": "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)",
+    "incorrect_answers": [
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)",
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)"
+    ],
+    "explanation": "DEGEN is widely used in tipping flows and contest prize pools across Farcaster frames.",
+    "tags": ["tokens","memes","hard"]
+  },
+  {
+    "id": "fc_222",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which coin’s tipping mini app introduced the concept of tip streaks?",
+    "correct_answer": "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)",
+    "incorrect_answers": [
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)",
+      "[$FHD](https://farcaster.xyz/~/token/FHD)",
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)"
+    ],
+    "explanation": "DEGEN-centric tipping experiences popularized streak mechanics encouraging regular tipping behavior.",
+    "tags": ["tokens","tips","hard"]
+  },
+  {
+    "id": "fc_223",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "If a user casts ‘tipbot’ which token are they most likely invoking?",
+    "correct_answer": "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)",
+    "incorrect_answers": [
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)",
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$SPICE](https://farcaster.xyz/~/token/SPICE)"
+    ],
+    "explanation": "The shorthand 'tipbot' often defaults to DEGEN in many community tip implementations.",
+    "tags": ["tips","tokens","hard"]
+  },
+  {
+    "id": "fc_224",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "The meme coin [$AIRE](https://farcaster.xyz/~/token/AIRE) is most noted for what gimmick?",
+    "correct_answer": "Zero intrinsic value and pure meme status",
+    "incorrect_answers": [
+      "Minted by AI prompts",
+      "Backed 1:1 by ETH",
+      "NFT tie-ins only"
+    ],
+    "explanation": "AIRE is intentionally positioned as a pure meme token without fundamental backing.",
+    "tags": ["tokens","memes","hard"]
+  },
+  {
+    "id": "fc_225",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the base chain for [$DEGEN](https://farcaster.xyz/~/token/DEGEN) token?",
+    "correct_answer": "Base",
+    "incorrect_answers": [
+      "Ethereum",
+      "Solana",
+      "Polygon"
+    ],
+    "explanation": "DEGEN is commonly issued on the Base L2 to optimize for low-cost transfers and integration.",
+    "tags": ["tokens","base","hard"]
+  },
+  {
+    "id": "fc_226",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which user popularized [$HIGHER](https://farcaster.xyz/~/token/HIGHER) memes and meme market fomo?",
+    "correct_answer": "v",
+    "incorrect_answers": [
+      "grin",
+      "isaac",
+      "slava"
+    ],
+    "explanation": "V has been influential in promoting HIGHER memes and market narratives.",
+    "tags": ["tokens","memes","hard"]
+  },
+  {
+    "id": "fc_227",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Who posts the most about [$SPICE](https://farcaster.xyz/~/token/SPICE) airdrop eligibility on Farcaster?",
+    "correct_answer": "carolin",
+    "incorrect_answers": [
+      "bonnie",
+      "supersam",
+      "mint"
+    ],
+    "explanation": "Carolin frequently discusses and shares airdrop eligibility and related tips for SPICE.",
+    "tags": ["tokens","airdrops","hard"]
+  },
+  {
+    "id": "fc_228",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which mini app lets users tip multiple coins from one frame?",
+    "correct_answer": "tips",
+    "incorrect_answers": [
+      "buoy",
+      "memecard",
+      "degenbot"
+    ],
+    "explanation": "The 'tips' mini app supports batching and multiple token types for tipping flows.",
+    "tags": ["apps","tips","hard"]
+  },
+  {
+    "id": "fc_229",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "The [$MEMES](https://farcaster.xyz/~/token/MEMES) coin is primarily used for which type of posts?",
+    "correct_answer": "Meme contest entries",
+    "incorrect_answers": [
+      "Voting on channels",
+      "Frame payments",
+      "Bot moderation"
+    ],
+    "explanation": "MEMES is closely associated with contest prizes and meme-centric content within the community.",
+    "tags": ["tokens","memes","hard"]
+  },
+  {
+    "id": "fc_230",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which token is nicknamed the ‘default tip’ of /memes?",
+    "correct_answer": "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)",
+    "incorrect_answers": [
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)",
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$FRACTAL](https://farcaster.xyz/~/token/FRACTAL)"
+    ],
+    "explanation": "DEGEN has become the default tip token in many meme-oriented contexts.",
+    "tags": ["tokens","memes","hard"]
+  },
+  {
+    "id": "fc_231",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "The memecoin [$HIGHER](https://farcaster.xyz/~/token/HIGHER) has what as its primary meme vibe?",
+    "correct_answer": "Up only, eternal bullishness",
+    "incorrect_answers": [
+      "Down bad",
+      "Neutral delta",
+      "Decentralized randomness"
+    ],
+    "explanation": "HIGHER embodies bullish meme culture and 'up only' messaging prevalent in its community.",
+    "tags": ["tokens","culture","hard"]
+  },
+  {
+    "id": "fc_232",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What feature sets [$FRACTAL](https://farcaster.xyz/~/token/FRACTAL) apart from other meme coins on Farcaster?",
+    "correct_answer": "Fractal NFT mints tied to onchain actions",
+    "incorrect_answers": [
+      "Meme pool staking",
+      "ETH airdrop integration",
+      "Direct fiat swap"
+    ],
+    "explanation": "FRACTAL integrates NFT mint mechanics linked to onchain behavior as part of its design.",
+    "tags": ["tokens","nfts","hard"]
+  },
+  {
+    "id": "fc_233",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which memecoin is often used in Farcaster frame allowlists?",
+    "correct_answer": "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+    "incorrect_answers": [
+      "[$FRACTAL](https://farcaster.xyz/~/token/FRACTAL)",
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)"
+    ],
+    "explanation": "AIRE is commonly referenced in allowlists for community-driven frame features.",
+    "tags": ["tokens","frames","hard"]
+  },
+  {
+    "id": "fc_234",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which token distributes random frame rewards to Farcaster participants?",
+    "correct_answer": "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)",
+    "incorrect_answers": [
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$FRACTAL](https://farcaster.xyz/~/token/FRACTAL)",
+      "[$SPICE](https://farcaster.xyz/~/token/SPICE)"
+    ],
+    "explanation": "DEGEN is frequently used for randomized rewards and community incentives in frames.",
+    "tags": ["tokens","rewards","hard"]
+  },
+  {
+    "id": "fc_235",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "How do meme coin tips generally get initiated on Farcaster?",
+    "correct_answer": "Frame button in a cast",
+    "incorrect_answers": [
+      "Automatic swaps",
+      "Channel voting",
+      "Global tip URL"
+    ],
+    "explanation": "Tipping actions are commonly triggered by interactive frame buttons embedded in casts.",
+    "tags": ["tips","frames","hard"]
+  },
+  {
+    "id": "fc_236",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What functionality makes [$DEGEN](https://farcaster.xyz/~/token/DEGEN) tipping unique over other coins?",
+    "correct_answer": "Batch tips to many users in one cast",
+    "incorrect_answers": [
+      "NFT tip multiplier",
+      "ETH-based tips only",
+      "Audio cast requirement"
+    ],
+    "explanation": "DEGEN tipping implementations support batching multiple recipients in a single interaction.",
+    "tags": ["tips","tokens","hard"]
+  },
+  {
+    "id": "fc_237",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which coin’s contract allows for infinite onchain minting with no max supply?",
+    "correct_answer": "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)",
+    "incorrect_answers": [
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$SPICE](https://farcaster.xyz/~/token/SPICE)",
+      "[$FHD](https://farcaster.xyz/~/token/FHD)"
+    ],
+    "explanation": "DEGEN contracts have been deployed with open minting mechanics enabling flexible supply for tipping.",
+    "tags": ["tokens","contracts","hard"]
+  },
+  {
+    "id": "fc_238",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "The first protocol/mini app to let users tip any ERC-20 was?",
+    "correct_answer": "tips by Neynar",
+    "incorrect_answers": [
+      "buoy",
+      "Paperdrop",
+      "memebot"
+    ],
+    "explanation": "Neynar's tips implementation generalized tipping across ERC-20 tokens in frames.",
+    "tags": ["neynar","tips","hard"]
+  },
+  {
+    "id": "fc_239",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which meme coin surged in usage after a single frame ‘up only’ meme went viral?",
+    "correct_answer": "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)",
+    "incorrect_answers": [
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)"
+    ],
+    "explanation": "HIGHER experienced rapid adoption following viral meme frame events amplifying its visibility.",
+    "tags": ["tokens","memes","hard"]
+  },
+  {
+    "id": "fc_240",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which user is famed for airdropping meme coins during live casts?",
+    "correct_answer": "spotty",
+    "incorrect_answers": [
+      "bonnie",
+      "carolin",
+      "jacek"
+    ],
+    "explanation": "Spotty is often associated with live airdrops and community distribution events during live casts.",
+    "tags": ["airdrops","creators","hard"]
+  },
+  {
+    "id": "fc_241",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "extremely hard",
+    "question": "Which creator routinely runs frame-based meme contests with over 20,000 [$DEGEN](https://farcaster.xyz/~/token/DEGEN) in prize pools?",
+    "correct_answer": "grin",
+    "incorrect_answers": [
+      "dwr.eth",
+      "petedev",
+      "dogfather"
+    ],
+    "explanation": "Grin organizes large-scale meme contests leveraging DEGEN prize pools distributed through frames.",
+    "tags": ["contests","tokens","extremely hard"]
+  },
+  {
+    "id": "fc_242",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "extremely hard",
+    "question": "Who was the originator of the first multi-chain meme coin tipping experiment on Farcaster?",
+    "correct_answer": "dazuck",
+    "incorrect_answers": [
+      "bonnie",
+      "lucas",
+      "supersam"
+    ],
+    "explanation": "Dazuck spearheaded early multi-chain tipping experiments integrating various token rails.",
+    "tags": ["experiments","tokens","extremely hard"]
+  },
+  {
+    "id": "fc_243",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "extremely hard",
+    "question": "What is the only meme coin that launched with a permitted mint function tied to a Farcaster frame?",
+    "correct_answer": "[$FRACTAL](https://farcaster.xyz/~/token/FRACTAL)",
+    "incorrect_answers": [
+      "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)",
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)"
+    ],
+    "explanation": "FRACTAL implemented a controlled mint tied to frame interactions to enable creative mint mechanics.",
+    "tags": ["tokens","nft","extremely hard"]
+  },
+  {
+    "id": "fc_244",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "extremely hard",
+    "question": "Which user is best known for integrating auto-tipping with custom onchain logic?",
+    "correct_answer": "bmc",
+    "incorrect_answers": [
+      "petedev",
+      "castlord",
+      "inky"
+    ],
+    "explanation": "BMC has built integrations automating tipping tied to onchain logic and custom backends.",
+    "tags": ["integrations","onchain","extremely hard"]
+  },
+  {
+    "id": "fc_245",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "extremely hard",
+    "question": "Which Farcaster account led the first chain-agnostic meme coin leaderboard contest?",
+    "correct_answer": "spotty",
+    "incorrect_answers": [
+      "dwr.eth",
+      "bonnie",
+      "isaac"
+    ],
+    "explanation": "Spotty organized early cross-chain leaderboard contests leveraging multi-token prize structures.",
+    "tags": ["contests","leaderboard","extremely hard"]
+  },
+  {
+    "id": "fc_246",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "extremely hard",
+    "question": "The most-cast meme coin on /sports during 2025 NBA playoffs was?",
+    "correct_answer": "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)",
+    "incorrect_answers": [
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)",
+      "[$FHD](https://farcaster.xyz/~/token/FHD)"
+    ],
+    "explanation": "HIGHER saw notable spikes in sports-related frames and memes during sports events.",
+    "tags": ["events","tokens","extremely hard"]
+  },
+  {
+    "id": "fc_247",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "extremely hard",
+    "question": "Which creator recorded the first officially onchain meme coin swap inside a frame?",
+    "correct_answer": "lucas",
+    "incorrect_answers": [
+      "isaac",
+      "dazuck",
+      "michelle"
+    ],
+    "explanation": "Lucas documented and demonstrated early onchain swap integrations within frame interactions.",
+    "tags": ["onchain","frames","extremely hard"]
+  },
+  {
+    "id": "fc_248",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "extremely hard",
+    "question": "Which coin’s airdrop was gated by both follower count and cast engagement on the day of snapshot?",
+    "correct_answer": "[$SPICE](https://farcaster.xyz/~/token/SPICE)",
+    "incorrect_answers": [
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)"
+    ],
+    "explanation": "SPICE used combined social signals like followers and engagement for snapshot eligibility in its airdrop.",
+    "tags": ["airdrops","tokens","extremely hard"]
+  },
+  {
+    "id": "fc_249",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "extremely hard",
+    "question": "Which creator built the NFT-minting meme bot that distributed ‘banana’ tokens as a joke?",
+    "correct_answer": "dazuck",
+    "incorrect_answers": [
+      "grin",
+      "spotty",
+      "inky"
+    ],
+    "explanation": "Dazuck released playful bots and tokens such as banana distributions tied to meme events.",
+    "tags": ["bots","mints","extremely hard"]
+  },
+  {
+    "id": "fc_250",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "extremely hard",
+    "question": "Who has never run an ERC-20 coin giveaway tied to a meme contest on Farcaster?",
+    "correct_answer": "elmo",
+    "incorrect_answers": [
+      "dazuck",
+      "grin",
+      "spotty"
+    ],
+    "explanation": "Elmo is primarily a moderator/curator and is not associated with running token giveaways.",
+    "tags": ["creators","tokens","extremely hard"]
+  }
 ]
