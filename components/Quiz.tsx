@@ -1,365 +1,427 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
+import { useSound } from '@/components/SoundContext';
+import Image from 'next/image';
+import { useAccount } from 'wagmi';
 
-/**
- * components/Quiz.tsx
- *
- * Client-side quiz component that loads the consolidated question bank at runtime:
- *   public/farcaster_questions.json
- *
- * Props:
- *  - mode?: "farcaster" | "default"
- *  - onComplete?: (result) => void
- *      Called when the user finishes the quiz (Finish button or auto-finish on last question).
- *      result = { score, total, attempted }
- *  - autoFinishOnLast?: boolean (default: true) — when true, completing the final question triggers onComplete automatically.
- *
- * Behavior:
- *  - Fetches /farcaster_questions.json on mount (client-side), validates the array.
- *  - Supports deterministic shuffle via seed, per-question submission, immediate feedback, Prev/Next navigation,
- *    Reveal Answer, Finish button and onComplete callback.
- *
- * Requirements:
- *  - Place your consolidated farcaster_questions.json (all 200 questions) in public/farcaster_questions.json
- *  - Each question object shape:
- *      { id: number, question: string, choices: { A: string, B: string, C: string, D: string }, answer: "A"|"B"|"C"|"D" }
- */
+import Timer from './Timer';
+import QuizQuestion from './QuizQuestion';
+import QuizResults from './QuizResults';
 
-type Choices = Record<string, string>;
+import { calculateTPoints } from '@/lib/tpoints';
+import type { QuizState } from '@/types/quiz';
 
-export type Question = {
-  id: number;
-  question: string;
-  choices: Choices;
-  answer: string; // "A" | "B" | "C" | "D"
-};
+const QUIZ_TIME_LIMIT = 60; // 1 minute in seconds
+const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
 
-type QuizResult = {
-  score: number;
-  total: number;
-  attempted: Record<number, { chosen: string; correct: boolean }>;
-};
-
-type QuizProps = {
-  mode?: "farcaster" | "default";
-  onComplete?: (result: QuizResult) => void;
-  autoFinishOnLast?: boolean;
-};
-
-const FETCH_TIMEOUT_MS = 4000;
-
-function timeoutPromise<T>(ms: number, p: Promise<T>) {
-  return new Promise<T>((resolve, reject) => {
-    const t = setTimeout(() => reject(new Error("timeout")), ms);
-    p
-      .then((v) => {
-        clearTimeout(t);
-        resolve(v);
-      })
-      .catch((err) => {
-        clearTimeout(t);
-        reject(err);
-      });
+export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: string; score: number; details?: any }) => void } = {}) {
+  const sound = useSound();
+  const { address: accountAddress, isConnected } = useAccount();
+  const [questionSource, setQuestionSource] = useState<'opentdb' | 'farcaster'>('opentdb');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingSource, setPendingSource] = useState<'opentdb' | 'farcaster'>('opentdb');
+  const [quizState, setQuizState] = useState<QuizState>({
+    questions: [],
+    currentQuestionIndex: 0,
+    score: 0,
+    answers: [],
+    timeRemaining: QUIZ_TIME_LIMIT,
+    quizStarted: false,
+    quizCompleted: false,
+    consecutiveCorrect: 0,
+    tPoints: 0,
   });
-}
-
-async function fetchQuestions(path: string): Promise<Question[] | null> {
-  try {
-    const res = await timeoutPromise(FETCH_TIMEOUT_MS, fetch(path));
-    if (!res.ok) return null;
-    const data = await res.json();
-    if (!Array.isArray(data)) return null;
-    const valid = data.every(
-      (it: unknown) =>
-        !!it &&
-        typeof (it as any).id === "number" &&
-        typeof (it as any).question === "string" &&
-        typeof (it as any).choices === "object" &&
-        typeof (it as any).answer === "string"
-    );
-    if (!valid) return null;
-    return data as Question[];
-  } catch {
-    return null;
-  }
-}
-
-const shuffleArray = <T,>(arr: T[], seed?: number) => {
-  const a = arr.slice();
-  let rand = Math.random;
-  if (seed !== undefined) {
-    let s = seed >>> 0;
-    rand = () => {
-      s = (1664525 * s + 1013904223) >>> 0;
-      return s / 0xffffffff;
-    };
-  }
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-};
-
-export default function Quiz({ mode = "farcaster", onComplete, autoFinishOnLast = true }: QuizProps) {
-  const [questions, setQuestions] = useState<Question[] | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
 
-  // UI state
-  const [shuffled, setShuffled] = useState(true);
-  const [seed, setSeed] = useState<number | undefined>(undefined);
-  const [index, setIndex] = useState(0);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [score, setScore] = useState(0);
-  const [attempted, setAttempted] = useState<Record<number, { chosen: string; correct: boolean }>>({});
-
-  useEffect(() => {
-    let cancelled = false;
+  const startQuiz = async () => {
     setLoading(true);
     setError(null);
 
-    (async () => {
-      const fetched = await fetchQuestions("/farcaster_questions.json");
-
-      if (cancelled) return;
-
-      if (!fetched) {
-        setError(
-          "Failed to load /farcaster_questions.json. Ensure the file exists in public/farcaster_questions.json and is a valid JSON array of questions."
-        );
-        setLoading(false);
-        return;
-      }
-
-      // In strict 'farcaster' mode we expect the full set (200), but we won't block usage;
-      // we'll surface an explicit error message if count < 200 so maintainers can notice.
-      if (mode === "farcaster" && fetched.length < 200) {
-        setError(`Loaded ${fetched.length} questions but farcaster mode expects 200 items in farcaster_questions.json.`);
-        // still set questions so users can play
-      }
-
-      setQuestions(fetched);
+    // Prevent starting if wallet is not connected (defensive guard in addition to disabled button)
+    if (!isConnected || !accountAddress) {
+      setError('Connect your wallet silly');
       setLoading(false);
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [mode]);
-
-  const displayed = useMemo(() => {
-    if (!questions) return [];
-    return shuffled ? shuffleArray(questions, seed) : questions;
-  }, [questions, shuffled, seed]);
-
-  useEffect(() => {
-    // reset when questions or shuffle config changes
-    setIndex(0);
-    setSelected(null);
-    setScore(0);
-    setAttempted({});
-  }, [questions, shuffled, seed]);
-
-  function invokeOnCompleteIfProvided() {
-    if (!onComplete || !questions) return;
-    const result: QuizResult = {
-      score,
-      total: questions.length,
-      attempted
-    };
-    try {
-      onComplete(result);
-    } catch (e) {
-      // swallow user callback errors to avoid crashing the UI
-      // but log to console for developer visibility
-      // eslint-disable-next-line no-console
-      console.error("Quiz onComplete callback threw:", e);
-    }
-  }
-
-  if (loading) {
-    return (
-      <div style={{ padding: 20 }}>
-        <h2>Farcaster Quiz</h2>
-        <p>Loading questions...</p>
-      </div>
-    );
-  }
-
-  if (error && !questions) {
-    return (
-      <div style={{ padding: 20 }}>
-        <h2>Farcaster Quiz — Error</h2>
-        <p style={{ color: "crimson" }}>{error}</p>
-        <div style={{ marginTop: 12 }}>
-          Checklist:
-          <ul>
-            <li>Place the file at: <code>public/farcaster_questions.json</code></li>
-            <li>Ensure it's a JSON array of objects: id, question, choices, answer</li>
-            <li>For full farcaster mode, include all 200 questions (IDs 1–200)</li>
-          </ul>
-        </div>
-      </div>
-    );
-  }
-
-  if (!questions || displayed.length === 0) {
-    return (
-      <div style={{ padding: 20 }}>
-        <h2>Farcaster Quiz</h2>
-        <p>No questions were loaded. Ensure /farcaster_questions.json is reachable and valid.</p>
-      </div>
-    );
-  }
-
-  const q = displayed[index];
-  const tried = attempted[q.id];
-  const isLastQuestion = index === displayed.length - 1;
-
-  function submitAnswer() {
-    if (!selected) return;
-    // prevent double-scoring
-    if (attempted[q.id]) return;
-    const correct = selected === q.answer;
-    setAttempted((s) => ({ ...s, [q.id]: { chosen: selected!, correct } }));
-    if (correct) setScore((s) => s + 1);
-  }
-
-  function goNext() {
-    // auto-submit if user selected answer and hasn't attempted this question
-    if (!tried && selected) submitAnswer();
-    if (isLastQuestion) {
-      // either auto-finish or just stay on last question but call onComplete if configured
-      if (autoFinishOnLast) {
-        // small timeout to ensure state updates for the last submission before calling callback
-        setTimeout(() => {
-          invokeOnCompleteIfProvided();
-        }, 0);
-      }
       return;
     }
-    setSelected(null);
-    setIndex((i) => i + 1);
-  }
 
-  function goPrev() {
-    setSelected(null);
-    if (index > 0) setIndex((i) => i - 1);
-  }
+    try {
+      // Request easy and medium questions explicitly
+      const response = await fetch(`/api/questions?amount=10&difficulty=easy,medium&source=${questionSource}`);
+      const data = await response.json();
 
-  function finishNow() {
-    // If current not yet attempted but user has selected, submit it first
-    if (!tried && selected) submitAnswer();
-    // call callback after state updates (schedule microtask)
+      if (!response.ok || data?.error) {
+        throw new Error(data?.error || 'Failed to load quiz');
+      }
+
+      setQuizState({
+        questions: data.results,
+        currentQuestionIndex: 0,
+        score: 0,
+        answers: new Array(data.results.length).fill(null),
+        timeRemaining: QUIZ_TIME_LIMIT,
+        quizStarted: true,
+        quizCompleted: false,
+        consecutiveCorrect: 0,
+        tPoints: 0,
+      });
+    } catch (err) {
+      setError('Failed to load quiz questions. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Main timer
+  useEffect(() => {
+    if (!quizState.quizStarted || quizState.quizCompleted) return;
+
+    const timer = setInterval(() => {
+      setQuizState((prev) => {
+        if (prev.timeRemaining <= 1) {
+          clearInterval(timer);
+          return { ...prev, timeRemaining: 0, quizCompleted: true };
+        }
+        return { ...prev, timeRemaining: prev.timeRemaining - 1 };
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [quizState.quizStarted, quizState.quizCompleted]);
+
+  // Notify parent when quiz completes so callers can show a share/preview flow
+  useEffect(() => {
+    if (!quizState.quizCompleted) return;
+    // Minimal client-side completion flag for quests gating
+    try {
+      // Emit client-side event only; backend relayer disabled.
+      window.dispatchEvent(new Event('triviacast:quizCompleted'));
+    } catch {}
+    try {
+      onComplete?.({
+        quizId: 'triviacast',
+        score: quizState.score,
+        details: {
+          total: quizState.questions.length,
+          tPoints: quizState.tPoints,
+        },
+      });
+    } catch (_) {
+      // ignore downstream errors from consumer
+    }
+    // Only fire when completion state flips to true
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quizState.quizCompleted]);
+
+  // Background music lifecycle: create/cleanup only on quiz lifecycle
+  useEffect(() => {
+    if (quizState.quizStarted && !quizState.quizCompleted) {
+      if (!audioRef.current) {
+        const audio = new Audio('/giggly-bubbles-222533.mp3');
+        audio.loop = true;
+        audio.volume = sound.disabled ? 0 : 0.14;
+        audio.muted = !!sound.disabled;
+        audioRef.current = audio;
+
+        if (!audio.muted) {
+          const playPromise = audio.play();
+          if (playPromise && typeof playPromise.then === 'function') {
+            playPromise
+              .then(() => setIsMusicPlaying(true))
+              .catch(() => setIsMusicPlaying(false));
+          } else {
+            setIsMusicPlaying(!audio.paused);
+          }
+        } else {
+          setIsMusicPlaying(false);
+        }
+      }
+    }
+
+    if (quizState.quizCompleted && audioRef.current) {
+      try {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      } catch (_) {}
+      setIsMusicPlaying(false);
+    }
+
+    return () => {
+      if (audioRef.current) {
+        try {
+          audioRef.current.pause();
+          audioRef.current = null;
+        } catch (_) {
+          audioRef.current = null;
+        }
+      }
+    };
+  }, [quizState.quizStarted, quizState.quizCompleted]);
+
+  // React to mute/unmute without recreating the audio element
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (sound.disabled) {
+      try {
+        audio.muted = true;
+        audio.pause();
+        audio.volume = 0;
+      } catch (_) {}
+      setIsMusicPlaying(false);
+    } else {
+      try {
+        audio.muted = false;
+        audio.volume = 0.14;
+        if (audio.paused) {
+          const playPromise = audio.play();
+          if (playPromise && typeof playPromise.then === 'function') {
+            playPromise
+              .then(() => setIsMusicPlaying(true))
+              .catch(() => setIsMusicPlaying(false));
+          } else {
+            setIsMusicPlaying(!audio.paused);
+          }
+        }
+      } catch (_) {}
+    }
+  }, [sound.disabled]);
+
+  const handleAnswer = (answer: string) => {
+    const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
+    const isCorrect = answer === currentQuestion.correct_answer;
+
+    const newAnswers = [...quizState.answers];
+    newAnswers[quizState.currentQuestionIndex] = answer;
+
+    setQuizState((prev) => {
+      const newConsecutive = isCorrect ? prev.consecutiveCorrect + 1 : 0;
+      const earnedPoints = calculateTPoints(newConsecutive, isCorrect, prev.consecutiveCorrect);
+
+      return {
+        ...prev,
+        answers: newAnswers,
+        score: isCorrect ? prev.score + 1 : prev.score,
+        consecutiveCorrect: newConsecutive,
+        tPoints: prev.tPoints + earnedPoints,
+      };
+    });
+
+    // Move to next question or complete quiz
     setTimeout(() => {
-      invokeOnCompleteIfProvided();
-    }, 0);
+      setQuizState((prev) => {
+        const lastIndex = prev.questions.length - 1;
+        if (prev.currentQuestionIndex < lastIndex) {
+          return { ...prev, currentQuestionIndex: prev.currentQuestionIndex + 1 };
+        }
+        return { ...prev, quizCompleted: true };
+      });
+    }, 500);
+  };
+
+  const restartQuiz = () => {
+    setQuizState({
+      questions: [],
+      currentQuestionIndex: 0,
+      score: 0,
+      answers: [],
+      timeRemaining: QUIZ_TIME_LIMIT,
+      quizStarted: false,
+      quizCompleted: false,
+      consecutiveCorrect: 0,
+      tPoints: 0,
+    });
+    setError(null);
+  };
+
+  const handleSourceChange = (newSource: 'opentdb' | 'farcaster') => {
+    if (quizState.quizStarted && !quizState.quizCompleted) {
+      // Show confirmation modal if quiz is active
+      setPendingSource(newSource);
+      setShowConfirmModal(true);
+    } else {
+      // Direct change if quiz not started
+      setQuestionSource(newSource);
+    }
+  };
+
+  const confirmSourceChange = () => {
+    setQuestionSource(pendingSource);
+    setShowConfirmModal(false);
+    restartQuiz();
+  };
+
+  const cancelSourceChange = () => {
+    setShowConfirmModal(false);
+  };
+
+  // Require wallet connection before showing any quiz UI
+  if (!isConnected || !accountAddress) {
+    return (
+      <div className="max-w-2xl mx-auto px-2 sm:px-6">
+        <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 text-center border-4 border-[#F4A6B7]">
+          <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#F4A6B7] text-[#5a3d5c] rounded-lg text-sm sm:text-base">
+            🔒 Connect your wallet silly
+          </div>
+        </div>
+      </div>
+    );
   }
+
+  // Pre-start state
+  if (!quizState.quizStarted) {
+    return (
+      <div className="max-w-2xl mx-auto px-2 sm:px-6">
+        <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 text-center border-4 border-[#F4A6B7]">
+          <div className="mb-6 flex justify-center">
+            <Image src="/brain-large.svg" alt="Brain" width={96} height={96} className="w-24 h-24 sm:w-32 sm:h-32" priority />
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-[#2d1b2e]">Trivia Challenge</h1>
+          
+          {/* Question Source Toggle */}
+          <div className="mb-6 p-4 bg-[#FFE4EC] rounded-lg border-2 border-[#F4A6B7]">
+            <label className="block text-sm font-semibold text-[#2d1b2e] mb-3">
+              Question Source
+            </label>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => handleSourceChange('opentdb')}
+                className={`flex-1 sm:flex-initial px-4 py-3 rounded-lg font-medium transition-all ${
+                  questionSource === 'opentdb'
+                    ? 'bg-[#F4A6B7] text-white shadow-lg scale-105'
+                    : 'bg-white text-[#5a3d5c] border-2 border-[#F4A6B7] hover:bg-[#FFE4EC]'
+                }`}
+              >
+                🌍 General Knowledge (OpenTDB)
+              </button>
+              <button
+                onClick={() => handleSourceChange('farcaster')}
+                className={`flex-1 sm:flex-initial px-4 py-3 rounded-lg font-medium transition-all ${
+                  questionSource === 'farcaster'
+                    ? 'bg-[#F4A6B7] text-white shadow-lg scale-105'
+                    : 'bg-white text-[#5a3d5c] border-2 border-[#F4A6B7] hover:bg-[#FFE4EC]'
+                }`}
+              >
+                🎯 Farcaster Knowledge (neynar)
+              </button>
+            </div>
+          </div>
+
+          <p className="text-[#5a3d5c] mb-8 text-base sm:text-lg">
+            ⏱️ Only 1 minute ⏱️<br />
+            ⁉️ 10 questions ⁉️<br />
+            😎🤓 Endless bragging rights 😎🤓<br />
+            🧠 Ready to prove you're a genius? 🧠
+          </p>
+          {error && (
+            <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#DC8291] text-[#C86D7D] rounded-lg text-sm sm:text-base">
+              {error}
+            </div>
+          )}
+          <button
+            onClick={startQuiz}
+            disabled={loading}
+            aria-disabled={loading}
+            className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-lg transition disabled:opacity-50 shadow-lg w-full sm:w-auto min-h-[56px]"
+          >
+            {loading ? 'Loading...' : 'Start Quiz'}
+          </button>
+        </div>
+
+        {/* Confirmation Modal */}
+        {showConfirmModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full border-4 border-[#F4A6B7]">
+              <h2 className="text-2xl font-bold mb-4 text-[#2d1b2e]">Confirm Source Change</h2>
+              <p className="text-[#5a3d5c] mb-6">
+                Switching question source will restart the current quiz. Do you want to proceed?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={cancelSourceChange}
+                  className="flex-1 px-4 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold rounded-lg transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmSourceChange}
+                  className="flex-1 px-4 py-3 bg-[#F4A6B7] hover:bg-[#E8949C] text-white font-semibold rounded-lg transition"
+                >
+                  Proceed
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Completed state
+  if (quizState.quizCompleted) {
+    return (
+      <QuizResults
+        score={quizState.score}
+        totalQuestions={quizState.questions.length}
+        questions={quizState.questions}
+        answers={quizState.answers}
+        tPoints={quizState.tPoints}
+        onRestart={restartQuiz}
+      />
+    );
+  }
+
+  // Active quiz state
+  const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
+  const answered = quizState.answers[quizState.currentQuestionIndex] !== null;
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", fontFamily: "Inter, system-ui, sans-serif", padding: 16 }}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2 style={{ margin: 0 }}>{mode === "farcaster" ? "Farcaster Knowledge Quiz" : "Trivia Quiz"}</h2>
-        <div style={{ textAlign: "right" }}>
-          <div>Loaded questions: <strong>{displayed.length}</strong></div>
-          <div>Score: <strong>{score}</strong> / <strong>{Object.keys(attempted).length}</strong></div>
+    <div className="max-w-3xl mx-auto px-2 sm:px-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-sm sm:text-base text-[#5a3d5c] font-semibold">
+          Question {quizState.currentQuestionIndex + 1} / {quizState.questions.length}
         </div>
-      </header>
-
-      {error && (
-        <div style={{ marginTop: 12, color: "orange" }}>
-          <strong>Note:</strong> {error}
-        </div>
-      )}
-
-      <section style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
-        <label>
-          <input type="checkbox" checked={shuffled} onChange={(e) => setShuffled(e.target.checked)} /> Shuffle
-        </label>
-        <label>
-          Seed:
-          <input
-            type="number"
-            value={seed ?? ""}
-            onChange={(e) => setSeed(e.target.value === "" ? undefined : Number(e.target.value))}
-            placeholder="optional"
-            style={{ marginLeft: 8, width: 120 }}
-          />
-        </label>
-        <div style={{ marginLeft: "auto", color: "#666" }}>
-          {index + 1} / {displayed.length} (ID: {q.id})
-        </div>
-      </section>
-
-      <article style={{ marginTop: 12, border: "1px solid #eee", padding: 16, borderRadius: 8 }}>
-        <p style={{ marginTop: 0, fontWeight: 600 }}>{q.question}</p>
-        <ul style={{ listStyle: "none", paddingLeft: 0 }}>
-          {Object.entries(q.choices).map(([k, v]) => {
-            const isSelected = selected === k;
-            const bg = tried ? (tried.chosen === k ? (tried.correct ? "#e6ffed" : "#ffecec") : "transparent") : isSelected ? "#eef2ff" : "transparent";
-            return (
-              <li key={k} style={{ marginBottom: 8 }}>
-                <label style={{ display: "block", padding: 10, borderRadius: 6, border: "1px solid #ddd", background: bg, cursor: tried ? "default" : "pointer" }}>
-                  <input
-                    type="radio"
-                    name={`q-${q.id}`}
-                    value={k}
-                    checked={isSelected}
-                    onChange={() => setSelected(k)}
-                    disabled={!!tried}
-                    style={{ marginRight: 8 }}
-                  />
-                  <strong>{k}.</strong> <span style={{ marginLeft: 8 }}>{v}</span>
-                  {tried && tried.chosen === k && (
-                    <span style={{ marginLeft: 10, color: tried.correct ? "green" : "crimson", fontWeight: 600 }}>
-                      {tried.correct ? " ✓ Correct" : " ✕ Incorrect"}
-                    </span>
-                  )}
-                  {tried && q.answer === k && <span style={{ marginLeft: 8, color: "green" }}> (Answer)</span>}
-                </label>
-              </li>
-            );
-          })}
-        </ul>
-
-        <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-          <button onClick={submitAnswer} disabled={!selected || !!tried} style={{ padding: "8px 12px" }}>
-            Submit
-          </button>
-
+        <div className="flex items-center gap-2">
+          <Timer timeRemaining={quizState.timeRemaining} />
           <button
-            onClick={() => {
-              goNext();
+            onPointerUp={() => {
+              const audio = audioRef.current;
+              if (!audio) return;
+              if (!audio.paused) {
+                try { audio.pause(); } catch (_) {}
+                setIsMusicPlaying(false);
+              } else {
+                if (sound.disabled) {
+                  try { sound.set(false); } catch (_) {}
+                }
+                try {
+                  audio.muted = false;
+                  audio.volume = 0.14;
+                  const p = audio.play();
+                  if (p && typeof p.then === 'function') {
+                    p.then(() => setIsMusicPlaying(true)).catch(() => setIsMusicPlaying(false));
+                  } else {
+                    setIsMusicPlaying(!audio.paused);
+                  }
+                } catch (_) {
+                  setIsMusicPlaying(false);
+                }
+              }
             }}
-            disabled={isLastQuestion && !autoFinishOnLast}
-            style={{ padding: "8px 12px" }}
+            aria-pressed={isMusicPlaying}
+            className="ml-2 bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-1.5 px-3 rounded-md text-xs shadow"
+            type="button"
           >
-            Next
+            {isMusicPlaying ? 'Pause Music' : 'Play Music'}
           </button>
-
-          <button onClick={goPrev} disabled={index === 0} style={{ padding: "8px 12px" }}>
-            Prev
-          </button>
-
-          {isLastQuestion ? (
-            <button onClick={finishNow} style={{ marginLeft: "auto", padding: "8px 12px", background: "#0b74ff", color: "white" }}>
-              Finish
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                // reveal answer for this question (does not change score)
-                if (!tried) setAttempted((s) => ({ ...s, [q.id]: { chosen: "_revealed", correct: false } }));
-              }}
-              style={{ marginLeft: "auto", padding: "8px 12px" }}
-            >
-              Reveal Answer
-            </button>
-          )}
         </div>
-      </article>
+      </div>
+
+      <QuizQuestion question={currentQuestion} onAnswer={handleAnswer} answered={answered} />
     </div>
   );
 }
