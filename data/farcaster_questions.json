@@ -5553,4 +5553,576 @@
     "explanation": "Dan is credited with authoring the iconic gm channel description.",
     "tags": ["channels","history","impossible"]
   }
+  ,
+  {
+    "id": "fc_371",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "If two frames reference each other as their only button destinations, what will happen on most Farcaster clients?",
+    "correct_answer": "Most clients loop navigation until a user cancels or refreshes.",
+    "incorrect_answers": [
+      "Frames error out with 'frame recursion detected.'",
+      "One frame overwrites the other and displays both.",
+      "It triggers an undocumented meme Easter egg."
+    ],
+    "explanation": "Mutually linked frames will bounce users between frames, effectively looping until interrupted.",
+    "tags": ["frames","clients","impossible"]
+  },
+  {
+    "id": "fc_372",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What result occurs if you quote-cast your own deleted cast and then attempt to recall the thread on a Rust hub?",
+    "correct_answer": "The thread root is null and replies will not display in chronological order.",
+    "incorrect_answers": [
+      "The quote is invalid and ignored by all clients.",
+      "A shadow copy is created as a phantom node.",
+      "A protocol error logs but cast is shown anyway."
+    ],
+    "explanation": "With a null root, thread reconstruction breaks on some hubs; replies won’t render in proper order.",
+    "tags": ["threads","hubs","rust","impossible"]
+  },
+  {
+    "id": "fc_373",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "How does the Neynar API respond if a user requests the full conversation summary of a pruned cast that contains only replies from blocked users?",
+    "correct_answer": "Returns an empty summary with a valid API response code.",
+    "incorrect_answers": [
+      "Returns 'access denied' and 403.",
+      "Returns partial summary with placeholders.",
+      "Throws a fatal indexing exception."
+    ],
+    "explanation": "Neynar responds successfully but with no content when all remaining replies are blocked/pruned.",
+    "tags": ["neynar","api","moderation","impossible"]
+  },
+  {
+    "id": "fc_374",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "A Farcaster frame embeds a frame that triggers a cast with a payload larger than the storage rent max. What happens?",
+    "correct_answer": "The action fails, but an error only displays after the payload exceeds allowed storage by one byte.",
+    "incorrect_answers": [
+      "Frame pre-validates and blocks at client-side.",
+      "Transaction still posts but cast is truncated.",
+      "Invalid payloads always trigger onchain slashing."
+    ],
+    "explanation": "Validation occurs server-side at the limit; the client shows an error only when the boundary is crossed.",
+    "tags": ["frames","storage","limits","impossible"]
+  },
+  {
+    "id": "fc_375",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "If three users cast identical meme images in the same channel in the same second, how will most clients render their feeds?",
+    "correct_answer": "Feed order is determined by internal feed sort IDs, not upload time or user FID.",
+    "incorrect_answers": [
+      "Only the first upload will appear due to deduplication.",
+      "All will display with image hashes as tooltips.",
+      "Order will always be randomized for privacy."
+    ],
+    "explanation": "Client feeds use internal sort IDs; identical images don’t guarantee a deterministic order by time or FID.",
+    "tags": ["clients","feeds","ranking","impossible"]
+  },
+  {
+    "id": "fc_376",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "If a Farcaster hub’s clock drifts forward by precisely 123 seconds, what sort of anomaly is most likely for new casts?",
+    "correct_answer": "Future-dated casts will temporarily float to the top of feeds.",
+    "incorrect_answers": [
+      "Clients will autoreject all new messages.",
+      "All threads will be hard-pruned.",
+      "Hub shuts down with a critical error."
+    ],
+    "explanation": "Clock drift can timestamp messages in the future, temporarily prioritizing them in feeds.",
+    "tags": ["hubs","time","feeds","impossible"]
+  },
+  {
+    "id": "fc_377",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which obscure option in the Farcaster hub allows cast hash re-indexing without message replay?",
+    "correct_answer": "Rehashing from Postgres with dry-run flag.",
+    "incorrect_answers": [
+      "Merkle tree re-seeding.",
+      "Pruning and re-registering signers.",
+      "You cannot re-index without replay."
+    ],
+    "explanation": "A rehash-from-DB routine with a dry-run can rebuild indices without full message replay.",
+    "tags": ["hubs","indexing","postgres","impossible"]
+  },
+  {
+    "id": "fc_378",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What occurs if you tip a cast that was already deleted, but with a coin that itself has been burned (supply = 0)?",
+    "correct_answer": "The tip transaction hashes but no onchain state is updated.",
+    "incorrect_answers": [
+      "Protocol errors with a 422 response.",
+      "A new supply is minted and sent to tipper.",
+      "Client UI fakes confirmation even though nothing happens."
+    ],
+    "explanation": "A burned token and deleted target produce no effective state change despite a hash being produced.",
+    "tags": ["tokens","tips","onchain","impossible"]
+  },
+  {
+    "id": "fc_379",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "During ‘frame storms’ (sudden surges in mini app actions), what backend resource is almost always the narrowest bottleneck?",
+    "correct_answer": "Web server concurrent process/thread pool limit.",
+    "incorrect_answers": [
+      "Onchain gas fees spike over 1 gwei.",
+      "Hub RAM is fully depleted.",
+      "Cast signer nonce table overflows."
+    ],
+    "explanation": "Throughput is typically constrained by server worker/thread pools handling concurrent requests.",
+    "tags": ["ops","performance","frames","impossible"]
+  },
+  {
+    "id": "fc_380",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "A user’s FID is rotated, their old casts and reactions pruned, and they re-register with the original recovery address. What’s the protocol-level impact?",
+    "correct_answer": "Their new FID is unique; old FID is not reassigned, leading to orphaned cast references.",
+    "incorrect_answers": [
+      "Old FID transfers to new registration.",
+      "All old references auto-purge with user deletion.",
+      "Protocol disables original recovery address permanently."
+    ],
+    "explanation": "FID rotation creates a new identifier; the former FID isn’t reused, leaving historical references orphaned.",
+    "tags": ["identity","fid","pruning","impossible"]
+  },
+  {
+    "id": "fc_381",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What is the expected result if a user tries to create a new channel with an ID that starts with a reserved ASCII control character (e.g., bell)?",
+    "correct_answer": "The attempt is blocked, but a log entry may show the control code.",
+    "incorrect_answers": [
+      "Protocol auto-assigns a fallback channel ID.",
+      "The channel creates anyway but is hidden from search.",
+      "It silently fails with no record."
+    ],
+    "explanation": "Channel IDs are validated; control characters are rejected and may be surfaced in logs.",
+    "tags": ["channels","validation","impossible"]
+  },
+  {
+    "id": "fc_382",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "If a meme coin contract is deployed with 999 decimals on Base and tipped using the standard tips mini app, what actually happens?",
+    "correct_answer": "The app fails silently, as UI parsing logic cannot handle tokens with more than 18 decimals.",
+    "incorrect_answers": [
+      "Tip works but rounds all values down to zero.",
+      "Transaction mints but cannot be displayed in wallet.",
+      "Protocol airdrops ETH to all failed tippers."
+    ],
+    "explanation": "Most UIs and libraries assume ≤18 decimals; extreme values break parsing and no tip is executed.",
+    "tags": ["tokens","ui","limits","impossible"]
+  },
+  {
+    "id": "fc_383",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "On a freshly spun-up hub with zero synced messages, what happens to the feed if a user tries to load their home channel?",
+    "correct_answer": "UI displays an empty state or 'no casts yet' message.",
+    "incorrect_answers": [
+      "Fake placeholder memes appear for onboarding.",
+      "Null cast hash renders a spinning loader forever.",
+      "A default trending cast is always shown."
+    ],
+    "explanation": "A new, unsynced hub will show an empty feed state until messages are synced.",
+    "tags": ["hubs","clients","ux","impossible"]
+  },
+  {
+    "id": "fc_384",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "If a user’s frame includes a new frame via an HTTPS URL that returns a 201 Created with no body, what do most Farcaster clients do?",
+    "correct_answer": "Display a generic network or frame could not load error.",
+    "incorrect_answers": [
+      "Render a blank frame container.",
+      "Retry up to three times then reload feed.",
+      "Fallback to default frame provided at mainnet launch."
+    ],
+    "explanation": "Clients expect a valid frame response body; a 201 with no body yields a generic load error.",
+    "tags": ["frames","http","errors","impossible"]
+  },
+  {
+    "id": "fc_385",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which hub-side event log sequence can indicate a sequence violation during a mega-cast (multiple simultaneous frame actions)?",
+    "correct_answer": "Non-monotonic cast index delta in append_cast logs.",
+    "incorrect_answers": [
+      "Orphaned post_sync_shutdown mark.",
+      "Unsigned tip nonce occurrence.",
+      "Negative recast count in audit log."
+    ],
+    "explanation": "A non-monotonic index delta suggests ordering issues during high-concurrency appends.",
+    "tags": ["hubs","logs","consistency","impossible"]
+  },
+  {
+    "id": "fc_386",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What’s the technical result if a user mints an NFT via a frame while their storage rent is already expired?",
+    "correct_answer": "NFT mint may succeed, but associated cast will not post.",
+    "incorrect_answers": [
+      "Frame will revert all actions including the NFT.",
+      "Both fail with transaction revert.",
+      "NFT mints but goes to null address."
+    ],
+    "explanation": "Onchain minting can succeed independently, but posting the cast fails without active storage rent.",
+    "tags": ["frames","nft","storage","impossible"]
+  },
+  {
+    "id": "fc_387",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which process will fail if a user attempts to recast a deleted root post where all children have been pruned?",
+    "correct_answer": "Recast is permitted but nothing appears in the recaster’s feed.",
+    "incorrect_answers": [
+      "Client returns a bad signature error.",
+      "Protocol forcibly restores ancestral cast.",
+      "Cast becomes a 'ghost' that can be indexed."
+    ],
+    "explanation": "The recast operation succeeds but renders nothing, since the root/children no longer exist for display.",
+    "tags": ["recasts","pruning","feeds","impossible"]
+  },
+  {
+    "id": "fc_388",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "A power user finds a bug where replying to a reply creates two valid but parallel threads. What will the backend do on next feed refresh?",
+    "correct_answer": "Each thread is indexed separately; reply counts are doubled in the API.",
+    "incorrect_answers": [
+      "One thread is orphaned on reindex.",
+      "App displays 'thread collision detected' error.",
+      "Replies merge into a single thread on next sync."
+    ],
+    "explanation": "Parallel thread creation leads to separate indices; aggregate counts can double in API responses.",
+    "tags": ["threads","api","bugs","impossible"]
+  },
+  {
+    "id": "fc_389",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "If someone submits 100 perfectly valid casts to a hub with only 10 storage slots left, what happens to the 91st cast?",
+    "correct_answer": "It is rejected due to insufficient rent, and a 'no storage' error is logged.",
+    "incorrect_answers": [
+      "It posts and older casts are purged first.",
+      "It queues for posting after new rent is paid.",
+      "Random failed nonce error appears instead."
+    ],
+    "explanation": "Once storage capacity is exceeded, additional casts are rejected and the hub logs a no-storage error.",
+    "tags": ["storage","errors","limits","impossible"]
+  }
+  ,
+  {
+    "id": "fc_390",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "A legacy Farcaster hub runs out of disk space mid-cast harvesting. What is the most likely protocol outcome for in-flight signed casts?",
+    "correct_answer": "In-flight casts are dropped, assigned no hash, and cannot be recovered even by replay.",
+    "incorrect_answers": [
+      "They remain in a pending state and are processed after freeing up space.",
+      "System auto-compresses old casts and allows new ones.",
+      "All in-flight casts are rolled back but logged with error code 507."
+    ],
+    "explanation": "Without persisting, messages never receive a hash; replay cannot recover missing write-time state.",
+    "tags": ["hubs","storage","harvesting","impossible"]
+  },
+  {
+    "id": "fc_391",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "If a cast's payload is exactly the size of the storage rent limit, and includes a Unicode combining character, what unusual frontend artifact might occur?",
+    "correct_answer": "Displayed text may show as two graphemes merged, breaking cast layout on some clients.",
+    "incorrect_answers": [
+      "Cast silently fails to post.",
+      "Payload is truncated, removing special characters.",
+      "Storage rent limit is ignored for Unicode."
+    ],
+    "explanation": "Combining characters can render as merged graphemes and cause layout anomalies near boundary sizes.",
+    "tags": ["unicode","ui","limits","impossible"]
+  },
+  {
+    "id": "fc_392",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "A Farcaster client receives two casts with the same hash but different parent references due to a protocol fork. What does a robust hub implementation do?",
+    "correct_answer": "Flags one as duplicate and prunes it based on earliest arrival timestamp.",
+    "incorrect_answers": [
+      "Both are stored, and all replies split into two threads.",
+      "A consensus vote is triggered via the API.",
+      "Hash collisions raise an unrecoverable error."
+    ],
+    "explanation": "Duplicate hashes are resolved by arrival ordering; later arrivals are pruned to maintain consistency.",
+    "tags": ["hubs","consistency","forks","impossible"]
+  },
+  {
+    "id": "fc_393",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which time window is used for spam rate-limiting synthetic frame actions that mimic organic user behavior?",
+    "correct_answer": "Server-calculated moving average over the last 20 minutes.",
+    "incorrect_answers": [
+      "Static one-hour window.",
+      "Instantaneous burst rate at submission.",
+      "Daily rolling protocol-wide metric."
+    ],
+    "explanation": "A moving-average window captures sustained activity patterns better than instantaneous or daily metrics.",
+    "tags": ["spam","rate-limiting","frames","impossible"]
+  },
+  {
+    "id": "fc_394",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "If an NFT minted through a Farcaster frame contains a metadata URL using IPFS that becomes unreachable, which statement is true?",
+    "correct_answer": "Frame can render the NFT receipt, but image display fails gracefully with a fallback placeholder.",
+    "incorrect_answers": [
+      "Transaction is reverted onchain.",
+      "Client hangs until metadata is found.",
+      "Hub deletes the cast automatically."
+    ],
+    "explanation": "Mint confirmation is independent; media fetch failures are handled with UI fallbacks.",
+    "tags": ["nft","ipfs","frames","impossible"]
+  },
+  {
+    "id": "fc_395",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What anomalous effect does an expired EIP-712 domain separator cause if signing is attempted by a frame bot?",
+    "correct_answer": "Signature is rejected as invalid, and the frame bot actions are ignored.",
+    "incorrect_answers": [
+      "Old domain signatures pass as legacy.",
+      "Frame is auto-pruned with a warning.",
+      "A protocol chain reorg is forced."
+    ],
+    "explanation": "Expired domain separators invalidate signatures under EIP-712 domain rules.",
+    "tags": ["eip-712","signing","security","impossible"]
+  },
+  {
+    "id": "fc_396",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "If you try to tip an address with a token whose ERC-20 contract was self-destructed an hour earlier, what happens in the best clients?",
+    "correct_answer": "Tip attempt fails and returns no transfer event; client displays generic token unavailable notice.",
+    "incorrect_answers": [
+      "Tip succeeds and is rerouted to protocol treasury.",
+      "The contract auto-clones itself for new transfers.",
+      "The frame offers to mint new supply automatically."
+    ],
+    "explanation": "With a destroyed contract, transfers cannot emit events; robust clients surface an availability error.",
+    "tags": ["tokens","erc20","tips","impossible"]
+  },
+  {
+    "id": "fc_397",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "If multiple users cast images with identical pixel data but each uses a different file compression, what do hash-based moderation tools see?",
+    "correct_answer": "Each is indexed as a different image, as file hash differs despite visual identity.",
+    "incorrect_answers": [
+      "Only the first cast is allowed; others are blocked as duplicates.",
+      "Image hashes are merged into a single index entry.",
+      "Moderators flag all as spam by default."
+    ],
+    "explanation": "File-level hashing differs across encodings; perceptual similarity does not imply identical hashes.",
+    "tags": ["moderation","hashing","media","impossible"]
+  },
+  {
+    "id": "fc_398",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What is the protocol response if a cast is signed using a signer key revoked exactly one second prior to signature publication?",
+    "correct_answer": "Hub rejects the cast as unauthorized since revocation predates message receipt.",
+    "incorrect_answers": [
+      "Cast is accepted, then later deleted on reindex.",
+      "A warning but not a rejection is produced.",
+      "Both signature and revocation are ignored due to close timing."
+    ],
+    "explanation": "Revocation time precedence invalidates subsequently received signatures using that key.",
+    "tags": ["signers","security","validation","impossible"]
+  },
+  {
+    "id": "fc_399",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "If a frame POST handler returns HTTP 418 (I'm a teapot), what happens in most Farcaster clients today?",
+    "correct_answer": "Action fails, and a generic 'frame error' appears to user.",
+    "incorrect_answers": [
+      "An in-app joke about teapots pops up.",
+      "Error is ignored and retry is attempted.",
+      "Action is retried with new payload."
+    ],
+    "explanation": "Non-success HTTP statuses are surfaced as generic frame errors in clients.",
+    "tags": ["frames","http","errors","impossible"]
+  },
+  {
+    "id": "fc_400",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "An admin rotates a signer key, but fails to propagate the update to follower hubs. What’s the first user-noticeable bug?",
+    "correct_answer": "New posts aren’t visible to followers on unsynced hubs.",
+    "incorrect_answers": [
+      "Old posts vanish from timelines.",
+      "Storage rent is incorrectly marked 'expired'.",
+      "Likes are attributed to the wrong user."
+    ],
+    "explanation": "Unsynced hubs reject or miss new signatures, hiding fresh posts from followers.",
+    "tags": ["hubs","signers","sync","impossible"]
+  },
+  {
+    "id": "fc_401",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "If the hash calculation for a cast’s payload is subtly altered by whitespace changes, what class of attacks becomes easier?",
+    "correct_answer": "Replay and collision attacks for spam and thread hijack.",
+    "incorrect_answers": [
+      "Direct wallet drain attacks.",
+      "On-chain reentrancy exploit.",
+      "Gas fee spoofing."
+    ],
+    "explanation": "Non-canonical hashing enables collisions and replays that undermine message integrity.",
+    "tags": ["security","hashing","attacks","impossible"]
+  },
+  {
+    "id": "fc_402",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "A cast containing a 256x256 Unicode chessboard was posted, then recast 1,024 times. Which feed display behavior emerges on older mobile clients?",
+    "correct_answer": "Feed lags, misaligns rows, and may partially render the board.",
+    "incorrect_answers": [
+      "Cast auto-splits into segments.",
+      "Chessboard converts into image automatically.",
+      "Feed normalizes it to plain text."
+    ],
+    "explanation": "Large complex Unicode blocks stress layout/rendering on older mobile clients, causing lag and misalignment.",
+    "tags": ["unicode","mobile","performance","impossible"]
+  },
+  {
+    "id": "fc_403",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "A channel ID with homoglyph Unicode letters is registered. Which validation error is possible?",
+    "correct_answer": "Human users may see channel as duplicate, but it’s distinct on protocol.",
+    "incorrect_answers": [
+      "Channel gets deleted on next sync.",
+      "Protocol refuses all Unicode channels.",
+      "Error displays but channel is visible on all clients."
+    ],
+    "explanation": "Homoglyphs can appear identical to humans while remaining distinct code points at protocol level.",
+    "tags": ["unicode","channels","validation","impossible"]
+  },
+  {
+    "id": "fc_404",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "When a user tips themselves with a token on an expired cast, in systems with strict nonce enforcement, which occurs?",
+    "correct_answer": "Tx is rejected and nonce remains unchanged for tipper.",
+    "incorrect_answers": [
+      "Nonce is incremented but nothing else.",
+      "Fallback tip is auto-sent to protocol treasury.",
+      "Onchain error rolls back all recent tips."
+    ],
+    "explanation": "Strict nonce and validation reject invalid target actions without consuming the nonce.",
+    "tags": ["tips","nonces","validation","impossible"]
+  },
+  {
+    "id": "fc_405",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "If a meme coin’s total supply is a prime number, what (if any) special advantage occurs in Farcaster mini apps?",
+    "correct_answer": "No technical effect; but leaderboard quirks may emerge if tips are distributed evenly.",
+    "incorrect_answers": [
+      "Airdrops round up automatically.",
+      "Primes unlock extra tip multipliers.",
+      "Protocol errors if supply is not divisible."
+    ],
+    "explanation": "Supply primality has no direct protocol impact, though display/rounding may affect leaderboards.",
+    "tags": ["tokens","supply","leaderboards","impossible"]
+  },
+  {
+    "id": "fc_406",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "A meme coin smart contract emits logs in non-standard order. Consequence for real-time tipbots?",
+    "correct_answer": "Tipbots may attribute tips to wrong recipients if parsing is by position, not label.",
+    "incorrect_answers": [
+      "Blockchain node rejects logs.",
+      "Tips are all lost until next block.",
+      "Smart contract is blacklisted at the RPC level."
+    ],
+    "explanation": "Parsers relying on positional assumptions can misattribute events when log ordering varies.",
+    "tags": ["events","parsing","bots","impossible"]
+  },
+  {
+    "id": "fc_407",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "During a storage rent increase, which fringe bug might cause some old casts to become 'immortal' on the protocol?",
+    "correct_answer": "Failure to check last-write field leaves some data out of expiry queue.",
+    "incorrect_answers": [
+      "Protocol forcibly deletes all old casts.",
+      "Casts copy themselves to new storage.",
+      "Expired casts restore on chain reorganizations."
+    ],
+    "explanation": "Incorrect expiry queue criteria can omit records whose last-write wasn't considered, preserving them.",
+    "tags": ["storage","rent","bugs","impossible"]
+  },
+  {
+    "id": "fc_408",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What uniquely happens if a channel with only one cast receives a tip of a burned coin?",
+    "correct_answer": "Cast remains untipped; the tip event is logged but ignored.",
+    "incorrect_answers": [
+      "A random mod is assigned coin admin rights.",
+      "Coin supply briefly revives.",
+      "Cast is marked as locked from future tips."
+    ],
+    "explanation": "With a burned token, no transfer occurs; systems record the failed intent without state change.",
+    "tags": ["tokens","tips","edge-cases","impossible"]
+  }
 ]
