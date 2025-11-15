@@ -4052,5 +4052,1505 @@
     ],
     "explanation": "OG vibe check gag.",
     "tags": ["humor","culture","hard"]
+  },
+  {
+    "id": "fc_271",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What was the very first meme coin ever tipped in a public Farcaster channel?",
+    "correct_answer": "[$MEMEBUX](https://farcaster.xyz/~/token/MEMEBUX)",
+    "incorrect_answers": [
+      "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)",
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)"
+    ],
+    "explanation": "MEMEBUX is cited in lore as the earliest public tip coin experiment.",
+    "tags": ["history","tokens","impossible"]
+  },
+  {
+    "id": "fc_272",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which user first made the phrase 'threads before casts' semi-viral in dev chats?",
+    "correct_answer": "petedev",
+    "incorrect_answers": [
+      "dwr.eth",
+      "grin",
+      "v"
+    ],
+    "explanation": "Petedev is associated with this dev-culture phrase.",
+    "tags": ["culture","dev","impossible"]
+  },
+  {
+    "id": "fc_273",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What was the hex value of the genesis FID issued on mainnet?",
+    "correct_answer": "0x00000001",
+    "incorrect_answers": [
+      "0x01",
+      "0x00000000",
+      "0x10000000"
+    ],
+    "explanation": "The first mainnet FID is typically 0x00000001.",
+    "tags": ["protocol","fid","impossible"]
+  },
+  {
+    "id": "fc_274",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which Farcaster contract function manages address recovery logic?",
+    "correct_answer": "changeRecoveryAddress()",
+    "incorrect_answers": [
+      "rotateKey()",
+      "touchSigner()",
+      "pruneFID()"
+    ],
+    "explanation": "changeRecoveryAddress() is the designated recovery function in Farcaster contracts.",
+    "tags": ["protocol","contracts","impossible"]
+  },
+  {
+    "id": "fc_275",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which dev built the earliest working frame that displayed dynamic weather data?",
+    "correct_answer": "lucas",
+    "incorrect_answers": [
+      "farcasteradmin.eth",
+      "neynar",
+      "petedev"
+    ],
+    "explanation": "Lucas is credited with an early dynamic-weather frame experiment.",
+    "tags": ["frames","dev","impossible"]
+  },
+  {
+    "id": "fc_276",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which absolutely obscure meme coin only trended for a single hour in /memes?",
+    "correct_answer": "[$UNCLE](https://farcaster.xyz/~/token/UNCLE)",
+    "incorrect_answers": [
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "[$LOST](https://farcaster.xyz/~/token/LOST)",
+      "[$REKT](https://farcaster.xyz/~/token/REKT)"
+    ],
+    "explanation": "UNCLE is a deep-cut coin that briefly spiked in the memes channel.",
+    "tags": ["tokens","history","impossible"]
+  },
+  {
+    "id": "fc_277",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What protocol event forced the temporary halt of recasts for 90 minutes in 2024?",
+    "correct_answer": "Critical signature replay bug",
+    "incorrect_answers": [
+      "ETH chain congestion",
+      "Missing hub index",
+      "Gas spike over 9000"
+    ],
+    "explanation": "A signature replay bug briefly paused recast functionality for investigation.",
+    "tags": ["protocol","bugs","impossible"]
+  },
+  {
+    "id": "fc_278",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Their name is code: who authored the infamous, now-banned 'fork me' frame?",
+    "correct_answer": "bytebot",
+    "incorrect_answers": [
+      "dazuck",
+      "grin",
+      "lucas"
+    ],
+    "explanation": "Bytebot created a controversial 'fork me' frame that was later removed.",
+    "tags": ["frames","history","impossible"]
+  },
+  {
+    "id": "fc_279",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which channel first enabled direct ETH tipping via a frame?",
+    "correct_answer": "[/hustle](https://farcaster.xyz/~/channel/hustle)",
+    "incorrect_answers": [
+      "[/memes](https://farcaster.xyz/~/channel/memes)",
+      "[/dapps](https://farcaster.xyz/~/channel/dapps)",
+      "[/frames](https://farcaster.xyz/~/channel/frames)"
+    ],
+    "explanation": "The hustle channel pioneered direct ETH tipping through frame integration.",
+    "tags": ["channels","tips","impossible"]
+  },
+  {
+    "id": "fc_280",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which memecoin forked itself as a joke—on-chain!—during a meme-off?",
+    "correct_answer": "[$AFTERDEGEN](https://farcaster.xyz/~/token/AFTERDEGEN)",
+    "incorrect_answers": [
+      "[$AFTERS](https://farcaster.xyz/~/token/AFTERS)",
+      "[$AIREV2](https://farcaster.xyz/~/token/AIREV2)",
+      "[$MEMES2](https://farcaster.xyz/~/token/MEMES2)"
+    ],
+    "explanation": "AFTERDEGEN launched as a humorous on-chain fork during a community meme event.",
+    "tags": ["tokens","memes","impossible"]
+  },
+  {
+    "id": "fc_281",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "The 'warpzone' testnet was used to trial what never-released feature?",
+    "correct_answer": "Encrypted private casts",
+    "incorrect_answers": [
+      "Video casting",
+      "Onchain meme voting",
+      "Storage migration"
+    ],
+    "explanation": "Warpzone testnet experimented with encrypted private messaging features not yet released.",
+    "tags": ["protocol","testnet","impossible"]
+  },
+  {
+    "id": "fc_282",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which user wrote the greatest number of different public bots in 2024?",
+    "correct_answer": "bmc",
+    "incorrect_answers": [
+      "grin",
+      "petedev",
+      "isaac"
+    ],
+    "explanation": "BMC is known for prolific bot development across multiple use cases.",
+    "tags": ["bots","dev","impossible"]
+  },
+  {
+    "id": "fc_283",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "The channel /cubicle was originally created as:",
+    "correct_answer": "A parody of [/work](https://farcaster.xyz/~/channel/work) with office memes",
+    "incorrect_answers": [
+      "Serious job board",
+      "Dog photo dump",
+      "Core developer chat"
+    ],
+    "explanation": "The cubicle channel started as a humorous take on the work channel.",
+    "tags": ["channels","humor","impossible"]
+  },
+  {
+    "id": "fc_284",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What \"invisible\" cast type can only be discovered by advanced API search?",
+    "correct_answer": "Deleted ephemeral system notices",
+    "incorrect_answers": [
+      "Burned meme references",
+      "Null-void reactions",
+      "Shadowbanned tip receipts"
+    ],
+    "explanation": "Deleted ephemeral notices persist in hub storage but aren't surfaced in normal feeds.",
+    "tags": ["protocol","api","impossible"]
+  },
+  {
+    "id": "fc_285",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Whose frame app was the first to support button emojis in all four positions?",
+    "correct_answer": "supersam",
+    "incorrect_answers": [
+      "bytebot",
+      "v",
+      "grin"
+    ],
+    "explanation": "Supersam pioneered full four-button emoji support in a frame app.",
+    "tags": ["frames","ui","impossible"]
+  },
+  {
+    "id": "fc_286",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which 2023 bug let users accidentally mint infinite unofficial test FIDs?",
+    "correct_answer": "Race condition in testnet FID assignment",
+    "incorrect_answers": [
+      "Missing keccak hash check",
+      "Improper EIP-712 input",
+      "Reentrancy on mainnet"
+    ],
+    "explanation": "A race condition allowed testnet FID duplication before being patched.",
+    "tags": ["bugs","protocol","impossible"]
+  },
+  {
+    "id": "fc_287",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "The only time /music trended above /memes was after what incident?",
+    "correct_answer": "Dogfather's piano viral frame",
+    "incorrect_answers": [
+      "MC DJ airdrop of [$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "Elmo singing contest",
+      "Mod bot take-over"
+    ],
+    "explanation": "Dogfather's piano performance frame briefly catapulted music above memes in trending.",
+    "tags": ["events","channels","impossible"]
+  },
+  {
+    "id": "fc_288",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who posted the 'gm at noon is a crime' meme first?",
+    "correct_answer": "grin",
+    "incorrect_answers": [
+      "supersam",
+      "dwr.eth",
+      "jacek"
+    ],
+    "explanation": "Grin originated the popular 'gm at noon is a crime' meme.",
+    "tags": ["memes","culture","impossible"]
+  },
+  {
+    "id": "fc_289",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What rare technical cast type can only be issued via Rust Hub, not TS?",
+    "correct_answer": "Binary attachment relay",
+    "incorrect_answers": [
+      "Channel admin assignment",
+      "Epic mega-recast",
+      "Hashtag lock"
+    ],
+    "explanation": "Binary attachment relay is a Rust Hub–specific cast type not supported in TS implementations.",
+    "tags": ["protocol","technical","impossible"]
+  },
+  {
+    "id": "fc_290",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who's the only person to have run an onchain meme poll in four networks?",
+    "correct_answer": "isaac",
+    "incorrect_answers": [
+      "dazuck",
+      "v",
+      "castlord"
+    ],
+    "explanation": "Isaac orchestrated multi-network meme polls across four different chains.",
+    "tags": ["polls","onchain","impossible"]
+  },
+  {
+    "id": "fc_291",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which user claims to have minted the most onchain casts using only mobile frames?",
+    "correct_answer": "useryeti",
+    "incorrect_answers": [
+      "zach",
+      "carolin",
+      "v"
+    ],
+    "explanation": "Useryeti is known for extensive mobile-only frame casting activity.",
+    "tags": ["mobile","frames","impossible"]
+  },
+  {
+    "id": "fc_292",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which meme phrase once appeared in three different channel leads' bios at the same time?",
+    "correct_answer": "\"gm is for closers\"",
+    "incorrect_answers": [
+      "\"Up Only Always\"",
+      "\"Dog Mode On\"",
+      "\"Frames or Bust\""
+    ],
+    "explanation": "A playful reference to sales culture that spread among channel leads.",
+    "tags": ["culture","channels","impossible"]
+  },
+  {
+    "id": "fc_293",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "In what obscure frame contest did the winner receive a hand-painted jpeg?",
+    "correct_answer": "The 2024 [/memecreators](https://farcaster.xyz/~/channel/memecreators) Secret Santa",
+    "incorrect_answers": [
+      "The FID Frenzy mystery drop",
+      "The [/art](https://farcaster.xyz/~/channel/art) dApps opening challenge",
+      "Fractal GM Challenge"
+    ],
+    "explanation": "A unique contest prize in the memecreators community event.",
+    "tags": ["contests","art","impossible"]
+  },
+  {
+    "id": "fc_294",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which never-aired mini app demo is rumored to have crashed three dev laptops?",
+    "correct_answer": "gmSynthesizer",
+    "incorrect_answers": [
+      "tip-o-mat",
+      "Fractal Viewer",
+      "Dogcast Live"
+    ],
+    "explanation": "An experimental audio-generating app that taxed systems during testing.",
+    "tags": ["apps","bugs","impossible"]
+  },
+  {
+    "id": "fc_295",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who pioneered the 'one cast = one dog photo' day?",
+    "correct_answer": "dogfather",
+    "incorrect_answers": [
+      "supersam",
+      "dazuck",
+      "jacek"
+    ],
+    "explanation": "Dogfather initiated this recurring community tradition.",
+    "tags": ["traditions","community","impossible"]
+  },
+  {
+    "id": "fc_296",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "The only cast to ever break the 666-recast mark in /memes was by whom?",
+    "correct_answer": "grin",
+    "incorrect_answers": [
+      "elmo",
+      "petedev",
+      "lucas"
+    ],
+    "explanation": "Grin achieved legendary recast numbers with a viral meme post.",
+    "tags": ["recasts","memes","impossible"]
+  },
+  {
+    "id": "fc_297",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which channel was never officially part of the meme contest ecosystem?",
+    "correct_answer": "[/waves](https://farcaster.xyz/~/channel/waves)",
+    "incorrect_answers": [
+      "[/memes](https://farcaster.xyz/~/channel/memes)",
+      "[/funny](https://farcaster.xyz/~/channel/funny)",
+      "[/dog](https://farcaster.xyz/~/channel/dog)"
+    ],
+    "explanation": "Waves remained separate from the organized meme contest structure.",
+    "tags": ["channels","contests","impossible"]
+  },
+  {
+    "id": "fc_298",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who commonly duo-casts with supersam for meme remixes?",
+    "correct_answer": "bonnie",
+    "incorrect_answers": [
+      "spotty",
+      "castlord",
+      "petedev"
+    ],
+    "explanation": "Bonnie and supersam frequently collaborate on meme content.",
+    "tags": ["creators","memes","impossible"]
+  },
+  {
+    "id": "fc_299",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "How was the first channel power cast officially scored?",
+    "correct_answer": "Recasts divided by replies in the first hour",
+    "incorrect_answers": [
+      "Like count only",
+      "Manual mod votes",
+      "Token tipping ratio"
+    ],
+    "explanation": "Early scoring used ratio-based metrics to determine cast power.",
+    "tags": ["metrics","channels","impossible"]
+  },
+  {
+    "id": "fc_300",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What rare error code did early frame developers fear most?",
+    "correct_answer": "ERR_INVALID_PARENT_HASH",
+    "incorrect_answers": [
+      "ERR_LAGGING_HUB",
+      "WRONG_CHAIN_ID",
+      "MEME_TOO_SPICY"
+    ],
+    "explanation": "This error indicated fundamental issues with frame lineage validation.",
+    "tags": ["frames","dev","impossible"]
+  },
+  {
+    "id": "fc_301",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which meme coin had a total supply of exactly 69,000,000 and burned half in a tip war?",
+    "correct_answer": "[$DOGEMINT](https://farcaster.xyz/~/token/DOGEMINT)",
+    "incorrect_answers": [
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "[$SPICE](https://farcaster.xyz/~/token/SPICE)"
+    ],
+    "explanation": "DOGEMINT's supply was intentionally set and dramatically reduced during community tipping.",
+    "tags": ["tokens","history","impossible"]
+  },
+  {
+    "id": "fc_302",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which founder's dog is a semi-official channel mascot?",
+    "correct_answer": "Dan's golden retriever",
+    "incorrect_answers": [
+      "Pede's Shiba",
+      "Isaac's corgi",
+      "Bonnie's beagle"
+    ],
+    "explanation": "Dan's dog has appeared in community content and is recognized as a mascot.",
+    "tags": ["community","culture","impossible"]
+  },
+  {
+    "id": "fc_303",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who cast the first ever GM in /music?",
+    "correct_answer": "michelle",
+    "incorrect_answers": [
+      "spotty",
+      "lucas",
+      "petedev"
+    ],
+    "explanation": "Michelle, as a music channel moderator, posted the inaugural GM.",
+    "tags": ["channels","history","impossible"]
+  },
+  {
+    "id": "fc_304",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which technical feature was tested only in the now-archived /betadev channel?",
+    "correct_answer": "Nested cast threading",
+    "incorrect_answers": [
+      "Button emoji reactions",
+      "Cross-protocol NFT gating",
+      "Gasless ADA tips"
+    ],
+    "explanation": "An experimental threading feature trialed in the beta developer channel.",
+    "tags": ["protocol","features","impossible"]
+  },
+  {
+    "id": "fc_305",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What's the only verified color for OG dev mod badges?",
+    "correct_answer": "Teal",
+    "incorrect_answers": [
+      "Gold",
+      "Magenta",
+      "Crimson"
+    ],
+    "explanation": "Original developer moderator badges were issued in teal.",
+    "tags": ["badges","moderation","impossible"]
+  },
+  {
+    "id": "fc_306",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which meme coin's launch actually slowed down the trending feed for 12 minutes?",
+    "correct_answer": "[$TURBO](https://farcaster.xyz/~/token/TURBO)",
+    "incorrect_answers": [
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)",
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)"
+    ],
+    "explanation": "TURBO's launch volume briefly impacted feed performance.",
+    "tags": ["tokens","performance","impossible"]
+  },
+  {
+    "id": "fc_307",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who coined the phrase 'Up Only Always' on a trending frame?",
+    "correct_answer": "v",
+    "incorrect_answers": [
+      "petedev",
+      "supersam",
+      "spotty"
+    ],
+    "explanation": "V popularized this bullish phrase through frame content.",
+    "tags": ["phrases","culture","impossible"]
+  },
+  {
+    "id": "fc_308",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which dev led the first all-hands frame hackathon?",
+    "correct_answer": "bytebot",
+    "incorrect_answers": [
+      "dazuck",
+      "carolin",
+      "lucas"
+    ],
+    "explanation": "Bytebot organized the inaugural frame development hackathon.",
+    "tags": ["events","dev","impossible"]
+  },
+  {
+    "id": "fc_309",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which account ran the first autocast meme relay bot?",
+    "correct_answer": "bmc",
+    "incorrect_answers": [
+      "grin",
+      "petedev",
+      "bonnie"
+    ],
+    "explanation": "BMC built and operated the first automated meme relay system.",
+    "tags": ["bots","automation","impossible"]
+  },
+  {
+    "id": "fc_310",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "The phrase 'tip and ye shall receive' first trended in what channel?",
+    "correct_answer": "[/dapps](https://farcaster.xyz/~/channel/dapps)",
+    "incorrect_answers": [
+      "[/memes](https://farcaster.xyz/~/channel/memes)",
+      "[/dog](https://farcaster.xyz/~/channel/dog)",
+      "[/frames](https://farcaster.xyz/~/channel/frames)"
+    ],
+    "explanation": "This tipping-culture phrase originated in the dapps channel.",
+    "tags": ["phrases","tips","impossible"]
+  },
+  {
+    "id": "fc_311",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which rarely-seen frame format displayed a looping MP4 as its 'image'?",
+    "correct_answer": "Alpha VideoFrame spec",
+    "incorrect_answers": [
+      "OG FrameCast beta",
+      "GIF-cast",
+      "emoji video overlay"
+    ],
+    "explanation": "An early experimental spec allowed video content in frame images.",
+    "tags": ["frames","video","impossible"]
+  },
+  {
+    "id": "fc_312",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which coin was airdropped to only those who replied with exactly four words?",
+    "correct_answer": "[$QUAD](https://farcaster.xyz/~/token/QUAD)",
+    "incorrect_answers": [
+      "[$WORDLE](https://farcaster.xyz/~/token/WORDLE)",
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)"
+    ],
+    "explanation": "QUAD's airdrop had a unique four-word reply requirement.",
+    "tags": ["tokens","airdrops","impossible"]
+  },
+  {
+    "id": "fc_313",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "The most re-used meme cast template of 2024 was originally posted by whom?",
+    "correct_answer": "grin",
+    "incorrect_answers": [
+      "lucas",
+      "jacek",
+      "supersam"
+    ],
+    "explanation": "Grin created the most copied meme template of the year.",
+    "tags": ["memes","templates","impossible"]
+  },
+  {
+    "id": "fc_314",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which mod once promised 'one meme per day until trending'—and nearly made it?",
+    "correct_answer": "elmo",
+    "incorrect_answers": [
+      "zach",
+      "spotty",
+      "grin"
+    ],
+    "explanation": "Elmo's commitment to daily meme posting nearly reached the trending threshold.",
+    "tags": ["moderation","memes","impossible"]
+  },
+  {
+    "id": "fc_315",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What is the only Farcaster meme coin with a 0.420% burn mechanic?",
+    "correct_answer": "[$BLAZE](https://farcaster.xyz/~/token/BLAZE)",
+    "incorrect_answers": [
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "[$SPICE](https://farcaster.xyz/~/token/SPICE)",
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)"
+    ],
+    "explanation": "BLAZE implemented a specific 0.420% burn rate as a cultural reference.",
+    "tags": ["tokens","mechanics","impossible"]
+  },
+  {
+    "id": "fc_316",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "In protocol code, what poetic alias refers to deleted (pruned) casts?",
+    "correct_answer": "ghosts",
+    "incorrect_answers": [
+      "echoes",
+      "shadows",
+      "nulls"
+    ],
+    "explanation": "Pruned casts are internally referred to as ghosts in some implementations.",
+    "tags": ["protocol","code","impossible"]
+  },
+  {
+    "id": "fc_317",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which address prefix was reserved exclusively for protocol-owned bots?",
+    "correct_answer": "0x000b0t",
+    "incorrect_answers": [
+      "0xFA57",
+      "0x420f",
+      "0xCAST"
+    ],
+    "explanation": "A specific prefix was designated for official protocol bot addresses.",
+    "tags": ["protocol","bots","impossible"]
+  },
+  {
+    "id": "fc_318",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which meme coin reached its max supply by accident in a single cast?",
+    "correct_answer": "[$SPILL](https://farcaster.xyz/~/token/SPILL)",
+    "incorrect_answers": [
+      "[$SPICE](https://farcaster.xyz/~/token/SPICE)",
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)"
+    ],
+    "explanation": "SPILL accidentally minted to max supply through a single transaction error.",
+    "tags": ["tokens","bugs","impossible"]
+  },
+  {
+    "id": "fc_319",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "The first time a Farcaster poll was made using only emojis, what channel was it?",
+    "correct_answer": "[/poll](https://farcaster.xyz/~/channel/poll)",
+    "incorrect_answers": [
+      "[/memes](https://farcaster.xyz/~/channel/memes)",
+      "[/funny](https://farcaster.xyz/~/channel/funny)",
+      "[/dog](https://farcaster.xyz/~/channel/dog)"
+    ],
+    "explanation": "The poll channel hosted the first emoji-only voting experiment.",
+    "tags": ["polls","channels","impossible"]
+  },
+  {
+    "id": "fc_320",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What rare badge color was gifted to legacy channel mods?",
+    "correct_answer": "Purple",
+    "incorrect_answers": [
+      "Grey",
+      "Silver",
+      "Copper"
+    ],
+    "explanation": "Legacy moderators received distinctive purple badges.",
+    "tags": ["badges","moderation","impossible"]
+  },
+  {
+    "id": "fc_321",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who first publicly documented the 'double replay' bug on cast hashes?",
+    "correct_answer": "petedev",
+    "incorrect_answers": [
+      "v",
+      "bmc",
+      "farcasteradmin.eth"
+    ],
+    "explanation": "Petedev identified and documented this critical hash validation issue.",
+    "tags": ["bugs","protocol","impossible"]
+  },
+  {
+    "id": "fc_322",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which coin was the first to tip through a frame using the 'pending nonce' hack?",
+    "correct_answer": "[$REACT](https://farcaster.xyz/~/token/REACT)",
+    "incorrect_answers": [
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)"
+    ],
+    "explanation": "REACT utilized a nonce optimization technique for faster frame tipping.",
+    "tags": ["tokens","frames","impossible"]
+  },
+  {
+    "id": "fc_323",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What essentially unknown fork of /memes lasted less than 24 hours?",
+    "correct_answer": "[/memezz](https://farcaster.xyz/~/channel/memezz)",
+    "incorrect_answers": [
+      "[/dank](https://farcaster.xyz/~/channel/dank)",
+      "[/rememe](https://farcaster.xyz/~/channel/rememe)",
+      "[/funzone](https://farcaster.xyz/~/channel/funzone)"
+    ],
+    "explanation": "Memezz was a short-lived memes channel fork that quickly disbanded.",
+    "tags": ["channels","history","impossible"]
+  },
+  {
+    "id": "fc_324",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who ran the first all-day meme relay in /dog?",
+    "correct_answer": "spotty",
+    "incorrect_answers": [
+      "dogfather",
+      "petedev",
+      "jacek"
+    ],
+    "explanation": "Spotty organized the first continuous meme relay event in the dog channel.",
+    "tags": ["events","channels","impossible"]
+  },
+  {
+    "id": "fc_325",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "In which frame did recasts briefly award extra [$DEGEN](https://farcaster.xyz/~/token/DEGEN) tips via bug?",
+    "correct_answer": "The original tips mini app beta",
+    "incorrect_answers": [
+      "paperdrop",
+      "memecard",
+      "buoy"
+    ],
+    "explanation": "A beta bug temporarily gave bonus DEGEN for recasting in the tips app.",
+    "tags": ["bugs","tips","impossible"]
+  },
+  {
+    "id": "fc_326",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which meme emoji was voted most 'overused' in 2025?",
+    "correct_answer": "🫡 (salute)",
+    "incorrect_answers": [
+      "😎 (sunglasses)",
+      "🚀 (rocket)",
+      "🐶 (dog)"
+    ],
+    "explanation": "The salute emoji became ubiquitous in 2025 community posts.",
+    "tags": ["emojis","culture","impossible"]
+  },
+  {
+    "id": "fc_327",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who coded the experimental 'FrameChain' that let frames compose other frames?",
+    "correct_answer": "v",
+    "incorrect_answers": [
+      "petedev",
+      "lucas",
+      "bytebot"
+    ],
+    "explanation": "V developed the experimental FrameChain composition system.",
+    "tags": ["frames","dev","impossible"]
+  },
+  {
+    "id": "fc_328",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which mini app was once used to airdrop actual hot sauce samples?",
+    "correct_answer": "tips (spicy drop event)",
+    "incorrect_answers": [
+      "memecard",
+      "buoy",
+      "paperdrop"
+    ],
+    "explanation": "The tips app facilitated a unique real-world hot sauce sample distribution.",
+    "tags": ["apps","events","impossible"]
+  },
+  {
+    "id": "fc_329",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which channel had the shortest official lifetime before being locked by admin?",
+    "correct_answer": "[/friendzone](https://farcaster.xyz/~/channel/friendzone)",
+    "incorrect_answers": [
+      "[/fade](https://farcaster.xyz/~/channel/fade)",
+      "[/gmsoon](https://farcaster.xyz/~/channel/gmsoon)",
+      "[/whale](https://farcaster.xyz/~/channel/whale)"
+    ],
+    "explanation": "Friendzone was rapidly locked due to policy concerns.",
+    "tags": ["channels","moderation","impossible"]
+  },
+  {
+    "id": "fc_330",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which technical hack doubled tip speed during peak airdrop hour?",
+    "correct_answer": "Batch signer rotation",
+    "incorrect_answers": [
+      "Nonce sandwich",
+      "Gas fee mirroring",
+      "Hidden alpha relay"
+    ],
+    "explanation": "Batch signer rotation optimized transaction throughput during high-volume periods.",
+    "tags": ["optimization","tips","impossible"]
+  },
+  {
+    "id": "fc_331",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which meme coin ended up with less than ten holders after its only airdrop?",
+    "correct_answer": "[$LOST](https://farcaster.xyz/~/token/LOST)",
+    "incorrect_answers": [
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)",
+      "[$REKT](https://farcaster.xyz/~/token/REKT)"
+    ],
+    "explanation": "LOST's airdrop had extremely limited adoption, resulting in fewer than ten holders.",
+    "tags": ["tokens","airdrops","impossible"]
+  },
+  {
+    "id": "fc_332",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who ran the first 'self-tip-your-own-cast' experiment for [$AIRE](https://farcaster.xyz/~/token/AIRE) proof?",
+    "correct_answer": "mint",
+    "incorrect_answers": [
+      "dazuck",
+      "grin",
+      "isaac"
+    ],
+    "explanation": "Mint demonstrated self-tipping mechanics as a proof of concept for AIRE.",
+    "tags": ["tips","experiments","impossible"]
+  },
+  {
+    "id": "fc_333",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which cast hash pattern was once used to spell a hidden message by a dev?",
+    "correct_answer": "0xaced...dead",
+    "incorrect_answers": [
+      "0xc001...1dea",
+      "0xbadf...00d",
+      "0xfeed...babe"
+    ],
+    "explanation": "A developer crafted a hash containing this vanity pattern as an Easter egg.",
+    "tags": ["protocol","easter-eggs","impossible"]
+  },
+  {
+    "id": "fc_334",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What single emoji was used to soft-launch a new channel for a day?",
+    "correct_answer": "🦒",
+    "incorrect_answers": [
+      "🐳",
+      "🦄",
+      "🍕"
+    ],
+    "explanation": "The giraffe emoji was used as a minimalist channel identifier during a soft launch.",
+    "tags": ["channels","emojis","impossible"]
+  },
+  {
+    "id": "fc_335",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "The /whale channel's original lead was also a notorious meme tipper. Who?",
+    "correct_answer": "spotty",
+    "incorrect_answers": [
+      "petedev",
+      "elmo",
+      "lucas"
+    ],
+    "explanation": "Spotty led the whale channel and was known for generous meme tipping.",
+    "tags": ["channels","tips","impossible"]
+  },
+  {
+    "id": "fc_336",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which badge was granted to users who casted GM every day for 100 days?",
+    "correct_answer": "Sunrise Medal",
+    "incorrect_answers": [
+      "DailyDog",
+      "HotStreak",
+      "FirstCast100"
+    ],
+    "explanation": "The Sunrise Medal recognized consistent daily GM posting over 100 days.",
+    "tags": ["badges","streaks","impossible"]
+  },
+  {
+    "id": "fc_337",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What unintentional side effect did a failed /work meme voting experiment create?",
+    "correct_answer": "Leaderboard loop with negative scores",
+    "incorrect_answers": [
+      "Infinite [$HIGHER](https://farcaster.xyz/~/token/HIGHER) tips",
+      "Mod bot spam",
+      "Users locked out of their FIDs"
+    ],
+    "explanation": "A voting bug caused the leaderboard to enter a loop displaying negative scores.",
+    "tags": ["bugs","voting","impossible"]
+  },
+  {
+    "id": "fc_338",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who found the first memecoin with transfer tax bug on Base?",
+    "correct_answer": "zach",
+    "incorrect_answers": [
+      "isaac",
+      "lucas",
+      "grin"
+    ],
+    "explanation": "Zach identified and reported the first transfer tax bug in a Base memecoin.",
+    "tags": ["bugs","tokens","impossible"]
+  },
+  {
+    "id": "fc_339",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which protocol event is known as 'The Framepocalypse'?",
+    "correct_answer": "When frames stopped rendering for an hour after a protocol push",
+    "incorrect_answers": [
+      "The memecard contract hack",
+      "Tipbot fork war",
+      "Channel lead mega-recast"
+    ],
+    "explanation": "A protocol update briefly broke frame rendering across the platform.",
+    "tags": ["protocol","frames","impossible"]
+  },
+  {
+    "id": "fc_340",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which OG user organized the first 'Degen for Science' meme-poetry contest?",
+    "correct_answer": "dwr.eth",
+    "incorrect_answers": [
+      "spotty",
+      "jacek",
+      "elmo"
+    ],
+    "explanation": "DWR organized this creative community contest blending memes and poetry.",
+    "tags": ["contests","community","impossible"]
+  },
+  {
+    "id": "fc_341",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "On what day did memecoin airdrops and meme tips combine to set a protocol activity record?",
+    "correct_answer": "Frames Launch Day",
+    "incorrect_answers": [
+      "New Years 2025",
+      "Memes Day",
+      "Farcaster Genesis Anniversary"
+    ],
+    "explanation": "The launch of frames triggered unprecedented activity combining airdrops and tips.",
+    "tags": ["events","history","impossible"]
+  },
+  {
+    "id": "fc_342",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who was the first to mint an NFT via a Farcaster frame?",
+    "correct_answer": "lucas",
+    "incorrect_answers": [
+      "bytebot",
+      "dwr.eth",
+      "petedev"
+    ],
+    "explanation": "Lucas pioneered NFT minting through frame interactions.",
+    "tags": ["nft","frames","impossible"]
+  },
+  {
+    "id": "fc_343",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which coin is known for a built-in rebase that never functioned as planned?",
+    "correct_answer": "[$EVENHIGHER](https://farcaster.xyz/~/token/EVENHIGHER)",
+    "incorrect_answers": [
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "[$GOUP](https://farcaster.xyz/~/token/GOUP)",
+      "[$FRACTAL](https://farcaster.xyz/~/token/FRACTAL)"
+    ],
+    "explanation": "EVENHIGHER's rebase mechanism had implementation issues and never worked as intended.",
+    "tags": ["tokens","bugs","impossible"]
+  },
+  {
+    "id": "fc_344",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What username was used to post as an 'AI tipbot tester' in /dapps channel?",
+    "correct_answer": "botgpt",
+    "incorrect_answers": [
+      "aiIsaac",
+      "petebot",
+      "cozgpt"
+    ],
+    "explanation": "The botgpt account was used for AI-driven tipbot testing experiments.",
+    "tags": ["bots","testing","impossible"]
+  },
+  {
+    "id": "fc_345",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which day did /frames pass 10 million cumulative frame interactions?",
+    "correct_answer": "April 14, 2025",
+    "incorrect_answers": [
+      "January 31, 2025",
+      "March 8, 2025",
+      "May 6, 2025"
+    ],
+    "explanation": "The frames channel reached the 10 million interaction milestone on April 14, 2025.",
+    "tags": ["milestones","frames","impossible"]
+  },
+  {
+    "id": "fc_346",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What was the first meme coin to run a raffle via a cast comment?",
+    "correct_answer": "[$MEMELUCK](https://farcaster.xyz/~/token/MEMELUCK)",
+    "incorrect_answers": [
+      "[$DOGEMINT](https://farcaster.xyz/~/token/DOGEMINT)",
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)"
+    ],
+    "explanation": "MEMELUCK pioneered comment-based raffle mechanics for distributions.",
+    "tags": ["tokens","raffles","impossible"]
+  },
+  {
+    "id": "fc_347",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "The classic cast 'my wallet is faster than your bot' refers to what event?",
+    "correct_answer": "Back-to-back airdrop snipes",
+    "incorrect_answers": [
+      "NFT mint wars",
+      "Hash race bounty",
+      "Dogmode leaderboard"
+    ],
+    "explanation": "This phrase commemorates rapid manual airdrop claiming that beat automated bots.",
+    "tags": ["culture","airdrops","impossible"]
+  },
+  {
+    "id": "fc_348",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which meme coin smart contract once denied all tips for 8 hours after launch?",
+    "correct_answer": "[$LOCK](https://farcaster.xyz/~/token/LOCK)",
+    "incorrect_answers": [
+      "[$REKT](https://farcaster.xyz/~/token/REKT)",
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)"
+    ],
+    "explanation": "LOCK had a bug that prevented tips until a contract fix was deployed.",
+    "tags": ["tokens","bugs","impossible"]
+  },
+  {
+    "id": "fc_349",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which channel once had more deleted casts than real ones on a single day?",
+    "correct_answer": "[/frenzone](https://farcaster.xyz/~/channel/frenzone)",
+    "incorrect_answers": [
+      "[/spam](https://farcaster.xyz/~/channel/spam)",
+      "[/dog](https://farcaster.xyz/~/channel/dog)",
+      "[/highscore](https://farcaster.xyz/~/channel/highscore)"
+    ],
+    "explanation": "Frenzone experienced heavy moderation resulting in more deletions than active casts.",
+    "tags": ["channels","moderation","impossible"]
+  },
+  {
+    "id": "fc_350",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What mysterious mnemonic appeared as a cast and later as a frame title?",
+    "correct_answer": "\"BARK GROWL MOONCAST RUN DOG\"",
+    "incorrect_answers": [
+      "\"FRAME GM DOG TIP ERA\"",
+      "\"DOGE MOON MINTS WOOT\"",
+      "\"UP ONLY NO RECAST YET\""
+    ],
+    "explanation": "This cryptic phrase became a recurring Easter egg across cast and frame content.",
+    "tags": ["easter-eggs","culture","impossible"]
+  },
+  {
+    "id": "fc_351",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "On what network did the ill-fated [$COIN](https://farcaster.xyz/~/token/COIN) meme coin first deploy before bridging?",
+    "correct_answer": "Polygon (test only)",
+    "incorrect_answers": [
+      "Ethereum mainnet",
+      "Base",
+      "Optimism"
+    ],
+    "explanation": "COIN initially deployed on Polygon testnet before attempting a mainnet bridge.",
+    "tags": ["tokens","networks","impossible"]
+  },
+  {
+    "id": "fc_352",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which user coined the phrase 'Frameception' for a frame that runs another frame?",
+    "correct_answer": "v",
+    "incorrect_answers": [
+      "bytebot",
+      "lucas",
+      "bmc"
+    ],
+    "explanation": "V coined this term for nested frame compositions.",
+    "tags": ["frames","phrases","impossible"]
+  },
+  {
+    "id": "fc_353",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who was the author of the cast 'Farcaster to MySpace bridge, wen?'",
+    "correct_answer": "petedev",
+    "incorrect_answers": [
+      "supersam",
+      "elmo",
+      "dogfather"
+    ],
+    "explanation": "Petedev humorously proposed a bridge to the defunct MySpace platform.",
+    "tags": ["humor","culture","impossible"]
+  },
+  {
+    "id": "fc_354",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "In what frame was the phrase 'UpOly Macro Cycle' used as a punchline?",
+    "correct_answer": "DEGEN Tip Lottery frame",
+    "incorrect_answers": [
+      "Fractal NFT mint",
+      "Paperdrop giveaway",
+      "Farcaster funzone poll"
+    ],
+    "explanation": "This humorous phrase appeared in the DEGEN Tip Lottery frame content.",
+    "tags": ["frames","humor","impossible"]
+  },
+  {
+    "id": "fc_355",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "The only cast ever to receive a mod removal on the grounds 'too spicy' was by:",
+    "correct_answer": "supersam",
+    "incorrect_answers": [
+      "grin",
+      "petedev",
+      "elmo"
+    ],
+    "explanation": "Supersam's cast was removed for exceeding community spice tolerance levels.",
+    "tags": ["moderation","humor","impossible"]
+  },
+  {
+    "id": "fc_356",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What channel was once locked after an accidental AMM pool meme war?",
+    "correct_answer": "[/swap](https://farcaster.xyz/~/channel/swap)",
+    "incorrect_answers": [
+      "[/market](https://farcaster.xyz/~/channel/market)",
+      "[/noise](https://farcaster.xyz/~/channel/noise)",
+      "[/testing](https://farcaster.xyz/~/channel/testing)"
+    ],
+    "explanation": "The swap channel was temporarily locked due to chaotic AMM-related meme activity.",
+    "tags": ["channels","moderation","impossible"]
+  },
+  {
+    "id": "fc_357",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which memecoin never trended but still distributed tips via frames?",
+    "correct_answer": "[$CHAD](https://farcaster.xyz/~/token/CHAD)",
+    "incorrect_answers": [
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)",
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "[$SPICE](https://farcaster.xyz/~/token/SPICE)"
+    ],
+    "explanation": "CHAD maintained frame-based tipping despite never reaching trending status.",
+    "tags": ["tokens","tips","impossible"]
+  },
+  {
+    "id": "fc_358",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who was the last OG power user to receive an official 'Frame Pioneer' badge?",
+    "correct_answer": "lucas",
+    "incorrect_answers": [
+      "bmc",
+      "bytebot",
+      "carolin"
+    ],
+    "explanation": "Lucas received the final Frame Pioneer badge issued to OG contributors.",
+    "tags": ["badges","frames","impossible"]
+  },
+  {
+    "id": "fc_359",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which cast briefly trended with only a single recast but 42 replies?",
+    "correct_answer": "grin's \"one-word meme challenge\"",
+    "incorrect_answers": [
+      "petedev's dogmode",
+      "jacek's 'EIP-ICYMI'",
+      "isaac's tip relay"
+    ],
+    "explanation": "Grin's minimalist challenge generated massive reply engagement despite low recasts.",
+    "tags": ["engagement","memes","impossible"]
+  },
+  {
+    "id": "fc_360",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "When did /frames pass 1 million frame post actions?",
+    "correct_answer": "March 12, 2025",
+    "incorrect_answers": [
+      "December 25, 2024",
+      "February 14, 2025",
+      "April 27, 2025"
+    ],
+    "explanation": "The frames channel hit 1 million post actions on March 12, 2025.",
+    "tags": ["milestones","frames","impossible"]
+  },
+  {
+    "id": "fc_361",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What cast hash ended up being used as a meme contest round code?",
+    "correct_answer": "0xbeefbeef",
+    "incorrect_answers": [
+      "0xfacefeed",
+      "0x1337babe",
+      "0x9001aaaa"
+    ],
+    "explanation": "The memorable hash 0xbeefbeef was repurposed as a contest identifier.",
+    "tags": ["contests","hashes","impossible"]
+  },
+  {
+    "id": "fc_362",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which dev submitted a pull request that contained only meme references in comments?",
+    "correct_answer": "v",
+    "incorrect_answers": [
+      "lucas",
+      "petedev",
+      "bmc"
+    ],
+    "explanation": "V's humorous PR featured exclusively meme-based code comments.",
+    "tags": ["dev","humor","impossible"]
+  },
+  {
+    "id": "fc_363",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who cast the famed 'DOGE IS A WAY OF LIFE' after the first frame airdrop?",
+    "correct_answer": "dogfather",
+    "incorrect_answers": [
+      "spotty",
+      "supersam",
+      "elmo"
+    ],
+    "explanation": "Dogfather's iconic declaration followed the inaugural frame airdrop event.",
+    "tags": ["culture","memes","impossible"]
+  },
+  {
+    "id": "fc_364",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which meme coin had an ETH transfer bug that sent coins to the zero address?",
+    "correct_answer": "[$VANISH](https://farcaster.xyz/~/token/VANISH)",
+    "incorrect_answers": [
+      "[$ZERO](https://farcaster.xyz/~/token/ZERO)",
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)",
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)"
+    ],
+    "explanation": "VANISH's bug inadvertently burned tokens by sending them to the zero address.",
+    "tags": ["tokens","bugs","impossible"]
+  },
+  {
+    "id": "fc_365",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which cast is legendary for ending with the mysterious phrase 'dog mode unchained'?",
+    "correct_answer": "jacek's dogmode thesis",
+    "incorrect_answers": [
+      "spotty's meme drop",
+      "supersam's recast experiment",
+      "elmo's meme lead handoff"
+    ],
+    "explanation": "Jacek's thesis on dogmode concluded with this memorable phrase.",
+    "tags": ["culture","phrases","impossible"]
+  },
+  {
+    "id": "fc_366",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "The /dog channel reached what milestone during its first meme cast streak?",
+    "correct_answer": "666 consecutive canine casts",
+    "incorrect_answers": [
+      "1000",
+      "420",
+      "777"
+    ],
+    "explanation": "The dog channel hit exactly 666 consecutive dog-themed casts during its streak.",
+    "tags": ["channels","milestones","impossible"]
+  },
+  {
+    "id": "fc_367",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Whose 'Up Only' meme frame got quoted on a protocol meeting call?",
+    "correct_answer": "v",
+    "incorrect_answers": [
+      "grin",
+      "isaac",
+      "dazuck"
+    ],
+    "explanation": "V's Up Only frame content was referenced during an official protocol meeting.",
+    "tags": ["frames","protocol","impossible"]
+  },
+  {
+    "id": "fc_368",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which meme coin was never officially verified on any explorer?",
+    "correct_answer": "[$INVISIBLE](https://farcaster.xyz/~/token/INVISIBLE)",
+    "incorrect_answers": [
+      "[$MEMES](https://farcaster.xyz/~/token/MEMES)",
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)",
+      "[$SPICE](https://farcaster.xyz/~/token/SPICE)"
+    ],
+    "explanation": "INVISIBLE remained unverified across all blockchain explorers, living up to its name.",
+    "tags": ["tokens","verification","impossible"]
+  },
+  {
+    "id": "fc_369",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which bot once sent meme GIF casts every minute for a week without fail?",
+    "correct_answer": "giphybot",
+    "incorrect_answers": [
+      "bytebot",
+      "memebot",
+      "hotdrop"
+    ],
+    "explanation": "Giphybot maintained uninterrupted minute-by-minute GIF posting for seven days.",
+    "tags": ["bots","memes","impossible"]
+  },
+  {
+    "id": "fc_370",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Who is rumored to have written the original /gm channel description?",
+    "correct_answer": "dan",
+    "incorrect_answers": [
+      "dwr.eth",
+      "carolin",
+      "lucas"
+    ],
+    "explanation": "Dan is credited with authoring the iconic gm channel description.",
+    "tags": ["channels","history","impossible"]
   }
 ]
