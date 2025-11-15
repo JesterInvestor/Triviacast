@@ -49,8 +49,8 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     }
 
     try {
-      // Request easy and medium questions explicitly
-      const response = await fetch(`/api/questions?amount=10&difficulty=easy,medium&source=${questionSource}`);
+      // Request questions without specifying a difficulty (allow all difficulties)
+      const response = await fetch(`/api/questions?amount=10&source=${questionSource}`);
       const data = await response.json();
 
       if (!response.ok || data?.error) {
