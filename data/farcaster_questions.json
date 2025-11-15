@@ -3752,4 +3752,305 @@
     "explanation": "Elmo is primarily a moderator/curator and is not associated with running token giveaways.",
     "tags": ["creators","tokens","extremely hard"]
   }
+,
+  {
+    "id": "fc_251",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What's the best way to summon a Farcaster whale?",
+    "correct_answer": "Cast 'wen airdrop?' 3 times before breakfast",
+    "incorrect_answers": [
+      "Offer gasless tips under a full moon",
+      "Name your wallet 0xWhalez",
+      "Post 'good night' at 8 AM"
+    ],
+    "explanation": "A playful nod to airdrop culture and attention-grabbing casts.",
+    "tags": ["humor","culture","hard"]
+  },
+  {
+    "id": "fc_252",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "If your meme doesn't go viral on Farcaster, you should:",
+    "correct_answer": "Recast it with more sparkles and claim 'algorithm hates me'",
+    "incorrect_answers": [
+      "DM grin for coaching",
+      "Tip yourself [$AIRE](https://farcaster.xyz/~/token/AIRE) and go outside",
+      "Blame the moderators"
+    ],
+    "explanation": "Jokes about engagement rituals and algorithm lore.",
+    "tags": ["humor","memes","hard"]
+  },
+  {
+    "id": "fc_253",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is universally accepted as ‘proof of work’ on Farcaster?",
+    "correct_answer": "Posting a ‘good dog’ photo every morning",
+    "incorrect_answers": [
+      "Holding 1 million [$DEGEN](https://farcaster.xyz/~/token/DEGEN)",
+      "Running a node for 24 hours",
+      "Recasting your own cast until it trends"
+    ],
+    "explanation": "Good-dog posts are a beloved running gag across channels.",
+    "tags": ["humor","traditions","hard"]
+  },
+  {
+    "id": "fc_254",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which beverage is rumored to power Farcaster’s core developers?",
+    "correct_answer": "Unlimited LaCroix",
+    "incorrect_answers": [
+      "ETH cappuccinos",
+      "Mountain Dew Baja Blast",
+      "Carbonated AIRE"
+    ],
+    "explanation": "Lighthearted dev culture meme.",
+    "tags": ["humor","culture","hard"]
+  },
+  {
+    "id": "fc_255",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "In Farcaster lore, what animal achieves instant micro-viral status?",
+    "correct_answer": "Shiba Inu in sunglasses",
+    "incorrect_answers": [
+      "Cat on a Roomba",
+      "Frog moonwalking",
+      "Penguin flipping burgers"
+    ],
+    "explanation": "Dog-meme supremacy in crypto culture.",
+    "tags": ["humor","memes","hard"]
+  },
+  {
+    "id": "fc_256",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "The secret to reaching the Farcaster trending feed is:",
+    "correct_answer": "Sacrificing 7 memes to the algorithm spirit",
+    "incorrect_answers": [
+      "Staking [$HIGHER](https://farcaster.xyz/~/token/HIGHER) on your profile photo",
+      "Voting in every poll ever cast",
+      "Complaining about storage rent in rhymes"
+    ],
+    "explanation": "Pokes fun at trending-feed superstition.",
+    "tags": ["humor","algorithm","hard"]
+  },
+  {
+    "id": "fc_257",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "When a user says 'my memecoin is the next [$DEGEN](https://farcaster.xyz/~/token/DEGEN)', what’s implied?",
+    "correct_answer": "They just launched it 5 minutes ago",
+    "incorrect_answers": [
+      "It has real-world utility",
+      "The dev is doxxed and thriving",
+      "It’s definitely a scam (allegedly)"
+    ],
+    "explanation": "Crypto launch memes and expectations.",
+    "tags": ["humor","tokens","hard"]
+  },
+  {
+    "id": "fc_258",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Farcaster’s official unit of measurement for engagement is:",
+    "correct_answer": "Memetrics per gm",
+    "incorrect_answers": [
+      "Recast miles",
+      "Degenpoints",
+      "WAGMI watts"
+    ],
+    "explanation": "A tongue-in-cheek fake metric.",
+    "tags": ["humor","engagement","hard"]
+  },
+  {
+    "id": "fc_259",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which word should be avoided at all costs in a serious cast?",
+    "correct_answer": "Serious",
+    "incorrect_answers": [
+      "Meme",
+      "Tipbot",
+      "Frame"
+    ],
+    "explanation": "Meta-joke about tone and community culture.",
+    "tags": ["humor","culture","hard"]
+  },
+  {
+    "id": "fc_260",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "If you recast your own cast three times in a row, you unlock:",
+    "correct_answer": "Achievement: Self-Reflection Level Up",
+    "incorrect_answers": [
+      "A MOD warning",
+      "Secret invite to [/lonely](https://farcaster.xyz/~/channel/lonely) channel",
+      "Your own meme token airdrop"
+    ],
+    "explanation": "Gamified self-recast gag.",
+    "tags": ["humor","recasts","hard"]
+  },
+  {
+    "id": "fc_261",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which mystical phrase summons instant engagement?",
+    "correct_answer": "'Gm, but with vibes'",
+    "incorrect_answers": [
+      "Frame it or shame it",
+      "Up only always",
+      "Tip me, I dare you"
+    ],
+    "explanation": "'gm' plus vibes is a long-running engagement meme.",
+    "tags": ["humor","phrases","hard"]
+  },
+  {
+    "id": "fc_262",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Best way to become a channel lead overnight?",
+    "correct_answer": "Offer unlimited coffee and meme coaching",
+    "incorrect_answers": [
+      "Rename channel to [/cats](https://farcaster.xyz/~/channel/cats)",
+      "Promise daily [$AIRE](https://farcaster.xyz/~/token/AIRE) giveaways",
+      "Declare yourself 'King of Degen'"
+    ],
+    "explanation": "Joke about channel lead clout and community perks.",
+    "tags": ["humor","channels","hard"]
+  },
+  {
+    "id": "fc_263",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "According to Farcaster tradition, how do you impress petedev?",
+    "correct_answer": "Submit a PR with memes in the README",
+    "incorrect_answers": [
+      "Start a podcast",
+      "Gift-wrap a Rust contract",
+      "Make a dog-only channel"
+    ],
+    "explanation": "Blends OSS culture with meme humor.",
+    "tags": ["humor","oss","hard"]
+  },
+  {
+    "id": "fc_264",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the correct response to ‘wen [$HIGHER](https://farcaster.xyz/~/token/HIGHER)’?",
+    "correct_answer": "'wen [$EVENHIGHER](https://farcaster.xyz/~/token/EVENHIGHER)'",
+    "incorrect_answers": [
+      "'wen [$LOWER](https://farcaster.xyz/~/token/LOWER)'",
+      "'soonTM'",
+      "'with fries?'"
+    ],
+    "explanation": "Plays on the 'wen' meme escalation.",
+    "tags": ["humor","tokens","hard"]
+  },
+  {
+    "id": "fc_265",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which coin is not real… yet?",
+    "correct_answer": "[$MEMEFRAME](https://farcaster.xyz/~/token/MEMEFRAME)",
+    "incorrect_answers": [
+      "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)",
+      "[$HIGHER](https://farcaster.xyz/~/token/HIGHER)",
+      "[$AIRE](https://farcaster.xyz/~/token/AIRE)"
+    ],
+    "explanation": "Imaginary token riffing on frames and memes.",
+    "tags": ["humor","tokens","hard"]
+  },
+  {
+    "id": "fc_266",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Most effective form of cast moderation is:",
+    "correct_answer": "Reply with 'try again with more vibes'",
+    "incorrect_answers": [
+      "Temp-ban for low karma",
+      "Deploying meme police bot",
+      "Airing grievances on [/gm](https://farcaster.xyz/~/channel/gm)"
+    ],
+    "explanation": "Soft moderation with humor.",
+    "tags": ["humor","moderation","hard"]
+  },
+  {
+    "id": "fc_267",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Why did the user tip themselves [$AIRE](https://farcaster.xyz/~/token/AIRE)?",
+    "correct_answer": "Just to feel something",
+    "incorrect_answers": [
+      "It increases your Neynar score",
+      "It unlocks a secret badge",
+      "It's required by the protocol"
+    ],
+    "explanation": "Self-tipping gag about vibes over utility.",
+    "tags": ["humor","tokens","hard"]
+  },
+  {
+    "id": "fc_268",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which Farcaster move always signals a bull market?",
+    "correct_answer": "Somebody memes a doge on a frame",
+    "incorrect_answers": [
+      "Users stop saying ‘wen’",
+      "Grin recasts everything",
+      "Isaac forgets to tip"
+    ],
+    "explanation": "Bullish doge + frames trope.",
+    "tags": ["humor","market","hard"]
+  },
+  {
+    "id": "fc_269",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "If your account is labeled as '0 spam', you are:",
+    "correct_answer": "Super legit, probably a dev’s dog",
+    "incorrect_answers": [
+      "Secretly Satoshi",
+      "Next channel lead",
+      "Eligible for zero memes"
+    ],
+    "explanation": "Playful status joke.",
+    "tags": ["humor","status","hard"]
+  },
+  {
+    "id": "fc_270",
+    "category": "Farcaster Knowledge",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "You know someone is OG if they:",
+    "correct_answer": "Still cast ‘gm’ at 2AM their time",
+    "incorrect_answers": [
+      "Bought all tip tokens in 2025",
+      "Have a four-digit FID",
+      "Link their MySpace profile"
+    ],
+    "explanation": "OG vibe check gag.",
+    "tags": ["humor","culture","hard"]
+  }
 ]
