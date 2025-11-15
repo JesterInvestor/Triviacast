@@ -306,7 +306,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
                     : 'bg-white text-[#5a3d5c] border-2 border-[#F4A6B7] hover:bg-[#FFE4EC]'
                 }`}
               >
-                🎯 Farcaster Knowledge (neynar)
+                🚀 Farcaster Knowledge (neynar)
               </button>
             </div>
           </div>
