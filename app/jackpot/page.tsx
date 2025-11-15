@@ -261,7 +261,7 @@ function formatHuman(amount: bigint, decimals = 18) {
     if (raw === '0') return '0';
     const pad = raw.padStart(decimals + 1, '0');
     const intPart = pad.slice(0, -decimals);
-    let fracPart = pad.slice(-decimals).replace(/0+$/, '');
+    const fracPart = pad.slice(-decimals).replace(/0+$/, '');
     const out = fracPart ? `${intPart}.${fracPart}` : intPart;
     return (neg ? '-' : '') + out;
   } catch (e) {
