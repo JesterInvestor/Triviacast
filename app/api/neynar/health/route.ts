@@ -1,6 +1,6 @@
 // Removed "use server" directive to allow constant exports (Next.js 15 restriction: only async functions can be exported in use server files)
 import { NextResponse } from "next/server";
-import { readStore } from "@/lib/neynar";
+
 import fs from "fs/promises";
 import path from "path";
 
@@ -71,23 +71,7 @@ export async function GET(req: Request) {
     }
   }
 
-  // Read challenge store metrics (mentions & scores captured by webhook)
-  const storeMetrics: any = {
-    totalEntries: 0,
-    lastEntryAt: null,
-    entriesWithScore: 0,
-  };
-  let stats: any = null;
-  try {
-    const store = await readStore();
-    storeMetrics.totalEntries = store.length;
-    if (store.length) {
-      const last = store[store.length - 1];
-      storeMetrics.lastEntryAt = last.timestamp || null;
-      storeMetrics.entriesWithScore = store.filter((e: any) => e.score != null).length;
-    }
-
-    if (statsRequested && store.length) {
+  // Leaderboard storage removed. No local challenge store metrics are available.
       // Build reciprocal match stats similar to webhook logic
       const processedPairs = new Set<string>();
       let totalMatches = 0;

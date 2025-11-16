@@ -1,9 +1,6 @@
-import fs from "fs/promises";
-import path from "path";
+
 import crypto from "crypto";
 
-const STORE_PATH = path.join(process.cwd(), "data", "scores.json");
-const HEALTH_PATH = path.join(process.cwd(), "data", "neynar_health.json");
 const NEYNAR_API_URL = "https://api.neynar.com/v2/farcaster/cast/";
 
 type PublishOpts = {
@@ -14,31 +11,7 @@ type PublishOpts = {
   channel_id?: string;
 };
 
-export async function readStore(): Promise<any[]> {
-  try {
-    const raw = await fs.readFile(STORE_PATH, "utf-8");
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) return parsed;
-    return [];
-  } catch (err) {
-    // If file missing, ensure directory exists and create empty array
-    try {
-      await fs.mkdir(path.dirname(STORE_PATH), { recursive: true });
-      await fs.writeFile(STORE_PATH, "[]", "utf-8");
-    } catch {}
-    return [];
-  }
-}
 
-export async function writeStore(data: any[]) {
-  try {
-    await fs.mkdir(path.dirname(STORE_PATH), { recursive: true });
-    await fs.writeFile(STORE_PATH, JSON.stringify(data, null, 2), "utf-8");
-  } catch (err) {
-    console.error("writeStore error", err);
-    throw err;
-  }
-}
 
 function randomIdem() {
   return crypto.randomBytes(12).toString("hex").slice(0, 16);

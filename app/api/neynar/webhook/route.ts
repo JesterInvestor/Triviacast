@@ -1,6 +1,6 @@
 "use server";
 import { NextResponse } from "next/server";
-import { readStore, writeStore, publishCast, parseScoreFromText } from "@/lib/neynar";
+import { publishCast, parseScoreFromText } from "@/lib/neynar";
 import fs from "fs/promises";
 import path from "path";
 
@@ -86,21 +86,7 @@ export async function POST(req: Request) {
     // Attempt to parse a Triviacast quiz score from the text
     const score = parseScoreFromText(text); // may be null
 
-    // Build store entry
-    const entry = {
-      castHash,
-      authorFid,
-      authorUsername,
-      mentioned,
-      score,
-      text,
-      timestamp,
-    };
-
-    // Read existing store and append
-    const store = await readStore();
-    store.push(entry);
-    await writeStore(store);
+    // No longer storing leaderboard data locally. All leaderboard logic should use live API calls.
 
     // Acknowledge the challenge when at least one opponent is mentioned.
     // Tag BOTH participants in the ack: the author and the first opponent.
