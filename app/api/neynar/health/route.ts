@@ -72,7 +72,7 @@ export async function GET(req: Request) {
   }
 
   // Read challenge store metrics (mentions & scores captured by webhook)
-  let storeMetrics: any = {
+  const storeMetrics: any = {
     totalEntries: 0,
     lastEntryAt: null,
     entriesWithScore: 0,
