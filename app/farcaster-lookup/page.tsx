@@ -76,7 +76,10 @@ export default function FarcasterLookupPage() {
             ctx?.username ||
             null;
           if (mounted && typeof u === "string" && u) {
-            const clean = u.replace(/^@/, "").replace(/(?:\.farcaster\.eth|\.eth)$/i, "");
+            const clean = u
+              .replace(/^@/, "")
+              .replace(/(?:\.farcaster\.eth|\.eth)$/i, "")
+              .toLowerCase();
             setViewerUsername(clean);
           }
         }
@@ -88,6 +91,31 @@ export default function FarcasterLookupPage() {
       mounted = false;
     };
   }, []);
+
+  // Also try to resolve the viewer's Farcaster username from connected wallet address (custody/verified addresses)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!address) return;
+      try {
+        const res = await fetch('/api/neynar/user', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ addresses: [address] }),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!cancelled && res.ok && json?.result) {
+          const key = String(address).toLowerCase();
+          const profile = json.result[key];
+          const uname = profile?.username ? String(profile.username).replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '') : null;
+          if (uname) setViewerUsername(uname.toLowerCase());
+        }
+      } catch {
+        // ignore
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [address]);
 
   const lookup = async () => {
     setLoading(true);
@@ -317,8 +345,10 @@ export default function FarcasterLookupPage() {
                         const target = result?.profile?.username || "";
                         // normalize handle so we don't end up with duplicate @ (some sources include '@')
                         // also strip known ENS/Farcaster suffixes so we only use plain username
-                        const cleanHandle = (target.startsWith("@") ? target.slice(1) : target).replace(/(?:\.farcaster\.eth|\.eth)$/i, "");
-                        const selfHandle = viewerUsername ? viewerUsername : "";
+                        const cleanHandle = (target.startsWith("@") ? target.slice(1) : target)
+                          .replace(/(?:\.farcaster\.eth|\.eth)$/i, "")
+                          .toLowerCase();
+                        const selfHandle = (viewerUsername || "").toLowerCase();
                         // Use tPoints from quiz results (includes streak bonuses); fallback to base calc
                         const computedTPoints =
                           typeof (res as any)?.details?.tPoints === "number" ? (res as any).details.tPoints : (res.score ?? 0) * 1000;
