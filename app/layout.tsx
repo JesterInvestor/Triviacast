@@ -10,7 +10,7 @@ const wacky = Bangers({ subsets: ["latin"], weight: "400", variable: "--font-wac
 // renders a rich embed in Farcaster clients.
 const miniappObj = {
   version: '1',
-  imageUrl: 'https://triviacast.xyz/og-image.png',
+  imageUrl: 'https://triviacast.xyz/og-image1200x630.png',
   button: {
     title: 'Open Triviacast',
     action: {
@@ -31,7 +31,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Triviacast — Test your brain',
     description: 'Trivia quiz mini-game — challenge friends, earn T Points, and share your results.',
-    images: ['https://triviacast.xyz/og-image.png'],
+    images: [
+      {
+        url: 'https://triviacast.xyz/og-image1200x630.png',
+        width: 1200,
+        height: 630,
+        alt: 'Triviacast promotional image showing the app logo and sample question',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
