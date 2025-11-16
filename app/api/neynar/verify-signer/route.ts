@@ -1,4 +1,4 @@
-"use server";
+// Removed "use server" directive to avoid build error with constant export
 import { NextResponse } from "next/server";
 import { publishCast } from "@/lib/neynar";
 
