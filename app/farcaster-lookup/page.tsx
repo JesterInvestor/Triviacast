@@ -49,6 +49,7 @@ export default function FarcasterLookupPage() {
   const [related, setRelated] = useState<Array<any>>([]);
   const [relatedLoading, setRelatedLoading] = useState(false);
   const [sdkMissing, setSdkMissing] = useState(false);
+  const [viewerUsername, setViewerUsername] = useState<string | null>(null);
   // NOTE: intentionally not auto-prefilling the lookup from URL params.
   // Shares should point to the canonical site only (https://triviacast.xyz).
 
@@ -59,6 +60,34 @@ export default function FarcasterLookupPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username]);
+
+  // Try to read the current Farcaster viewer's username from miniapp SDK context (best-effort)
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const mod = await import("@farcaster/miniapp-sdk");
+        const sdk = (mod as any).sdk;
+        if (sdk && sdk.context) {
+          const ctx = await sdk.context;
+          const u =
+            ctx?.user?.username ||
+            ctx?.viewer?.username ||
+            ctx?.username ||
+            null;
+          if (mounted && typeof u === "string" && u) {
+            const clean = u.replace(/^@/, "").replace(/(?:\.farcaster\.eth|\.eth)$/i, "");
+            setViewerUsername(clean);
+          }
+        }
+      } catch {
+        // ignore if not in mini app context
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const lookup = async () => {
     setLoading(true);
@@ -289,6 +318,7 @@ export default function FarcasterLookupPage() {
                         // normalize handle so we don't end up with duplicate @ (some sources include '@')
                         // also strip known ENS/Farcaster suffixes so we only use plain username
                         const cleanHandle = (target.startsWith("@") ? target.slice(1) : target).replace(/(?:\.farcaster\.eth|\.eth)$/i, "");
+                        const selfHandle = viewerUsername ? viewerUsername : "";
                         // Use tPoints from quiz results (includes streak bonuses); fallback to base calc
                         const computedTPoints =
                           typeof (res as any)?.details?.tPoints === "number" ? (res as any).details.tPoints : (res.score ?? 0) * 1000;
@@ -297,9 +327,15 @@ export default function FarcasterLookupPage() {
                         const pointsStr = Number(computedTPoints).toLocaleString();
                         // Spiced / playful default message
                         // Use plain @username only (do not append .farcaster.eth)
-                        const mention = cleanHandle;
-                        const defaultText = mention
-                          ? `@${mention} — I just played Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink}`
+                        const friend = cleanHandle;
+                        const tags = (() => {
+                          const a = selfHandle ? `@${selfHandle}` : "";
+                          const b = friend ? `@${friend}` : "";
+                          if (a && b && selfHandle !== friend) return `${a} ${b}`;
+                          return a || b; // whichever exists
+                        })();
+                        const defaultText = tags
+                          ? `${tags} — I just played Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink}`
                           : `I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink}`;
                         setPreviewText(defaultText);
                         setPreviewLink(challengeLink);

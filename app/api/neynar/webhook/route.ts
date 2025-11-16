@@ -29,6 +29,7 @@ export async function POST(req: Request) {
 
     const castHash: string = cast.hash;
     const authorFid: number = cast.author?.fid ?? cast.author_fid ?? cast.fid ?? null;
+    const authorUsername: string | null = (cast.author?.username || cast.author_username || null) as string | null;
     const text: string = String(cast.text ?? "");
     const timestamp = cast.timestamp ?? new Date().toISOString();
 
@@ -45,6 +46,11 @@ export async function POST(req: Request) {
       displayName: p.displayName ?? null,
     }));
 
+    // Track unique mentioned usernames for quick checks
+    const mentionedUsernames = new Set(
+      mentioned.map((m) => (m.username ? String(m.username) : null)).filter(Boolean) as string[]
+    );
+
     // Attempt to parse a Triviacast quiz score from the text
     const score = parseScoreFromText(text); // may be null
 
@@ -52,6 +58,7 @@ export async function POST(req: Request) {
     const entry = {
       castHash,
       authorFid,
+      authorUsername,
       mentioned,
       score,
       text,
@@ -62,6 +69,25 @@ export async function POST(req: Request) {
     const store = await readStore();
     store.push(entry);
     await writeStore(store);
+
+    // Acknowledge the challenge when at least one opponent is mentioned.
+    // Tag BOTH participants in the ack: the author and the first opponent.
+    const opponent = mentioned.find((m) => m.username && m.username !== authorUsername) || mentioned[0];
+    if (opponent) {
+      const mentionA = authorUsername ? `@${authorUsername}` : `FID ${authorFid}`;
+      const mentionB = opponent.username ? `@${opponent.username}` : `FID ${opponent.fid}`;
+      const ackText = `Challenge detected between ${mentionA} and ${mentionB}. We\u2019ll watch for the reply cast and announce the winner. #Triviacast`;
+      try {
+        await publishCast({
+          text: ackText,
+          parent: castHash,
+          parent_author_fid: authorFid,
+        });
+      } catch (err) {
+        // Log and continue; failure to ack shouldn't block the flow
+        console.error("ack publish error", err);
+      }
+    }
 
     // If there is a reciprocal challenge (someone previously challenged the current author),
     // check for any record where a mentioned fid previously posted and mentioned this author.
@@ -85,8 +111,9 @@ export async function POST(req: Request) {
       const aScore = score;
       const bScore = reciprocal.score;
       let resultText = "";
-      const a = { fid: authorFid, username: (mentionedProfiles.length ? mentionedProfiles[0].username?.replace(/^@/, "") : null) ?? null };
-      const b = { fid: reciprocal.authorFid, username: reciprocal.mentioned?.find((m: any) => m.fid === authorFid)?.username ?? null };
+      // a = current author; b = reciprocal author
+      const a = { fid: authorFid, username: authorUsername ?? null };
+      const b = { fid: reciprocal.authorFid, username: reciprocal.authorUsername ?? null };
 
       // Build mention strings preferring @username when available
       const mentionA = a.username ? `@${a.username}` : `FID ${a.fid}`;
@@ -100,17 +127,24 @@ export async function POST(req: Request) {
         resultText = `${mentionA} and ${mentionB} tied at ${aScore.toLocaleString()} T Points! Who will break the tie? #Triviacast`;
       }
 
-      // Use the most recent cast as parent for context (reply to the latest cast among the two)
-      const parentHash = castHash; // reply to the current cast
-      const parent_author_fid = authorFid;
+      // Reply to BOTH casts: the current cast and the reciprocal cast
+      const parents = [
+        { parent: castHash as string, parent_author_fid: authorFid as number },
+        { parent: reciprocal.castHash as string, parent_author_fid: reciprocal.authorFid as number },
+      ];
 
       try {
-        const publishRes = await publishCast({
-          text: resultText,
-          parent: parentHash,
-          parent_author_fid,
-        });
-        return NextResponse.json({ ok: true, message: "stored and announced winner", publishRes }, { status: 200 });
+        const results = [] as any[];
+        for (const p of parents) {
+          try {
+            const r = await publishCast({ text: resultText, parent: p.parent, parent_author_fid: p.parent_author_fid });
+            results.push({ parent: p.parent, ok: true, res: r });
+          } catch (err) {
+            console.error("winner publish error", err);
+            results.push({ parent: p.parent, ok: false, error: String(err) });
+          }
+        }
+        return NextResponse.json({ ok: true, message: "stored and announced winner to both casts", results }, { status: 200 });
       } catch (err: any) {
         console.error("publish error", err);
         return NextResponse.json({ ok: false, message: "failed to publish announcement", error: String(err) }, { status: 500 });
