@@ -50,9 +50,11 @@ async function ensureOnchainKit() {
   }
 }
 
-function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string; avatarImgUrl?: string; fid?: number; bio?: string; followers?: number; following?: number; custody_address?: string; verified_addresses?: any }, fallbackAddress?: string }) {
+function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string; avatarImgUrl?: string; pfpUrl?: string; pfp_url?: string; avatar?: string; fid?: number; bio?: string; followers?: number; following?: number; custody_address?: string; verified_addresses?: any; raw?: any }, fallbackAddress?: string }) {
   // Use avatar from profile if available, else fallback to stamp
-  const avatarUrl = profile?.avatarImgUrl || (fallbackAddress ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32` : undefined);
+  const avatarUrl =
+    profile?.avatarImgUrl || profile?.pfpUrl || profile?.pfp_url || profile?.avatar ||
+    (fallbackAddress ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32` : undefined);
   const display = profile?.username || profile?.displayName || "Get on Facaster bro";
   return (
     <div className="flex items-center gap-2">

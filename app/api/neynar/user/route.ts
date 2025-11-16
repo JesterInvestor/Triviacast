@@ -49,14 +49,18 @@ export async function POST(request: Request) {
           const profile = {
             fid: user.fid,
             username: user.username,
-            displayName: user.display_name,
-            avatarImgUrl: user.pfp_url,
+            displayName: user.display_name || user.displayName || user.name || undefined,
+            // Provide multiple possible avatar keys for frontend compatibility
+            avatarImgUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
+            pfpUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
+            avatar: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
             bio: user.profile?.bio?.text ?? '',
-            followers: user.follower_count ?? 0,
-            following: user.following_count ?? 0,
+            followers: user.follower_count ?? user.followers ?? 0,
+            following: user.following_count ?? user.following ?? 0,
             hasPowerBadge: user.power_badge ?? false,
             custody_address: user.custody_address,
             verified_addresses: user.verified_addresses,
+            raw: user,
           };
           addressToProfile[key] = profile;
         } else {
