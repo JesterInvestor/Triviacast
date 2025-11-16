@@ -3,6 +3,7 @@ import path from "path";
 import crypto from "crypto";
 
 const STORE_PATH = path.join(process.cwd(), "data", "scores.json");
+const HEALTH_PATH = path.join(process.cwd(), "data", "neynar_health.json");
 const NEYNAR_API_URL = "https://api.neynar.com/v2/farcaster/cast/";
 
 type PublishOpts = {
@@ -75,6 +76,17 @@ export async function publishCast(opts: PublishOpts) {
     const errMsg = parsed?.error || JSON.stringify(parsed) || `status ${res.status}`;
     throw new Error(`Neynar publish failed: ${errMsg}`);
   }
+  // Write health file with last successful publish metadata (best-effort)
+  try {
+    const health = {
+      lastHash: parsed?.cast?.hash || null,
+      lastTextSample: String(opts.text || "").slice(0, 120),
+      lastAt: new Date().toISOString(),
+      channel: opts.channel_id ?? "neynar",
+    };
+    await fs.mkdir(path.dirname(HEALTH_PATH), { recursive: true });
+    await fs.writeFile(HEALTH_PATH, JSON.stringify(health, null, 2), "utf-8");
+  } catch {}
   return parsed;
 }
 
