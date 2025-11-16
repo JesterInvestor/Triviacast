@@ -1,6 +1,33 @@
 "use server";
 import { NextResponse } from "next/server";
 import { readStore, writeStore, publishCast, parseScoreFromText } from "@/lib/neynar";
+import fs from "fs/promises";
+import path from "path";
+
+// Challenge trigger token to qualify casts as Triviacast challenges.
+// Default matches the inserted compose token. Override via env TRIVIA_CHALLENGE_TOKEN.
+const CHALLENGE_TOKEN = (process.env.TRIVIA_CHALLENGE_TOKEN || "$(triviacastchallenge)").toLowerCase();
+
+// File to store announced winner pair keys for idempotency (avoid duplicate announcements & extra API calls)
+const WINNER_PAIRS_PATH = path.join(process.cwd(), "data", "winner_pairs.json");
+
+async function readWinnerPairs(): Promise<Set<string>> {
+  try {
+    const raw = await fs.readFile(WINNER_PAIRS_PATH, "utf-8");
+    const arr = JSON.parse(raw);
+    if (Array.isArray(arr)) return new Set(arr);
+    return new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+async function writeWinnerPairs(set: Set<string>) {
+  try {
+    await fs.mkdir(path.dirname(WINNER_PAIRS_PATH), { recursive: true });
+    await fs.writeFile(WINNER_PAIRS_PATH, JSON.stringify([...set], null, 2), "utf-8");
+  } catch {}
+}
 
 type NeynarWebhookPayload = {
   type?: string;
@@ -35,8 +62,7 @@ export async function POST(req: Request) {
 
     const mentionedProfiles: Array<any> = Array.isArray(cast.mentioned_profiles) ? cast.mentioned_profiles : [];
     if (!mentionedProfiles.length) {
-      // nothing to do if nobody was mentioned
-      return NextResponse.json({ ok: true, message: "no mentioned profiles" }, { status: 200 });
+      return NextResponse.json({ ok: true, message: "ignored: no mentions" }, { status: 200 });
     }
 
     // Collect mentioned fids and usernames (best-effort)
@@ -50,6 +76,12 @@ export async function POST(req: Request) {
     const mentionedUsernames = new Set(
       mentioned.map((m) => (m.username ? String(m.username) : null)).filter(Boolean) as string[]
     );
+
+    // Only proceed if challenge token present to reduce credit usage
+    const hasToken = text.toLowerCase().includes(CHALLENGE_TOKEN);
+    if (!hasToken) {
+      return NextResponse.json({ ok: true, message: "ignored: missing challenge token" }, { status: 200 });
+    }
 
     // Attempt to parse a Triviacast quiz score from the text
     const score = parseScoreFromText(text); // may be null
@@ -76,15 +108,10 @@ export async function POST(req: Request) {
     if (opponent) {
       const mentionA = authorUsername ? `@${authorUsername}` : `FID ${authorFid}`;
       const mentionB = opponent.username ? `@${opponent.username}` : `FID ${opponent.fid}`;
-      const ackText = `Challenge detected between ${mentionA} and ${mentionB}. We\u2019ll watch for the reply cast and announce the winner. #Triviacast`;
+      const ackText = `Challenge detected between ${mentionA} and ${mentionB}. Watching for the reply to announce a winner. #Triviacast`;
       try {
-        await publishCast({
-          text: ackText,
-          parent: castHash,
-          parent_author_fid: authorFid,
-        });
+        await publishCast({ text: ackText, parent: castHash, parent_author_fid: authorFid });
       } catch (err) {
-        // Log and continue; failure to ack shouldn't block the flow
         console.error("ack publish error", err);
       }
     }
@@ -107,6 +134,12 @@ export async function POST(req: Request) {
 
     // If reciprocal found and both sides have scores, compare and publish a winner announcement
     if (reciprocal && reciprocal.score != null && score != null) {
+      // Idempotency: avoid duplicate winner announcements for same pair
+      const winnerPairs = await readWinnerPairs();
+      const pairKey = [authorFid, reciprocal.authorFid].sort((a, b) => Number(a) - Number(b)).join(":");
+      if (winnerPairs.has(pairKey)) {
+        return NextResponse.json({ ok: true, message: "winner already announced for pair", pairKey }, { status: 200 });
+      }
       // Determine winner
       const aScore = score;
       const bScore = reciprocal.score;
@@ -144,7 +177,9 @@ export async function POST(req: Request) {
             results.push({ parent: p.parent, ok: false, error: String(err) });
           }
         }
-        return NextResponse.json({ ok: true, message: "stored and announced winner to both casts", results }, { status: 200 });
+        winnerPairs.add(pairKey);
+        await writeWinnerPairs(winnerPairs);
+        return NextResponse.json({ ok: true, message: "stored & announced winner (idempotent)", pairKey, results }, { status: 200 });
       } catch (err: any) {
         console.error("publish error", err);
         return NextResponse.json({ ok: false, message: "failed to publish announcement", error: String(err) }, { status: 500 });
