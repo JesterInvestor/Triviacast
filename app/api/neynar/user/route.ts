@@ -1,27 +1,4 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
-
-// Simple JSON cache stored locally to reduce repeated Neynar bulk lookups.
-// Structure: { byAddress: { [address]: { profile: {...}, fetchedAt: number } } }
-const CACHE_PATH = path.join(process.cwd(), 'data', 'profile_cache.json');
-const PROFILE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours TTL (adjust as needed)
-
-async function readCache(): Promise<{ byAddress: Record<string, { profile: any; fetchedAt: number }> }> {
-  try {
-    const raw = await fs.readFile(CACHE_PATH, 'utf-8');
-    return JSON.parse(raw);
-  } catch {
-    return { byAddress: {} };
-  }
-}
-
-async function writeCache(cache: { byAddress: Record<string, { profile: any; fetchedAt: number }> }) {
-  try {
-    await fs.mkdir(path.dirname(CACHE_PATH), { recursive: true });
-    await fs.writeFile(CACHE_PATH, JSON.stringify(cache, null, 2), 'utf-8');
-  } catch {}
-}
 
 function normalizeEthOrSolAddress(input: string): string | null {
   if (!input) return null;
@@ -43,7 +20,6 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const addresses = Array.isArray(body.addresses) ? body.addresses : [];
-    const force = body.force === true; // allow client to bypass cache
     if (addresses.length === 0) {
       return NextResponse.json({ error: 'Missing addresses array in request body.' }, { status: 400 });
     }
@@ -60,36 +36,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No valid addresses after normalization.' }, { status: 400 });
     }
 
-    const cache = await readCache();
-    const now = Date.now();
     const addressToProfile: Record<string, any> = {};
     const errors: Record<string, string> = {};
 
-    // Determine which addresses need fresh fetch
-    const toFetch: string[] = [];
-    for (const addr of normalizedAddresses) {
-      const cached = cache.byAddress[addr];
-      if (!cached) {
-        toFetch.push(addr);
-      } else if (force || now - cached.fetchedAt > PROFILE_TTL_MS) {
-        toFetch.push(addr); // stale
-      } else {
-        addressToProfile[addr] = cached.profile; // serve from cache
-      }
-    }
-
-    if (toFetch.length > 0) {
-      let res: Record<string, any> = {};
-      try {
-        res = await client.fetchBulkUsersByEthOrSolAddress({ addresses: toFetch });
-      } catch (err) {
-        for (const addr of toFetch) {
-          errors[addr] = 'Neynar API error: ' + String(err);
-        }
-      }
-      for (const addr of toFetch) {
+    try {
+      const res = await client.fetchBulkUsersByEthOrSolAddress({ addresses: normalizedAddresses });
+      for (const addr of normalizedAddresses) {
         const key = addr.toLowerCase();
-        const users = res[key];
+        const users = res?.[key];
         if (Array.isArray(users) && users.length > 0) {
           const user = users[0];
           const profile = {
@@ -105,13 +59,14 @@ export async function POST(request: Request) {
             verified_addresses: user.verified_addresses,
           };
           addressToProfile[key] = profile;
-          cache.byAddress[key] = { profile, fetchedAt: now };
-        } else if (!errors[key]) {
+        } else {
           errors[key] = 'Profile not found';
         }
       }
-      // Persist updated cache
-      await writeCache(cache);
+    } catch (err) {
+      for (const addr of normalizedAddresses) {
+        errors[addr] = 'Neynar API error: ' + String(err);
+      }
     }
 
     return NextResponse.json({ result: addressToProfile, errors });
