@@ -97,8 +97,8 @@ export default function QuestsPage() {
 
   // --- Follow status check (hide Follow quest if user already follows target fid) ---
   const TARGET_FID = 1175506; // @jesterinvestor
-  // CAP: users with >= 52 iQ must NOT be able to claim the +50 follow reward
-  const FOLLOW_IQ_CAP = 52;
+  // CAP: users with >= 51 iQ must NOT be able to claim the +50 follow reward
+  const FOLLOW_IQ_CAP = 51;
   const [checkingFollow, setCheckingFollow] = useState(false);
   const [alreadyFollowingJester, setAlreadyFollowingJester] = useState<boolean | null>(null);
   useEffect(() => {
