@@ -62,6 +62,11 @@ export default function FarcasterMiniAppReady() {
         await new Promise((res) => setTimeout(res, delayMs));
       }
     })();
+
+    // Cleanup: signal cancellation so retries stop when component unmounts
+    return () => {
+      cancelled = true;
+    };
   }, []);
   return null;
 }
