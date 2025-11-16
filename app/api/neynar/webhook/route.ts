@@ -102,75 +102,11 @@ export async function POST(req: Request) {
       }
     }
 
-    // If there is a reciprocal challenge (someone previously challenged the current author),
-    // check for any record where a mentioned fid previously posted and mentioned this author.
-    // We'll look for latest reciprocal entry (most recent) and compare scores.
-    // Reciprocal: existing.authorFid === mentioned_fid_of_current && existing.mentioned contains current author fid
-    const reciprocal = store
-      .slice() // copy
-      .reverse()
-      .find((e: any) => {
-        if (!e || !Array.isArray(e.mentioned) || !e.authorFid) return false;
-        const mentionsCurrentAuthor = e.mentioned.some((m: any) => Number(m.fid) === Number(authorFid));
-        const authoredByMentioned = mentioned.some((m) => Number(m.fid) === Number(e.authorFid));
-        // ensure we don't match the same cast
-        const differentCast = e.castHash !== castHash;
-        return mentionsCurrentAuthor && authoredByMentioned && differentCast;
-      });
-
-    // If reciprocal found and both sides have scores, compare and publish a winner announcement
-    if (reciprocal && reciprocal.score != null && score != null) {
-      // Idempotency: avoid duplicate winner announcements for same pair
-      const winnerPairs = await readWinnerPairs();
-      const pairKey = [authorFid, reciprocal.authorFid].sort((a, b) => Number(a) - Number(b)).join(":");
-      if (winnerPairs.has(pairKey)) {
-        return NextResponse.json({ ok: true, message: "winner already announced for pair", pairKey }, { status: 200 });
-      }
-      // Determine winner
-      const aScore = score;
-      const bScore = reciprocal.score;
-      let resultText = "";
-      // a = current author; b = reciprocal author
-      const a = { fid: authorFid, username: authorUsername ?? null };
-      const b = { fid: reciprocal.authorFid, username: reciprocal.authorUsername ?? null };
-
-      // Build mention strings preferring @username when available
-      const mentionA = a.username ? `@${a.username}` : `FID ${a.fid}`;
-      const mentionB = b.username ? `@${b.username}` : `FID ${b.fid}`;
-
-      if (aScore > bScore) {
-        resultText = `${mentionA} beat ${mentionB}! Final: ${aScore.toLocaleString()} vs ${bScore.toLocaleString()} — who can top them? #Triviacast`;
-      } else if (bScore > aScore) {
-        resultText = `${mentionB} beat ${mentionA}! Final: ${bScore.toLocaleString()} vs ${aScore.toLocaleString()} — rematch? #Triviacast`;
-      } else {
-        resultText = `${mentionA} and ${mentionB} tied at ${aScore.toLocaleString()} T Points! Who will break the tie? #Triviacast`;
-      }
-
-      // Reply to BOTH casts: the current cast and the reciprocal cast
-      const parents = [
-        { parent: castHash as string, parent_author_fid: authorFid as number },
-        { parent: reciprocal.castHash as string, parent_author_fid: reciprocal.authorFid as number },
-      ];
-
-      try {
-        const results = [] as any[];
-        for (const p of parents) {
-          try {
-            const r = await publishCast({ text: resultText, parent: p.parent, parent_author_fid: p.parent_author_fid });
-            results.push({ parent: p.parent, ok: true, res: r });
-          } catch (err) {
-            console.error("winner publish error", err);
-            results.push({ parent: p.parent, ok: false, error: String(err) });
-          }
-        }
-        winnerPairs.add(pairKey);
-        await writeWinnerPairs(winnerPairs);
-        return NextResponse.json({ ok: true, message: "stored & announced winner (idempotent)", pairKey, results }, { status: 200 });
-      } catch (err: any) {
-        console.error("publish error", err);
-        return NextResponse.json({ ok: false, message: "failed to publish announcement", error: String(err) }, { status: 500 });
-      }
-    }
+    // Note: local persistent `store` was removed. If you want automatic winner
+    // announcements based on reciprocal casts, we need to query Neynar for recent
+    // casts from the mentioned user(s) that mention the current author and
+    // contain the challenge token. For now, with storage removed we do not
+    // attempt automatic winner announcements here to avoid false positives.
 
     // Otherwise, optionally reply acknowledging we recorded the challenge (this is optional).
     // Here we respond only with 200 and leave announcing for when reciprocal completes.
