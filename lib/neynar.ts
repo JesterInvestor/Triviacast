@@ -1,6 +1,9 @@
 
+import fs from "fs/promises";
+import path from "path";
 import crypto from "crypto";
 
+const HEALTH_PATH = path.join(process.cwd(), "data", "neynar_health.json");
 const NEYNAR_API_URL = "https://api.neynar.com/v2/farcaster/cast/";
 
 type PublishOpts = {
