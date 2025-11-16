@@ -38,7 +38,7 @@ export async function GET(req: Request) {
   const signerUuid = process.env.NEYNAR_SIGNER_UUID;
   const url = new URL(req.url);
   const probe = url.searchParams.get("probe") === "1"; // if true attempt lightweight signer metadata fetch
-  const statsRequested = url.searchParams.get("stats") === "1"; // compute challenge stats
+  const statsRequested = url.searchParams.get("stats") === "1"; // kept for compatibility though stats are no longer computed here
 
   const envStatus = {
     hasApiKey: Boolean(apiKey),
@@ -71,54 +71,6 @@ export async function GET(req: Request) {
     }
   }
 
-  // Leaderboard storage removed. No local challenge store metrics are available.
-      // Build reciprocal match stats similar to webhook logic
-      const processedPairs = new Set<string>();
-      let totalMatches = 0;
-      let ties = 0;
-      let wins = 0;
-      let aggregateMargin = 0;
-      let totalScoreSamples = 0;
-      let scoreSum = 0;
-      // Index by castHash for faster lookups if needed
-      for (let i = 0; i < store.length; i++) {
-        const a = store[i];
-        if (!a || a.score == null || !Array.isArray(a.mentioned) || !a.authorFid) continue;
-        for (let j = i + 1; j < store.length; j++) {
-          const b = store[j];
-          if (!b || b.score == null || !Array.isArray(b.mentioned) || !b.authorFid) continue;
-          const mentionsA = a.mentioned.some((m: any) => Number(m.fid) === Number(b.authorFid));
-          const mentionsB = b.mentioned.some((m: any) => Number(m.fid) === Number(a.authorFid));
-          if (!mentionsA || !mentionsB) continue;
-          // Pair key (order independent)
-          const pairKey = [a.authorFid, b.authorFid].sort((x, y) => Number(x) - Number(y)).join(":");
-          if (processedPairs.has(pairKey)) continue;
-          processedPairs.add(pairKey);
-          totalMatches++;
-          const aScore = Number(a.score);
-            const bScore = Number(b.score);
-          scoreSum += aScore + bScore;
-          totalScoreSamples += 2;
-          if (aScore === bScore) {
-            ties++;
-          } else {
-            wins++;
-            aggregateMargin += Math.abs(aScore - bScore);
-          }
-        }
-      }
-      stats = {
-        totalMatches,
-        wins,
-        ties,
-        winRate: totalMatches ? wins / totalMatches : 0,
-        tieRate: totalMatches ? ties / totalMatches : 0,
-        avgMargin: wins ? aggregateMargin / wins : 0,
-        avgScore: totalScoreSamples ? scoreSum / totalScoreSamples : 0,
-      };
-    }
-  } catch {}
-
   // Read health file (written by publish instrumentation if present)
   const lastPublish = await readHealthFile();
 
@@ -130,8 +82,6 @@ export async function GET(req: Request) {
       statsRequested,
       signer: signerMeta,
       signerError,
-      store: storeMetrics,
-      stats,
       lastPublish,
       timestamp: new Date().toISOString(),
     },
