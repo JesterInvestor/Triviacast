@@ -335,8 +335,8 @@ export default function FarcasterLookupPage() {
                           return a || b; // whichever exists
                         })();
                         const defaultText = tags
-                          ? `${tags} — I just played Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink}`
-                          : `I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink}`;
+                          ? `${tags} — I just played Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink} $(triviacastchallenge)`
+                          : `I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink} $(triviacastchallenge)`;
                         setPreviewText(defaultText);
                         setPreviewLink(challengeLink);
                         setPreviewOpen(true);
