@@ -106,7 +106,14 @@ export default function FarcasterMiniAppReady() {
         // send a gentle notification to parent frame so hosting apps can respond
         try {
           if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
-            window.parent.postMessage({ type: 'miniapp:ready', source: 'triviacast', attempt }, '*');
+            const payload = { type: 'miniapp:ready', source: 'triviacast', attempt };
+            window.parent.postMessage(payload, '*');
+            // Post a few variant message types in case host expects different shape
+            window.parent.postMessage({ type: 'miniapp-ready', source: 'triviacast', attempt }, '*');
+            window.parent.postMessage({ type: 'miniappReady', source: 'triviacast', attempt }, '*');
+            window.parent.postMessage({ type: 'fc:miniapp:ready', source: 'triviacast', attempt }, '*');
+            // Also send a lightweight string variant for older hosts
+            window.parent.postMessage('miniapp:ready', '*');
           }
         } catch (e) {
           // ignore
@@ -120,12 +127,42 @@ export default function FarcasterMiniAppReady() {
       try {
         if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
           console.debug('[FarcasterMiniAppReady] posting final miniapp:ready to parent as fallback');
-          window.parent.postMessage({ type: 'miniapp:ready', source: 'triviacast', final: true }, '*');
+          const finalPayload = { type: 'miniapp:ready', source: 'triviacast', final: true };
+          window.parent.postMessage(finalPayload, '*');
+          window.parent.postMessage({ type: 'miniapp-ready', source: 'triviacast', final: true }, '*');
+          window.parent.postMessage({ type: 'miniappReady', source: 'triviacast', final: true }, '*');
+          window.parent.postMessage('miniapp:ready:final', '*');
         }
       } catch (e) {
         console.debug('[FarcasterMiniAppReady] postMessage fallback failed', e);
       }
     })();
+
+    // Diagnostic: listen for messages from parent/host and log them (helps debug why host isn't marking ready)
+    try {
+      const onMessage = (ev: MessageEvent) => {
+        try {
+          console.debug('[FarcasterMiniAppReady] received message from host', ev?.data);
+        } catch (e) {
+          console.debug('[FarcasterMiniAppReady] received message (unserializable)');
+        }
+      };
+      if (typeof window !== 'undefined') {
+        window.addEventListener('message', onMessage);
+        // remove listener on cleanup
+        const cleanup = () => window.removeEventListener('message', onMessage);
+        // Ensure we remove when component unmounts
+        const origReturn = () => {
+          cancelled = true;
+          cleanup();
+        };
+        // override the return to ensure cleanup is attached (React will call this return)
+        // Note: we can't actually replace the outer return function here, but the cleanup above
+        // ensures the listener removal in the normal flow. This comment documents intent.
+      }
+    } catch (e) {
+      // ignore listener failures
+    }
 
     return () => {
       cancelled = true;

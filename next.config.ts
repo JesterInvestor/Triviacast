@@ -17,8 +17,8 @@ const nextConfig: NextConfig = {
       "font-src 'self' data:",
       // Allow HTTPS and WSS connections for RPCs/wallets/providers to avoid brittle allowlists
       "connect-src 'self' https: wss:",
-      // Disallow all framing
-      "frame-ancestors 'none'",
+      // Allow framing by known Mini App hosts (Farcaster/Warpcast and subdomains)
+      "frame-ancestors 'self' https://farcaster.xyz https://client.farcaster.xyz https://*.farcaster.xyz https://warpcast.com https://client.warpcast.com https://*.warpcast.com https://base.org https://*.base.org",
       // Disallow plugins/objects
       "object-src 'none'",
       // Upgrade mixed content
@@ -31,7 +31,6 @@ const nextConfig: NextConfig = {
         headers: [
           { key: 'Content-Security-Policy', value: csp },
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-          { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
