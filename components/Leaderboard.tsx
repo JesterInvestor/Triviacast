@@ -7,6 +7,7 @@ import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
 import { getIQPoints } from '@/lib/iq';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
+import { ProfileCard } from '@/components/ProfileCard';
 
 // shareLeaderboardUrl/openShareUrl removed — wallet badge removed from leaderboard
 import { base } from 'viem/chains';
@@ -408,12 +409,16 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                           <td className="py-3 align-middle w-12 font-semibold text-sm text-[#2d1b2e]">{rank}</td>
                           <td className="py-3 align-middle">
                             <div className="flex items-center gap-3">
-                              <ProfileDisplay profile={profile} fallbackAddress={addr} />
-                              {/* Show error if no profile found and error exists for this address */}
-                              {!profile && profileErrors && (profileErrors[addr] || profileErrors['all']) && (
-                                <span className="text-xs text-red-500 ml-2">{profileErrors[addr] || profileErrors['all']}</span>
-                              )}
-                            </div>
+                                    {profile ? (
+                                      <ProfileCard fid={profile.fid} profile={profile} />
+                                    ) : (
+                                      <span className="font-bold text-[#2d1b2e] text-base sm:text-lg">Get on Facaster bro</span>
+                                    )}
+                                    {/* Show error if no profile found and error exists for this address */}
+                                    {!profile && profileErrors && (profileErrors[addr] || profileErrors['all']) && (
+                                      <span className="text-xs text-red-500 ml-2">{profileErrors[addr] || profileErrors['all']}</span>
+                                    )}
+                                  </div>
                           </td>
                           <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{(view === 'iq' ? (entry.iqPoints || 0) : (entry.tPoints || 0)).toLocaleString()}</td>
                         </tr>
