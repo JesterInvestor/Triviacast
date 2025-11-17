@@ -93,7 +93,7 @@ export default function QuizResults({
             console.log('Points saved to blockchain successfully');
           } catch (error) {
             console.error('Failed to save points to blockchain:', error);
-            setSaveError('Failed to save points to blockchain. If you are using the Base wallet, please ensure your wallet is connected to the Base network and confirm the transaction. Otherwise, open the miniapp in Farcaster to claim T points and $TRIV.');
+            setSaveError('Open miniapp with Farcaster to get T points and $TRIV');
           }
         } else {
           console.warn('[Triviacast] Contract not configured, skipping blockchain save');

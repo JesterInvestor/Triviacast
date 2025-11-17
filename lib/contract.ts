@@ -139,9 +139,58 @@ export async function addPointsOnChain(
       chainId: activeChain.id,
       account: simulationAccount,
     });
-    const hash = await writeContract(wagmiConfig, request);
-    await waitForTransactionReceipt(wagmiConfig, { hash, chainId: activeChain.id });
-    return hash;
+
+    try {
+      const hash = await writeContract(wagmiConfig, request);
+      await waitForTransactionReceipt(wagmiConfig, { hash, chainId: activeChain.id });
+      return hash;
+    } catch (writeError) {
+      console.warn('[Triviacast] writeContract failed, attempting eth_sendTransaction fallback', writeError);
+
+      // Fallback: attempt to use the injected provider directly (window.ethereum)
+      try {
+        const w = (globalThis as any) as any;
+        if (w?.ethereum && typeof w.ethereum.request === 'function') {
+          // Treat request as any to avoid strict typing issues from viem/wagmi
+          const reqAny: any = request as any;
+          const tx: any = {
+            from: simulationAccount,
+            to: reqAny.to ?? reqAny.address ?? CONTRACT_ADDRESS,
+            data: reqAny.data ?? reqAny.calldata ?? reqAny.input ?? reqAny?.request?.data ?? null,
+          };
+
+          if (reqAny.value) {
+            try {
+              const v = BigInt(reqAny.value as any);
+              tx.value = `0x${v.toString(16)}`;
+            } catch (_vErr) {
+              // ignore conversion error
+            }
+          }
+
+          if (reqAny.gas || reqAny.gasLimit) {
+            const g = reqAny.gas ?? reqAny.gasLimit;
+            try {
+              const gv = BigInt(g as any);
+              tx.gas = `0x${gv.toString(16)}`;
+            } catch (_gErr) {
+              // ignore
+            }
+          }
+
+          const sendResult = await w.ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
+          const txHash = sendResult as string;
+          console.info('[Triviacast] eth_sendTransaction fallback sent tx', { txHash });
+          await waitForTransactionReceipt(wagmiConfig, { hash: txHash as `0x${string}`, chainId: activeChain.id });
+          return txHash as `0x${string}`;
+        }
+      } catch (fallbackErr) {
+        console.error('[Triviacast] eth_sendTransaction fallback failed', fallbackErr);
+      }
+
+      // If fallback did not work, rethrow the original write error to surface it.
+      throw writeError;
+    }
   } catch (error: any) {
     // Try to surface a revert reason if available
     console.error('[Triviacast] addPointsOnChain transaction failed', {
