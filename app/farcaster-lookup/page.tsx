@@ -272,7 +272,9 @@ export default function FarcasterLookupPage() {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={
-                    resolveAvatarUrl(result.profile.pfpUrl as string) || ((result.profile as any).address ? `https://cdn.stamp.fyi/avatar/${String((result.profile as any).address).toLowerCase()}?s=48` : undefined)
+                    resolveAvatarUrl(result.profile.pfpUrl as string) ||
+                    resolveAvatarUrl(result.profile.raw?.pfpUrl || result.profile.raw?.pfp_url) ||
+                    (result.profile.raw?.custody_address ? `https://cdn.stamp.fyi/avatar/${String(result.profile.raw.custody_address).toLowerCase()}?s=48` : undefined)
                   }
                   alt={result.profile.username || 'avatar'}
                   className="w-10 h-10 rounded-full object-cover"

@@ -49,10 +49,12 @@ export default function FarcasterLookup({
   };
 
   const avatarSrc = (() => {
-    const pfp = profile?.pfpUrl || null;
+    const pfp = profile?.pfpUrl || (profile as any)?.raw?.pfpUrl || (profile as any)?.raw?.pfp_url || null;
     const resolved = resolveAvatarUrl(pfp) || null;
     if (resolved) return resolved;
-    // fallback to stamp.fyi when we have a valid hex address
+    // fallback to stamp.fyi when we have a valid custody address from the returned profile, else use typed input
+    const custody = (profile as any)?.raw?.custody_address;
+    if (custody && typeof custody === 'string' && /^0x[a-fA-F0-9]{40}$/.test(custody)) return `https://cdn.stamp.fyi/avatar/${custody.toLowerCase()}?s=48`;
     if (isHexAddress(address)) return `https://cdn.stamp.fyi/avatar/${address.toLowerCase()}?s=48`;
     return null;
   })();
