@@ -279,6 +279,42 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
     };
   }, [displayCount, limitedLeaderboard.length, isFetchingMore, loadMore]);
 
+  // Precompute the rows to display so JSX stays simple.
+  const rowsToDisplay = useMemo(() => {
+    return limitedLeaderboard
+      .slice(0, displayCount)
+      .map((entry, i) => {
+        const rank = i + 1;
+        const addr = (entry.walletAddress || '').toLowerCase();
+        let profile = profiles[addr];
+
+        if (!profile) {
+          profile = Object.values(profiles).find(
+            (p: any) => p?.custody_address?.toLowerCase() === addr
+          );
+        }
+
+        if (!profile) {
+          profile = Object.values(profiles).find((p: any) => {
+            const verified = [
+              ...(p?.verified_addresses?.eth_addresses || []),
+              ...(p?.verified_addresses?.sol_addresses || []),
+            ].map((a: string) => a.toLowerCase());
+            return verified.includes(addr);
+          });
+        }
+
+        const points = view === 'iq' ? (entry.iqPoints || 0) : (entry.tPoints || 0);
+
+        return {
+          rank,
+          addr,
+          profile,
+          points,
+        };
+      });
+  }, [limitedLeaderboard, displayCount, profiles, view]);
+
   return (
     <div className="w-full px-0 sm:px-6">
       <div className="bg-white rounded-lg shadow-xl p-2 sm:p-6 border-4 border-[#F4A6B7] w-full max-w-full">
@@ -414,49 +450,24 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                   </tr>
                 </thead>
                 <tbody>
-                  {limitedLeaderboard
-                    .slice(0, displayCount)
-                    .map((entry, i) => {
-                      const rank = i + 1;
-                      // Always normalize address for lookup
-                      const addr = (entry.walletAddress || '').toLowerCase();
-                      let profile = profiles[addr];
-                      // Try custody address match
-                      if (!profile) {
-                        profile = Object.values(profiles).find(
-                          (p: any) => p?.custody_address?.toLowerCase() === addr
-                        );
-                      }
-                      // Try verified addresses match
-                      if (!profile) {
-                        profile = Object.values(profiles).find((p: any) => {
-                          const verified = [
-                            ...(p?.verified_addresses?.eth_addresses || []),
-                            ...(p?.verified_addresses?.sol_addresses || [])
-                          ].map((a: string) => a.toLowerCase());
-                          return verified.includes(addr);
-                        });
-                      }
-                      return (
-                        <tr key={`${addr}-${i}`} className="border-b border-[#f8e8eb]">
-                          <td className="py-3 align-middle w-12 font-semibold text-sm text-[#2d1b2e]">{rank}</td>
-                          <td className="py-3 align-middle">
-                            <div className="flex items-center gap-3">
-                                    {profile ? (
-                                      <ProfileCard fid={profile.fid} profile={profile} />
-                                    ) : (
-                                      <span className="font-bold text-[#2d1b2e] text-base sm:text-lg">Get on Facaster bro</span>
-                                    )}
-                                    {/* Show error if no profile found and error exists for this address */}
-                                    {!profile && profileErrors && (profileErrors[addr] || profileErrors['all']) && (
-                                      <span className="text-xs text-red-500 ml-2">{profileErrors[addr] || profileErrors['all']}</span>
-                                    )}
-                                  </div>
-                          </td>
-                          <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{(view === 'iq' ? (entry.iqPoints || 0) : (entry.tPoints || 0)).toLocaleString()}</td>
-                        </tr>
-                      );
-                    })}
+                  {rowsToDisplay.map((r) => (
+                    <tr key={`${r.addr}-${r.rank}`} className="border-b border-[#f8e8eb]">
+                      <td className="py-3 align-middle w-12 font-semibold text-sm text-[#2d1b2e]">{r.rank}</td>
+                      <td className="py-3 align-middle">
+                        <div className="flex items-center gap-3">
+                          {r.profile ? (
+                            <ProfileCard fid={r.profile.fid} profile={r.profile} fallbackAddress={r.addr} />
+                          ) : (
+                            <span className="font-bold text-[#2d1b2e] text-base sm:text-lg">Get on Facaster bro</span>
+                          )}
+                          {!r.profile && profileErrors && (profileErrors[r.addr] || profileErrors['all']) && (
+                            <span className="text-xs text-red-500 ml-2">{profileErrors[r.addr] || profileErrors['all']}</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{r.points.toLocaleString()}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
               {/* Sentinel element observed by IntersectionObserver to trigger loading more */}
