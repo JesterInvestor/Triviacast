@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { resolveAvatarUrl } from '@/lib/avatar';
 
 export interface FarcasterProfileProps {
   address: string;
@@ -78,10 +79,18 @@ export const FarcasterProfile: React.FC<FarcasterProfileProps> = ({ address, api
   return (
     <div className={`flex items-center justify-center ${className || ""}`.trim()}>
       <div className="bg-gradient-to-r from-[#FFE4EC] to-[#E6E6FF] border-2 border-[#F4A6B7] rounded-xl shadow-md px-4 py-3 flex items-center gap-4 min-w-[220px]">
+        {/* Resolve ipfs:// and data: URLs; fall back to stamp.fyi if broken */}
         <img
-          src={profile.pfp?.url || `https://cdn.stamp.fyi/avatar/${address}?s=44`}
+          src={resolveAvatarUrl(profile.pfp?.url) || `https://cdn.stamp.fyi/avatar/${address}?s=44`}
           alt={profile.username}
-          className="rounded-full border-2 border-[#DC8291] w-12 h-12 shadow"
+          className="rounded-full border-2 border-[#DC8291] w-12 h-12 shadow object-cover"
+          onError={(e) => {
+            try {
+              const el = e.currentTarget as HTMLImageElement;
+              const fallback = `https://cdn.stamp.fyi/avatar/${address}?s=44`;
+              if (el.src !== fallback) el.src = fallback;
+            } catch {}
+          }}
         />
         <div className="flex flex-col justify-center">
           <span className="font-bold text-[#2d1b2e] text-base leading-tight">{profile.displayName || profile.username}</span>
