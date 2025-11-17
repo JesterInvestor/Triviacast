@@ -42,36 +42,28 @@ export default function Home() {
           <Quiz />
         </div>
 
-        {/* Follow Triviacast button at bottom of main page (sane theme, matches site accents) */}
+        {/* Farchess promo button (replaces Follow Triviacast) */}
         <div className="mt-8 w-full flex justify-center">
           <a
-            href="https://farcaster.xyz/triviacast"
+            href="https://farcaster.xyz/miniapps/DXCz8KIyfsme/farchess"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Follow Triviacast on Farcaster"
-            title="Follow Triviacast on Farcaster"
-            className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-fuchsia-600 via-pink-500 to-amber-400 text-white font-semibold rounded-full shadow-lg hover:scale-[1.02] transform transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-fuchsia-200"
+            aria-label="Farchess - Play Chess earn $CHESS"
+            title="Farchess - Play Chess earn $CHESS"
+            className="relative inline-flex items-center rounded-2xl p-[2px] bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 hover:scale-[1.02] transform transition-all duration-200"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              aria-hidden
-            >
-              <path d="M2 21l1-7 7-1 10-10-3 10-10 7-5 1z" fill="rgba(255,255,255,0.14)"></path>
-              <path
-                d="M16 3l5 5-10 10-5 1 1-5 10-11z"
-                stroke="white"
-                strokeWidth="0.9"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="none"
-              />
-              <path d="M7 17l4 4" stroke="white" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <span className="whitespace-nowrap text-sm">Follow Triviacast</span>
+            <span className="block rounded-xl bg-gradient-to-br from-[#0b0710] to-[#241226] px-6 py-4 text-center shadow-inner w-full">
+              <div className="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-6 h-6 text-yellow-300 flex-shrink-0" aria-hidden>
+                  <path fill="#FFC857" d="M12 2c-1.1 0-2 .9-2 2v1H8c-1.1 0-2 .9-2 2v1h12V7c0-1.1-.9-2-2-2h-2V4c0-1.1-.9-2-2-2z"/>
+                  <path fill="#F6AE2D" d="M6 12v6h12v-6H6z"/>
+                </svg>
+                <div className="flex flex-col text-left">
+                  <span className="text-yellow-300 font-extrabold text-sm sm:text-base leading-tight">Farchess - Play Chess</span>
+                  <span className="text-yellow-200 text-xs sm:text-sm">earn $CHESS</span>
+                </div>
+              </div>
+            </span>
           </a>
         </div>
 
