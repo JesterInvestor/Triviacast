@@ -6,65 +6,124 @@ export default function FarcasterMiniAppReady() {
   useEffect(() => {
     let cancelled = false;
 
-    async function tryReadyOnce(): Promise<boolean> {
-      // 1) Quick check known globals
+    async function callReadyOnCandidate(candidate: any, label = 'candidate'): Promise<boolean> {
       try {
-        const w = window as any;
-        const candidates = [w.sdk, w.farcasterSdk, w.farcasterMiniApp, w.__farcasterMiniApp, w.FarcasterMiniApp, w];
-        for (const c of candidates) {
-          if (!c) continue;
-          try {
-            const maybeSdk = c.sdk ? c.sdk : c;
-            if (maybeSdk && maybeSdk.actions && typeof maybeSdk.actions.ready === 'function') {
-              console.debug('[FarcasterMiniAppReady] calling ready() from global');
-              void maybeSdk.actions.ready({ disableNativeGestures: false });
-              return true;
-            }
-          } catch (e) {
-            // ignore
-          }
+        if (!candidate) return false;
+        const maybeSdk = candidate.sdk ? candidate.sdk : candidate;
+        if (maybeSdk && maybeSdk.actions && typeof maybeSdk.actions.ready === 'function') {
+          console.debug(`[FarcasterMiniAppReady] calling ${label}.actions.ready()`);
+          // fire-and-forget
+          void maybeSdk.actions.ready({ disableNativeGestures: false });
+          return true;
         }
       } catch (e) {
-        console.debug('[FarcasterMiniAppReady] global check failed', e);
+        console.debug(`[FarcasterMiniAppReady] ${label} ready() threw`, e);
+      }
+      return false;
+    }
+
+    async function findAndReady(): Promise<boolean> {
+      // quick global checks (window, known globals)
+      try {
+        const w = window as any;
+        const candidates = [w, w.sdk, w.farcasterSdk, w.farcasterMiniApp, w.__farcasterMiniApp, w.FarcasterMiniApp, w.miniApp, w.farcaster];
+        for (const [i, c] of candidates.entries()) {
+          if (!c) continue;
+          if (await callReadyOnCandidate(c, `global[${i}]`)) return true;
+        }
+
+        // scan top-level window keys for SDK-like objects (best-effort)
+        try {
+          const keys = Object.keys(w || {}).slice(0, 200);
+          for (const k of keys) {
+            try {
+              const v = (w as any)[k];
+              if (v && typeof v === 'object') {
+                if (v.actions && typeof v.actions.ready === 'function') {
+                  if (await callReadyOnCandidate(v, `window.${k}`)) return true;
+                }
+              }
+            } catch (_) {
+              // ignore inaccessible properties
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+      } catch (e) {
+        console.debug('[FarcasterMiniAppReady] global detection failed', e);
       }
 
-      // 2) Try importing SDK but don't wait long
+      // Try importing the module once (do not block too long)
       try {
         const importPromise = import('@farcaster/miniapp-sdk').catch(() => null);
         const mod = await Promise.race([importPromise, new Promise((res) => setTimeout(() => res(null), 800))]);
         if (cancelled) return false;
         if (mod) {
           const maybeSdk = (mod as any)?.sdk ?? (mod as any)?.default?.sdk ?? (mod as any)?.default ?? mod;
-          if (maybeSdk && maybeSdk.actions && typeof maybeSdk.actions.ready === 'function') {
-            console.debug('[FarcasterMiniAppReady] calling ready() from module');
-            void maybeSdk.actions.ready({ disableNativeGestures: false });
-            return true;
-          }
+          if (await callReadyOnCandidate(maybeSdk, 'module')) return true;
         }
       } catch (e) {
         console.debug('[FarcasterMiniAppReady] import attempt failed', e);
+      }
+
+      // Also check parent/top frames for SDK objects (if accessible)
+      try {
+        if (window.parent && window.parent !== window) {
+          if (await callReadyOnCandidate(window.parent, 'window.parent')) return true;
+        }
+      } catch (e) {
+        console.debug('[FarcasterMiniAppReady] access to window.parent failed', e);
+      }
+
+      try {
+        if (window.top && window.top !== window) {
+          if (await callReadyOnCandidate(window.top, 'window.top')) return true;
+        }
+      } catch (e) {
+        console.debug('[FarcasterMiniAppReady] access to window.top failed', e);
       }
 
       return false;
     }
 
     (async () => {
-      // Run once, quick retry, then fallback to postMessage
-      let ok = await tryReadyOnce();
-      if (!ok && !cancelled) {
-        await new Promise((res) => setTimeout(res, 300));
-        ok = await tryReadyOnce();
-      }
+      // Poll for the SDK for up to ~5 seconds (20 attempts * 250ms)
+      const maxAttempts = 20;
+      const delayMs = 250;
 
-      if (!ok && !cancelled) {
+      for (let attempt = 0; attempt < maxAttempts && !cancelled; attempt++) {
         try {
-          if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
-            console.debug('[FarcasterMiniAppReady] posting miniapp:ready to parent as fallback');
-            window.parent.postMessage({ type: 'miniapp:ready', source: 'triviacast' }, '*');
+          const ok = await findAndReady();
+          if (ok) {
+            console.debug('[FarcasterMiniAppReady] ready() called successfully');
+            return;
           }
         } catch (e) {
-          console.debug('[FarcasterMiniAppReady] postMessage fallback failed', e);
+          console.debug('[FarcasterMiniAppReady] findAndReady error', e);
         }
+
+        // send a gentle notification to parent frame so hosting apps can respond
+        try {
+          if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'miniapp:ready', source: 'triviacast', attempt }, '*');
+          }
+        } catch (e) {
+          // ignore
+        }
+
+        // wait before next attempt
+        await new Promise((res) => setTimeout(res, delayMs));
+      }
+
+      // Final fallback: one last postMessage
+      try {
+        if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+          console.debug('[FarcasterMiniAppReady] posting final miniapp:ready to parent as fallback');
+          window.parent.postMessage({ type: 'miniapp:ready', source: 'triviacast', final: true }, '*');
+        }
+      } catch (e) {
+        console.debug('[FarcasterMiniAppReady] postMessage fallback failed', e);
       }
     })();
 
