@@ -412,7 +412,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                           <td className="py-3 align-middle">
                             <div className="flex items-center gap-3">
                                     {profile ? (
-                                      <ProfileCard fid={profile.fid} profile={profile} />
+                                      <ProfileCard fid={profile.fid} profile={profile} fallbackAddress={addr} />
                                     ) : (
                                       <span className="font-bold text-[#2d1b2e] text-base sm:text-lg">Get on Facaster bro</span>
                                     )}
