@@ -9,6 +9,7 @@ import { useAccount } from "wagmi";
 import { ProfileCard } from "@/components/ProfileCard";
 import { NeynarCastCard } from "@/components/NeynarCastCard";
 import NeynarUserDropdown from "@/components/NeynarUserDropdown";
+import { resolveAvatarUrl } from '@/lib/avatar';
 // leaderboard removed from lookup page per request
 
 type Cast = {
@@ -254,7 +255,21 @@ export default function FarcasterLookupPage() {
             </ol>
           </div>
           <div className="flex flex-col items-center gap-2 w-full max-w-md bg-white rounded-xl border-2 border-[#F4A6B7] shadow-md px-4 py-4">
-            <NeynarUserDropdown value={username} onChange={setUsername} />
+            <div className="w-full flex items-center gap-3">
+              {result && result.profile && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={
+                    resolveAvatarUrl(result.profile.pfpUrl as string) || ((result.profile as any).address ? `https://cdn.stamp.fyi/avatar/${String((result.profile as any).address).toLowerCase()}?s=48` : undefined)
+                  }
+                  alt={result.profile.username || 'avatar'}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              )}
+              <div className="flex-1">
+                <NeynarUserDropdown value={username} onChange={setUsername} />
+              </div>
+            </div>
             <button
               onClick={() => {
                 if (username && username.trim() !== "") {
