@@ -8,7 +8,7 @@ const miniappObj = {
     title: 'View Leaderboard',
     action: {
       type: 'launch_frame',
-      url: 'https://triviacast.xyz/leaderboard',
+      url: 'https://triviacast.xyz',
       name: 'Triviacast',
       splashImageUrl: 'https://triviacast.xyz/splash.png',
       splashBackgroundColor: '#FFE4EC',
