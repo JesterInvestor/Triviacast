@@ -55,8 +55,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={wacky.variable}>
       <body className={inter.className}>
+        <FarcasterMiniAppReady />
         <ClientLayout>
-          <FarcasterMiniAppReady />
           {children}
         </ClientLayout>
       </body>

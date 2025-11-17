@@ -8,7 +8,6 @@ import { useState } from 'react';
 import { wagmiConfig } from '@/lib/wagmi';
 import BottomNav from '@/components/BottomNav';
 import AutoConnector from '@/components/AutoConnector';
-import FarcasterMiniAppReady from '@/components/FarcasterMiniAppReady';
 import { SoundProvider } from '@/components/SoundContext';
 
 export default function ClientLayout({
@@ -29,7 +28,6 @@ export default function ClientLayout({
             }}
           >
             <SoundProvider>
-              <FarcasterMiniAppReady />
               <AutoConnector />
               {children}
               <BottomNav />
