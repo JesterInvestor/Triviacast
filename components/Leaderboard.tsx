@@ -7,6 +7,7 @@ import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
 import { getIQPoints } from '@/lib/iq';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
+import { ProfileCard } from '@/components/ProfileCard';
 
 // shareLeaderboardUrl/openShareUrl removed — wallet badge removed from leaderboard
 import { base } from 'viem/chains';
@@ -50,9 +51,24 @@ async function ensureOnchainKit() {
   }
 }
 
-function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string; avatarImgUrl?: string; fid?: number; bio?: string; followers?: number; following?: number; custody_address?: string; verified_addresses?: any }, fallbackAddress?: string }) {
-  // Use avatar from profile if available, else fallback to stamp
-  const avatarUrl = profile?.avatarImgUrl || (fallbackAddress ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32` : undefined);
+function resolveAvatarUrl(raw?: string | null): string | null {
+  if (!raw) return null;
+  const s = String(raw).trim();
+  if (!s) return null;
+  if (s.startsWith('data:')) return s;
+  if (/^https?:\/\//i.test(s)) return s;
+  // ipfs://CID or /ipfs/CID
+  const ipfsMatch = s.match(/ipfs:\/\/(.+)/i) || s.match(/(?:^|\/ipfs\/)([a-zA-Z0-9]+)/i);
+  if (ipfsMatch) {
+    const cid = ipfsMatch[1];
+    return `https://cloudflare-ipfs.com/ipfs/${cid}`;
+  }
+  return s;
+}
+
+function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string; avatarImgUrl?: string; pfpUrl?: string; pfp_url?: string; avatar?: string; fid?: number; bio?: string; followers?: number; following?: number; custody_address?: string; verified_addresses?: any; raw?: any }, fallbackAddress?: string }) {
+  const candidate = profile?.avatarImgUrl || profile?.pfpUrl || profile?.pfp_url || profile?.avatar || profile?.raw?.pfp_url || profile?.raw?.pfpUrl || null;
+  const avatarUrl = resolveAvatarUrl(candidate) || (fallbackAddress ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32` : undefined);
   const display = profile?.username || profile?.displayName || "Get on Facaster bro";
   return (
     <div className="flex items-center gap-2">
@@ -86,6 +102,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
   const totalTPoints = useMemo(() => {
     return leaderboard.reduce((sum, entry) => sum + (entry?.tPoints || 0), 0);
   }, [leaderboard]);
+  
 
   // Sorted leaderboard memoized so we can paginate the sorted list consistently
   const sortedLeaderboard = useMemo(() => {
@@ -324,6 +341,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
           )}
         </div>
         {/* Address lookup removed per request */}
+        
         <p className="text-center text-[#5a3d5c] mb-4 sm:mb-6 text-sm sm:text-lg">
           There are always some winners... 🥳🥇🏆<br />
           and some losers 😭😩😞
@@ -393,12 +411,16 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                           <td className="py-3 align-middle w-12 font-semibold text-sm text-[#2d1b2e]">{rank}</td>
                           <td className="py-3 align-middle">
                             <div className="flex items-center gap-3">
-                              <ProfileDisplay profile={profile} fallbackAddress={addr} />
-                              {/* Show error if no profile found and error exists for this address */}
-                              {!profile && profileErrors && (profileErrors[addr] || profileErrors['all']) && (
-                                <span className="text-xs text-red-500 ml-2">{profileErrors[addr] || profileErrors['all']}</span>
-                              )}
-                            </div>
+                                    {profile ? (
+                                      <ProfileCard fid={profile.fid} profile={profile} />
+                                    ) : (
+                                      <span className="font-bold text-[#2d1b2e] text-base sm:text-lg">Get on Facaster bro</span>
+                                    )}
+                                    {/* Show error if no profile found and error exists for this address */}
+                                    {!profile && profileErrors && (profileErrors[addr] || profileErrors['all']) && (
+                                      <span className="text-xs text-red-500 ml-2">{profileErrors[addr] || profileErrors['all']}</span>
+                                    )}
+                                  </div>
                           </td>
                           <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{(view === 'iq' ? (entry.iqPoints || 0) : (entry.tPoints || 0)).toLocaleString()}</td>
                         </tr>
