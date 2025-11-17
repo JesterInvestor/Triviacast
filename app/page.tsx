@@ -49,6 +49,8 @@ export default function Home() {
               onClick={async (e) => {
                 e.preventDefault();
                 const url = 'https://farcaster.xyz/miniapps/DXCz8KIyfsme/farchess';
+                console.debug('[Farchess] click handler invoked');
+
                 // Try known global SDKs first
                 try {
                   const w = window as any;
@@ -58,34 +60,39 @@ export default function Home() {
                     try {
                       const maybeSdk = c.sdk ? c.sdk : c;
                       if (maybeSdk && maybeSdk.actions) {
-                        // Try a few possible action methods in order
+                        // Try a few possible action methods in order, with debug logs
                         if (typeof maybeSdk.actions.launchMiniApp === 'function') {
+                          console.debug('[Farchess] using maybeSdk.actions.launchMiniApp');
                           void maybeSdk.actions.launchMiniApp({ url });
                           return;
                         }
                         if (typeof maybeSdk.actions.launchFrame === 'function') {
+                          console.debug('[Farchess] using maybeSdk.actions.launchFrame');
                           void maybeSdk.actions.launchFrame({ url });
                           return;
                         }
                         if (typeof maybeSdk.actions.launch === 'function') {
+                          console.debug('[Farchess] using maybeSdk.actions.launch');
                           void maybeSdk.actions.launch({ type: 'launch_miniapp', url });
                           return;
                         }
                         if (typeof maybeSdk.actions.open === 'function') {
+                          console.debug('[Farchess] using maybeSdk.actions.open');
                           void maybeSdk.actions.open({ url });
                           return;
                         }
                         if (typeof maybeSdk.actions.performAction === 'function') {
+                          console.debug('[Farchess] using maybeSdk.actions.performAction');
                           void maybeSdk.actions.performAction({ type: 'launch_miniapp', url });
                           return;
                         }
                       }
-                    } catch (e) {
-                      // ignore and try next
+                    } catch (err) {
+                      console.debug('[Farchess] sdk global attempt threw', err);
                     }
                   }
-                } catch (e) {
-                  // ignore
+                } catch (err) {
+                  console.debug('[Farchess] global sdk check failed', err);
                 }
 
                 // Try dynamic import of the SDK (fast, with timeout)
@@ -96,35 +103,67 @@ export default function Home() {
                     const maybeSdk = (mod as any)?.sdk ?? (mod as any)?.default?.sdk ?? (mod as any)?.default ?? mod;
                     if (maybeSdk && maybeSdk.actions) {
                       if (typeof maybeSdk.actions.launchMiniApp === 'function') {
+                        console.debug('[Farchess] using imported sdk.actions.launchMiniApp');
                         void maybeSdk.actions.launchMiniApp({ url });
                         return;
                       }
                       if (typeof maybeSdk.actions.launchFrame === 'function') {
+                        console.debug('[Farchess] using imported sdk.actions.launchFrame');
                         void maybeSdk.actions.launchFrame({ url });
                         return;
                       }
                       if (typeof maybeSdk.actions.launch === 'function') {
+                        console.debug('[Farchess] using imported sdk.actions.launch');
                         void maybeSdk.actions.launch({ type: 'launch_miniapp', url });
                         return;
                       }
                       if (typeof maybeSdk.actions.open === 'function') {
+                        console.debug('[Farchess] using imported sdk.actions.open');
                         void maybeSdk.actions.open({ url });
                         return;
                       }
                       if (typeof maybeSdk.actions.performAction === 'function') {
+                        console.debug('[Farchess] using imported sdk.actions.performAction');
                         void maybeSdk.actions.performAction({ type: 'launch_miniapp', url });
                         return;
                       }
                     }
                   }
-                } catch (e) {
-                  // ignore
+                } catch (err) {
+                  console.debug('[Farchess] dynamic import attempt failed', err);
+                }
+
+                // Try posting messages to parent window with several common shapes
+                try {
+                  console.debug('[Farchess] no SDK launch worked — trying postMessage fallbacks to parent');
+                  if (window.parent && window.parent !== window) {
+                    const msgs = [
+                      { type: 'launch_miniapp', url },
+                      { type: 'launch_frame', url },
+                      { type: 'miniapp:launch', action: { type: 'launch_miniapp', url } },
+                      { type: 'miniapp:open', url },
+                      { type: 'miniapp:action', action: { type: 'launch_miniapp', url } },
+                    ];
+                    for (const m of msgs) {
+                      try {
+                        window.parent.postMessage(m, '*');
+                        console.debug('[Farchess] posted message to parent', m);
+                      } catch (err) {
+                        console.debug('[Farchess] postMessage to parent failed for', m, err);
+                      }
+                    }
+                    // allow the host a brief moment to handle the message
+                    await new Promise((res) => setTimeout(res, 200));
+                  }
+                } catch (err) {
+                  console.debug('[Farchess] postMessage fallbacks failed', err);
                 }
 
                 // As a final fallback, open the URL in a new tab/window
                 try {
                   window.open('https://farcaster.xyz/miniapps/DXCz8KIyfsme/farchess', '_blank', 'noopener');
-                } catch (e) {
+                } catch (err) {
+                  console.debug('[Farchess] window.open failed, navigating', err);
                   // last resort: set location
                   window.location.href = 'https://farcaster.xyz/miniapps/DXCz8KIyfsme/farchess';
                 }
