@@ -52,6 +52,18 @@ export default function FarcasterLookupPage() {
   const [sdkMissing, setSdkMissing] = useState(false);
   const [viewerUsername, setViewerUsername] = useState<string | null>(null);
   const profile = (result && result.profile) ? (result.profile as any) : null;
+  const avatarSrc = profile
+    ? (() => {
+        const srcRaw = profile.pfpUrl ?? profile.raw?.pfpUrl ?? profile.raw?.pfp_url ?? profile.avatar ?? null;
+        const resolved = srcRaw ? resolveAvatarUrl(srcRaw) : null;
+        if (resolved) return resolved;
+        const custody = profile.raw?.custody_address;
+        if (custody && typeof custody === 'string' && /^0x[a-fA-F0-9]{40}$/.test(custody)) {
+          return `https://cdn.stamp.fyi/avatar/${String(custody).toLowerCase()}?s=48`;
+        }
+        return undefined;
+      })()
+    : undefined;
   // NOTE: intentionally not auto-prefilling the lookup from URL params.
   // Shares should point to the canonical site only (https://triviacast.xyz).
 
@@ -272,11 +284,7 @@ export default function FarcasterLookupPage() {
               {profile && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={
-                    resolveAvatarUrl(profile.pfpUrl as string) ||
-                    resolveAvatarUrl(profile.raw?.pfpUrl || profile.raw?.pfp_url) ||
-                    (profile.raw?.custody_address ? `https://cdn.stamp.fyi/avatar/${String(profile.raw.custody_address).toLowerCase()}?s=48` : undefined)
-                  }
+                  src={avatarSrc}
                   alt={profile.username || 'avatar'}
                   className="w-10 h-10 rounded-full object-cover"
                   onError={(e) => {
