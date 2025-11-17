@@ -51,6 +51,7 @@ export default function FarcasterLookupPage() {
   const [relatedLoading, setRelatedLoading] = useState(false);
   const [sdkMissing, setSdkMissing] = useState(false);
   const [viewerUsername, setViewerUsername] = useState<string | null>(null);
+  const profile = (result && result.profile) ? (result.profile as any) : null;
   // NOTE: intentionally not auto-prefilling the lookup from URL params.
   // Shares should point to the canonical site only (https://triviacast.xyz).
 
@@ -268,16 +269,27 @@ export default function FarcasterLookupPage() {
           </div>
           <div className="flex flex-col items-center gap-2 w-full max-w-md bg-white rounded-xl border-2 border-[#F4A6B7] shadow-md px-4 py-4">
             <div className="w-full flex items-center gap-3">
-              {result && result.profile && (
+              {profile && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={
-                    resolveAvatarUrl(result.profile.pfpUrl as string) ||
-                    resolveAvatarUrl(result.profile.raw?.pfpUrl || result.profile.raw?.pfp_url) ||
-                    (result.profile.raw?.custody_address ? `https://cdn.stamp.fyi/avatar/${String(result.profile.raw.custody_address).toLowerCase()}?s=48` : undefined)
+                    resolveAvatarUrl(profile.pfpUrl as string) ||
+                    resolveAvatarUrl(profile.raw?.pfpUrl || profile.raw?.pfp_url) ||
+                    (profile.raw?.custody_address ? `https://cdn.stamp.fyi/avatar/${String(profile.raw.custody_address).toLowerCase()}?s=48` : undefined)
                   }
-                  alt={result.profile.username || 'avatar'}
+                  alt={profile.username || 'avatar'}
                   className="w-10 h-10 rounded-full object-cover"
+                  onError={(e) => {
+                    try {
+                      const el = e.currentTarget as HTMLImageElement;
+                      const custody = profile.raw?.custody_address;
+                      const fallback = custody && typeof custody === 'string' && /^0x[a-fA-F0-9]{40}$/.test(custody)
+                        ? `https://cdn.stamp.fyi/avatar/${String(custody).toLowerCase()}?s=48`
+                        : '';
+                      if (fallback && el.src !== fallback) el.src = fallback;
+                      else el.style.display = 'none';
+                    } catch (_) {}
+                  }}
                 />
               )}
               <div className="flex-1">
@@ -297,9 +309,9 @@ export default function FarcasterLookupPage() {
             </button>
           </div>
           {error && <div className="text-red-600 mt-2">{error}</div>}
-          {result && result.profile && (
+          {profile && (
             <div className="mt-4 bg-white p-4 rounded-xl shadow-md w-full max-w-md flex flex-col items-center">
-              <ProfileCard fid={result.profile.fid} profile={result.profile} />
+              <ProfileCard fid={profile.fid} profile={profile} />
               {/* Play Quiz button shown inline after a successful lookup */}
               <div className="w-full mt-3">
                 <button
@@ -519,11 +531,11 @@ export default function FarcasterLookupPage() {
                 </div>
               )}
               {/* Show recent casts if available */}
-              {Array.isArray(result.profile.casts) && result.profile.casts.length > 0 && (
+              {profile && Array.isArray(profile.casts) && profile.casts.length > 0 && (
                 <div className="mt-4 w-full">
                   <h3 className="font-bold text-[#2d1b2e] text-base mb-2">Recent Casts</h3>
                   <ul className="space-y-2">
-                    {result.profile.casts.slice(0, 5).map((cast: any, idx: number) => (
+                    {profile.casts.slice(0, 5).map((cast: any, idx: number) => (
                       <li key={cast.hash || idx}>
                         <NeynarCastCard identifier={cast.hash || ""} renderEmbeds={true} type="url" />
                       </li>
