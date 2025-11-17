@@ -102,6 +102,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
   const totalTPoints = useMemo(() => {
     return leaderboard.reduce((sum, entry) => sum + (entry?.tPoints || 0), 0);
   }, [leaderboard]);
+  
 
   // Sorted leaderboard memoized so we can paginate the sorted list consistently
   const sortedLeaderboard = useMemo(() => {
@@ -340,6 +341,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
           )}
         </div>
         {/* Address lookup removed per request */}
+        
         <p className="text-center text-[#5a3d5c] mb-4 sm:mb-6 text-sm sm:text-lg">
           There are always some winners... 🥳🥇🏆<br />
           and some losers 😭😩😞

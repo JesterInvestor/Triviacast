@@ -1,4 +1,5 @@
 import React from "react";
+import Image from 'next/image';
 
 // Simplified: render avatar only from Neynar-provided `pfpUrl` (no fallbacks).
 export const ProfileCard: React.FC<ProfileCardProps> = ({ fid, profile }) => {
@@ -12,7 +13,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ fid, profile }) => {
   return (
     <div className="w-full flex items-center gap-3">
       {pfp ? (
-        <img src={pfp} alt={username || displayName || 'profile'} className="w-16 h-16 rounded-full object-cover" />
+        <Image src={pfp} alt={username || displayName || 'profile'} width={40} height={40} className="rounded-full object-cover" unoptimized />
       ) : null}
       <div>
         <div className="font-bold text-lg">{displayName || (username ? `@${username}` : `FID ${fid ?? ''}`)}</div>
