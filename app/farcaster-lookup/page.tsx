@@ -332,13 +332,30 @@ export default function FarcasterLookupPage() {
                     {related.map((p: any) => (
                       <div key={p.fid || p.username} className="flex-shrink-0 w-40 bg-white rounded-lg border p-3 shadow-sm">
                         <div className="flex items-center gap-3 mb-2">
-                          {p.pfpUrl ? (
-                            <img
-                              src={p.pfpUrl}
-                              alt={p.username || p.displayName || "user"}
-                              className="w-10 h-10 rounded-full"
-                            />
-                          ) : null}
+                          {(
+                            (() => {
+                              const srcCandidate = p.pfpUrl || resolveAvatarUrl(p.raw?.pfpUrl || p.raw?.pfp_url || p.pfp_url || p.avatar) || (p.raw?.custody_address ? `https://cdn.stamp.fyi/avatar/${String(p.raw.custody_address).toLowerCase()}?s=48` : undefined);
+                              if (!srcCandidate) return null;
+                              return (
+                                <img
+                                  src={srcCandidate}
+                                  alt={p.username || p.displayName || "user"}
+                                  className="w-10 h-10 rounded-full"
+                                  onError={(e) => {
+                                    try {
+                                      const el = e.currentTarget as HTMLImageElement;
+                                      const custody = p.raw?.custody_address;
+                                      const fallback = custody && typeof custody === 'string' && /^0x[a-fA-F0-9]{40}$/.test(custody)
+                                        ? `https://cdn.stamp.fyi/avatar/${String(custody).toLowerCase()}?s=48`
+                                        : '';
+                                      if (fallback && el.src !== fallback) el.src = fallback;
+                                      else el.style.display = 'none';
+                                    } catch (_) {}
+                                  }}
+                                />
+                              );
+                            })()
+                          )}
                           <div>
                             <div className="text-sm font-bold">{p.displayName || p.username || `FID ${p.fid}`}</div>
                             <div className="text-xs text-gray-500">{p.username || ""}</div>
