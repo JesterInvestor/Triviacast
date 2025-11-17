@@ -126,13 +126,18 @@ export async function addPointsOnChain(
   }
   try {
     // Simulate to estimate gas, then write and wait for receipt
+    // Use the active connected account when building the tx simulation/write request.
+    // This helps connectors like WalletConnect / injected wallets (Base) correctly
+    // provide a signer for the transaction.
+    const accInfo = getAccount(wagmiConfig);
+    const simulationAccount = (accInfo?.address ?? walletAddress) as `0x${string}`;
     const { request } = await simulateContract(wagmiConfig, {
       address: CONTRACT_ADDRESS as `0x${string}`,
       abi: CONTRACT_ABI_WITH_ERRORS as any,
       functionName: 'addPoints',
       args: [walletAddress as `0x${string}`, BigInt(points)],
       chainId: activeChain.id,
-      account: walletAddress as `0x${string}`,
+      account: simulationAccount,
     });
     const hash = await writeContract(wagmiConfig, request);
     await waitForTransactionReceipt(wagmiConfig, { hash, chainId: activeChain.id });
