@@ -23,6 +23,8 @@ export default function WagmiWalletConnect() {
           return;
         }
         const json = await res.json();
+        // Debug: log fetched profile response
+        try { console.debug('[WagmiWalletConnect] fetched neynar profile', { address, json }); } catch (e) {}
         setProfile(json?.result ?? null);
       } catch (e) {
         setProfile(null);

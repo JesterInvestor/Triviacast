@@ -130,6 +130,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
       try {
         const board = await getLeaderboard();
         // board contains walletAddress and tPoints; for IQ view we'll augment with iqPoints
+        let finalList: any[] = board;
         if (view === 'iq') {
           // Fetch IQ points for each address in parallel (best-effort)
           const entries = await Promise.all(
@@ -144,12 +145,23 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             })
           );
           setLeaderboard(entries);
+          finalList = entries;
         } else {
           setLeaderboard(board);
+          finalList = board;
         }
 
-        // Batch fetch Farcaster profiles for leaderboard addresses
-        const addresses = board.map((b: any) => b.walletAddress?.toLowerCase()).filter(Boolean);
+        // Batch fetch Farcaster profiles for the TOP N leaderboard addresses only
+        const addresses = finalList
+          .slice()
+          .sort((a: any, b: any) => {
+            const aPoints = view === 'iq' ? (a.iqPoints || 0) : (a.tPoints || 0);
+            const bPoints = view === 'iq' ? (b.iqPoints || 0) : (b.tPoints || 0);
+            return bPoints - aPoints;
+          })
+          .slice(0, MAX_DISPLAY)
+          .map((b: any) => (b.walletAddress || b.wallet || b.address || '').toLowerCase())
+          .filter(Boolean);
         try {
           const response = await fetch('/api/neynar/user', {
             method: 'POST',
@@ -163,6 +175,25 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             setProfileErrors({});
           } else {
             const parsed = JSON.parse(data);
+            // Debug: log the raw parsed response so we can inspect pfp field names
+            try {
+              console.debug('[Leaderboard] Neynar parsed response', parsed);
+              if (parsed && parsed.result) {
+                Object.entries(parsed.result).forEach(([k, v]) => {
+                  try {
+                    const p = v as any;
+                    console.debug('[Leaderboard] profile', k, {
+                      username: p?.username,
+                      fid: p?.fid,
+                      pfpUrl: p?.pfpUrl ?? p?.pfp_url ?? p?.avatar ?? p?.raw?.pfpUrl ?? p?.raw?.pfp_url,
+                      raw: p?.raw ?? null,
+                    });
+                  } catch (e) {}
+                });
+              }
+            } catch (e) {
+              console.debug('[Leaderboard] error logging parsed response', String(e));
+            }
             setProfiles(prev => ({ ...prev, ...parsed.result }));
             setProfileErrors(parsed.errors || {});
           }
