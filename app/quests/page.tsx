@@ -4,7 +4,7 @@ import { useAccount, useChainId, useSwitchChain } from 'wagmi';
 import { useIQPoints } from '@/lib/hooks/useIQPoints';
 import WalletIQPoints from '@/components/WalletIQPoints';
 import { useQuestIQ } from '@/lib/hooks/useQuestIQ';
-import { shareAppUrl, openShareUrl } from '@/lib/farcaster';
+import { shareAppUrl, openShareUrl, openFarcasterProfile } from '@/lib/farcaster';
 // Gating reads removed (we no longer rely on backend relayer to mark quiz/friend searches)
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
@@ -295,7 +295,7 @@ export default function QuestsPage() {
                       try { markFollowDone(); } catch {}
                       showToast('Follow action recorded — Claim enabled for today', 'success');
                     }
-                    try { window.open('https://farcaster.xyz/jesterinvestor', '_blank', 'noopener'); } catch {}
+                    try { void openFarcasterProfile('jesterinvestor'); } catch {}
                     setFollowBurst(true);
                     setTimeout(() => setFollowBurst(false), 900);
                   }}

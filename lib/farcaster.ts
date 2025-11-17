@@ -215,3 +215,108 @@ export function shareLeaderboardUrl(rank: number | null, points: number): string
   const site = getBaseUrl();
   return buildPlatformShareUrl(shareLeaderboardText(rank, points), [`${site}/leaderboard`], { action: 'share' });
 }
+
+// Open a Farcaster profile (username like 'jesterinvestor') using the best available method:
+// 1) Try any injected or imported Farcaster miniapp SDK actions (openUrl/open/etc.)
+// 2) Try postMessage fallbacks to parent
+// 3) Finally fallback to window.open
+export async function openFarcasterProfile(username: string): Promise<void> {
+  if (typeof window === 'undefined') return;
+  const url = `https://farcaster.xyz/${username}`;
+
+  // Try known global SDKs first
+  try {
+    const w = window as any;
+    const candidates = [w.sdk, w.farcasterSdk, w.farcasterMiniApp, w.__farcasterMiniApp, w.FarcasterMiniApp, w];
+    for (const c of candidates) {
+      if (!c) continue;
+      try {
+        const maybeSdk = c.sdk ? c.sdk : c;
+        if (maybeSdk && maybeSdk.actions) {
+          if (typeof maybeSdk.actions.openUrl === 'function') {
+            void maybeSdk.actions.openUrl({ url });
+            return;
+          }
+          if (typeof maybeSdk.actions.open === 'function') {
+            void maybeSdk.actions.open({ url });
+            return;
+          }
+          if (typeof maybeSdk.actions.openMiniApp === 'function') {
+            void maybeSdk.actions.openMiniApp({ url });
+            return;
+          }
+          if (typeof maybeSdk.actions.launchMiniApp === 'function') {
+            void maybeSdk.actions.launchMiniApp({ url });
+            return;
+          }
+        }
+      } catch (err) {
+        // ignore and try next candidate
+      }
+    }
+  } catch (err) {
+    // ignore
+  }
+
+  // Try dynamic import of the SDK as a next option
+  try {
+    const importPromise = import('@farcaster/miniapp-sdk').catch(() => null);
+    const mod = await Promise.race([importPromise, new Promise((res) => setTimeout(() => res(null), 600))]);
+    if (mod) {
+      const maybeSdk = (mod as any)?.sdk ?? (mod as any)?.default?.sdk ?? (mod as any)?.default ?? mod;
+      if (maybeSdk && maybeSdk.actions) {
+        if (typeof maybeSdk.actions.openUrl === 'function') {
+          void maybeSdk.actions.openUrl({ url });
+          return;
+        }
+        if (typeof maybeSdk.actions.open === 'function') {
+          void maybeSdk.actions.open({ url });
+          return;
+        }
+        if (typeof maybeSdk.actions.openMiniApp === 'function') {
+          void maybeSdk.actions.openMiniApp({ url });
+          return;
+        }
+        if (typeof maybeSdk.actions.launchMiniApp === 'function') {
+          void maybeSdk.actions.launchMiniApp({ url });
+          return;
+        }
+      }
+    }
+  } catch (err) {
+    // ignore import failures
+  }
+
+  // Try postMessage fallbacks to parent
+  try {
+    if (window.parent && window.parent !== window) {
+      const msgs = [
+        { type: 'open_url', url },
+        { type: 'open', url },
+        { type: 'openUrl', url },
+        { type: 'miniapp:open', url },
+        { type: 'miniapp:action', action: { type: 'open_url', url } },
+      ];
+      for (const m of msgs) {
+        try {
+          window.parent.postMessage(m, '*');
+        } catch (err) {
+          // ignore
+        }
+      }
+      // give host a brief moment to handle the message
+      await new Promise((res) => setTimeout(res, 200));
+    }
+  } catch (err) {
+    // ignore
+  }
+
+  // Final fallback: open in new tab/window or navigate
+  try {
+    window.open(url, '_blank', 'noopener');
+    return;
+  } catch (err) {
+    // last resort
+    window.location.href = url;
+  }
+}
