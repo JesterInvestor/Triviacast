@@ -1,6 +1,7 @@
 import { Inter, Bangers } from "next/font/google";
 import "./globals.css";
 import ClientLayout from '@/components/ClientLayout';
+import FarcasterMiniAppReady from '@/components/FarcasterMiniAppReady';
 import { Metadata } from 'next';
 
 const inter = Inter({ subsets: ["latin"] });
@@ -55,6 +56,7 @@ export default function RootLayout({
     <html lang="en" className={wacky.variable}>
       <body className={inter.className}>
         <ClientLayout>
+          <FarcasterMiniAppReady />
           {children}
         </ClientLayout>
       </body>
