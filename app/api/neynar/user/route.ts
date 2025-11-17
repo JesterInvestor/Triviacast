@@ -39,37 +39,86 @@ export async function POST(request: Request) {
     const addressToProfile: Record<string, any> = {};
     const errors: Record<string, string> = {};
 
+    // Try SDK first, then fall back to the documented HTTP GET endpoint if needed.
+    let succeeded = false;
     try {
-      const res = await client.fetchBulkUsersByEthOrSolAddress({ addresses: normalizedAddresses });
-      for (const addr of normalizedAddresses) {
-        const key = addr.toLowerCase();
-        const users = res?.[key];
-        if (Array.isArray(users) && users.length > 0) {
-          const user = users[0];
-          const profile = {
-            fid: user.fid,
-            username: user.username,
-            displayName: user.display_name || user.displayName || user.name || undefined,
-            // Provide multiple possible avatar keys for frontend compatibility
-            avatarImgUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
-            pfpUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
-            avatar: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
-            bio: user.profile?.bio?.text ?? '',
-            followers: user.follower_count ?? user.followers ?? 0,
-            following: user.following_count ?? user.following ?? 0,
-            hasPowerBadge: user.power_badge ?? false,
-            custody_address: user.custody_address,
-            verified_addresses: user.verified_addresses,
-            raw: user,
-          };
-          addressToProfile[key] = profile;
-        } else {
-          errors[key] = 'Profile not found';
+      if (client && typeof client.fetchBulkUsersByEthOrSolAddress === 'function') {
+        const res = await client.fetchBulkUsersByEthOrSolAddress({ addresses: normalizedAddresses });
+        for (const addr of normalizedAddresses) {
+          const key = addr.toLowerCase();
+          const users = res?.[key] || res?.[addr] || res?.[key.toUpperCase()];
+          if (Array.isArray(users) && users.length > 0) {
+            const user = users[0];
+            const profile = {
+              fid: user.fid,
+              username: user.username,
+              displayName: user.display_name || user.displayName || user.name || undefined,
+              avatarImgUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
+              pfpUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
+              avatar: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
+              bio: user.profile?.bio?.text ?? '',
+              followers: user.follower_count ?? user.followers ?? 0,
+              following: user.following_count ?? user.following ?? 0,
+              hasPowerBadge: user.power_badge ?? false,
+              custody_address: user.custody_address,
+              verified_addresses: user.verified_addresses,
+              raw: user,
+            };
+            addressToProfile[key] = profile;
+          } else {
+            errors[key] = 'Profile not found';
+          }
         }
+        succeeded = true;
       }
     } catch (err) {
-      for (const addr of normalizedAddresses) {
-        errors[addr] = 'Neynar API error: ' + String(err);
+      // fall through to HTTP fallback
+      console.debug('Neynar SDK bulk fetch failed, will try HTTP fallback', String(err));
+    }
+
+    if (!succeeded) {
+      try {
+        const url = `https://api.neynar.com/v2/farcaster/user/bulk-by-address/?addresses=${encodeURIComponent(normalizedAddresses.join(','))}`;
+        const resp = await fetch(url, { headers: { accept: 'application/json', ...(apiKey ? { 'X-API-KEY': apiKey } : {}) } });
+        if (resp.ok) {
+          const data = await resp.json();
+          // The API returns a mapping from address -> array of User
+          for (const addr of normalizedAddresses) {
+            const key = addr.toLowerCase();
+            const users = data?.[key] || data?.[addr] || data?.[key.toUpperCase()] || [];
+            if (Array.isArray(users) && users.length > 0) {
+              const user = users[0];
+              const profile = {
+                fid: user.fid,
+                username: user.username,
+                displayName: user.display_name || user.displayName || user.name || undefined,
+                avatarImgUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
+                pfpUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
+                avatar: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
+                bio: user.profile?.bio?.text ?? '',
+                followers: user.follower_count ?? user.followers ?? 0,
+                following: user.following_count ?? user.following ?? 0,
+                hasPowerBadge: user.power_badge ?? false,
+                custody_address: user.custody_address,
+                verified_addresses: user.verified_addresses,
+                raw: user,
+              };
+              addressToProfile[key] = profile;
+            } else {
+              errors[key] = 'Profile not found';
+            }
+          }
+          succeeded = true;
+        } else {
+          const text = await resp.text().catch(() => '');
+          for (const addr of normalizedAddresses) {
+            errors[addr] = `HTTP fallback failed: ${resp.status} ${text}`;
+          }
+        }
+      } catch (err) {
+        for (const addr of normalizedAddresses) {
+          errors[addr] = 'Neynar HTTP fallback error: ' + String(err);
+        }
       }
     }
 
