@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { resolveAvatarUrl } from '@/lib/avatar';
 
 // POST /api/neynar/related
 // Body: { fid: number, limit?: number }
@@ -20,14 +21,17 @@ export async function POST(req: Request) {
         const sdkResp: any = await client.fetchFollowSuggestions({ fid, limit });
         const arr = sdkResp?.result || sdkResp?.users || sdkResp || [];
         if (Array.isArray(arr)) {
-          const normalized = arr.map((u: any) => ({
-            fid: u.fid,
-            username: u.username ? `@${String(u.username).replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '')}` : undefined,
-            displayName: u.display_name || u.displayName || u.name || undefined,
-            pfpUrl: u.pfp_url || u.pfpUrl || u.avatar || undefined,
-            followers: u.follower_count ?? u.followers ?? 0,
-            raw: u,
-          }));
+          const normalized = arr.map((u: any) => {
+            const src = u.pfp_url || u.pfpUrl || u.avatar || undefined;
+            return {
+              fid: u.fid,
+              username: u.username ? `@${String(u.username).replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '')}` : undefined,
+              displayName: u.display_name || u.displayName || u.name || undefined,
+              pfpUrl: resolveAvatarUrl(src) || undefined,
+              followers: u.follower_count ?? u.followers ?? 0,
+              raw: u,
+            };
+          });
           return NextResponse.json({ result: normalized });
         }
       }
@@ -43,14 +47,17 @@ export async function POST(req: Request) {
       const data = await resp.json();
       const arr = data?.result || data?.users || data || [];
       if (Array.isArray(arr)) {
-        const normalized = arr.map((u: any) => ({
-          fid: u.fid,
-          username: u.username ? `@${String(u.username).replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '')}` : undefined,
-          displayName: u.display_name || u.displayName || u.name || undefined,
-          pfpUrl: u.pfp_url || u.pfpUrl || u.avatar || undefined,
-          followers: u.follower_count ?? u.followers ?? 0,
-          raw: u,
-        }));
+        const normalized = arr.map((u: any) => {
+          const src = u.pfp_url || u.pfpUrl || u.avatar || undefined;
+          return {
+            fid: u.fid,
+            username: u.username ? `@${String(u.username).replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '')}` : undefined,
+            displayName: u.display_name || u.displayName || u.name || undefined,
+            pfpUrl: resolveAvatarUrl(src) || undefined,
+            followers: u.follower_count ?? u.followers ?? 0,
+            raw: u,
+          };
+        });
         return NextResponse.json({ result: normalized });
       }
     } catch (e) {

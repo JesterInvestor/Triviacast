@@ -60,275 +60,163 @@ cp .env.example .env.local
 
 4. Add your environment variables to `.env.local`:
 ```
-NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id
-NEXT_PUBLIC_RPC_URL=https://base-sepolia.infura.io/v3/...
+# Triviacast
 
-# Optional: Add smart contract configuration for blockchain storage
-# NEXT_PUBLIC_CONTRACT_ADDRESS=0x...
-# NEXT_PUBLIC_CHAIN_ID=84532
+Triviacast is a Farcaster-focused trivia mini-app built with Next.js and TypeScript. Players answer timed multiple-choice questions, earn "T Points", and can optionally persist scores on-chain. The app integrates with Farcaster Mini App SDK and wallet providers (wagmi + WalletConnect).
+
+Key ideas:
+- Fast, mobile-first trivia experience as a Farcaster Mini App
+- Wallet-connected points and leaderboard with optional smart-contract persistence
+- Mix of OpenTDB-sourced and curated Farcaster questions
+
+---
+
+## Table of contents
+- [Features](#features)
+- [Quick start](#quick-start)
+- [Environment / Configuration](#environment--configuration)
+- [Architecture & Key files](#architecture--key-files)
+- [Smart contracts](#smart-contracts)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Features
+
+- Timed quiz gameplay (configurable questions/time)
+- Question sources: Open Trivia Database (OpenTDB) + curated local `data/farcaster_questions.json`
+- Real-time scoring, streak bonuses, and T Points balance
+- Wallet integration via `wagmi` and WalletConnect (Farcaster Mini App connector supported)
+- Optional on-chain storage of points via `TriviaPoints.sol` (Base Sepolia by default)
+- Leaderboard for top wallets
+- Responsive UI built with Tailwind CSS and Next.js App Router
+
+---
+
+## Quick start
+
+Requirements
+- Node.js 18+ and npm (or yarn)
+
+Local development
+1. Clone the repo:
+
+```powershell
+git clone https://github.com/JesterInvestor/Triviacast.git
+cd Triviacast
 ```
 
-5. Run the development server:
-```bash
+2. Install dependencies:
+
+```powershell
+npm install
+```
+
+3. Create `.env.local` (see the Environment section below for keys):
+
+```powershell
+copy .env.example .env.local
+```
+
+4. Start dev server:
+
+```powershell
 npm run dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser
+Open: http://localhost:3000
 
-## Quiz Features
+Run the production build locally:
 
-### Question Sources
-
-The quiz now supports two question sources:
-
-1. **General Knowledge (OpenTDB)** - Questions from the Open Trivia Database API
-   - Covers a wide range of general trivia topics
-   - Questions are fetched in real-time from https://opentdb.com/api.php
-   - Includes easy and medium difficulty questions
-
-2. **Farcaster Knowledge (Local)** - Curated questions about Farcaster
-   - 100 hand-crafted questions about Farcaster ecosystem
-   - Covers topics like protocol basics, infrastructure, creators, and technical details
-   - Questions stored locally in `data/farcaster_questions.json`
-   - Includes easy, medium, and hard difficulty levels
-
-You can switch between question sources using the toggle on the quiz start screen. If you switch sources during an active quiz, you'll be prompted to confirm that the quiz will restart.
-
-### Adding More Farcaster Questions
-
-To add more Farcaster questions to the local set:
-
-1. Edit the file `data/farcaster_questions.json`
-2. Add new question objects following this structure:
-```json
-{
-  "id": "fc_101",
-  "category": "Farcaster Knowledge",
-  "type": "multiple",
-  "difficulty": "easy|medium|hard",
-  "question": "Your question text here?",
-  "correct_answer": "The correct answer",
-  "incorrect_answers": [
-    "Wrong answer 1",
-    "Wrong answer 2",
-    "Wrong answer 3"
-  ],
-  "explanation": "Optional explanation of the answer",
-  "tags": ["farcaster", "optional-tag"]
-}
+```powershell
+npm run build; npm run start
 ```
-3. Ensure the JSON file remains valid (proper commas, brackets, etc.)
-4. Test your changes by selecting "Farcaster Knowledge" in the quiz
 
-### Timer System
-- 5-minute overall time limit for the entire quiz
-- Visual timer with color-coded warnings (green → yellow → red)
-- Automatic quiz completion when time expires
+---
 
-### Question Display
-- Questions fetched from Open Trivia Database
-- Multiple choice format with 4 options
-- HTML entity decoding for special characters
-- Randomized answer order for each question
+## Environment / Configuration
 
-### Scoring & T Points System
-- Real-time score tracking
-- Earn 1000 T points per correct answer
-- Streak bonuses: 500 points for 3 in a row, 1000 for 5, 2000 for perfect 10!
-- Wallet-based point storage (localStorage + optional blockchain)
-- Leaderboard tracking top 100 wallets
-- Detailed results page with answer review
-- Performance feedback based on percentage score
-- Visual indicators for correct/incorrect answers
+Essential env vars (set in `.env.local` or CI/Vercel):
 
-## Technology Stack
+- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` — WalletConnect Cloud project ID (required for WalletConnect)
+- `NEXT_PUBLIC_RPC_URL` — RPC endpoint used for optional on-chain features
+- `NEXT_PUBLIC_CONTRACT_ADDRESS` — Optional: deployed `TriviaPoints` contract address
+- `NEXT_PUBLIC_CHAIN_ID` — Optional chain id for the contract (e.g., Base Sepolia)
 
-- **Framework**: Next.js 15 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Wallet Integration**: wagmi v2 with Farcaster Mini App connector + WalletConnect
-- **Blockchain**: Solidity 0.8.27 (Base Sepolia)
-- **API**: Open Trivia Database
-- **Farcaster SDK**: @farcaster/miniapp-sdk
-- **Deployment**: Vercel
+Optional keys used by features (jackpot, spins, etc.) are documented in the repo docs (`SMART_CONTRACT_INTEGRATION.md`, `WAGMI_INTEGRATION.md`).
 
-## Smart Contract Integration
+---
 
-The app includes optional blockchain functionality for T points storage:
+## Architecture & Key files
 
-- **Smart Contract**: `TriviaPoints.sol` - Manages points on Base Sepolia testnet
-- **Hybrid Storage**: Uses blockchain when configured, falls back to localStorage
-- **Automatic Sync**: Points saved to blockchain after each quiz
-- **Leaderboard**: Fetches top wallets from smart contract
+- `app/` - Next.js App Router pages and API routes
+   - `app/api/questions/route.ts` - server API fetching and normalizing questions
+- `components/` - React UI components and providers (Quiz, Timer, Leaderboard, Wallet integration)
+- `lib/` - helper libraries: contract interactions, tpoints logic, wagmi configuration
+- `contracts/` - Solidity contracts (`TriviaPoints.sol`, `Jackpot.sol`)
+- `data/` - curated local questions (`farcaster_questions.json`)
+- `hardhat/` - Hardhat project for compiling/deploying contracts
 
-See [SMART_CONTRACT_INTEGRATION.md](./SMART_CONTRACT_INTEGRATION.md) for detailed setup instructions.
+Use these files as entry points when you need to change behavior or wire new features.
+
+---
+
+## Smart contracts
+
+This project optionally persists points on-chain via `TriviaPoints.sol`. Smart-contract related files are in `contracts/` and the Hardhat deployment helpers are under `hardhat/`.
+
+See `SMART_CONTRACT_INTEGRATION.md` for:
+- deployment steps
+- required env variables for Hardhat scripts
+- how the frontend toggles between local storage and on-chain storage
+
+---
 
 ## Deployment
 
-### Vercel Deployment
+Recommended: Vercel (App Router ready). On Vercel, add the same environment variables you use locally.
 
-1. Push your code to GitHub
-2. Import the repository in Vercel
-3. Add environment variables in Vercel project settings:
-   - `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` (required)
-   - `NEXT_PUBLIC_RPC_URL` (recommended)
-   - `NEXT_PUBLIC_CONTRACT_ADDRESS` (optional - for blockchain storage)
-   - `NEXT_PUBLIC_CHAIN_ID` (optional - default: 84532 for Base Sepolia)
-4. Deploy!
+Steps:
+1. Push to GitHub
+2. Import repository in Vercel
+3. Add env vars in the project settings
+4. Deploy
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/JesterInvestor/Quiz)
+CI / other platforms: ensure `NEXT_PUBLIC_*` variables are available at build time.
 
-## Farcaster Mini App Integration
-
-The app is fully configured as a Farcaster Mini App with:
-- **Mini App SDK**: Properly calls `sdk.actions.ready()` to hide the splash screen
-- **Wallet Provider**: Uses wagmi with `@farcaster/miniapp-wagmi-connector` for seamless wallet access
-- **Manifest**: Configured in `public/farcaster-manifest.json`
-
-To integrate with Farcaster:
-1. Deploy your app to a public URL (e.g., Vercel)
-2. Update the URLs in `farcaster-manifest.json` with your actual domain
-3. Register your miniapp with Farcaster
-
-See [WAGMI_INTEGRATION.md](./WAGMI_INTEGRATION.md) for detailed wagmi setup and usage.
-
-## API Routes
-
-### GET `/api/questions`
-
-Fetches trivia questions from Open Trivia Database.
-
-**Query Parameters:**
-- `amount` (default: 10): Number of questions to fetch
-- `difficulty` (default: medium): Question difficulty (easy, medium, hard)
-- `category` (optional): Question category ID
-
-**Example:**
-```
-GET /api/questions?amount=10&difficulty=medium
-```
-
-## Project Structure
-
-```
-Triviacast/
-├── app/
-│   ├── api/
-│   │   └── questions/
-│   │       └── route.ts          # API route for fetching questions
-│   ├── leaderboard/
-│   │   └── page.tsx              # Leaderboard page
-│   ├── layout.tsx                # Root layout with providers
-│   ├── page.tsx                  # Home page
-│   └── globals.css               # Global styles
-├── components/
-│   ├── Quiz.tsx                  # Main quiz component
-│   ├── QuizQuestion.tsx          # Question display component
-│   ├── QuizResults.tsx           # Results display component with point saving
-│   ├── Timer.tsx                 # Timer component
-│   ├── Leaderboard.tsx           # Leaderboard display
-│   ├── WalletPoints.tsx          # Wallet points display
-│   ├── WagmiProvider.tsx         # wagmi provider wrapper
-│   ├── WagmiProvider.tsx         # wagmi provider wrapper
-│   ├── WagmiWalletConnect.tsx    # wagmi + WalletConnect connection component
-│   └── FarcasterMiniAppReady.tsx # Mini App SDK ready() caller
-├── contracts/
-│   ├── TriviaPoints.sol          # Smart contract for T points
-│   └── README.md                 # Contract deployment guide
-├── lib/
-│   ├── contract.ts               # Blockchain interaction functions
-│   ├── tpoints.ts                # T points calculation and storage
-│   └── wagmi.ts                  # wagmi configuration with Farcaster & WalletConnect
-├── types/
-│   └── quiz.ts                   # TypeScript type definitions
-├── public/
-│   └── farcaster-manifest.json   # Farcaster configuration
-├── .env.example                  # Environment variables template
-├── SMART_CONTRACT_INTEGRATION.md # Smart contract setup guide
-├── WAGMI_INTEGRATION.md          # wagmi setup and usage guide
-└── FARCASTER.md                  # Farcaster Mini App documentation
-```
+---
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome. Good first steps:
+- Run the app locally and explore the `components/Quiz*` components
+- Add or refine questions in `data/farcaster_questions.json`
+- Improve tests (if you add features, include tests)
+
+Please open issues or PRs against the `main` branch. Follow the repo's existing style (TypeScript, Tailwind, no trailing semicolons where project style avoids them).
+
+---
+
+## Suggested next steps (after this README)
+
+- Run `npm run build` and verify production output
+- If you use the blockchain features, follow `SMART_CONTRACT_INTEGRATION.md` to deploy contracts and update env vars
+- Add a short CONTRIBUTING.md if you expect external contributors
+
+---
 
 ## License
 
-MIT License - feel free to use this project for your own purposes.
+MIT
 
-## Support
+---
 
-For issues, questions, or suggestions, please open an issue on GitHub.
+If you'd like, I can also:
+- add a `CONTRIBUTING.md` with developer setup
+- generate a trimmed `README` tailored for a GitHub repo front page (shorter intro + badges)
+│   │   └── page.tsx              # Leaderboard page
 
-## Environment Configuration
-
-### Daily Claim Amount
-
-You can customize the daily claim display text via environment variables:
-
-1. Preferred: set a single combined label
-```
-NEXT_PUBLIC_DAILY_CLAIM_AMOUNT=50,000 $TRIV
-```
-2. Or set value + units separately (they are concatenated):
-```
-NEXT_PUBLIC_DAILY_CLAIM_AMOUNT_VALUE=50000
-NEXT_PUBLIC_DAILY_CLAIM_AMOUNT_UNITS=$TRIV
-```
-Format the value exactly as you want it to appear (e.g. include commas). Leading/trailing spaces are trimmed automatically.
-
-If none are set the UI falls back to `100,000 $TRIV`.
-
-### Jackpot / VRF / Prepaid Spins
-
-Add these variables to `.env.local` (and to Vercel project settings) to enable the on-chain Jackpot page flow:
-
-```
-NEXT_PUBLIC_JACKPOT_ADDRESS=0xYourDeployedJackpotContract
-NEXT_PUBLIC_USDC_ADDRESS=0x833589fCDd4FfD38E7aF5aD01D50e4d60C2d8bC7  # Base mainnet USDC (change if testnet)
-```
-
-Hardhat deployment requires VRF + token configuration (used only in scripts, not exposed client-side). Names below must match those expected by the deploy script and custom task:
-
-```
-VRF_COORDINATOR=0xYourVrfCoordinator
-VRF_SUBSCRIPTION_ID=1234          # uint64 subscription id
-VRF_KEYHASH=0xYourGasLaneKeyHash  # Chainlink gas lane (no underscore; matches code)
-TRIV_TOKEN_ADDRESS=0xYourTrivErc20
-TRIVIAPOINTS_ADDRESS=0xYourTriviaPointsContract
-FEE_RECEIVER_ADDRESS=0xDistributorOrTreasury
-USDC_ADDRESS=0x833589fCDd4FfD38E7aF5aD01D50e4d60C2d8bC7
-SPIN_PRICE_USDC=500000            # 0.5 USDC with 6 decimals (constructor price)
-POINTS_THRESHOLD=100000           # Minimum T points to be eligible
-```
-
-After deploying the contract:
-1. Add the Jackpot contract as a consumer to the Chainlink VRF subscription.
-2. Fund LINK (if required by the network) to the subscription.
-3. Fund the Jackpot contract with enough `$TRIV` to cover maximum prizes (e.g. 10,000,000 $TRIV jackpot). You can top up over time.
-4. Set `NEXT_PUBLIC_JACKPOT_ADDRESS` so the frontend can interact.
-5. Ensure the USDC allowance is granted by users before buying spins.
-
-Prepaid spins flow:
-- User approves USDC to the Jackpot contract.
-- User buys N spins in one transaction (`buySpins(count)`); credits accumulate.
-- User consumes one credit per `spin()` call; 24h cooldown enforced by contract.
-- Chainlink VRF returns random tier; contract attempts immediate `$TRIV` payout if balance sufficient.
-
-Frontend considerations:
-- The wheel only animates after `SpinResult` event to reflect the actual on-chain outcome.
-- Credits badge shows remaining spin credits and quick buy buttons (+5, +10, +100).
-- Large purchases (e.g. 100 spins) may require users to increase UI allowance if you cap approvals.
-
-Security / Ops checklist:
-| Item | Action |
-|------|--------|
-| VRF subscription | Add Jackpot as consumer |
-| TRIV funding | Transfer reward tokens to contract address |
-| USDC price | Confirm `SPIN_PRICE_USDC` matches `price` state (update via `setPrice`) |
-| Tier odds | Adjust with `setTiers` ensuring sum of bp = 10000 |
-| Monitoring | Index `SpinRequested` & `SpinResult` for analytics |
-| Withdrawal | Use `rescueTokens` only by owner for non-prize tokens or maintenance |
-
+│   ├── layout.tsx                # Root layout with providers
 

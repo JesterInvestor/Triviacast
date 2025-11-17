@@ -1,5 +1,3 @@
-"use client";
-
 export function resolveAvatarUrl(raw?: string | null): string | null {
   if (!raw) return null;
   const s = String(raw).trim();

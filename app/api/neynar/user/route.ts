@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { resolveAvatarUrl } from '@/lib/avatar';
 
 function normalizeEthOrSolAddress(input: string): string | null {
   if (!input) return null;
@@ -49,13 +50,14 @@ export async function POST(request: Request) {
           const users = res?.[key] || res?.[addr] || res?.[key.toUpperCase()];
           if (Array.isArray(users) && users.length > 0) {
             const user = users[0];
+            const src = user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null;
             const profile = {
               fid: user.fid,
               username: user.username,
               displayName: user.display_name || user.displayName || user.name || undefined,
-              avatarImgUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
-              pfpUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
-              avatar: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
+              avatarImgUrl: resolveAvatarUrl(src) || null,
+              pfpUrl: resolveAvatarUrl(src) || null,
+              avatar: resolveAvatarUrl(src) || null,
               bio: user.profile?.bio?.text ?? '',
               followers: user.follower_count ?? user.followers ?? 0,
               following: user.following_count ?? user.following ?? 0,
@@ -88,13 +90,14 @@ export async function POST(request: Request) {
             const users = data?.[key] || data?.[addr] || data?.[key.toUpperCase()] || [];
             if (Array.isArray(users) && users.length > 0) {
               const user = users[0];
+              const src = user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null;
               const profile = {
                 fid: user.fid,
                 username: user.username,
                 displayName: user.display_name || user.displayName || user.name || undefined,
-                avatarImgUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
-                pfpUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
-                avatar: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || null,
+                avatarImgUrl: resolveAvatarUrl(src) || null,
+                pfpUrl: resolveAvatarUrl(src) || null,
+                avatar: resolveAvatarUrl(src) || null,
                 bio: user.profile?.bio?.text ?? '',
                 followers: user.follower_count ?? user.followers ?? 0,
                 following: user.following_count ?? user.following ?? 0,

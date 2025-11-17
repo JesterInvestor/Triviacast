@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { resolveFarcasterProfile } from '@/lib/addressResolver';
+import { resolveAvatarUrl } from '@/lib/avatar';
 
 // POST /api/farcaster/profile
 // Accepts JSON { username?: string, address?: string }
@@ -99,10 +100,11 @@ export async function POST(req: Request) {
 }
 
 function normalizeUserToProfile(user: any, resolvedAddress: string | null) {
+  const src = user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || undefined;
   return {
     address: resolvedAddress || undefined,
     username: user.username ? `@${String(user.username).replace(/^@/, '').replace(/(?:\.farcaster\.eth|\.eth)$/i, '')}` : undefined,
-    pfpUrl: user.pfp_url || user.pfpUrl || user.avatar || user.profile?.pfpUrl || undefined,
+    pfpUrl: resolveAvatarUrl(src) || undefined,
     displayName: user.display_name || user.displayName || user.name || undefined,
     bio: user.profile?.bio?.text || user.bio || undefined,
     followers: user.follower_count ?? user.followers ?? undefined,
@@ -114,10 +116,11 @@ function normalizeUserToProfile(user: any, resolvedAddress: string | null) {
 }
 
 function normalizeResolvedToProfile(resolved: any, resolvedAddress: string) {
+  const src = resolved.pfpUrl || resolved.raw?.pfpUrl || undefined;
   return {
     address: resolvedAddress,
     username: resolved.username,
-    pfpUrl: resolved.pfpUrl,
+    pfpUrl: resolveAvatarUrl(src) || undefined,
     displayName: resolved.displayName,
     bio: resolved.bio,
     followers: resolved.followers,
