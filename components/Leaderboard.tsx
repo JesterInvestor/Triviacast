@@ -175,6 +175,22 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             setProfileErrors({});
           } else {
             const parsed = JSON.parse(data);
+            // Client-side normalize avatar URLs as a safety net in case server didn't resolve them.
+            try {
+              if (parsed && parsed.result && typeof parsed.result === 'object') {
+                for (const [addr, p] of Object.entries(parsed.result)) {
+                  try {
+                    const src = (p as any).pfpUrl || (p as any).avatarImgUrl || (p as any).pfp_url || (p as any).avatar || (p as any).raw?.pfpUrl || (p as any).raw?.pfp_url || null;
+                    (p as any).pfpUrl = resolveAvatarUrl(src) || null;
+                    (p as any).avatarImgUrl = (p as any).pfpUrl || (p as any).avatarImgUrl || null;
+                  } catch (e) {
+                    // ignore per-profile errors
+                  }
+                }
+              }
+            } catch (e) {
+              console.debug('[Leaderboard] avatar normalization failed', String(e));
+            }
             // Debug: log the raw parsed response so we can inspect pfp field names
             try {
               console.debug('[Leaderboard] Neynar parsed response', parsed);

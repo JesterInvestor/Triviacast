@@ -153,7 +153,17 @@ export default function FarcasterLookupPage() {
             if (r.ok) {
               const parsed = await r.json();
               console.debug('[FarcasterLookup] related API response', parsed);
-              setRelated(Array.isArray(parsed.result) ? parsed.result : []);
+              const items = Array.isArray(parsed.result) ? parsed.result : [];
+              // Normalize pfp urls client-side as a safety net
+              const norm = items.map((u: any) => {
+                try {
+                  const src = u.pfp_url || u.pfpUrl || u.avatar || (u.raw && (u.raw.pfpUrl || u.raw.pfp_url)) || null;
+                  return { ...u, pfpUrl: resolveAvatarUrl(src) || undefined };
+                } catch (e) {
+                  return u;
+                }
+              });
+              setRelated(norm);
             } else {
               setRelated([]);
             }
