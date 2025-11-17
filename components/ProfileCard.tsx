@@ -16,10 +16,10 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ fid, profile, useNeyna
   return (
     <div className="w-full flex items-center gap-3">
       <img
-        src={avatar || 
-          (profile?.raw?.custody_address ? `https://cdn.stamp.fyi/avatar/${String(profile.raw.custody_address)}?s=128` : '/neynar.svg')}
+        src={avatar || (profile?.raw?.custody_address ? `https://cdn.stamp.fyi/avatar/${String(profile.raw.custody_address)}?s=128` : '/neynar.svg')}
         alt={username || displayName || 'profile'}
         className="w-16 h-16 rounded-full object-cover"
+        onError={(e) => { try { (e.currentTarget as HTMLImageElement).src = '/neynar.svg'; } catch {} }}
       />
       <div>
         <div className="font-bold text-lg">{displayName || (username ? `@${username}` : `FID ${fid ?? ''}`)}</div>

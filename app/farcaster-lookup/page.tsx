@@ -292,12 +292,10 @@ export default function FarcasterLookupPage() {
                       <div key={p.fid || p.username} className="flex-shrink-0 w-40 bg-white rounded-lg border p-3 shadow-sm">
                         <div className="flex items-center gap-3 mb-2">
                           <img
-                            src={
-                              p.pfpUrl || p.avatarImgUrl || p.raw?.pfp_url || p.raw?.pfpUrl || 
-                              (p.raw?.custody_address ? `https://cdn.stamp.fyi/avatar/${String(p.raw.custody_address)}?s=64` : '/neynar.svg')
-                            }
+                            src={p.pfpUrl || p.avatarImgUrl || p.raw?.pfp_url || p.raw?.pfpUrl || (p.raw?.custody_address ? `https://cdn.stamp.fyi/avatar/${String(p.raw.custody_address)}?s=64` : '/neynar.svg')}
                             alt={p.username || p.displayName || "user"}
                             className="w-10 h-10 rounded-full"
+                            onError={(e) => { try { (e.currentTarget as HTMLImageElement).src = '/neynar.svg'; } catch {} }}
                           />
                           <div>
                             <div className="text-sm font-bold">{p.displayName || p.username || `FID ${p.fid}`}</div>
