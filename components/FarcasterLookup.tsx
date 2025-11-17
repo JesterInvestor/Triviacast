@@ -63,7 +63,26 @@ export default function FarcasterLookup({
     <div className="flex items-center gap-2">
       {avatarSrc ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={avatarSrc} alt={profile?.username || 'avatar'} className="w-8 h-8 rounded-full object-cover" />
+        <img
+          src={avatarSrc}
+          alt={profile?.username || 'avatar'}
+          className="w-8 h-8 rounded-full object-cover"
+          onError={(e) => {
+            try {
+              const el = e.currentTarget as HTMLImageElement;
+              const custody = (profile as any)?.raw?.custody_address;
+              const fallback = custody && /^0x[a-fA-F0-9]{40}$/.test(custody)
+                ? `https://cdn.stamp.fyi/avatar/${custody.toLowerCase()}?s=48`
+                : isHexAddress(address)
+                  ? `https://cdn.stamp.fyi/avatar/${address.toLowerCase()}?s=48`
+                  : '';
+              if (fallback && el.src !== fallback) el.src = fallback;
+              else if (!fallback) el.style.display = 'none';
+            } catch (_) {
+              // ignore
+            }
+          }}
+        />
       ) : null}
       <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="0x..." className="border px-2 py-1 rounded text-sm flex-1" />
       <button onClick={lookup} disabled={loading || !address} className="bg-[#F4A6B7] px-3 py-1 rounded text-sm">
