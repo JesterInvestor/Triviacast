@@ -61,6 +61,11 @@ export default function Home() {
                       const maybeSdk = c.sdk ? c.sdk : c;
                       if (maybeSdk && maybeSdk.actions) {
                         // Try a few possible action methods in order, with debug logs
+                        if (typeof maybeSdk.actions.openMiniApp === 'function') {
+                          console.debug('[Farchess] using maybeSdk.actions.openMiniApp');
+                          void maybeSdk.actions.openMiniApp({ url });
+                          return;
+                        }
                         if (typeof maybeSdk.actions.launchMiniApp === 'function') {
                           console.debug('[Farchess] using maybeSdk.actions.launchMiniApp');
                           void maybeSdk.actions.launchMiniApp({ url });
@@ -102,6 +107,11 @@ export default function Home() {
                   if (mod) {
                     const maybeSdk = (mod as any)?.sdk ?? (mod as any)?.default?.sdk ?? (mod as any)?.default ?? mod;
                     if (maybeSdk && maybeSdk.actions) {
+                      if (typeof maybeSdk.actions.openMiniApp === 'function') {
+                        console.debug('[Farchess] using imported sdk.actions.openMiniApp');
+                        void maybeSdk.actions.openMiniApp({ url });
+                        return;
+                      }
                       if (typeof maybeSdk.actions.launchMiniApp === 'function') {
                         console.debug('[Farchess] using imported sdk.actions.launchMiniApp');
                         void maybeSdk.actions.launchMiniApp({ url });
