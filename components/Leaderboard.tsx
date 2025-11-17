@@ -50,11 +50,24 @@ async function ensureOnchainKit() {
   }
 }
 
+function resolveAvatarUrl(raw?: string | null): string | null {
+  if (!raw) return null;
+  const s = String(raw).trim();
+  if (!s) return null;
+  if (s.startsWith('data:')) return s;
+  if (/^https?:\/\//i.test(s)) return s;
+  // ipfs://CID or /ipfs/CID
+  const ipfsMatch = s.match(/ipfs:\/\/(.+)/i) || s.match(/(?:^|\/ipfs\/)([a-zA-Z0-9]+)/i);
+  if (ipfsMatch) {
+    const cid = ipfsMatch[1];
+    return `https://cloudflare-ipfs.com/ipfs/${cid}`;
+  }
+  return s;
+}
+
 function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string; avatarImgUrl?: string; pfpUrl?: string; pfp_url?: string; avatar?: string; fid?: number; bio?: string; followers?: number; following?: number; custody_address?: string; verified_addresses?: any; raw?: any }, fallbackAddress?: string }) {
-  // Use avatar from profile if available, else fallback to stamp
-  const avatarUrl =
-    profile?.avatarImgUrl || profile?.pfpUrl || profile?.pfp_url || profile?.avatar ||
-    (fallbackAddress ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32` : undefined);
+  const candidate = profile?.avatarImgUrl || profile?.pfpUrl || profile?.pfp_url || profile?.avatar || profile?.raw?.pfp_url || profile?.raw?.pfpUrl || null;
+  const avatarUrl = resolveAvatarUrl(candidate) || (fallbackAddress ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32` : undefined);
   const display = profile?.username || profile?.displayName || "Get on Facaster bro";
   return (
     <div className="flex items-center gap-2">
