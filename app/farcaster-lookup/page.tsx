@@ -135,6 +135,7 @@ export default function FarcasterLookupPage() {
         body: JSON.stringify({ username }),
       });
       const data = await res.json();
+      console.debug('[FarcasterLookup] profile API response', data);
       if (!res.ok) throw new Error(data?.error || "lookup failed");
       // If the response is a profile object, wrap it as { profile: data }
       if (data && (data.address || data.username) && !data.error) {
@@ -151,6 +152,7 @@ export default function FarcasterLookupPage() {
             });
             if (r.ok) {
               const parsed = await r.json();
+              console.debug('[FarcasterLookup] related API response', parsed);
               setRelated(Array.isArray(parsed.result) ? parsed.result : []);
             } else {
               setRelated([]);
