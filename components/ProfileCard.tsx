@@ -1,31 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-export const ProfileCard: React.FC<ProfileCardProps> = ({ fid, profile }) => {
-  const [NeynarProfileCard, setNeynarProfileCard] = useState<any>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const mod = await import("@neynar/react");
-        if (mounted && mod && mod.NeynarProfileCard) setNeynarProfileCard(() => mod.NeynarProfileCard);
-      } catch (e) {
-        // Neynar react not available in this environment — fallback will be used
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
-
+// Default behaviour: always render the simple fallback avatar and text.
+// Loading the full Neynar widget can cause a client-side re-render that
+// replaces the avatar (observed as a brief flash then disappearance in
+// preview environments). To avoid that, widget loading is opt-in via
+// the `useNeynarWidget` prop.
+export const ProfileCard: React.FC<ProfileCardProps> = ({ fid, profile, useNeynarWidget = false }) => {
   if (!fid && !profile) return null;
-
-  // If the NeynarProfileCard component is available, prefer it for a rich profile display
-  if (NeynarProfileCard && fid) {
-    return (
-      <div className="w-full">
-        <NeynarProfileCard fid={fid} />
-      </div>
-    );
-  }
 
   // Fallback simple profile display using provided `profile` data
   const avatar = profile?.pfpUrl || profile?.avatarImgUrl || profile?.raw?.pfp_url || profile?.raw?.pfpUrl || null;
@@ -51,5 +32,6 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ fid, profile }) => {
 export interface ProfileCardProps {
   fid?: number;
   profile?: any;
+  useNeynarWidget?: boolean;
 }
 
