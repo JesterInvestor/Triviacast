@@ -50,17 +50,17 @@ export default function Home() {
             rel="noopener noreferrer"
             aria-label="Farchess - Play Chess earn $CHESS"
             title="Farchess - Play Chess earn $CHESS"
-            className="relative inline-flex items-center rounded-2xl p-[2px] bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 hover:scale-[1.02] transform transition-all duration-200"
+            className="relative inline-flex items-center rounded-2xl p-[2px] bg-gradient-to-r from-sky-300 via-blue-500 to-blue-800 hover:scale-[1.02] transform transition-all duration-200"
           >
-            <span className="block rounded-xl bg-gradient-to-br from-[#0b0710] to-[#241226] px-6 py-4 text-center shadow-inner w-full">
+            <span className="block rounded-xl bg-gradient-to-br from-[#071427] to-[#0b2540] px-6 py-4 text-center shadow-inner w-full">
               <div className="flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-6 h-6 text-yellow-300 flex-shrink-0" aria-hidden>
-                  <path fill="#FFC857" d="M12 2c-1.1 0-2 .9-2 2v1H8c-1.1 0-2 .9-2 2v1h12V7c0-1.1-.9-2-2-2h-2V4c0-1.1-.9-2-2-2z"/>
-                  <path fill="#F6AE2D" d="M6 12v6h12v-6H6z"/>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-6 h-6 text-sky-300 flex-shrink-0" aria-hidden>
+                  <path fill="#7AD0FF" d="M12 2c-1.1 0-2 .9-2 2v1H8c-1.1 0-2 .9-2 2v1h12V7c0-1.1-.9-2-2-2h-2V4c0-1.1-.9-2-2-2z"/>
+                  <path fill="#3BB0FF" d="M6 12v6h12v-6H6z"/>
                 </svg>
                 <div className="flex flex-col text-left">
-                  <span className="text-yellow-300 font-extrabold text-sm sm:text-base leading-tight">Farchess - Play Chess</span>
-                  <span className="text-yellow-200 text-xs sm:text-sm">earn $CHESS</span>
+                  <span className="text-sky-300 font-extrabold text-sm sm:text-base leading-tight">Farchess - Play Chess</span>
+                  <span className="text-sky-200 text-xs sm:text-sm">earn $CHESS</span>
                 </div>
               </div>
             </span>
