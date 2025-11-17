@@ -43,6 +43,38 @@ export default function FarcasterMiniAppReady() {
               }
             }
           }
+
+          // If we didn't find an expected global, scan window keys for anything that looks like the SDK.
+          try {
+            const found: string[] = [];
+            const props = Object.keys(w);
+            for (let i = 0; i < props.length; i++) {
+              const k = props[i];
+              try {
+                const val = (w as any)[k];
+                if (val && typeof val === 'object' && val.actions && typeof val.actions.ready === 'function') {
+                  found.push(k as string);
+                  // Attempt to call it once we find it
+                  try {
+                    console.debug(`[FarcasterMiniAppReady] calling discovered global ${k}.actions.ready()`);
+                    void val.actions.ready({ disableNativeGestures: false });
+                    return true;
+                  } catch (e) {
+                    console.debug(`[FarcasterMiniAppReady] discovered ${k}.actions.ready threw`, e);
+                  }
+                }
+              } catch (e) {
+                // ignore inaccessible props
+              }
+              if (found.length >= 3) break; // don't scan entire huge window object
+            }
+            if (found.length > 0) {
+              console.debug('[FarcasterMiniAppReady] discovered SDK-like globals:', found.slice(0, 3));
+            }
+          } catch (e) {
+            // ignore scanning errors
+            console.debug('[FarcasterMiniAppReady] window scan failed', e);
+          }
         } catch (err) {
           console.debug('[FarcasterMiniAppReady] global detection failed', err);
         }
@@ -60,6 +92,16 @@ export default function FarcasterMiniAppReady() {
 
         // 3) wait and retry
         await new Promise((res) => setTimeout(res, delayMs));
+      }
+
+      // If we reached here without success, attempt a generic postMessage to parent window (in case host listens for this)
+      try {
+        if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+          console.debug('[FarcasterMiniAppReady] posting ready message to parent window as fallback');
+          window.parent.postMessage({ type: 'miniapp:ready', source: 'triviacast' }, '*');
+        }
+      } catch (e) {
+        console.debug('[FarcasterMiniAppReady] postMessage fallback failed', e);
       }
     })();
 
