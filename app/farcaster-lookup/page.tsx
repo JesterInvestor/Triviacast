@@ -270,7 +270,7 @@ export default function FarcasterLookupPage() {
           {error && <div className="text-red-600 mt-2">{error}</div>}
           {result && result.profile && (
             <div className="mt-4 bg-white p-4 rounded-xl shadow-md w-full max-w-md flex flex-col items-center">
-              <ProfileCard fid={result.profile.fid} />
+              <ProfileCard fid={result.profile.fid} profile={result.profile} />
               {/* Play Quiz button shown inline after a successful lookup */}
               <div className="w-full mt-3">
                 <button
@@ -292,7 +292,10 @@ export default function FarcasterLookupPage() {
                       <div key={p.fid || p.username} className="flex-shrink-0 w-40 bg-white rounded-lg border p-3 shadow-sm">
                         <div className="flex items-center gap-3 mb-2">
                           <img
-                            src={p.pfpUrl || `https://cdn.stamp.fyi/avatar/${String(p.raw?.custody_address || "")}?s=64`}
+                            src={
+                              p.pfpUrl || p.avatarImgUrl || p.raw?.pfp_url || p.raw?.pfpUrl || 
+                              (p.raw?.custody_address ? `https://cdn.stamp.fyi/avatar/${String(p.raw.custody_address)}?s=64` : '/neynar.svg')
+                            }
                             alt={p.username || p.displayName || "user"}
                             className="w-10 h-10 rounded-full"
                           />
