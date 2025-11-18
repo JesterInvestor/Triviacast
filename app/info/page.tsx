@@ -144,6 +144,7 @@ export default function InfoPage() {
               >
                 <option value="">Select a category</option>
                 <option>General Knowledge</option>
+                <option>Farcaster Knowledge</option>
                 <option>Entertainment: Books</option>
                 <option>Entertainment: Film</option>
                 <option>Entertainment: Music</option>
