@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import StakingWidget from "../../components/StakingWidget";
 
 function pad(n: number) {
   return n.toString().padStart(2, "0");
@@ -79,6 +80,8 @@ export default function JackpotPage() {
             ? "Jackpot is live"
             : `Time remaining: ${days} days, ${pad(hoursTotal)} hours, ${pad(minutes)} minutes, ${pad(seconds)} seconds`}
         </div>
+        {/* Staking widget inserted below the countdown card */}
+        <StakingWidget />
       </div>
     </main>
   );
