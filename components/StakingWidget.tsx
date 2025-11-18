@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useAccount, useSigner } from "wagmi";
+import { useAccount } from "wagmi";
 import { ethers } from "ethers";
 import { TRIV_ABI, STAKING_ABI } from "../lib/stakingClient";
 
@@ -10,7 +10,6 @@ const TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || "";
 
 export default function StakingWidget() {
   const { address, isConnected } = useAccount();
-  const { data: signer } = useSigner();
 
   const [tokenBalance, setTokenBalance] = useState("0");
   const [stakedBalance, setStakedBalance] = useState("0");
@@ -23,7 +22,8 @@ export default function StakingWidget() {
     async function refresh() {
       if (!address) return;
       try {
-        const provider = signer ? signer.provider : (window as any).ethereum ? new ethers.BrowserProvider((window as any).ethereum) : null;
+        const hasWindow = typeof window !== "undefined" && (window as any).ethereum;
+        const provider = hasWindow ? new ethers.BrowserProvider((window as any).ethereum) : null;
         if (!provider) return;
 
         const triv = new ethers.Contract(TRIV_ADDRESS, TRIV_ABI, provider);
@@ -56,8 +56,11 @@ export default function StakingWidget() {
     if (!signer || !address) return;
     setLoading(true);
     try {
-      const triv = new ethers.Contract(TRIV_ADDRESS, TRIV_ABI, signer as any);
-      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signer as any);
+      if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
+      const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
+      const signerObj = await browserProvider.getSigner();
+      const triv = new ethers.Contract(TRIV_ADDRESS, TRIV_ABI, signerObj as any);
+      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
       const parsed = ethers.parseUnits(amount || "0", 18);
       // Approve
       const allowance = await triv.allowance(address, STAKING_ADDRESS);
@@ -78,7 +81,10 @@ export default function StakingWidget() {
     if (!signer) return;
     setLoading(true);
     try {
-      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signer as any);
+      if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
+      const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
+      const signerObj = await browserProvider.getSigner();
+      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
       const parsed = ethers.parseUnits(amount || "0", 18);
       const tx = await staking.withdraw(parsed);
       await tx.wait();
@@ -93,7 +99,10 @@ export default function StakingWidget() {
     if (!signer) return;
     setLoading(true);
     try {
-      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signer as any);
+      if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
+      const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
+      const signerObj = await browserProvider.getSigner();
+      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
       const tx = await staking.claimReward();
       await tx.wait();
     } catch (e) {
