@@ -17,71 +17,82 @@ export default function InfoPage() {
 
   const [form, setForm] = useState(DEFAULT_FORM);
 
-  // exportToFile removed — exporting as JSON via the UI was removed per request
-
   const FARCASTER_MINIAPP = "https://farcaster.xyz/miniapps/UmWywlPILouA/triviacast";
-
   const WARPCAST_COMPOSE = "https://warpcast.com/compose";
-  const WARPCAST_HOME = "https://warpcast.com";
+  const TRIVIACAST_INFO = "https://triviacast.xyz/info";
+  const OPEN_TDB_URL = "https://opentdb.com/trivia_add_question.php";
 
   const canCast = form.question.trim() !== "" && form.correct_answer.trim() !== "";
-  const [copied, setCopied] = useState(false);
 
-  const castToFarcaster = async () => {
-    if (!canCast) {
-      // simple guard
-      // eslint-disable-next-line no-alert
-      alert("Please fill at least the question and correct answer before casting.");
-      return;
-    }
+  const capitalize = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
+  const buildCastMessage = () => {
     const incorrect = (form.incorrect_answers || [])
       .map((s) => (s || "").trim())
       .filter(Boolean);
 
-    // Build a clean compose message without the miniapp link to avoid compose/profile preview issues
-    const TRIVIACAST_INFO = "https://triviacast.xyz/info";
-    let message = `Triviacast question: ${form.question}`;
-    if (form.category && form.category.trim()) {
-      message += `\nCategory: ${form.category.trim()}`;
-    }
-    // Difficulty always present (defaults to easy)
-    message += `\nDifficulty: ${form.difficulty}`;
-    message += `\nCorrect: ${form.correct_answer}`;
-    if (incorrect.length) {
-      message += `\nIncorrect: ${incorrect.join(", ")}`;
-    }
-    if (form.reference && form.reference.trim()) {
-      message += `\nReference: ${form.reference.trim()}`;
-    }
-    message += `\n@jesterinvestor\nUsers can add their own questions at: ${TRIVIACAST_INFO}`;
+    const parts: string[] = [];
 
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(message);
-        setCopied(true);
-        // also call alert as a fallback for environments that still support it
-        try {
-          // eslint-disable-next-line no-alert
-          alert("Copied to clipboard");
-        } catch (e) {
-          // ignore
-        }
-        // hide the inline badge after 3s
-        setTimeout(() => setCopied(false), 3000);
-      } else {
-        // eslint-disable-next-line no-alert
-        alert("Clipboard not available — please select and copy the message manually.");
-      }
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("Clipboard write failed", err);
-      // eslint-disable-next-line no-alert
-      alert("Failed to copy message to clipboard.");
+    parts.push("🎙️ Triviacast question");
+    parts.push(""); // blank line for readability
+    parts.push(`Q: ${form.question.trim()}`);
+
+    if (form.category && form.category.trim()) {
+      parts.push(`Category: ${form.category.trim()}`);
     }
+
+    parts.push(`Difficulty: ${capitalize(form.difficulty)}`);
+    parts.push(`✅ Answer: ${form.correct_answer.trim()}`);
+
+    if (incorrect.length) {
+      // join incorrect answers with bullet separators to make them easy to scan
+      parts.push(`❌ Other options: ${incorrect.join(" • ")}`);
+    }
+
+    if (form.reference && form.reference.trim()) {
+      parts.push(`🔎 Reference: ${form.reference.trim()}`);
+    }
+
+    parts.push(""); // blank line
+    parts.push(`Play or add questions: ${TRIVIACAST_INFO}`);
+    parts.push(`Miniapp: ${FARCASTER_MINIAPP}`);
+    parts.push(""); // blank line
+    parts.push("— @jesterinvestor");
+
+    return parts.join("\n");
   };
 
-  const OPEN_TDB_URL = "https://opentdb.com/trivia_add_question.php";
+  const composeToWarpcast = async () => {
+    if (!canCast) {
+      // simple guard
+      // eslint-disable-next-line no-alert
+      alert("Please fill at least the question and correct answer before composing a cast.");
+      return;
+    }
+
+    const message = buildCastMessage();
+
+    try {
+      // Prefer Warpcast SDK if injected/available at window.warpcast.compose
+      const anyWindow = window as any;
+      if (anyWindow.warpcast && typeof anyWindow.warpcast.compose === "function") {
+        // If the SDK is present and provides a compose helper, use it.
+        await anyWindow.warpcast.compose({ text: message });
+        // eslint-disable-next-line no-alert
+        alert("Compose opened via Warpcast SDK.");
+        return;
+      }
+
+      // Fallback: open the Warpcast compose URL with prefilled text
+      const url = `${WARPCAST_COMPOSE}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Compose failed", err);
+      // eslint-disable-next-line no-alert
+      alert("Failed to open compose. You can always copy the text manually from the form.");
+    }
+  };
 
   const openOpenTDB = async () => {
     // Open OpenTDB add question page in a new tab. The OpenTDB form must be filled manually.
@@ -112,7 +123,7 @@ export default function InfoPage() {
         </div>
 
         <div className="mb-4 text-lg text-gray-800 text-center">
-          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and on-chain rewards. Connect your wallet and show your Farcaster profile to participate.
+          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and on-chain rewards. Connect your wallet and show your Farc[...]
         </div>
 
         <div className="mb-4 text-lg text-fuchsia-800 font-semibold text-center">
@@ -246,7 +257,7 @@ export default function InfoPage() {
             <p className="mt-2">You have a few options to share or submit the question you create:</p>
             <ul className="list-disc pl-5 mt-2">
               <li>
-                <strong>Copy message</strong>: Click <em>Copy message</em> to copy a ready-to-post message that mentions <code>@jesterinvestor</code>. Paste it into Warpcast (Compose).
+                <strong>Compose on Warpcast</strong>: Click <em>Compose on Warpcast</em> to open the Warpcast compose flow (uses SDK if available, otherwise opens a prefilled compose page).
               </li>
               <li className="mt-1">
                 <strong>Add directly to OpenTDB</strong>: Click <em>Add directly to OpenTDB</em> to open the OpenTDB submission page. Fill the OpenTDB form manually — no autofill is provided.
@@ -259,19 +270,13 @@ export default function InfoPage() {
           <div className="mt-4 flex items-center gap-3">
             <button
               type="button"
-              onClick={() => castToFarcaster()}
+              onClick={() => composeToWarpcast()}
               disabled={!canCast}
               className={`px-4 py-2 rounded text-white ${canCast ? "bg-fuchsia-600 hover:bg-fuchsia-700" : "bg-gray-300 cursor-not-allowed"}`}
-              title={canCast ? "Copy prepared cast message to clipboard" : "Fill question and correct answer to enable copying"}
+              title={canCast ? "Open Warpcast compose (uses SDK if present)" : "Fill question and correct answer to enable composing"}
             >
-              Copy message
+              Cast Question
             </button>
-
-            {copied && (
-              <div className="ml-2 inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm">
-                Copied to clipboard
-              </div>
-            )}
 
             <button
               type="button"
@@ -328,7 +333,7 @@ export default function InfoPage() {
 
         <div className="mb-6 p-4 bg-blue-50 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-blue-700">Quests and Jackpot</h2>
-          <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward players and unlock bonuses.</p>
+          <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward[...]
           <ul className="list-disc pl-6 text-gray-700 mt-2">
             <li>Daily Quest — complete a short set of questions every day to earn bonus T Points</li>
             <li>Weekly Quest — finish a longer challenge for rare rewards and leaderboard boosts</li>
@@ -389,7 +394,7 @@ export default function InfoPage() {
               rel="noopener noreferrer"
               aria-label="Follow Triviacast on Farcaster"
               title="Follow Triviacast on Farcaster"
-              className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-fuchsia-600 via-pink-500 to-amber-400 text-white font-semibold rounded-full shadow-2xl hover:scale-[1.03] hover:-translate-y-0.5 transform transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-fuchsia-300"
+              className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-fuchsia-600 via-pink-500 to-amber-400 text-white font-semibold rounded-full shadow-2xl hover:scale-[1.03] hover:[...]"
             >
               {/* simple rocket / follow icon */}
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
