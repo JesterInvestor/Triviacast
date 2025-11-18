@@ -25,9 +25,9 @@ export default function ClientLayout({
             // Enable MiniKit features used by the demo (useAuthenticate, useMiniKit)
             // If your OnchainKit version expects a different config key for MiniKit,
             // consult OnchainKit docs. This provider ensures `useAuthenticate` works.
-            config={{
-              minikit: { enabled: true },
-            }}
+            // Cast to `any` because the installed OnchainKit types may differ from
+            // this project's expectations.
+            config={{ minikit: { enabled: true } } as any}
           >
             <Neynar.NeynarContextProvider
               settings={{
