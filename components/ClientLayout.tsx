@@ -6,6 +6,8 @@ import { WagmiConfig } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { wagmiConfig } from '@/lib/wagmi';
+import { OnchainKitProvider } from '@coinbase/onchainkit';
+import { base } from 'wagmi/chains';
 import BottomNav from '@/components/BottomNav';
 import AutoConnector from '@/components/AutoConnector';
 import { SoundProvider } from '@/components/SoundContext';
@@ -17,22 +19,33 @@ export default function ClientLayout({
   return (
     <WagmiConfig config={wagmiConfig}>
         <QueryClientProvider client={queryClient}>
-          <Neynar.NeynarContextProvider
-            settings={{
-              clientId: process.env.NEXT_PUBLIC_NEYNAR_CLIENT_ID || "",
-              defaultTheme: Neynar.Theme.Light,
-              eventsCallbacks: {
-                onAuthSuccess: () => {},
-                onSignout() {},
-              },
+          <OnchainKitProvider
+            apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
+            chain={base}
+            // Enable MiniKit features used by the demo (useAuthenticate, useMiniKit)
+            // If your OnchainKit version expects a different config key for MiniKit,
+            // consult OnchainKit docs. This provider ensures `useAuthenticate` works.
+            config={{
+              minikit: { enabled: true },
             }}
           >
-            <SoundProvider>
-              <AutoConnector />
-              {children}
-              <BottomNav />
-            </SoundProvider>
-          </Neynar.NeynarContextProvider>
+            <Neynar.NeynarContextProvider
+              settings={{
+                clientId: process.env.NEXT_PUBLIC_NEYNAR_CLIENT_ID || "",
+                defaultTheme: Neynar.Theme.Light,
+                eventsCallbacks: {
+                  onAuthSuccess: () => {},
+                  onSignout() {},
+                },
+              }}
+            >
+              <SoundProvider>
+                <AutoConnector />
+                {children}
+                <BottomNav />
+              </SoundProvider>
+            </Neynar.NeynarContextProvider>
+          </OnchainKitProvider>
         </QueryClientProvider>
     </WagmiConfig>
   );
