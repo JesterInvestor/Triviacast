@@ -275,7 +275,7 @@ export default function InfoPage() {
               className={`px-4 py-2 rounded text-white ${canCast ? "bg-fuchsia-600 hover:bg-fuchsia-700" : "bg-gray-300 cursor-not-allowed"}`}
               title={canCast ? "Open Warpcast compose (uses SDK if present)" : "Fill question and correct answer to enable composing"}
             >
-              Cast Question
+              Compose on Warpcast
             </button>
 
             <button
@@ -394,7 +394,7 @@ export default function InfoPage() {
               rel="noopener noreferrer"
               aria-label="Follow Triviacast on Farcaster"
               title="Follow Triviacast on Farcaster"
-              className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-fuchsia-600 via-pink-500 to-amber-400 text-white font-semibold rounded-full shadow-2xl hover:scale-[1.03] hover:[...]"
+              className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-fuchsia-600 via-pink-500 to-amber-400 text-white font-semibold rounded-full shadow-2xl hover:scale-[1.03]"
             >
               {/* simple rocket / follow icon */}
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
