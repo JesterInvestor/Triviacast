@@ -45,7 +45,6 @@ export default function InfoPage() {
     parts.push(`✅ Answer: ${form.correct_answer.trim()}`);
 
     if (incorrect.length) {
-      // join incorrect answers with bullet separators to make them easy to scan
       parts.push(`❌ Other options: ${incorrect.join(" • ")}`);
     }
 
@@ -53,10 +52,10 @@ export default function InfoPage() {
       parts.push(`🔎 Reference: ${form.reference.trim()}`);
     }
 
-    parts.push(""); // blank line
+    parts.push("");
     parts.push(`Play or add questions: ${TRIVIACAST_INFO}`);
     parts.push(`Miniapp: ${FARCASTER_MINIAPP}`);
-    parts.push(""); // blank line
+    parts.push("");
     parts.push("— @jesterinvestor");
 
     return parts.join("\n");
@@ -76,7 +75,6 @@ export default function InfoPage() {
       // Prefer Warpcast SDK if injected/available at window.warpcast.compose
       const anyWindow = window as any;
       if (anyWindow.warpcast && typeof anyWindow.warpcast.compose === "function") {
-        // If the SDK is present and provides a compose helper, use it.
         await anyWindow.warpcast.compose({ text: message });
         // eslint-disable-next-line no-alert
         alert("Compose opened via Warpcast SDK.");
@@ -95,7 +93,6 @@ export default function InfoPage() {
   };
 
   const openOpenTDB = async () => {
-    // Open OpenTDB add question page in a new tab. The OpenTDB form must be filled manually.
     window.open(OPEN_TDB_URL, "_blank", "noopener,noreferrer");
   };
 
@@ -138,7 +135,6 @@ export default function InfoPage() {
               <p className="text-sm text-gray-500 mb-1 italic">Thanks to OpenTDB for the open question format.</p>
             </div>
             <div className="ml-4 flex-shrink-0">
-              {/* Subtle OpenTDB logo — drop the file into public as /opentdb-logo.png to show */}
               <img src="/opentdb-logo.png" alt="Open Trivia Database" className="w-20 opacity-60" />
             </div>
           </div>
@@ -333,7 +329,7 @@ export default function InfoPage() {
 
         <div className="mb-6 p-4 bg-blue-50 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-blue-700">Quests and Jackpot</h2>
-          <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward[...]
+          <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward players.</p>
           <ul className="list-disc pl-6 text-gray-700 mt-2">
             <li>Daily Quest — complete a short set of questions every day to earn bonus T Points</li>
             <li>Weekly Quest — finish a longer challenge for rare rewards and leaderboard boosts</li>
@@ -394,7 +390,7 @@ export default function InfoPage() {
               rel="noopener noreferrer"
               aria-label="Follow Triviacast on Farcaster"
               title="Follow Triviacast on Farcaster"
-              className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-fuchsia-600 via-pink-500 to-amber-400 text-white font-semibold rounded-full shadow-2xl hover:scale-[1.03]"
+              className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-fuchsia-600 via-pink-500 to-amber-400 text-white font-semibold rounded-full shadow-2xl hover:scale-[1.03] transition-transform"
             >
               {/* simple rocket / follow icon */}
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
