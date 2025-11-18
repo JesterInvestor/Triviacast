@@ -6124,7 +6124,7 @@
     ],
     "explanation": "With a burned token, no transfer occurs; systems record the failed intent without state change.",
     "tags": ["tokens","tips","edge-cases","impossible"]
-  }
+  },
   {
   "id": "fc_409",
   "category": "Farcaster Mini Apps & Features",
