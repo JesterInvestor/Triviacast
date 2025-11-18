@@ -50,10 +50,10 @@ export default function StakingWidget() {
       mounted = false;
       clearInterval(id);
     };
-  }, [address, signer]);
+  }, [address]);
 
   const doApproveAndStake = async () => {
-    if (!signer || !address) return;
+    if (!address) return;
     setLoading(true);
     try {
       if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
@@ -78,7 +78,7 @@ export default function StakingWidget() {
   };
 
   const doWithdraw = async () => {
-    if (!signer) return;
+    if (!address) return;
     setLoading(true);
     try {
       if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
@@ -96,7 +96,7 @@ export default function StakingWidget() {
   };
 
   const doClaim = async () => {
-    if (!signer) return;
+    if (!address) return;
     setLoading(true);
     try {
       if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
