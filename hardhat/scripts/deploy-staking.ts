@@ -1,10 +1,18 @@
 import { ethers } from "hardhat";
 import * as dotenv from "dotenv";
+import path from "path";
 
-dotenv.config();
+// Load the hardhat folder .env (where PRIVATE_KEY is normally stored)
+dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
+  const signers = await ethers.getSigners();
+  if (!signers || signers.length === 0) {
+    throw new Error(
+      "No signers available. Ensure PRIVATE_KEY is set in hardhat/.env and the Hardhat config loads it."
+    );
+  }
+  const deployer = signers[0];
   console.log("Deploying with", deployer.address);
 
   // If TRIV_TOKEN_ADDRESS is set in environment, reuse that token. Otherwise deploy a new TRIV.
@@ -18,8 +26,8 @@ async function main() {
     console.log("No TRIV_TOKEN_ADDRESS found in env — deploying a new TRIV token.");
     const TRIV = await ethers.getContractFactory("TRIVToken");
     const triv = await TRIV.deploy();
-    await triv.deployed();
-    trivAddress = triv.target || triv.address;
+    await triv.waitForDeployment();
+    trivAddress = await triv.getAddress();
     console.log("TRIV deployed to:", trivAddress);
 
     // Mint some tokens to deployer for testing
@@ -31,8 +39,8 @@ async function main() {
 
   const Staking = await ethers.getContractFactory("SimpleStaking");
   const staking = await Staking.deploy(trivAddress, trivAddress);
-  await staking.deployed();
-  const stakingAddress = staking.target || staking.address;
+  await staking.waitForDeployment();
+  const stakingAddress = await staking.getAddress();
   console.log("Staking deployed to:", stakingAddress);
 
   // If we deployed a new TRIV above (i.e., env var not set), fund rewards automatically.
