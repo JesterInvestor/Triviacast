@@ -7,23 +7,31 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /**
- * @notice Simple staking with configurable rewardRate (tokens per second).
- * - Users stake `stakeToken` and earn `rewardToken` at `rewardRate` (tokens/sec) distributed pro-rata by stake.
- * - Owner can set rewardRate via setRewardRate. Calls updatePool() first to preserve accrual.
+ * @notice Staking contract with configurable rewards expressed as "per-day" TRIV.
+ * - Users stake 'stakeToken' and earn 'rewardToken' (TRIV) at a rate derived from dailyReward.
+ * - Owner sets dailyReward (tokens-per-day, in token smallest unit). rewardRate = dailyReward / 86400 (tokens/sec).
+ * - Owner must fund the contract with TRIV tokens for payouts.
+ *
+ * Rounding note: rewardRate is integer division newDaily / 86400. If newDaily < 86400 (in wei),
+ * rewardRate will be zero. To avoid that, specify dailyReward in token smallest units (e.g., 18-decimals).
  */
 contract StakingWithRewards is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     IERC20 public immutable stakeToken;
-    IERC20 public immutable rewardToken;
+    IERC20 public immutable rewardToken; // TRIV
 
-    // reward rate in tokens per second
-    uint256 public rewardRate;
+    // Reward configuration
+    uint256 public dailyReward; // tokens per day (in smallest units)
+    uint256 public rewardRate;  // tokens per second (derived from dailyReward): dailyReward / 86400
 
     // accrual accounting
     uint256 public accRewardPerShare; // scaled by 1e12
     uint256 public lastRewardTime;
     uint256 public totalStaked;
+
+    uint256 private constant SECONDS_PER_DAY = 86400;
+    uint256 private constant ACC_PRECISION = 1e12;
 
     struct UserInfo {
         uint256 amount;      // staked amount
@@ -35,13 +43,15 @@ contract StakingWithRewards is Ownable, ReentrancyGuard {
     event Staked(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
     event RewardPaid(address indexed user, uint256 amount);
+    event DailyRewardUpdated(uint256 oldDaily, uint256 newDaily);
     event RewardRateUpdated(uint256 oldRate, uint256 newRate);
 
-    constructor(address _stakeToken, address _rewardToken, uint256 _rewardRate) {
+    constructor(address _stakeToken, address _rewardToken, uint256 _dailyReward) {
         require(_stakeToken != address(0) && _rewardToken != address(0), "zero addr");
         stakeToken = IERC20(_stakeToken);
         rewardToken = IERC20(_rewardToken);
-        rewardRate = _rewardRate;
+        dailyReward = _dailyReward;
+        rewardRate = _dailyReward / SECONDS_PER_DAY;
         lastRewardTime = block.timestamp;
     }
 
@@ -49,10 +59,10 @@ contract StakingWithRewards is Ownable, ReentrancyGuard {
     modifier updatePool() {
         if (block.timestamp > lastRewardTime) {
             uint256 elapsed = block.timestamp - lastRewardTime;
-            if (totalStaked > 0) {
+            if (totalStaked > 0 && rewardRate > 0) {
                 uint256 reward = elapsed * rewardRate;
-                // accRewardPerShare uses 1e12 precision
-                accRewardPerShare += (reward * 1e12) / totalStaked;
+                // accRewardPerShare uses ACC_PRECISION
+                accRewardPerShare += (reward * ACC_PRECISION) / totalStaked;
             }
             lastRewardTime = block.timestamp;
         }
@@ -63,12 +73,12 @@ contract StakingWithRewards is Ownable, ReentrancyGuard {
     function pendingReward(address user) external view returns (uint256) {
         UserInfo storage u = userInfo[user];
         uint256 _acc = accRewardPerShare;
-        if (block.timestamp > lastRewardTime && totalStaked > 0) {
+        if (block.timestamp > lastRewardTime && totalStaked > 0 && rewardRate > 0) {
             uint256 elapsed = block.timestamp - lastRewardTime;
             uint256 reward = elapsed * rewardRate;
-            _acc += (reward * 1e12) / totalStaked;
+            _acc += (reward * ACC_PRECISION) / totalStaked;
         }
-        return (u.amount * _acc) / 1e12 - u.rewardDebt;
+        return (u.amount * _acc) / ACC_PRECISION - u.rewardDebt;
     }
 
     // stake (approve first)
@@ -76,7 +86,7 @@ contract StakingWithRewards is Ownable, ReentrancyGuard {
         require(amount > 0, "zero");
         UserInfo storage u = userInfo[msg.sender];
         // pay pending
-        uint256 pending = (u.amount * accRewardPerShare) / 1e12 - u.rewardDebt;
+        uint256 pending = (u.amount * accRewardPerShare) / ACC_PRECISION - u.rewardDebt;
         if (pending > 0) {
             _safeRewardTransfer(msg.sender, pending);
             emit RewardPaid(msg.sender, pending);
@@ -84,7 +94,7 @@ contract StakingWithRewards is Ownable, ReentrancyGuard {
         stakeToken.safeTransferFrom(msg.sender, address(this), amount);
         u.amount += amount;
         totalStaked += amount;
-        u.rewardDebt = (u.amount * accRewardPerShare) / 1e12;
+        u.rewardDebt = (u.amount * accRewardPerShare) / ACC_PRECISION;
         emit Staked(msg.sender, amount);
     }
 
@@ -92,7 +102,7 @@ contract StakingWithRewards is Ownable, ReentrancyGuard {
     function withdraw(uint256 amount) external nonReentrant updatePool {
         UserInfo storage u = userInfo[msg.sender];
         require(amount <= u.amount, "insufficient");
-        uint256 pending = (u.amount * accRewardPerShare) / 1e12 - u.rewardDebt;
+        uint256 pending = (u.amount * accRewardPerShare) / ACC_PRECISION - u.rewardDebt;
         if (pending > 0) {
             _safeRewardTransfer(msg.sender, pending);
             emit RewardPaid(msg.sender, pending);
@@ -100,7 +110,7 @@ contract StakingWithRewards is Ownable, ReentrancyGuard {
         u.amount -= amount;
         totalStaked -= amount;
         stakeToken.safeTransfer(msg.sender, amount);
-        u.rewardDebt = (u.amount * accRewardPerShare) / 1e12;
+        u.rewardDebt = (u.amount * accRewardPerShare) / ACC_PRECISION;
         emit Withdrawn(msg.sender, amount);
     }
 
@@ -116,14 +126,30 @@ contract StakingWithRewards is Ownable, ReentrancyGuard {
         emit Withdrawn(msg.sender, amt);
     }
 
-    // owner sets reward rate (tokens per second). Updates pool before changing.
+    /**
+     * @notice Owner sets daily rewards in token smallest units (e.g., wei). Contract must be funded with enough TRIV.
+     * @dev updatePool modifier runs first to preserve accrual with the old rate.
+     */
+    function setDailyReward(uint256 newDaily) external onlyOwner updatePool {
+        uint256 oldDaily = dailyReward;
+        uint256 oldRate = rewardRate;
+        dailyReward = newDaily;
+        // integer division: rounding down. If this is too coarse, increase newDaily or adopt higher precision accounting.
+        rewardRate = newDaily / SECONDS_PER_DAY;
+        emit DailyRewardUpdated(oldDaily, newDaily);
+        emit RewardRateUpdated(oldRate, rewardRate);
+    }
+
+    // owner can still directly set tokens-per-second if desired
     function setRewardRate(uint256 newRate) external onlyOwner updatePool {
         uint256 old = rewardRate;
         rewardRate = newRate;
+        // keep dailyReward in sync for UX (approx)
+        dailyReward = newRate * SECONDS_PER_DAY;
         emit RewardRateUpdated(old, newRate);
     }
 
-    // requires owner to fund the contract with rewardToken to pay rewards
+    // requires owner to fund the contract with rewardToken (TRIV) to pay rewards
     function _safeRewardTransfer(address to, uint256 amount) internal {
         uint256 bal = rewardToken.balanceOf(address(this));
         if (amount > bal) {
