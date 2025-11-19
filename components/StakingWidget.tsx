@@ -14,10 +14,21 @@ export default function StakingWidget() {
   const [tokenBalance, setTokenBalance] = useState("0");
   const [stakedBalance, setStakedBalance] = useState("0");
   const [earned, setEarned] = useState("0");
+  const [totalStaked, setTotalStaked] = useState("0");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [txStatus, setTxStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
   const [txHash, setTxHash] = useState<string | null>(null);
+
+  const format6 = (val: string) => {
+    try {
+      const n = Number(val);
+      if (!isFinite(n)) return "0.000000";
+      return n.toFixed(6);
+    } catch (e) {
+      return "0.000000";
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -31,16 +42,18 @@ export default function StakingWidget() {
         const triv = new ethers.Contract(TRIV_ADDRESS, TRIV_ABI, provider);
         const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, provider);
 
-        const [tb, sb, er] = await Promise.all([
+        const [tb, sb, er, ts] = await Promise.all([
           triv.balanceOf(address),
           staking.balanceOf(address),
           staking.earned(address),
+          staking.totalSupply(),
         ]);
 
         if (!mounted) return;
         setTokenBalance(ethers.formatUnits(tb, 18));
         setStakedBalance(ethers.formatUnits(sb, 18));
         setEarned(ethers.formatUnits(er, 18));
+        setTotalStaked(ethers.formatUnits(ts, 18));
       } catch (e) {
         // ignore
       }
@@ -166,10 +179,11 @@ export default function StakingWidget() {
       <div className="p-6 rounded-xl bg-white/90 border border-[#F4A6B7] shadow-sm">
         <h2 className="text-lg font-semibold text-[#6b4460] mb-3">Stake TRIV for Jackpot rewards</h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-          <div className="p-3 bg-[#fff0f4] rounded">Your TRIV: <strong>{tokenBalance}</strong></div>
-          <div className="p-3 bg-[#fff0f4] rounded">Staked: <strong>{stakedBalance}</strong></div>
-          <div className="p-3 bg-[#fff0f4] rounded">Earned: <strong>{earned}</strong></div>
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
+          <div className="p-3 bg-[#fff0f4] rounded">Your TRIV: <strong>{format6(tokenBalance)}</strong></div>
+          <div className="p-3 bg-[#fff0f4] rounded">Staked: <strong>{format6(stakedBalance)}</strong></div>
+          <div className="p-3 bg-[#fff0f4] rounded">Earned: <strong>{format6(earned)}</strong></div>
+          <div className="p-3 bg-[#fff0f4] rounded">Total Staked: <strong>{format6(totalStaked)}</strong></div>
         </div>
 
         {!isConnected ? (
@@ -182,12 +196,11 @@ export default function StakingWidget() {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />
-            <div className="flex gap-2">
-              <button disabled={loading} onClick={doApproveAndStake} className="px-4 py-2 bg-[#FFC4D1] rounded font-semibold">Stake</button>
-              <button disabled={loading} onClick={doWithdraw} className="px-4 py-2 bg-white border rounded">Withdraw</button>
-              <button disabled={loading} onClick={doClaim} className="px-4 py-2 bg-white border rounded">Claim</button>
-              <button disabled={loading} onClick={doExit} className="px-4 py-2 bg-white border rounded">Exit</button>
-            </div>
+            <div className="flex flex-col sm:flex-row gap-2 w-full">
+                <button disabled={loading} onClick={doApproveAndStake} className="w-full sm:w-auto px-4 py-2 bg-[#FFC4D1] rounded font-semibold">Stake</button>
+                <button disabled={loading} onClick={doWithdraw} className="w-full sm:w-auto px-4 py-2 bg-white border rounded">Withdraw</button>
+                <button disabled={loading} onClick={doClaim} className="w-full sm:w-auto px-4 py-3 bg-white border rounded font-semibold">Claim</button>
+              </div>
           </div>
         )}
         {txStatus !== "idle" && (
