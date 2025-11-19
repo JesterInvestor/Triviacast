@@ -141,18 +141,6 @@ export default function InfoPage() {
     window.open(OPEN_TDB_URL, "_blank", "noopener,noreferrer");
   };
 
-  const copyMessageToClipboard = async () => {
-    const msg = buildCastMessage();
-    try {
-      await navigator.clipboard.writeText(msg);
-      // eslint-disable-next-line no-alert
-      alert("Message copied to clipboard.");
-    } catch (e) {
-      // eslint-disable-next-line no-alert
-      alert("Copy failed — select and copy the preview manually.");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
@@ -348,45 +336,6 @@ export default function InfoPage() {
               Reset
             </button>
           </div>
-        </div>
-
-        {/* Preview of the formatted cast */}
-        <div className="mb-6 p-4 bg-white rounded-xl shadow w-full max-w-2xl border">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold mb-2 text-purple-600">Preview (formatted for Warpcast / Farcaster)</h2>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => copyMessageToClipboard()}
-                className="px-3 py-1.5 rounded bg-fuchsia-600 text-white hover:bg-fuchsia-700"
-              >
-                Copy
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  // open a simple new tab with the formatted message for quick copy if the compose SDK isn't available
-                  const win = window.open("", "_blank");
-                  if (win) {
-                    win.document.body.style.whiteSpace = "pre-wrap";
-                    win.document.body.style.fontFamily = "monospace, ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace";
-                    win.document.title = "Triviacast Preview";
-                    win.document.body.innerText = buildCastMessage();
-                  } else {
-                    // eslint-disable-next-line no-alert
-                    alert("Unable to open preview in a new tab.");
-                  }
-                }}
-                className="px-3 py-1.5 rounded border bg-white"
-              >
-                Open in new tab
-              </button>
-            </div>
-          </div>
-
-          <pre className="mt-2 p-3 bg-gray-50 border rounded text-sm text-gray-800 whitespace-pre-wrap" style={{ whiteSpace: "pre-wrap" }}>
-            {buildCastMessage()}
-          </pre>
         </div>
 
         {/* Remaining informational sections (left mostly unchanged) */}
