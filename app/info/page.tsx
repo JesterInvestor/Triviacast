@@ -26,21 +26,39 @@ export default function InfoPage() {
 
   const capitalize = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
+  // Fisher-Yates shuffle
+  const shuffleInPlace = <T,>(arr: T[]) => {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    return arr;
+  };
+
   const buildCastMessage = () => {
-    // keep up to three incorrects, trim and filter out empty strings
+    // Collect up to three trimmed incorrect answers
     const incorrect = (form.incorrect_answers || [])
       .map((s) => (s || "").trim())
       .filter(Boolean)
       .slice(0, 3);
 
-    // Build answers array so that correct answer is always the last option (D)
-    const options = [...incorrect];
+    // Build an array of option objects, ensuring 3 incorrect slots exist
+    const optionObjs: { text: string; isCorrect: boolean }[] = incorrect.map((t) => ({
+      text: t,
+      isCorrect: false,
+    }));
 
-    // Ensure we have exactly 3 incorrect slots for consistent labeling A/B/C
-    while (options.length < 3) options.push("");
+    while (optionObjs.length < 3) {
+      optionObjs.push({ text: "", isCorrect: false });
+    }
 
-    // Push correct answer last (D)
-    options.push(form.correct_answer.trim());
+    // Push correct answer object
+    optionObjs.push({ text: form.correct_answer.trim(), isCorrect: true });
+
+    // Shuffle the options so correct answer appears at a random position
+    shuffleInPlace(optionObjs);
 
     const labels = ["A", "B", "C", "D"];
 
@@ -55,15 +73,13 @@ export default function InfoPage() {
     }
 
     parts.push(`Difficulty: ${capitalize(form.difficulty)}`);
-    parts.push(""); // blank line before answers
+    parts.push(""); // blank before answers
     parts.push("Answers:");
-    parts.push(
-      ...options.map((opt, idx) => {
-        const label = labels[idx] || `${idx + 1}`;
-        // If option is empty, show label with an empty string so formatting stays predictable
-        return `${label}) ${opt || ""}`;
-      })
-    );
+
+    optionObjs.forEach((opt, idx) => {
+      const label = labels[idx] || `${idx + 1}`;
+      parts.push(`${label}) ${opt.text || ""}`);
+    });
 
     if (form.reference && form.reference.trim()) {
       parts.push("");
@@ -73,8 +89,12 @@ export default function InfoPage() {
     parts.push("");
     parts.push(`Play or add questions: ${TRIVIACAST_INFO} Miniapp: ${FARCASTER_MINIAPP}`);
     parts.push("");
-    // final answer line: indicate D) is the correct one
-    parts.push(`✅ D) ${form.correct_answer.trim()}`);
+
+    // Find which label corresponds to the correct answer after shuffle
+    const correctIndex = optionObjs.findIndex((o) => o.isCorrect);
+    const correctLabel = labels[correctIndex] || `${correctIndex + 1}`;
+
+    parts.push(`✅ ${correctLabel}) ${form.correct_answer.trim()}`);
     parts.push("");
     parts.push("— @jesterinvestor");
 
