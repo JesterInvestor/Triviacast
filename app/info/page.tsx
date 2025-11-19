@@ -68,20 +68,45 @@ export default function InfoPage() {
       alert("Please fill at least the question and correct answer before composing a cast.");
       return;
     }
-
     const message = buildCastMessage();
 
     try {
-      // Prefer Warpcast SDK if injected/available at window.warpcast.compose
       const anyWindow = window as any;
-      if (anyWindow.warpcast && typeof anyWindow.warpcast.compose === "function") {
-        await anyWindow.warpcast.compose({ text: message });
-        // eslint-disable-next-line no-alert
-        alert("Compose opened via Warpcast SDK.");
+
+      // 1) If the Farcaster miniapp SDK is injected globally as `sdk`, use it
+      if (anyWindow.sdk && anyWindow.sdk.actions && typeof anyWindow.sdk.actions.composeCast === "function") {
+        const result = await anyWindow.sdk.actions.composeCast({ text: message, embeds: [TRIVIACAST_INFO] });
+        if (result?.cast) {
+          // eslint-disable-next-line no-alert
+          alert("Cast posted successfully.");
+        } else {
+          // eslint-disable-next-line no-alert
+          alert("Compose opened — no cast was posted.");
+        }
         return;
       }
 
-      // Fallback: open the Warpcast compose URL with prefilled text
+      // 2) Try dynamic import of the SDK (if available in node_modules)
+      try {
+        // dynamic import may fail in some runtimes; wrap in try/catch
+        // eslint-disable-next-line global-require, import/no-extraneous-dependencies
+        const mod = await import("@farcaster/miniapp-sdk");
+        if (mod?.sdk && mod.sdk.actions && typeof mod.sdk.actions.composeCast === "function") {
+          const result = await mod.sdk.actions.composeCast({ text: message, embeds: [TRIVIACAST_INFO] });
+          if (result?.cast) {
+            // eslint-disable-next-line no-alert
+            alert("Cast posted successfully.");
+          } else {
+            // eslint-disable-next-line no-alert
+            alert("Compose opened — no cast was posted.");
+          }
+          return;
+        }
+      } catch (e) {
+        // dynamic import not available or not installed — continue to fallback
+      }
+
+      // 3) Fallback: open the Warpcast compose URL with prefilled text
       const url = `${WARPCAST_COMPOSE}?text=${encodeURIComponent(message)}`;
       window.open(url, "_blank", "noopener,noreferrer");
     } catch (err) {
