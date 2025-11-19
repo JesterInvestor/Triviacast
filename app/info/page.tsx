@@ -177,7 +177,7 @@ export default function InfoPage() {
         </div>
 
         <div className="mb-4 text-lg text-gray-800 text-center">
-          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and on-chain rewards. Connect your wallet and show your Farc[...]
+          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and on-chain rewards. Connect your wallet and show your Farcaster profile.
         </div>
 
         <div className="mb-4 text-lg text-fuchsia-800 font-semibold text-center">
@@ -426,7 +426,7 @@ export default function InfoPage() {
 
         <div className="mb-6 p-4 bg-blue-50 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-blue-700">Quests and Jackpot</h2>
-          <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward[...]
+          <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward points and give bonuses.</p>
           <ul className="list-disc pl-6 text-gray-700 mt-2">
             <li>Daily Quest — complete a short set of questions every day to earn bonus T Points</li>
             <li>Weekly Quest — finish a longer challenge for rare rewards and leaderboard boosts</li>
@@ -502,7 +502,7 @@ export default function InfoPage() {
               href="https://warpcast.com/jesterinvestor"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 border rounded-full bg-white text-fuchsia-600 shadow hover:shadow-md transition"
+              className="inline-flex items-center gap-2 px-4 py-2 border rounded-full bg-white text-fuchsia-600 shadow hover:shadow-md transition-shadow"
               title="Visit @jesterinvestor on Warpcast"
             >
               View @jesterinvestor
