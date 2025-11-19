@@ -16,6 +16,8 @@ export default function StakingWidget() {
   const [earned, setEarned] = useState("0");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
+  const [txStatus, setTxStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
+  const [txHash, setTxHash] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -55,6 +57,8 @@ export default function StakingWidget() {
   const doApproveAndStake = async () => {
     if (!address) return;
     setLoading(true);
+    setTxStatus("pending");
+    setTxHash(null);
     try {
       if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
       const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
@@ -69,8 +73,11 @@ export default function StakingWidget() {
         await tx.wait();
       }
       const stakeTx = await staking.stake(parsed);
+      setTxHash(stakeTx.hash ?? null);
       await stakeTx.wait();
+      setTxStatus("success");
     } catch (e) {
+      setTxStatus("error");
       console.error(e);
     } finally {
       setLoading(false);
@@ -80,6 +87,8 @@ export default function StakingWidget() {
   const doWithdraw = async () => {
     if (!address) return;
     setLoading(true);
+    setTxStatus("pending");
+    setTxHash(null);
     try {
       if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
       const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
@@ -87,8 +96,11 @@ export default function StakingWidget() {
       const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
       const parsed = ethers.parseUnits(amount || "0", 18);
       const tx = await staking.withdraw(parsed);
+      setTxHash(tx.hash ?? null);
       await tx.wait();
+      setTxStatus("success");
     } catch (e) {
+      setTxStatus("error");
       console.error(e);
     } finally {
       setLoading(false);
@@ -98,14 +110,41 @@ export default function StakingWidget() {
   const doClaim = async () => {
     if (!address) return;
     setLoading(true);
+    setTxStatus("pending");
+    setTxHash(null);
     try {
       if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
       const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
       const signerObj = await browserProvider.getSigner();
       const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
       const tx = await staking.claimReward();
+      setTxHash(tx.hash ?? null);
       await tx.wait();
+      setTxStatus("success");
     } catch (e) {
+      setTxStatus("error");
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const doExit = async () => {
+    if (!address) return;
+    setLoading(true);
+    setTxStatus("pending");
+    setTxHash(null);
+    try {
+      if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
+      const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
+      const signerObj = await browserProvider.getSigner();
+      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
+      const tx = await staking.exit();
+      setTxHash(tx.hash ?? null);
+      await tx.wait();
+      setTxStatus("success");
+    } catch (e) {
+      setTxStatus("error");
       console.error(e);
     } finally {
       setLoading(false);
@@ -147,7 +186,20 @@ export default function StakingWidget() {
               <button disabled={loading} onClick={doApproveAndStake} className="px-4 py-2 bg-[#FFC4D1] rounded font-semibold">Stake</button>
               <button disabled={loading} onClick={doWithdraw} className="px-4 py-2 bg-white border rounded">Withdraw</button>
               <button disabled={loading} onClick={doClaim} className="px-4 py-2 bg-white border rounded">Claim</button>
+              <button disabled={loading} onClick={doExit} className="px-4 py-2 bg-white border rounded">Exit</button>
             </div>
+          </div>
+        )}
+        {txStatus !== "idle" && (
+          <div className="mt-3 text-sm">
+            <strong>Status:</strong> {txStatus}
+            {txHash && (
+              <div>
+                <a className="text-blue-600" target="_blank" rel="noreferrer" href={`https://basescan.org/tx/${txHash}`}>
+                  View tx
+                </a>
+              </div>
+            )}
           </div>
         )}
       </div>

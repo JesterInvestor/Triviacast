@@ -50,3 +50,4 @@ typechain-types/
 
 # local env files tracked by mistake
 env.local
+.env 

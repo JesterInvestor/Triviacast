@@ -4,10 +4,12 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /// @title SimpleStaking
 /// @notice Simple staking contract: stake TRIV to earn TRIV rewards. Owner can fund rewards for a duration.
-contract SimpleStaking is Ownable {
+contract SimpleStaking is Ownable, ReentrancyGuard, Pausable {
     using SafeERC20 for IERC20;
 
     IERC20 public immutable stakingToken;
@@ -59,7 +61,7 @@ contract SimpleStaking is Ownable {
         return (_balances[account] * (rewardPerToken() - userRewardPerTokenPaid[account])) / 1e18 + rewards[account];
     }
 
-    function stake(uint256 amount) external updateReward(msg.sender) {
+    function stake(uint256 amount) external whenNotPaused nonReentrant updateReward(msg.sender) {
         require(amount > 0, "Cannot stake 0");
         _totalSupply += amount;
         _balances[msg.sender] += amount;
@@ -67,7 +69,7 @@ contract SimpleStaking is Ownable {
         emit Staked(msg.sender, amount);
     }
 
-    function withdraw(uint256 amount) public updateReward(msg.sender) {
+    function withdraw(uint256 amount) public nonReentrant updateReward(msg.sender) {
         require(amount > 0, "Cannot withdraw 0");
         _totalSupply -= amount;
         _balances[msg.sender] -= amount;
@@ -75,7 +77,7 @@ contract SimpleStaking is Ownable {
         emit Withdrawn(msg.sender, amount);
     }
 
-    function claimReward() public updateReward(msg.sender) {
+    function claimReward() public nonReentrant updateReward(msg.sender) {
         uint256 reward = rewards[msg.sender];
         if (reward > 0) {
             rewards[msg.sender] = 0;
@@ -93,6 +95,7 @@ contract SimpleStaking is Ownable {
     /// @param reward Total reward amount being added
     /// @param duration Duration in seconds over which the reward is paid
     function notifyRewardAmount(uint256 reward, uint256 duration) external onlyOwner updateReward(address(0)) {
+        require(duration > 0, "Duration must be > 0");
         if (block.timestamp >= periodFinish) {
             rewardRate = reward / duration;
         } else {
@@ -106,6 +109,22 @@ contract SimpleStaking is Ownable {
         // transfer rewards into contract
         rewardToken.safeTransferFrom(msg.sender, address(this), reward);
         emit RewardAdded(reward, duration);
+    }
+
+    /// @notice Pause staking (owner only)
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /// @notice Unpause staking (owner only)
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
+    /// @notice Recover ERC20 tokens accidentally sent to this contract. Cannot recover staking or reward tokens.
+    function recoverERC20(address token, address to, uint256 amount) external onlyOwner {
+        require(token != address(stakingToken) && token != address(rewardToken), "Cannot recover staking or reward token");
+        IERC20(token).safeTransfer(to, amount);
     }
 
     function totalSupply() external view returns (uint256) {
