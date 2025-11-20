@@ -180,7 +180,18 @@ export default function StakingWidget() {
     }
   };
 
-  if (!STAKING_ADDRESS || !TRIV_ADDRESS) {
+  const resolvedStakingAddr = runtimeStakingAddress || BUILD_STAKING_ADDRESS;
+  const resolvedTrivAddr = runtimeTrivAddress || BUILD_TRIV_ADDRESS;
+
+  if (resolvingConfig) {
+    return (
+      <div className="mt-6 w-full max-w-2xl text-left">
+        <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200 text-gray-700">Resolving staking configuration…</div>
+      </div>
+    );
+  }
+
+  if (!resolvedStakingAddr || !resolvedTrivAddr) {
     return (
       <div className="mt-6 w-full max-w-2xl text-left">
         <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-800">
