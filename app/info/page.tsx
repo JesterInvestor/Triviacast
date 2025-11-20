@@ -27,11 +27,9 @@ export default function InfoPage() {
   const capitalize = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
   const buildCastMessage = () => {
-    // keep up to three incorrects, trim and filter out empty strings
     const incorrect = (form.incorrect_answers || [])
       .map((s) => (s || "").trim())
-      .filter(Boolean)
-      .slice(0, 3);
+      .filter(Boolean);
 
     const parts: string[] = [];
 
@@ -57,64 +55,6 @@ export default function InfoPage() {
     parts.push("");
     parts.push(`Play or add questions: ${TRIVIACAST_INFO}`);
     parts.push(`Miniapp: ${FARCASTER_MINIAPP}`);
-    parts.push("");
-    parts.push("— @jesterinvestor");
-
-    return parts.join("\n");
-  };
-
-  const composeToWarpcast = async () => {
-    if (!canCast) {
-      // simple guard
-      // eslint-disable-next-line no-alert
-      alert("Please fill at least the question and correct answer before composing a cast.");
-      return;
-    }
-    // Build an array of option objects, ensuring 3 incorrect slots exist
-    const optionObjs: { text: string; isCorrect: boolean }[] = incorrect.map((t) => ({
-      text: t,
-      isCorrect: false,
-    }));
-
-    // Ensure we have exactly 3 incorrect slots for consistent labeling A/B/C
-    while (options.length < 3) options.push("");
-
-    // Push correct answer last (D)
-    options.push(form.correct_answer.trim());
-
-    const labels = ["A", "B", "C", "D"];
-
-    const parts: string[] = [];
-
-    parts.push("🎙️ Triviacast question");
-    parts.push(""); // blank line
-    parts.push(`Q: ${form.question.trim()}`);
-
-    if (form.category && form.category.trim()) {
-      parts.push(`Category: ${form.category.trim()}`);
-    }
-
-    parts.push(`Difficulty: ${capitalize(form.difficulty)}`);
-    parts.push(""); // blank line before answers
-    parts.push("Answers:");
-    parts.push(
-      ...options.map((opt, idx) => {
-        const label = labels[idx] || `${idx + 1}`;
-        // If option is empty, show label with an empty string so formatting stays predictable
-        return `${label}) ${opt || ""}`;
-      })
-    );
-
-    if (form.reference && form.reference.trim()) {
-      parts.push("");
-      parts.push(`🔎 Reference: ${form.reference.trim()}`);
-    }
-
-    parts.push("");
-    parts.push(`Play or add questions: ${TRIVIACAST_INFO} Miniapp: ${FARCASTER_MINIAPP}`);
-    parts.push("");
-    // final answer line: indicate D) is the correct one
-    parts.push(`✅ D) ${form.correct_answer.trim()}`);
     parts.push("");
     parts.push("— @jesterinvestor");
 
@@ -185,35 +125,6 @@ export default function InfoPage() {
 
       // Open the Farcaster miniapp page so the user can paste/compose there
       window.open(FARCASTER_MINIAPP, "_blank", "noopener,noreferrer");
-          // eslint-disable-next-line no-alert
-          alert("Compose opened — no cast was posted.");
-        }
-        return;
-      }
-
-      // 2) Try dynamic import of the SDK (if available in node_modules)
-      try {
-        // dynamic import may fail in some runtimes; wrap in try/catch
-        // eslint-disable-next-line global-require, import/no-extraneous-dependencies
-        const mod = await import("@farcaster/miniapp-sdk");
-        if (mod?.sdk && mod.sdk.actions && typeof mod.sdk.actions.composeCast === "function") {
-          const result = await mod.sdk.actions.composeCast({ text: message, embeds: [TRIVIACAST_INFO] });
-          if (result?.cast) {
-            // eslint-disable-next-line no-alert
-            alert("Cast posted successfully.");
-          } else {
-            // eslint-disable-next-line no-alert
-            alert("Compose opened — no cast was posted.");
-          }
-          return;
-        }
-      } catch (e) {
-        // dynamic import not available or not installed — continue to fallback
-      }
-
-      // 3) Fallback: open the Warpcast compose URL with prefilled text
-      const url = `${WARPCAST_COMPOSE}?text=${encodeURIComponent(message)}`;
-      window.open(url, "_blank", "noopener,noreferrer");
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Compose failed", err);
@@ -226,22 +137,10 @@ export default function InfoPage() {
     window.open(OPEN_TDB_URL, "_blank", "noopener,noreferrer");
   };
 
-  const copyMessageToClipboard = async () => {
-    const msg = buildCastMessage();
-    try {
-      await navigator.clipboard.writeText(msg);
-      // eslint-disable-next-line no-alert
-      alert("Message copied to clipboard.");
-    } catch (e) {
-      // eslint-disable-next-line no-alert
-      alert("Copy failed — select and copy the preview manually.");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
-        {/* Header */}
+        {/* Mini brain icon and header */}
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
           <div className="flex flex-col items-center gap-3 sm:gap-4 w-full">
             <Image
@@ -263,14 +162,13 @@ export default function InfoPage() {
 
         <div className="mb-4 text-lg text-gray-800 text-center">
           <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and on-chain rewards. Connect your wallet and show your Farc[...]
-          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and on-chain rewards. Connect your wallet and show your Farcaster profile.
         </div>
 
         <div className="mb-4 text-lg text-fuchsia-800 font-semibold text-center">
           🚀 Connect with Farcaster and your Base wallet to unlock the full Triviacast experience
         </div>
 
-        {/* Form */}
+        {/* OpenTDB-like Add Question form (moved to top) */}
         <div className="mb-6 p-4 bg-white rounded-xl shadow w-full max-w-2xl border">
           <div className="flex items-start justify-between">
             <div>
@@ -436,46 +334,6 @@ export default function InfoPage() {
           </div>
         </div>
 
-        {/* Preview of the formatted cast */}
-        <div className="mb-6 p-4 bg-white rounded-xl shadow w-full max-w-2xl border">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold mb-2 text-purple-600">Preview (formatted for Warpcast / Farcaster)</h2>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => copyMessageToClipboard()}
-                className="px-3 py-1.5 rounded bg-fuchsia-600 text-white hover:bg-fuchsia-700"
-              >
-                Copy
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  // open a simple new tab with the formatted message for quick copy if the compose SDK isn't available
-                  const win = window.open("", "_blank");
-                  if (win) {
-                    win.document.body.style.whiteSpace = "pre-wrap";
-                    win.document.body.style.fontFamily = "monospace, ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace";
-                    win.document.title = "Triviacast Preview";
-                    win.document.body.innerText = buildCastMessage();
-                  } else {
-                    // eslint-disable-next-line no-alert
-                    alert("Unable to open preview in a new tab.");
-                  }
-                }}
-                className="px-3 py-1.5 rounded border bg-white"
-              >
-                Open in new tab
-              </button>
-            </div>
-          </div>
-
-          <pre className="mt-2 p-3 bg-gray-50 border rounded text-sm text-gray-800 whitespace-pre-wrap" style={{ whiteSpace: "pre-wrap" }}>
-            {buildCastMessage()}
-          </pre>
-        </div>
-
-        {/* Remaining informational sections (left mostly unchanged) */}
         <div className="mb-6 p-4 bg-gradient-to-r from-pink-100 to-blue-100 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-purple-600">How to Play</h2>
           <ul className="list-disc pl-6 text-gray-700">
@@ -513,7 +371,6 @@ export default function InfoPage() {
         <div className="mb-6 p-4 bg-blue-50 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-blue-700">Quests and Jackpot</h2>
           <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward players.</p>
-          <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward points and give bonuses.</p>
           <ul className="list-disc pl-6 text-gray-700 mt-2">
             <li>Daily Quest — complete a short set of questions every day to earn bonus T Points</li>
             <li>Weekly Quest — finish a longer challenge for rare rewards and leaderboard boosts</li>
@@ -589,7 +446,7 @@ export default function InfoPage() {
               href="https://warpcast.com/jesterinvestor"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 border rounded-full bg-white text-fuchsia-600 shadow hover:shadow-md transition-shadow"
+              className="inline-flex items-center gap-2 px-4 py-2 border rounded-full bg-white text-fuchsia-600 shadow hover:shadow-md transition"
               title="Visit @jesterinvestor on Warpcast"
             >
               View @jesterinvestor
