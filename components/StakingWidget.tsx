@@ -17,9 +17,8 @@ export default function StakingWidget() {
   const [stakedBalance, setStakedBalance] = useState("0");
   const [earned, setEarned] = useState("0");
   const [totalStaked, setTotalStaked] = useState("0");
-  const [runtimeStakingAddress, setRuntimeStakingAddress] = useState<string | null>(null);
-  const [runtimeTrivAddress, setRuntimeTrivAddress] = useState<string | null>(null);
-  const [resolvingConfig, setResolvingConfig] = useState<boolean>(false);
+  const [runtimeConfig, setRuntimeConfig] = useState<{ NEXT_PUBLIC_STAKING_ADDRESS?: string | null; NEXT_PUBLIC_TRIV_ADDRESS?: string | null } | null>(null);
+  const [loadingConfig, setLoadingConfig] = useState(false);
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [txStatus, setTxStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
@@ -35,35 +34,25 @@ export default function StakingWidget() {
     }
   };
 
-  // Resolve runtime config (if build-time envs are empty) and poll chain values.
+  // Fetch runtime config only if build-time values are missing.
   useEffect(() => {
     let mounted = true;
-
-    async function resolveConfig() {
-      if (BUILD_STAKING_ADDRESS && BUILD_TRIV_ADDRESS) {
-        // Nothing to resolve — use build-time values
-        setRuntimeStakingAddress(null);
-        setRuntimeTrivAddress(null);
-        return;
-      }
-
-      setResolvingConfig(true);
+    async function loadConfig() {
+      if (BUILD_STAKING_ADDRESS && BUILD_TRIV_ADDRESS) return;
+      setLoadingConfig(true);
       try {
         const res = await fetch('/api/config');
         if (!res.ok) throw new Error('failed to fetch config');
         const payload = await res.json();
         if (!mounted) return;
-        setRuntimeStakingAddress(payload.NEXT_PUBLIC_STAKING_ADDRESS);
-        setRuntimeTrivAddress(payload.NEXT_PUBLIC_TRIV_ADDRESS);
+        setRuntimeConfig(payload);
       } catch (err) {
         console.error('StakingWidget: could not load runtime config', err);
       } finally {
-        setResolvingConfig(false);
+        setLoadingConfig(false);
       }
     }
-
-    resolveConfig();
-
+    loadConfig();
     return () => {
       mounted = false;
     };
@@ -73,31 +62,43 @@ export default function StakingWidget() {
     let mounted = true;
     let id: any = null;
 
-    const resolvedStaking = (runtimeStakingAddress || BUILD_STAKING_ADDRESS) as string;
-    const resolvedTriv = (runtimeTrivAddress || BUILD_TRIV_ADDRESS) as string;
+    const resolvedStaking = (BUILD_STAKING_ADDRESS || runtimeConfig?.NEXT_PUBLIC_STAKING_ADDRESS) as string | undefined;
+    const resolvedTriv = (BUILD_TRIV_ADDRESS || runtimeConfig?.NEXT_PUBLIC_TRIV_ADDRESS) as string | undefined;
 
     async function refresh() {
-      if (!address || !publicClient) return;
+      if (!address) return;
       if (!resolvedStaking || !resolvedTriv) return;
-        try {
-          const [tb, sb, er, ts] = await Promise.all([
-            publicClient.readContract({ address: resolvedTriv as `0x${string}`, abi: TRIV_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
-            publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
-            publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'earned', args: [address as `0x${string}`] }),
-            publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'totalSupply', args: [] }),
-          ]);
+      try {
+        const [tb, sb, er, ts] = await Promise.all([
+          publicClient.readContract({ address: resolvedTriv as `0x${string}`, abi: TRIV_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
+          publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
+          publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'earned', args: [address as `0x${string}`] }),
+          publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'totalSupply', args: [] }),
+        ]);
 
         if (!mounted) return;
         setTokenBalance(ethers.formatUnits(tb as any, 18));
         setStakedBalance(ethers.formatUnits(sb as any, 18));
         setEarned(ethers.formatUnits(er as any, 18));
         setTotalStaked(ethers.formatUnits(ts as any, 18));
-      } catch (e) {
-        console.error('StakingWidget: readContract failed', e);
+      } catch (err) {
+        console.warn('publicClient.readContract failed, falling back to server endpoint', err);
+        try {
+          const fallback = await fetch(`/api/chain/staking-stats?address=${address}`);
+          if (fallback.ok) {
+            const data = await fallback.json();
+            if (!mounted) return;
+            if (data.tokenBalance) setTokenBalance(String(data.tokenBalance));
+            if (data.stakedBalance) setStakedBalance(String(data.stakedBalance));
+            if (data.earned) setEarned(String(data.earned));
+            if (data.totalStaked) setTotalStaked(String(data.totalStaked));
+          }
+        } catch (e) {
+          console.error('StakingWidget: server fallback failed', e);
+        }
       }
     }
 
-    // start polling if we have addresses
     if (resolvedStaking && resolvedTriv) {
       refresh();
       id = setInterval(refresh, 10_000);
@@ -107,7 +108,7 @@ export default function StakingWidget() {
       mounted = false;
       if (id) clearInterval(id);
     };
-  }, [address, publicClient, runtimeStakingAddress, runtimeTrivAddress]);
+  }, [address, publicClient, runtimeConfig]);
 
   const doApproveAndStake = async () => {
     if (!address) return;
@@ -180,10 +181,10 @@ export default function StakingWidget() {
     }
   };
 
-  const resolvedStakingAddr = runtimeStakingAddress || BUILD_STAKING_ADDRESS;
-  const resolvedTrivAddr = runtimeTrivAddress || BUILD_TRIV_ADDRESS;
+  const resolvedStakingAddr = BUILD_STAKING_ADDRESS || runtimeConfig?.NEXT_PUBLIC_STAKING_ADDRESS;
+  const resolvedTrivAddr = BUILD_TRIV_ADDRESS || runtimeConfig?.NEXT_PUBLIC_TRIV_ADDRESS;
 
-  if (resolvingConfig) {
+  if (loadingConfig && !BUILD_STAKING_ADDRESS && !BUILD_TRIV_ADDRESS) {
     return (
       <div className="mt-6 w-full max-w-2xl text-left">
         <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200 text-gray-700">Resolving staking configuration…</div>
