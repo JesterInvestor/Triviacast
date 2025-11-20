@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
+import { callStake, withdrawStake, claimStakeReward, exitStake } from "../lib/staking";
 import { ethers } from "ethers";
 import { TRIV_ABI, STAKING_ABI } from "../lib/stakingClient";
 
@@ -10,6 +11,7 @@ const TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || "";
 
 export default function StakingWidget() {
   const { address, isConnected } = useAccount();
+  const publicClient = usePublicClient();
 
   const [tokenBalance, setTokenBalance] = useState("0");
   const [stakedBalance, setStakedBalance] = useState("0");
@@ -33,27 +35,20 @@ export default function StakingWidget() {
   useEffect(() => {
     let mounted = true;
     async function refresh() {
-      if (!address) return;
+      if (!address || !publicClient) return;
       try {
-        const hasWindow = typeof window !== "undefined" && (window as any).ethereum;
-        const provider = hasWindow ? new ethers.BrowserProvider((window as any).ethereum) : null;
-        if (!provider) return;
-
-        const triv = new ethers.Contract(TRIV_ADDRESS, TRIV_ABI, provider);
-        const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, provider);
-
         const [tb, sb, er, ts] = await Promise.all([
-          triv.balanceOf(address),
-          staking.balanceOf(address),
-          staking.earned(address),
-          staking.totalSupply(),
+          publicClient.readContract({ address: TRIV_ADDRESS as `0x${string}`, abi: TRIV_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
+          publicClient.readContract({ address: STAKING_ADDRESS as `0x${string}`, abi: STAKING_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
+          publicClient.readContract({ address: STAKING_ADDRESS as `0x${string}`, abi: STAKING_ABI as any, functionName: 'earned', args: [address as `0x${string}`] }),
+          publicClient.readContract({ address: STAKING_ADDRESS as `0x${string}`, abi: STAKING_ABI as any, functionName: 'totalSupply', args: [] }),
         ]);
 
         if (!mounted) return;
-        setTokenBalance(ethers.formatUnits(tb, 18));
-        setStakedBalance(ethers.formatUnits(sb, 18));
-        setEarned(ethers.formatUnits(er, 18));
-        setTotalStaked(ethers.formatUnits(ts, 18));
+        setTokenBalance(ethers.formatUnits(tb as any, 18));
+        setStakedBalance(ethers.formatUnits(sb as any, 18));
+        setEarned(ethers.formatUnits(er as any, 18));
+        setTotalStaked(ethers.formatUnits(ts as any, 18));
       } catch (e) {
         // ignore
       }
@@ -73,21 +68,10 @@ export default function StakingWidget() {
     setTxStatus("pending");
     setTxHash(null);
     try {
-      if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
-      const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
-      const signerObj = await browserProvider.getSigner();
-      const triv = new ethers.Contract(TRIV_ADDRESS, TRIV_ABI, signerObj as any);
-      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
       const parsed = ethers.parseUnits(amount || "0", 18);
-      // Approve
-      const allowance = await triv.allowance(address, STAKING_ADDRESS);
-      if (allowance < parsed) {
-        const tx = await triv.approve(STAKING_ADDRESS, parsed);
-        await tx.wait();
-      }
-      const stakeTx = await staking.stake(parsed);
-      setTxHash(stakeTx.hash ?? null);
-      await stakeTx.wait();
+      // Use helper which handles approval flow and staking via wagmi core
+      const hash = await callStake(parsed);
+      setTxHash(hash ?? null);
       setTxStatus("success");
     } catch (e) {
       setTxStatus("error");
@@ -103,14 +87,9 @@ export default function StakingWidget() {
     setTxStatus("pending");
     setTxHash(null);
     try {
-      if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
-      const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
-      const signerObj = await browserProvider.getSigner();
-      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
       const parsed = ethers.parseUnits(amount || "0", 18);
-      const tx = await staking.withdraw(parsed);
-      setTxHash(tx.hash ?? null);
-      await tx.wait();
+      const hash = await withdrawStake(parsed);
+      setTxHash(hash ?? null);
       setTxStatus("success");
     } catch (e) {
       setTxStatus("error");
@@ -126,13 +105,8 @@ export default function StakingWidget() {
     setTxStatus("pending");
     setTxHash(null);
     try {
-      if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
-      const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
-      const signerObj = await browserProvider.getSigner();
-      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
-      const tx = await staking.claimReward();
-      setTxHash(tx.hash ?? null);
-      await tx.wait();
+      const hash = await claimStakeReward();
+      setTxHash(hash ?? null);
       setTxStatus("success");
     } catch (e) {
       setTxStatus("error");
@@ -148,13 +122,8 @@ export default function StakingWidget() {
     setTxStatus("pending");
     setTxHash(null);
     try {
-      if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
-      const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
-      const signerObj = await browserProvider.getSigner();
-      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
-      const tx = await staking.exit();
-      setTxHash(tx.hash ?? null);
-      await tx.wait();
+      const hash = await exitStake();
+      setTxHash(hash ?? null);
       setTxStatus("success");
     } catch (e) {
       setTxStatus("error");
