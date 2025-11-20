@@ -27,20 +27,7 @@ export default function InfoPage() {
   const capitalize = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
   const buildCastMessage = () => {
-
-  // Fisher-Yates shuffle
-  const shuffleInPlace = <T,>(arr: T[]) => {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      const tmp = arr[i];
-      arr[i] = arr[j];
-      arr[j] = tmp;
-    }
-    return arr;
-  };
-
-  const buildCastMessage = () => {
-    // Collect up to three trimmed incorrect answers
+    // keep up to three incorrects, trim and filter out empty strings
     const incorrect = (form.incorrect_answers || [])
       .map((s) => (s || "").trim())
       .filter(Boolean)
@@ -89,15 +76,11 @@ export default function InfoPage() {
       isCorrect: false,
     }));
 
-    while (optionObjs.length < 3) {
-      optionObjs.push({ text: "", isCorrect: false });
-    }
+    // Ensure we have exactly 3 incorrect slots for consistent labeling A/B/C
+    while (options.length < 3) options.push("");
 
-    // Push correct answer object
-    optionObjs.push({ text: form.correct_answer.trim(), isCorrect: true });
-
-    // Shuffle the options so correct answer appears at a random position
-    shuffleInPlace(optionObjs);
+    // Push correct answer last (D)
+    options.push(form.correct_answer.trim());
 
     const labels = ["A", "B", "C", "D"];
 
@@ -112,13 +95,15 @@ export default function InfoPage() {
     }
 
     parts.push(`Difficulty: ${capitalize(form.difficulty)}`);
-    parts.push(""); // blank before answers
+    parts.push(""); // blank line before answers
     parts.push("Answers:");
-
-    optionObjs.forEach((opt, idx) => {
-      const label = labels[idx] || `${idx + 1}`;
-      parts.push(`${label}) ${opt.text || ""}`);
-    });
+    parts.push(
+      ...options.map((opt, idx) => {
+        const label = labels[idx] || `${idx + 1}`;
+        // If option is empty, show label with an empty string so formatting stays predictable
+        return `${label}) ${opt || ""}`;
+      })
+    );
 
     if (form.reference && form.reference.trim()) {
       parts.push("");
@@ -128,12 +113,8 @@ export default function InfoPage() {
     parts.push("");
     parts.push(`Play or add questions: ${TRIVIACAST_INFO} Miniapp: ${FARCASTER_MINIAPP}`);
     parts.push("");
-
-    // Find which label corresponds to the correct answer after shuffle
-    const correctIndex = optionObjs.findIndex((o) => o.isCorrect);
-    const correctLabel = labels[correctIndex] || `${correctIndex + 1}`;
-
-    parts.push(`✅ ${correctLabel}) ${form.correct_answer.trim()}`);
+    // final answer line: indicate D) is the correct one
+    parts.push(`✅ D) ${form.correct_answer.trim()}`);
     parts.push("");
     parts.push("— @jesterinvestor");
 
@@ -243,6 +224,18 @@ export default function InfoPage() {
 
   const openOpenTDB = async () => {
     window.open(OPEN_TDB_URL, "_blank", "noopener,noreferrer");
+  };
+
+  const copyMessageToClipboard = async () => {
+    const msg = buildCastMessage();
+    try {
+      await navigator.clipboard.writeText(msg);
+      // eslint-disable-next-line no-alert
+      alert("Message copied to clipboard.");
+    } catch (e) {
+      // eslint-disable-next-line no-alert
+      alert("Copy failed — select and copy the preview manually.");
+    }
   };
 
   return (
@@ -441,6 +434,45 @@ export default function InfoPage() {
               Reset
             </button>
           </div>
+        </div>
+
+        {/* Preview of the formatted cast */}
+        <div className="mb-6 p-4 bg-white rounded-xl shadow w-full max-w-2xl border">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold mb-2 text-purple-600">Preview (formatted for Warpcast / Farcaster)</h2>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => copyMessageToClipboard()}
+                className="px-3 py-1.5 rounded bg-fuchsia-600 text-white hover:bg-fuchsia-700"
+              >
+                Copy
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  // open a simple new tab with the formatted message for quick copy if the compose SDK isn't available
+                  const win = window.open("", "_blank");
+                  if (win) {
+                    win.document.body.style.whiteSpace = "pre-wrap";
+                    win.document.body.style.fontFamily = "monospace, ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace";
+                    win.document.title = "Triviacast Preview";
+                    win.document.body.innerText = buildCastMessage();
+                  } else {
+                    // eslint-disable-next-line no-alert
+                    alert("Unable to open preview in a new tab.");
+                  }
+                }}
+                className="px-3 py-1.5 rounded border bg-white"
+              >
+                Open in new tab
+              </button>
+            </div>
+          </div>
+
+          <pre className="mt-2 p-3 bg-gray-50 border rounded text-sm text-gray-800 whitespace-pre-wrap" style={{ whiteSpace: "pre-wrap" }}>
+            {buildCastMessage()}
+          </pre>
         </div>
 
         {/* Remaining informational sections (left mostly unchanged) */}
