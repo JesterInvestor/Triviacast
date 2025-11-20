@@ -5,12 +5,6 @@ const nextConfig: NextConfig = {
   experimental: {
     // no specific flag for ignore, but keeping minimal config here
   },
-  eslint: {
-    // Avoid failing the production build due to lint warnings/errors during CI or local build.
-    // Many files currently trigger `@typescript-eslint` warnings; ignore them during build
-    // so the build completes while we incrementally fix lint issues.
-    ignoreDuringBuilds: true,
-  },
   async headers() {
     const csp = [
       "default-src 'self'",

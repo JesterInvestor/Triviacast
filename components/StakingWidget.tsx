@@ -1,24 +1,20 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useAccount, usePublicClient } from "wagmi";
-import { callStake, withdrawStake, claimStakeReward, exitStake } from "../lib/staking";
+import { useAccount } from "wagmi";
 import { ethers } from "ethers";
 import { TRIV_ABI, STAKING_ABI } from "../lib/stakingClient";
 
-const BUILD_STAKING_ADDRESS = process.env.NEXT_PUBLIC_STAKING_ADDRESS || "";
-const BUILD_TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || "";
+const STAKING_ADDRESS = process.env.NEXT_PUBLIC_STAKING_ADDRESS || "";
+const TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || "";
 
 export default function StakingWidget() {
   const { address, isConnected } = useAccount();
-  const publicClient = usePublicClient();
 
   const [tokenBalance, setTokenBalance] = useState("0");
   const [stakedBalance, setStakedBalance] = useState("0");
   const [earned, setEarned] = useState("0");
   const [totalStaked, setTotalStaked] = useState("0");
-  const [runtimeConfig, setRuntimeConfig] = useState<{ NEXT_PUBLIC_STAKING_ADDRESS?: string | null; NEXT_PUBLIC_TRIV_ADDRESS?: string | null } | null>(null);
-  const [loadingConfig, setLoadingConfig] = useState(false);
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [txStatus, setTxStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
@@ -34,84 +30,42 @@ export default function StakingWidget() {
     }
   };
 
-  // Fetch runtime config only if build-time values are missing.
   useEffect(() => {
     let mounted = true;
-    async function loadConfig() {
-      if (BUILD_STAKING_ADDRESS && BUILD_TRIV_ADDRESS) return;
-      setLoadingConfig(true);
-      try {
-        const res = await fetch('/api/config');
-        if (!res.ok) throw new Error('failed to fetch config');
-        const payload = await res.json();
-        if (!mounted) return;
-        setRuntimeConfig(payload);
-      } catch (err) {
-        console.error('StakingWidget: could not load runtime config', err);
-      } finally {
-        setLoadingConfig(false);
-      }
-    }
-    loadConfig();
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-    let id: any = null;
-
-    const resolvedStaking = (BUILD_STAKING_ADDRESS || runtimeConfig?.NEXT_PUBLIC_STAKING_ADDRESS) as string | undefined;
-    const resolvedTriv = (BUILD_TRIV_ADDRESS || runtimeConfig?.NEXT_PUBLIC_TRIV_ADDRESS) as string | undefined;
-
     async function refresh() {
       if (!address) return;
-      if (!resolvedStaking || !resolvedTriv) return;
       try {
-        const pc = publicClient;
-        if (!pc) throw new Error('publicClient unavailable');
+        const hasWindow = typeof window !== "undefined" && (window as any).ethereum;
+        const provider = hasWindow ? new ethers.BrowserProvider((window as any).ethereum) : null;
+        if (!provider) return;
+
+        const triv = new ethers.Contract(TRIV_ADDRESS, TRIV_ABI, provider);
+        const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, provider);
 
         const [tb, sb, er, ts] = await Promise.all([
-          pc.readContract({ address: resolvedTriv as `0x${string}`, abi: TRIV_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
-          pc.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
-          pc.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'earned', args: [address as `0x${string}`] }),
-          pc.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'totalSupply', args: [] }),
+          triv.balanceOf(address),
+          staking.balanceOf(address),
+          staking.earned(address),
+          staking.totalSupply(),
         ]);
 
         if (!mounted) return;
-        setTokenBalance(ethers.formatUnits(tb as any, 18));
-        setStakedBalance(ethers.formatUnits(sb as any, 18));
-        setEarned(ethers.formatUnits(er as any, 18));
-        setTotalStaked(ethers.formatUnits(ts as any, 18));
-      } catch (err) {
-        console.warn('publicClient.readContract failed, falling back to server endpoint', err);
-        try {
-          const fallback = await fetch(`/api/chain/staking-stats?address=${address}`);
-          if (fallback.ok) {
-            const data = await fallback.json();
-            if (!mounted) return;
-            if (data.tokenBalance) setTokenBalance(String(data.tokenBalance));
-            if (data.stakedBalance) setStakedBalance(String(data.stakedBalance));
-            if (data.earned) setEarned(String(data.earned));
-            if (data.totalStaked) setTotalStaked(String(data.totalStaked));
-          }
-        } catch (e) {
-          console.error('StakingWidget: server fallback failed', e);
-        }
+        setTokenBalance(ethers.formatUnits(tb, 18));
+        setStakedBalance(ethers.formatUnits(sb, 18));
+        setEarned(ethers.formatUnits(er, 18));
+        setTotalStaked(ethers.formatUnits(ts, 18));
+      } catch (e) {
+        // ignore
       }
     }
 
-    if (resolvedStaking && resolvedTriv) {
-      refresh();
-      id = setInterval(refresh, 10_000);
-    }
-
+    refresh();
+    const id = setInterval(refresh, 10_000);
     return () => {
       mounted = false;
-      if (id) clearInterval(id);
+      clearInterval(id);
     };
-  }, [address, publicClient, runtimeConfig]);
+  }, [address]);
 
   const doApproveAndStake = async () => {
     if (!address) return;
@@ -119,10 +73,21 @@ export default function StakingWidget() {
     setTxStatus("pending");
     setTxHash(null);
     try {
+      if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
+      const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
+      const signerObj = await browserProvider.getSigner();
+      const triv = new ethers.Contract(TRIV_ADDRESS, TRIV_ABI, signerObj as any);
+      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
       const parsed = ethers.parseUnits(amount || "0", 18);
-      // Use helper which handles approval flow and staking via wagmi core
-      const hash = await callStake(parsed);
-      setTxHash(hash ?? null);
+      // Approve
+      const allowance = await triv.allowance(address, STAKING_ADDRESS);
+      if (allowance < parsed) {
+        const tx = await triv.approve(STAKING_ADDRESS, parsed);
+        await tx.wait();
+      }
+      const stakeTx = await staking.stake(parsed);
+      setTxHash(stakeTx.hash ?? null);
+      await stakeTx.wait();
       setTxStatus("success");
     } catch (e) {
       setTxStatus("error");
@@ -138,9 +103,14 @@ export default function StakingWidget() {
     setTxStatus("pending");
     setTxHash(null);
     try {
+      if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
+      const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
+      const signerObj = await browserProvider.getSigner();
+      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
       const parsed = ethers.parseUnits(amount || "0", 18);
-      const hash = await withdrawStake(parsed);
-      setTxHash(hash ?? null);
+      const tx = await staking.withdraw(parsed);
+      setTxHash(tx.hash ?? null);
+      await tx.wait();
       setTxStatus("success");
     } catch (e) {
       setTxStatus("error");
@@ -156,8 +126,13 @@ export default function StakingWidget() {
     setTxStatus("pending");
     setTxHash(null);
     try {
-      const hash = await claimStakeReward();
-      setTxHash(hash ?? null);
+      if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
+      const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
+      const signerObj = await browserProvider.getSigner();
+      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
+      const tx = await staking.claimReward();
+      setTxHash(tx.hash ?? null);
+      await tx.wait();
       setTxStatus("success");
     } catch (e) {
       setTxStatus("error");
@@ -173,8 +148,13 @@ export default function StakingWidget() {
     setTxStatus("pending");
     setTxHash(null);
     try {
-      const hash = await exitStake();
-      setTxHash(hash ?? null);
+      if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
+      const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
+      const signerObj = await browserProvider.getSigner();
+      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
+      const tx = await staking.exit();
+      setTxHash(tx.hash ?? null);
+      await tx.wait();
       setTxStatus("success");
     } catch (e) {
       setTxStatus("error");
@@ -184,18 +164,7 @@ export default function StakingWidget() {
     }
   };
 
-  const resolvedStakingAddr = BUILD_STAKING_ADDRESS || runtimeConfig?.NEXT_PUBLIC_STAKING_ADDRESS;
-  const resolvedTrivAddr = BUILD_TRIV_ADDRESS || runtimeConfig?.NEXT_PUBLIC_TRIV_ADDRESS;
-
-  if (loadingConfig && !BUILD_STAKING_ADDRESS && !BUILD_TRIV_ADDRESS) {
-    return (
-      <div className="mt-6 w-full max-w-2xl text-left">
-        <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200 text-gray-700">Resolving staking configuration…</div>
-      </div>
-    );
-  }
-
-  if (!resolvedStakingAddr || !resolvedTrivAddr) {
+  if (!STAKING_ADDRESS || !TRIV_ADDRESS) {
     return (
       <div className="mt-6 w-full max-w-2xl text-left">
         <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-800">
@@ -208,20 +177,20 @@ export default function StakingWidget() {
   return (
     <div className="mt-6 w-full max-w-2xl text-left">
       <div className="p-6 rounded-xl bg-white/90 border border-[#F4A6B7] shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Stake TRIV for Jackpot rewards</h2>
+        <h2 className="text-lg font-semibold text-[#6b4460] mb-3">Stake TRIV for Jackpot rewards</h2>
         <div className="mb-4">
-          <span className="inline-block px-3 py-1 rounded-full bg-[#FFF3F6] text-pink-700 font-semibold text-sm">Current APR: 80%</span>
+          <span className="inline-block px-3 py-1 rounded-full bg-[#FFF3F6] text-[#b84d6a] font-semibold text-sm">Current APR: 80%</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
-          <div className="p-3 bg-[#fff0f4] rounded text-gray-900">Your TRIV: <strong>{format6(tokenBalance)}</strong></div>
-          <div className="p-3 bg-[#fff0f4] rounded text-gray-900">Staked: <strong>{format6(stakedBalance)}</strong></div>
-          <div className="p-3 bg-[#fff0f4] rounded text-gray-900">Earned: <strong>{format6(earned)}</strong></div>
-          <div className="p-3 bg-[#fff0f4] rounded text-gray-900">Total Staked: <strong>{format6(totalStaked)}</strong></div>
+          <div className="p-3 bg-[#fff0f4] rounded">Your TRIV: <strong>{format6(tokenBalance)}</strong></div>
+          <div className="p-3 bg-[#fff0f4] rounded">Staked: <strong>{format6(stakedBalance)}</strong></div>
+          <div className="p-3 bg-[#fff0f4] rounded">Earned: <strong>{format6(earned)}</strong></div>
+          <div className="p-3 bg-[#fff0f4] rounded">Total Staked: <strong>{format6(totalStaked)}</strong></div>
         </div>
 
         {!isConnected ? (
-          <div className="text-sm text-gray-700">Connect your wallet to stake.</div>
+          <div className="text-sm text-[#7a516d]">Connect your wallet to stake.</div>
         ) : (
           <div className="flex flex-col sm:flex-row gap-3">
             <input
