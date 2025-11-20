@@ -6,8 +6,8 @@ import { callStake, withdrawStake, claimStakeReward, exitStake } from "../lib/st
 import { ethers } from "ethers";
 import { TRIV_ABI, STAKING_ABI } from "../lib/stakingClient";
 
-const STAKING_ADDRESS = process.env.NEXT_PUBLIC_STAKING_ADDRESS || "";
-const TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || "";
+const BUILD_STAKING_ADDRESS = process.env.NEXT_PUBLIC_STAKING_ADDRESS || "";
+const BUILD_TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || "";
 
 export default function StakingWidget() {
   const { address, isConnected } = useAccount();
@@ -17,6 +17,9 @@ export default function StakingWidget() {
   const [stakedBalance, setStakedBalance] = useState("0");
   const [earned, setEarned] = useState("0");
   const [totalStaked, setTotalStaked] = useState("0");
+  const [runtimeStakingAddress, setRuntimeStakingAddress] = useState<string | null>(null);
+  const [runtimeTrivAddress, setRuntimeTrivAddress] = useState<string | null>(null);
+  const [resolvingConfig, setResolvingConfig] = useState<boolean>(false);
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [txStatus, setTxStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
@@ -32,16 +35,56 @@ export default function StakingWidget() {
     }
   };
 
+  // Resolve runtime config (if build-time envs are empty) and poll chain values.
   useEffect(() => {
     let mounted = true;
+
+    async function resolveConfig() {
+      if (BUILD_STAKING_ADDRESS && BUILD_TRIV_ADDRESS) {
+        // Nothing to resolve — use build-time values
+        setRuntimeStakingAddress(null);
+        setRuntimeTrivAddress(null);
+        return;
+      }
+
+      setResolvingConfig(true);
+      try {
+        const res = await fetch('/api/config');
+        if (!res.ok) throw new Error('failed to fetch config');
+        const payload = await res.json();
+        if (!mounted) return;
+        setRuntimeStakingAddress(payload.NEXT_PUBLIC_STAKING_ADDRESS);
+        setRuntimeTrivAddress(payload.NEXT_PUBLIC_TRIV_ADDRESS);
+      } catch (err) {
+        console.error('StakingWidget: could not load runtime config', err);
+      } finally {
+        setResolvingConfig(false);
+      }
+    }
+
+    resolveConfig();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    let id: any = null;
+
+    const resolvedStaking = (runtimeStakingAddress || BUILD_STAKING_ADDRESS) as string;
+    const resolvedTriv = (runtimeTrivAddress || BUILD_TRIV_ADDRESS) as string;
+
     async function refresh() {
       if (!address || !publicClient) return;
+      if (!resolvedStaking || !resolvedTriv) return;
       try {
         const [tb, sb, er, ts] = await Promise.all([
-          publicClient.readContract({ address: TRIV_ADDRESS as `0x${string}`, abi: TRIV_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
-          publicClient.readContract({ address: STAKING_ADDRESS as `0x${string}`, abi: STAKING_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
-          publicClient.readContract({ address: STAKING_ADDRESS as `0x${string}`, abi: STAKING_ABI as any, functionName: 'earned', args: [address as `0x${string}`] }),
-          publicClient.readContract({ address: STAKING_ADDRESS as `0x${string}`, abi: STAKING_ABI as any, functionName: 'totalSupply', args: [] }),
+          publicClient.readContract({ address: resolvedTriv as `0x${string}`, abi: TRIV_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
+          publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
+          publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'earned', args: [address as `0x${string}`] }),
+          publicClient.readContract({ address: resolvedStaking as `0x${string}', abi: STAKING_ABI as any, functionName: 'totalSupply', args: [] }),
         ]);
 
         if (!mounted) return;
@@ -50,17 +93,21 @@ export default function StakingWidget() {
         setEarned(ethers.formatUnits(er as any, 18));
         setTotalStaked(ethers.formatUnits(ts as any, 18));
       } catch (e) {
-        // ignore
+        console.error('StakingWidget: readContract failed', e);
       }
     }
 
-    refresh();
-    const id = setInterval(refresh, 10_000);
+    // start polling if we have addresses
+    if (resolvedStaking && resolvedTriv) {
+      refresh();
+      id = setInterval(refresh, 10_000);
+    }
+
     return () => {
       mounted = false;
-      clearInterval(id);
+      if (id) clearInterval(id);
     };
-  }, [address]);
+  }, [address, publicClient, runtimeStakingAddress, runtimeTrivAddress]);
 
   const doApproveAndStake = async () => {
     if (!address) return;
