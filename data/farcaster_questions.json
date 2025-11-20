@@ -6124,5 +6124,525 @@
     ],
     "explanation": "With a burned token, no transfer occurs; systems record the failed intent without state change.",
     "tags": ["tokens","tips","edge-cases","impossible"]
-  }
+  },
+  {
+  "id": "fc_409",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "Which mini app is most associated with group link sharing and collections?",
+  "correct_answer": "Buoy",
+  "incorrect_answers": [
+    "Tips",
+    "Paperdrop",
+    "Frame Poll"
+  ]
+},
+{
+  "id": "fc_410",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "What feature do most Paperdrop mini app drops utilize for gating claims?",
+  "correct_answer": "Reply with a specific word or code",
+  "incorrect_answers": [
+    "Must tip [$DEGEN](https://farcaster.xyz/~/token/DEGEN) first",
+    "ETH wallet age verification",
+    "Frame interaction history"
+  ]
+},
+{
+  "id": "fc_411",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "Which mini app pioneered real-time dashboard leaderboards for meme contests?",
+  "correct_answer": "Memecard",
+  "incorrect_answers": [
+    "Polls",
+    "Tips",
+    "Frame Poll"
+  ]
+},
+{
+  "id": "fc_412",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "If you use 'Tips' mini app to send multiple ERC-20s simultaneously, what key UI feature appears?",
+  "correct_answer": "Token picker with batch confirmation",
+  "incorrect_answers": [
+    "Gasless tip option appears",
+    "Failed tokens are auto-retried",
+    "ETH fallback toggle"
+  ]
+},
+{
+  "id": "fc_413",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "What is the default time window for most leaderboard tracking in meme contest frames?",
+  "correct_answer": "24 hours",
+  "incorrect_answers": [
+    "One week",
+    "6 hours",
+    "Hourly rolling"
+  ]
+},
+{
+  "id": "fc_414",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "The 'memecard' mini app typically awards what for a top meme?",
+  "correct_answer": "[$MEMES](https://farcaster.xyz/~/token/MEMES) token or NFT",
+  "incorrect_answers": [
+    "[$DEGEN](https://farcaster.xyz/~/token/DEGEN)",
+    "ETH",
+    "Gasless transaction slot"
+  ]
+},
+{
+  "id": "fc_415",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "Most Farcaster poll/quiz mini apps limit option count to which number?",
+  "correct_answer": "4",
+  "incorrect_answers": [
+    "10",
+    "2",
+    "Unlimited"
+  ]
+},
+{
+  "id": "fc_416",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "What happens on 'Tips' mini app if you try to tip a token that the recipient has blacklisted?",
+  "correct_answer": "Transaction is rejected and an error is shown.",
+  "incorrect_answers": [
+    "Tip is rerouted to the sender.",
+    "Fallback to [$DEGEN](https://farcaster.xyz/~/token/DEGEN) tip.",
+    "Tips always go through anyway."
+  ]
+},
+{
+  "id": "fc_417",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "Which feature is unique to the Paperdrop mini app compared to simple poll frames?",
+  "correct_answer": "Token/NFT claim with claim tracking",
+  "incorrect_answers": [
+    "Button emoji support",
+    "Gasless actions",
+    "Multi-language polls"
+  ]
+},
+{
+  "id": "fc_418",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "Which mini app first enabled share-to-channel leaderboards for meme scores on Farcaster?",
+  "correct_answer": "Memecard",
+  "incorrect_answers": [
+    "Polls",
+    "Tips",
+    "GM Board"
+  ]
+},
+{
+  "id": "fc_419",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "How does Buoy mini app ensure only group members can contribute new links?",
+  "correct_answer": "UGC links are restricted to approved user list",
+  "incorrect_answers": [
+    "Onchain proof-of-group NFT",
+    "ETH stake verification",
+    "No restrictions; anyone can post"
+  ]
+},
+{
+  "id": "fc_420",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "What does the 'Frame Poll' app do if a tie is detected in the results?",
+  "correct_answer": "Displays tie as a separate status in UI",
+  "incorrect_answers": [
+    "Randomly selects a winner",
+    "Hides the results",
+    "Auto-mints an NFT for each participant"
+  ]
+},
+{
+  "id": "fc_421",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "What special feature does the 'GM Board' mini app provide?",
+  "correct_answer": "Tracks daily GM streaks across users",
+  "incorrect_answers": [
+    "Audio GM casting",
+    "ETH tipping for every GM",
+    "Automatic meme generation"
+  ]
+},
+{
+  "id": "fc_422",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "Which feature is currently NOT supported by most meme contest mini apps?",
+  "correct_answer": "Dynamic difficulty based on meme age",
+  "incorrect_answers": [
+    "Batch voting",
+    "Result hashing",
+    "Partial tip distribution"
+  ]
+},
+{
+  "id": "fc_423",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "How does the 'Tips' mini app handle insufficient token balances at tip time?",
+  "correct_answer": "Tip is declined and user is notified",
+  "incorrect_answers": [
+    "Tip is partially filled",
+    "ETH is sent instead",
+    "App debits from another token"
+  ]
+},
+{
+  "id": "fc_424",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "What advanced feature do some NFT claiming mini apps provide for onchain validation?",
+  "correct_answer": "Merkle proof validation of claim eligibility",
+  "incorrect_answers": [
+    "Gasless minting by default",
+    "ETH direct payout to minters",
+    "Signed GIF badge for each claim"
+  ]
+},
+{
+  "id": "fc_425",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "Which app has run 'meme streak' leaderboards for perfect daily casting?",
+  "correct_answer": "GM Board",
+  "incorrect_answers": [
+    "Frame Quiz",
+    "Tips",
+    "Memecard"
+  ]
+},
+{
+  "id": "fc_426",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "Which unique frame format do some meme apps use to encode tip payouts at the end?",
+  "correct_answer": "Base64-encoded metadata string",
+  "incorrect_answers": [
+    "QR code images in frame UI",
+    "ETH DNS lookup",
+    "Speech-to-text claim phrase"
+  ]
+},
+{
+  "id": "fc_427",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "If you see a paper emoji button in a meme contest frame, which app is it probably from?",
+  "correct_answer": "Paperdrop",
+  "incorrect_answers": [
+    "Tips",
+    "GM Board",
+    "Memecard"
+  ]
+},
+{
+  "id": "fc_428",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "hard",
+  "question": "What leaderboard action is unique to GM Board?",
+  "correct_answer": "Daily reset but preserves longest GM streak record",
+  "incorrect_answers": [
+    "Once-a-week scoring",
+    "Bonus points for Poll voting",
+    "ETH payout to every top user"
+  ]
+},
+{
+  "id": "fc_429",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "Which mini app is famous for running the first NCC/GM 'frame scavenger hunt' event?",
+  "correct_answer": "Memecard",
+  "incorrect_answers": [
+    "Polls",
+    "Buoy",
+    "Frame Poll"
+  ]
+},
+{
+  "id": "fc_430",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "If a meme contest frame displays a spinning dog GIF as the payout screen, it’s likely built with what library?",
+  "correct_answer": "Custom React hook with WebP fallback",
+  "incorrect_answers": [
+    "Standard tips mini app template",
+    "Neynar SDK legacy UI",
+    "Canvas.js plugin"
+  ]
+},
+{
+  "id": "fc_431",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "What feature did Buoy add in Q2 2025 that changed group moderation flows?",
+  "correct_answer": "Dynamic invite links for sub-group creation",
+  "incorrect_answers": [
+    "ETH tipping for link upvotes",
+    "NFT-locked links",
+    "OAuth for Google sign-on"
+  ]
+},
+{
+  "id": "fc_432",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "Why did the original Paperdrop contracts force a timeout after 1024 claims?",
+  "correct_answer": "To avoid exceeding block gas limits on mass batch mints",
+  "incorrect_answers": [
+    "ETH withdrawal-only lock was needed",
+    "Signed claims expired all at once",
+    "UI would crash with over 1k claims"
+  ]
+},
+{
+  "id": "fc_433",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "Which meme contest app once airdropped a reward only to users with at least 89 recasts?",
+  "correct_answer": "Memecard in Up Only challenge",
+  "incorrect_answers": [
+    "Buoy Dogmode",
+    "GM Board",
+    "Paperdrop x AIRE"
+  ]
+},
+{
+  "id": "fc_434",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "What unusual voting mechanic did Frame Poll briefly roll out for April Fools’?",
+  "correct_answer": "Allowed voting against meme options (downvotes)",
+  "incorrect_answers": [
+    "Tip-based voting weights",
+    "Private vote reveal queue",
+    "QR code secret ballot"
+  ]
+},
+{
+  "id": "fc_435",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "In what scenario does the GM Board hidden emoji badge appear?",
+  "correct_answer": "If you post 'gm' with a sunrise emoji for 7 straight days",
+  "incorrect_answers": [
+    "After topping the leaderboard 5 times",
+    "Random weekday only",
+    "Frame app vote for secret badge"
+  ]
+},
+{
+  "id": "fc_436",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "Which frame format is least supported by tips mini app v2?",
+  "correct_answer": "Spritesheet-based animated memes",
+  "incorrect_answers": [
+    "PDF embeds",
+    "Base64 PNGs",
+    "Markdown with emoji"
+  ]
+},
+{
+  "id": "fc_437",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "What notorious Paperdrop bug briefly let users claim two drops per wallet?",
+  "correct_answer": "Duplicate wallet check bypass under race conditions",
+  "incorrect_answers": [
+    "EIP-712 replay attack",
+    "Claim expiry index overrun",
+    "MEV front-running exploit"
+  ]
+},
+{
+  "id": "fc_438",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "Which meme contest app built the first cast-to-leaderboard cross-link?",
+  "correct_answer": "Memecard",
+  "incorrect_answers": [
+    "Tips",
+    "Dogmode",
+    "Frame Quiz"
+  ]
+},
+{
+  "id": "fc_439",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "If a tips mini app payout is attempted with a blacklisted coin on channel memes, what is the protocol response?",
+  "correct_answer": "Tip fails with error and event is logged for mods",
+  "incorrect_answers": [
+    "Coin is burned automatically",
+    "Fallback tip in [$DEGEN](https://farcaster.xyz/~/token/DEGEN) is sent",
+    "Tip is hidden but goes through"
+  ]
+},
+{
+  "id": "fc_440",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "What mini app feature enables staged multi-phase meme contests?",
+  "correct_answer": "Time-gated frame state progression",
+  "incorrect_answers": [
+    "Multi-cast root links",
+    "ETH deposit phase first",
+    "Mint-gating memes"
+  ]
+},
+{
+  "id": "fc_441",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "Which app once randomly paired users for meme judging in a ‘meme cup’?",
+  "correct_answer": "Memecard",
+  "incorrect_answers": [
+    "GM Board",
+    "Tips",
+    "Frame Poll"
+  ]
+},
+{
+  "id": "fc_442",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "Paperdrop is most likely to display a frame error if a user...",
+  "correct_answer": "Tries to claim more than once from the same wallet",
+  "incorrect_answers": [
+    "Posts a meme during claim",
+    "Tipped the wrong token",
+    "Votes on a poll before drop"
+  ]
+},
+{
+  "id": "fc_443",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "The Buoy moderation banlist is stored using what protocol primitive?",
+  "correct_answer": "In-memory hash set synced with Merkle backup",
+  "incorrect_answers": [
+    "Onchain NFT",
+    "Plaintext Google Sheet",
+    "IPFS-pinned JSON"
+  ]
+},
+{
+  "id": "fc_444",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "Memecard will not let you submit a meme if...",
+  "correct_answer": "Your account is flagged as spam by [/memes](https://farcaster.xyz/~/channel/memes) mods",
+  "incorrect_answers": [
+    "Wallet is empty",
+    "User owns fewer than ten NFTs",
+    "You use a custom Telegram avatar"
+  ]
+},
+{
+  "id": "fc_445",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "How does Tips mini app handle ERC-20s with >18 decimal places?",
+  "correct_answer": "Tip input is truncated and rounded to 18 decimals or fails.",
+  "incorrect_answers": [
+    "Auto-mints bridging wraps",
+    "Sends max value instead of specified tip",
+    "Fails only on mobile, works on web"
+  ]
+},
+{
+  "id": "fc_446",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "A rare bug in an early meme contest app let users...",
+  "correct_answer": "Upvote the same meme multiple times with different wallets",
+  "incorrect_answers": [
+    "Mint meme as NFT twice",
+    "Vote on non-existent options",
+    "Forward contest to Lens"
+  ]
+},
+{
+  "id": "fc_447",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "Frame Poll app disables voting for users who...",
+  "correct_answer": "Are muted in the root channel",
+  "incorrect_answers": [
+    "Have posted <10 casts",
+    "Have no avatar set",
+    "Have <0.6 Neynar score"
+  ]
+},
+{
+  "id": "fc_448",
+  "category": "Farcaster Mini Apps & Features",
+  "type": "multiple",
+  "difficulty": "impossible",
+  "question": "If the 'Tips' mini app gas estimator fails due to a network fork, what UI fallback occurs?",
+  "correct_answer": "Tip is cancelled and user sees a generic error page.",
+  "incorrect_answers": [
+    "Fallback gas estimate is used.",
+    "Tip goes through, user is charged later.",
+    "App silently hangs until network recovers."
+  ]
+}
 ]

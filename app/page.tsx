@@ -202,6 +202,147 @@ export default function Home() {
           </a>
         </div>
 
+        {/* Join Fellow Triviacasters button (now uses same launch logic) */}
+        <div className="mt-4 w-full flex justify-center">
+          <a
+            href="#"
+            onClick={async (e) => {
+              e.preventDefault();
+              const url = 'https://farcaster.xyz/~/group/vG63_ZR3i9CCRz9B-7CaRg';
+              console.debug('[JoinGroup] click handler invoked');
+
+              // Try known global SDKs first
+              try {
+                const w = window as any;
+                const candidates = [w.sdk, w.farcasterSdk, w.farcasterMiniApp, w.__farcasterMiniApp, w.FarcasterMiniApp, w];
+                for (const c of candidates) {
+                  if (!c) continue;
+                  try {
+                    const maybeSdk = c.sdk ? c.sdk : c;
+                    if (maybeSdk && maybeSdk.actions) {
+                      if (typeof maybeSdk.actions.openMiniApp === 'function') {
+                        console.debug('[JoinGroup] using maybeSdk.actions.openMiniApp');
+                        void maybeSdk.actions.openMiniApp({ url });
+                        return;
+                      }
+                      if (typeof maybeSdk.actions.launchMiniApp === 'function') {
+                        console.debug('[JoinGroup] using maybeSdk.actions.launchMiniApp');
+                        void maybeSdk.actions.launchMiniApp({ url });
+                        return;
+                      }
+                      if (typeof maybeSdk.actions.launchFrame === 'function') {
+                        console.debug('[JoinGroup] using maybeSdk.actions.launchFrame');
+                        void maybeSdk.actions.launchFrame({ url });
+                        return;
+                      }
+                      if (typeof maybeSdk.actions.launch === 'function') {
+                        console.debug('[JoinGroup] using maybeSdk.actions.launch');
+                        void maybeSdk.actions.launch({ type: 'launch_miniapp', url });
+                        return;
+                      }
+                      if (typeof maybeSdk.actions.open === 'function') {
+                        console.debug('[JoinGroup] using maybeSdk.actions.open');
+                        void maybeSdk.actions.open({ url });
+                        return;
+                      }
+                      if (typeof maybeSdk.actions.performAction === 'function') {
+                        console.debug('[JoinGroup] using maybeSdk.actions.performAction');
+                        void maybeSdk.actions.performAction({ type: 'launch_miniapp', url });
+                        return;
+                      }
+                    }
+                  } catch (err) {
+                    console.debug('[JoinGroup] sdk global attempt threw', err);
+                  }
+                }
+              } catch (err) {
+                console.debug('[JoinGroup] global sdk check failed', err);
+              }
+
+              // Try dynamic import of the SDK (fast, with timeout)
+              try {
+                const importPromise = import('@farcaster/miniapp-sdk').catch(() => null);
+                const mod = await Promise.race([importPromise, new Promise((res) => setTimeout(() => res(null), 600))]);
+                if (mod) {
+                  const maybeSdk = (mod as any)?.sdk ?? (mod as any)?.default?.sdk ?? (mod as any)?.default ?? mod;
+                  if (maybeSdk && maybeSdk.actions) {
+                    if (typeof maybeSdk.actions.openMiniApp === 'function') {
+                      console.debug('[JoinGroup] using imported sdk.actions.openMiniApp');
+                      void maybeSdk.actions.openMiniApp({ url });
+                      return;
+                    }
+                    if (typeof maybeSdk.actions.launchMiniApp === 'function') {
+                      console.debug('[JoinGroup] using imported sdk.actions.launchMiniApp');
+                      void maybeSdk.actions.launchMiniApp({ url });
+                      return;
+                    }
+                    if (typeof maybeSdk.actions.launchFrame === 'function') {
+                      console.debug('[JoinGroup] using imported sdk.actions.launchFrame');
+                      void maybeSdk.actions.launchFrame({ url });
+                      return;
+                    }
+                    if (typeof maybeSdk.actions.launch === 'function') {
+                      console.debug('[JoinGroup] using imported sdk.actions.launch');
+                      void maybeSdk.actions.launch({ type: 'launch_miniapp', url });
+                      return;
+                    }
+                    if (typeof maybeSdk.actions.open === 'function') {
+                      console.debug('[JoinGroup] using imported sdk.actions.open');
+                      void maybeSdk.actions.open({ url });
+                      return;
+                    }
+                    if (typeof maybeSdk.actions.performAction === 'function') {
+                      console.debug('[JoinGroup] using imported sdk.actions.performAction');
+                      void maybeSdk.actions.performAction({ type: 'launch_miniapp', url });
+                      return;
+                    }
+                  }
+                }
+              } catch (err) {
+                console.debug('[JoinGroup] dynamic import attempt failed', err);
+              }
+
+              // Try posting messages to parent window with several common shapes
+              try {
+                console.debug('[JoinGroup] no SDK launch worked — trying postMessage fallbacks to parent');
+                if (window.parent && window.parent !== window) {
+                  const msgs = [
+                    { type: 'launch_miniapp', url },
+                    { type: 'launch_frame', url },
+                    { type: 'miniapp:launch', action: { type: 'launch_miniapp', url } },
+                    { type: 'miniapp:open', url },
+                    { type: 'miniapp:action', action: { type: 'launch_miniapp', url } },
+                  ];
+                  for (const m of msgs) {
+                    try {
+                      window.parent.postMessage(m, '*');
+                      console.debug('[JoinGroup] posted message to parent', m);
+                    } catch (err) {
+                      console.debug('[JoinGroup] postMessage to parent failed for', m, err);
+                    }
+                  }
+                  await new Promise((res) => setTimeout(res, 200));
+                }
+              } catch (err) {
+                console.debug('[JoinGroup] postMessage fallbacks failed', err);
+              }
+
+              // As a final fallback, open the URL in a new tab/window
+              try {
+                window.open(url, '_blank', 'noopener');
+              } catch (err) {
+                console.debug('[JoinGroup] window.open failed, navigating', err);
+                window.location.href = url;
+              }
+            }}
+            aria-label="Join Fellow Triviacasters"
+            title="Join Fellow Triviacasters"
+            className="inline-flex items-center justify-center gap-3 rounded-2xl px-6 py-3 bg-white/90 hover:bg-white transition-shadow shadow-md transform hover:scale-[1.01] duration-150"
+          >
+            <span className="font-extrabold text-[#2d1b2e] text-sm sm:text-base">Join Fellow Triviacasters</span>
+          </a>
+        </div>
+
         {/* Footer */}
         <footer className="mt-8 text-center text-xs text-gray-400 w-full">
           Triviacast © 2025. May your answers be quick and your points be plenty. Rocket fuel not included

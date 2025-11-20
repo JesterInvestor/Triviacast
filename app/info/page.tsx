@@ -27,9 +27,24 @@ export default function InfoPage() {
   const capitalize = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
   const buildCastMessage = () => {
+
+  // Fisher-Yates shuffle
+  const shuffleInPlace = <T,>(arr: T[]) => {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    return arr;
+  };
+
+  const buildCastMessage = () => {
+    // Collect up to three trimmed incorrect answers
     const incorrect = (form.incorrect_answers || [])
       .map((s) => (s || "").trim())
-      .filter(Boolean);
+      .filter(Boolean)
+      .slice(0, 3);
 
     const parts: string[] = [];
 
@@ -55,6 +70,70 @@ export default function InfoPage() {
     parts.push("");
     parts.push(`Play or add questions: ${TRIVIACAST_INFO}`);
     parts.push(`Miniapp: ${FARCASTER_MINIAPP}`);
+    parts.push("");
+    parts.push("— @jesterinvestor");
+
+    return parts.join("\n");
+  };
+
+  const composeToWarpcast = async () => {
+    if (!canCast) {
+      // simple guard
+      // eslint-disable-next-line no-alert
+      alert("Please fill at least the question and correct answer before composing a cast.");
+      return;
+    }
+    // Build an array of option objects, ensuring 3 incorrect slots exist
+    const optionObjs: { text: string; isCorrect: boolean }[] = incorrect.map((t) => ({
+      text: t,
+      isCorrect: false,
+    }));
+
+    while (optionObjs.length < 3) {
+      optionObjs.push({ text: "", isCorrect: false });
+    }
+
+    // Push correct answer object
+    optionObjs.push({ text: form.correct_answer.trim(), isCorrect: true });
+
+    // Shuffle the options so correct answer appears at a random position
+    shuffleInPlace(optionObjs);
+
+    const labels = ["A", "B", "C", "D"];
+
+    const parts: string[] = [];
+
+    parts.push("🎙️ Triviacast question");
+    parts.push(""); // blank line
+    parts.push(`Q: ${form.question.trim()}`);
+
+    if (form.category && form.category.trim()) {
+      parts.push(`Category: ${form.category.trim()}`);
+    }
+
+    parts.push(`Difficulty: ${capitalize(form.difficulty)}`);
+    parts.push(""); // blank before answers
+    parts.push("Answers:");
+
+    optionObjs.forEach((opt, idx) => {
+      const label = labels[idx] || `${idx + 1}`;
+      parts.push(`${label}) ${opt.text || ""}`);
+    });
+
+    if (form.reference && form.reference.trim()) {
+      parts.push("");
+      parts.push(`🔎 Reference: ${form.reference.trim()}`);
+    }
+
+    parts.push("");
+    parts.push(`Play or add questions: ${TRIVIACAST_INFO} Miniapp: ${FARCASTER_MINIAPP}`);
+    parts.push("");
+
+    // Find which label corresponds to the correct answer after shuffle
+    const correctIndex = optionObjs.findIndex((o) => o.isCorrect);
+    const correctLabel = labels[correctIndex] || `${correctIndex + 1}`;
+
+    parts.push(`✅ ${correctLabel}) ${form.correct_answer.trim()}`);
     parts.push("");
     parts.push("— @jesterinvestor");
 
@@ -125,6 +204,35 @@ export default function InfoPage() {
 
       // Open the Farcaster miniapp page so the user can paste/compose there
       window.open(FARCASTER_MINIAPP, "_blank", "noopener,noreferrer");
+          // eslint-disable-next-line no-alert
+          alert("Compose opened — no cast was posted.");
+        }
+        return;
+      }
+
+      // 2) Try dynamic import of the SDK (if available in node_modules)
+      try {
+        // dynamic import may fail in some runtimes; wrap in try/catch
+        // eslint-disable-next-line global-require, import/no-extraneous-dependencies
+        const mod = await import("@farcaster/miniapp-sdk");
+        if (mod?.sdk && mod.sdk.actions && typeof mod.sdk.actions.composeCast === "function") {
+          const result = await mod.sdk.actions.composeCast({ text: message, embeds: [TRIVIACAST_INFO] });
+          if (result?.cast) {
+            // eslint-disable-next-line no-alert
+            alert("Cast posted successfully.");
+          } else {
+            // eslint-disable-next-line no-alert
+            alert("Compose opened — no cast was posted.");
+          }
+          return;
+        }
+      } catch (e) {
+        // dynamic import not available or not installed — continue to fallback
+      }
+
+      // 3) Fallback: open the Warpcast compose URL with prefilled text
+      const url = `${WARPCAST_COMPOSE}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank", "noopener,noreferrer");
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Compose failed", err);
@@ -140,7 +248,7 @@ export default function InfoPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] flex flex-col items-center justify-center">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
-        {/* Mini brain icon and header */}
+        {/* Header */}
         <div className="mb-6 sm:mb-8 flex flex-col items-center justify-center gap-4 w-full">
           <div className="flex flex-col items-center gap-3 sm:gap-4 w-full">
             <Image
@@ -162,13 +270,14 @@ export default function InfoPage() {
 
         <div className="mb-4 text-lg text-gray-800 text-center">
           <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and on-chain rewards. Connect your wallet and show your Farc[...]
+          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and on-chain rewards. Connect your wallet and show your Farcaster profile.
         </div>
 
         <div className="mb-4 text-lg text-fuchsia-800 font-semibold text-center">
           🚀 Connect with Farcaster and your Base wallet to unlock the full Triviacast experience
         </div>
 
-        {/* OpenTDB-like Add Question form (moved to top) */}
+        {/* Form */}
         <div className="mb-6 p-4 bg-white rounded-xl shadow w-full max-w-2xl border">
           <div className="flex items-start justify-between">
             <div>
@@ -334,6 +443,7 @@ export default function InfoPage() {
           </div>
         </div>
 
+        {/* Remaining informational sections (left mostly unchanged) */}
         <div className="mb-6 p-4 bg-gradient-to-r from-pink-100 to-blue-100 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-purple-600">How to Play</h2>
           <ul className="list-disc pl-6 text-gray-700">
@@ -371,6 +481,7 @@ export default function InfoPage() {
         <div className="mb-6 p-4 bg-blue-50 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-blue-700">Quests and Jackpot</h2>
           <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward players.</p>
+          <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward points and give bonuses.</p>
           <ul className="list-disc pl-6 text-gray-700 mt-2">
             <li>Daily Quest — complete a short set of questions every day to earn bonus T Points</li>
             <li>Weekly Quest — finish a longer challenge for rare rewards and leaderboard boosts</li>
@@ -446,7 +557,7 @@ export default function InfoPage() {
               href="https://warpcast.com/jesterinvestor"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 border rounded-full bg-white text-fuchsia-600 shadow hover:shadow-md transition"
+              className="inline-flex items-center gap-2 px-4 py-2 border rounded-full bg-white text-fuchsia-600 shadow hover:shadow-md transition-shadow"
               title="Visit @jesterinvestor on Warpcast"
             >
               View @jesterinvestor
