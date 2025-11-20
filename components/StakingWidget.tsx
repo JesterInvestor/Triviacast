@@ -79,13 +79,13 @@ export default function StakingWidget() {
     async function refresh() {
       if (!address || !publicClient) return;
       if (!resolvedStaking || !resolvedTriv) return;
-      try {
-        const [tb, sb, er, ts] = await Promise.all([
-          publicClient.readContract({ address: resolvedTriv as `0x${string}`, abi: TRIV_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
-          publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
-          publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'earned', args: [address as `0x${string}`] }),
-          publicClient.readContract({ address: resolvedStaking as `0x${string}', abi: STAKING_ABI as any, functionName: 'totalSupply', args: [] }),
-        ]);
+        try {
+          const [tb, sb, er, ts] = await Promise.all([
+            publicClient.readContract({ address: resolvedTriv as `0x${string}`, abi: TRIV_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
+            publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
+            publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'earned', args: [address as `0x${string}`] }),
+            publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'totalSupply', args: [] }),
+          ]);
 
         if (!mounted) return;
         setTokenBalance(ethers.formatUnits(tb as any, 18));
