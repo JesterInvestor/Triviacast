@@ -177,20 +177,20 @@ export default function StakingWidget() {
   return (
     <div className="mt-6 w-full max-w-2xl text-left">
       <div className="p-6 rounded-xl bg-white/90 border border-[#F4A6B7] shadow-sm">
-        <h2 className="text-lg font-semibold text-[#6b4460] mb-3">Stake TRIV for Jackpot rewards</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-3">Stake TRIV for Jackpot rewards</h2>
         <div className="mb-4">
-          <span className="inline-block px-3 py-1 rounded-full bg-[#FFF3F6] text-[#b84d6a] font-semibold text-sm">Current APR: 80%</span>
+          <span className="inline-block px-3 py-1 rounded-full bg-[#FFF3F6] text-pink-700 font-semibold text-sm">Current APR: 80%</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
-          <div className="p-3 bg-[#fff0f4] rounded">Your TRIV: <strong>{format6(tokenBalance)}</strong></div>
-          <div className="p-3 bg-[#fff0f4] rounded">Staked: <strong>{format6(stakedBalance)}</strong></div>
-          <div className="p-3 bg-[#fff0f4] rounded">Earned: <strong>{format6(earned)}</strong></div>
-          <div className="p-3 bg-[#fff0f4] rounded">Total Staked: <strong>{format6(totalStaked)}</strong></div>
+          <div className="p-3 bg-[#fff0f4] rounded text-gray-900">Your TRIV: <strong>{format6(tokenBalance)}</strong></div>
+          <div className="p-3 bg-[#fff0f4] rounded text-gray-900">Staked: <strong>{format6(stakedBalance)}</strong></div>
+          <div className="p-3 bg-[#fff0f4] rounded text-gray-900">Earned: <strong>{format6(earned)}</strong></div>
+          <div className="p-3 bg-[#fff0f4] rounded text-gray-900">Total Staked: <strong>{format6(totalStaked)}</strong></div>
         </div>
 
         {!isConnected ? (
-          <div className="text-sm text-[#7a516d]">Connect your wallet to stake.</div>
+          <div className="text-sm text-gray-700">Connect your wallet to stake.</div>
         ) : (
           <div className="flex flex-col sm:flex-row gap-3">
             <input
