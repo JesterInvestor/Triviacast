@@ -33,8 +33,48 @@ export default function InfoPage() {
       .filter(Boolean)
       .slice(0, 3);
 
-    // Build answers array so that correct answer is always the last option (D)
-    const options = [...incorrect];
+    const parts: string[] = [];
+
+    parts.push("🎙️ Triviacast question");
+    parts.push(""); // blank line for readability
+    parts.push(`Q: ${form.question.trim()}`);
+
+    if (form.category && form.category.trim()) {
+      parts.push(`Category: ${form.category.trim()}`);
+    }
+
+    parts.push(`Difficulty: ${capitalize(form.difficulty)}`);
+    parts.push(`✅ Answer: ${form.correct_answer.trim()}`);
+
+    if (incorrect.length) {
+      parts.push(`❌ Other options: ${incorrect.join(" • ")}`);
+    }
+
+    if (form.reference && form.reference.trim()) {
+      parts.push(`🔎 Reference: ${form.reference.trim()}`);
+    }
+
+    parts.push("");
+    parts.push(`Play or add questions: ${TRIVIACAST_INFO}`);
+    parts.push(`Miniapp: ${FARCASTER_MINIAPP}`);
+    parts.push("");
+    parts.push("— @jesterinvestor");
+
+    return parts.join("\n");
+  };
+
+  const composeToWarpcast = async () => {
+    if (!canCast) {
+      // simple guard
+      // eslint-disable-next-line no-alert
+      alert("Please fill at least the question and correct answer before composing a cast.");
+      return;
+    }
+    // Build an array of option objects, ensuring 3 incorrect slots exist
+    const optionObjs: { text: string; isCorrect: boolean }[] = incorrect.map((t) => ({
+      text: t,
+      isCorrect: false,
+    }));
 
     // Ensure we have exactly 3 incorrect slots for consistent labeling A/B/C
     while (options.length < 3) options.push("");
@@ -126,6 +166,51 @@ export default function InfoPage() {
         // dynamic import not available or not installed — continue to fallback
       }
 
+      // 3) Fallback: copy message to clipboard (if allowed) and open the Farcaster miniapp
+      try {
+        if (navigator?.clipboard && typeof navigator.clipboard.writeText === "function") {
+          await navigator.clipboard.writeText(message);
+          // eslint-disable-next-line no-alert
+          alert("Message copied to clipboard. Open the Farcaster miniapp to paste or post it.");
+        } else {
+          // eslint-disable-next-line no-alert
+          alert("Miniapp SDK not available. Please open the Farcaster miniapp and paste the message manually.");
+        }
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error("Clipboard write failed", e);
+        // eslint-disable-next-line no-alert
+        alert("Miniapp SDK not available. Please open the Farcaster miniapp and paste the message manually.");
+      }
+
+      // Open the Farcaster miniapp page so the user can paste/compose there
+      window.open(FARCASTER_MINIAPP, "_blank", "noopener,noreferrer");
+          // eslint-disable-next-line no-alert
+          alert("Compose opened — no cast was posted.");
+        }
+        return;
+      }
+
+      // 2) Try dynamic import of the SDK (if available in node_modules)
+      try {
+        // dynamic import may fail in some runtimes; wrap in try/catch
+        // eslint-disable-next-line global-require, import/no-extraneous-dependencies
+        const mod = await import("@farcaster/miniapp-sdk");
+        if (mod?.sdk && mod.sdk.actions && typeof mod.sdk.actions.composeCast === "function") {
+          const result = await mod.sdk.actions.composeCast({ text: message, embeds: [TRIVIACAST_INFO] });
+          if (result?.cast) {
+            // eslint-disable-next-line no-alert
+            alert("Cast posted successfully.");
+          } else {
+            // eslint-disable-next-line no-alert
+            alert("Compose opened — no cast was posted.");
+          }
+          return;
+        }
+      } catch (e) {
+        // dynamic import not available or not installed — continue to fallback
+      }
+
       // 3) Fallback: open the Warpcast compose URL with prefilled text
       const url = `${WARPCAST_COMPOSE}?text=${encodeURIComponent(message)}`;
       window.open(url, "_blank", "noopener,noreferrer");
@@ -177,6 +262,7 @@ export default function InfoPage() {
         </div>
 
         <div className="mb-4 text-lg text-gray-800 text-center">
+          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and on-chain rewards. Connect your wallet and show your Farc[...]
           <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and on-chain rewards. Connect your wallet and show your Farcaster profile.
         </div>
 
@@ -426,6 +512,7 @@ export default function InfoPage() {
 
         <div className="mb-6 p-4 bg-blue-50 rounded-xl shadow w-full max-w-2xl">
           <h2 className="text-xl font-bold mb-2 text-blue-700">Quests and Jackpot</h2>
+          <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward players.</p>
           <p className="text-gray-700">Quests are live and growing. Complete daily challenges and event quests to earn bonus T Points and unique status. Quests are collections of questions that reward points and give bonuses.</p>
           <ul className="list-disc pl-6 text-gray-700 mt-2">
             <li>Daily Quest — complete a short set of questions every day to earn bonus T Points</li>
