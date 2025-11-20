@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @notice Staking contract with configurable rewards expressed as "per-day" TRIV.
@@ -46,7 +46,7 @@ contract StakingWithRewards is Ownable, ReentrancyGuard {
     event DailyRewardUpdated(uint256 oldDaily, uint256 newDaily);
     event RewardRateUpdated(uint256 oldRate, uint256 newRate);
 
-    constructor(address _stakeToken, address _rewardToken, uint256 _dailyReward) {
+    constructor(address _stakeToken, address _rewardToken, uint256 _dailyReward) Ownable(msg.sender) {
         require(_stakeToken != address(0) && _rewardToken != address(0), "zero addr");
         stakeToken = IERC20(_stakeToken);
         rewardToken = IERC20(_rewardToken);
