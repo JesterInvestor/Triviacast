@@ -69,11 +69,14 @@ export default function StakingWidget() {
       if (!address) return;
       if (!resolvedStaking || !resolvedTriv) return;
       try {
+        const pc = publicClient;
+        if (!pc) throw new Error('publicClient unavailable');
+
         const [tb, sb, er, ts] = await Promise.all([
-          publicClient.readContract({ address: resolvedTriv as `0x${string}`, abi: TRIV_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
-          publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
-          publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'earned', args: [address as `0x${string}`] }),
-          publicClient.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'totalSupply', args: [] }),
+          pc.readContract({ address: resolvedTriv as `0x${string}`, abi: TRIV_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
+          pc.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'balanceOf', args: [address as `0x${string}`] }),
+          pc.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'earned', args: [address as `0x${string}`] }),
+          pc.readContract({ address: resolvedStaking as `0x${string}`, abi: STAKING_ABI as any, functionName: 'totalSupply', args: [] }),
         ]);
 
         if (!mounted) return;
