@@ -2,6 +2,8 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import StakingWidget from "../../components/StakingWidget";
+import WagmiWalletConnect from "../../components/WagmiWalletConnect";
+import { useConnect, useAccount } from 'wagmi';
 
 function pad(n: number) {
   return n.toString().padStart(2, "0");
@@ -43,6 +45,9 @@ export default function JackpotPage() {
         aria-label="Jackpot countdown"
       >
         <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] mb-4">Jackpot coming soon.....</h1>
+        <div className="mb-4">
+          <ConnectControls />
+        </div>
         <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">Only for players with 100,000 T points and 60 iQ.</p>
 
         <div className="w-full flex flex-col items-center gap-6">
@@ -84,6 +89,34 @@ export default function JackpotPage() {
         <StakingWidget />
       </div>
     </main>
+  );
+}
+
+function ConnectControls() {
+  const { connectors, connect } = useConnect();
+  const { isConnected } = useAccount();
+
+  if (isConnected) {
+    return <WagmiWalletConnect />;
+  }
+
+  return (
+    <div className="flex flex-col sm:flex-row items-center gap-3">
+      <div className="text-sm text-[#7a516d]">Connect wallet to participate:</div>
+      <div className="flex gap-2 flex-wrap">
+        {connectors.map((c) => (
+          <button
+            key={c.id}
+            onClick={() => connect({ connector: c })}
+            disabled={!c.ready}
+            className="px-3 py-2 rounded bg-white border text-sm shadow-sm"
+            title={c.name}
+          >
+            {c.name}{!c.ready ? ' (unavailable)' : ''}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
