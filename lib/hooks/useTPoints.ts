@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { readContract } from '@wagmi/core'
 import { base } from 'wagmi/chains'
+import { wagmiConfig } from '@/lib/wagmi'
 
 // Minimal ABI: assumes T-points contract exposes getPoints(address) -> uint256
 const TPOINTS_ABI = [
@@ -20,13 +21,17 @@ export default function useTPoints(address?: `0x${string}`) {
         return
       }
       try {
-        const res = await readContract({
-          address: TPOINTS_ADDRESS,
-          abi: TPOINTS_ABI as any,
-          functionName: 'getPoints',
-          args: [address],
-          chainId: base.id,
-        })
+        // wagmi's readContract expects the config object and the wagmiConfig as a second arg
+        const res = await readContract(
+          {
+            address: TPOINTS_ADDRESS,
+            abi: TPOINTS_ABI as any,
+            functionName: 'getPoints',
+            args: [address],
+            chainId: base.id,
+          },
+          wagmiConfig
+        )
         if (!cancelled) setTPoints(BigInt(res ?? 0))
       } catch (e) {
         // on error, leave as null (caller can treat as 0)
