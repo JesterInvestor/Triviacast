@@ -2,9 +2,17 @@
 
 import React from "react";
 import StakingWidget from "../../components/StakingWidget";
-import Megapot from "../../components/Megapot";
 import WagmiWalletConnect from "../../components/WagmiWalletConnect";
 import { useConnect, useAccount } from "wagmi";
+
+/**
+ * Jackpot page without the countdown timer.
+ *
+ * NOTE: Megapot component was previously missing in your build and caused a module-not-found error.
+ * To ensure this file can be pasted and built immediately, I've included a small local Megapot placeholder
+ * component below. If you already have a real components/Megapot, you can remove the local Megapot function
+ * and import it instead (restore `import Megapot from "../../components/Megapot";`).
+ */
 
 export default function JackpotPage() {
   return (
@@ -38,13 +46,34 @@ export default function JackpotPage() {
           </p>
         </div>
 
-        {/* Megapot (moved above staking widget) */}
+        {/* Inline Megapot placeholder (keeps the build from failing if a real component is missing) */}
         <Megapot />
 
         {/* Staking widget */}
         <StakingWidget />
       </div>
     </main>
+  );
+}
+
+/* Simple local Megapot placeholder so this file builds immediately.
+   Replace or remove this if you have ../../components/Megapot in the repo. */
+function Megapot() {
+  return (
+    <div className="w-full max-w-2xl mt-6 rounded-lg bg-gradient-to-b from-white/70 to-white/40 border border-[#f4c0cc] p-4 shadow-sm">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-sm uppercase text-[#6b4460] tracking-wide">Megapot</div>
+          <div className="text-lg font-semibold text-[#9b3550]">Mega rewards & referral pool</div>
+          <div className="text-xs text-[#7a516d] mt-1">
+            Connect your wallet to view the Megapot balance and claim rules.
+          </div>
+        </div>
+        <div>
+          <button className="px-3 py-2 bg-white rounded border text-sm shadow-sm">View</button>
+        </div>
+      </div>
+    </div>
   );
 }
 
