@@ -34,7 +34,7 @@ export default function JackpotPage() {
         </div>
         <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">
           Only 1 USDC per ticket. Only for players with 100,000 T points and 60
-          iQ.
+          iQ soon. Get T points and iQ!!!
         </p>
 
         {/* Removed countdown */}
