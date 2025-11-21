@@ -67,6 +67,9 @@ export default function QuestsPage() {
     return `Chain ${chainId}`;
   }, [chainId]);
   const { iqPoints } = useIQPoints(address as `0x${string}` | undefined);
+  const isOver50IQ = useMemo(() => {
+    try { return (iqPoints ?? 0n) > 50n; } catch { return false; }
+  }, [iqPoints]);
   // Always require Base network for direct on-chain user claims (no gasless backend).
   const requiresBase = true;
   const [inlineError, setInlineError] = useState<string | null>(null);
@@ -186,9 +189,8 @@ export default function QuestsPage() {
           {/* Add vertical spacing between the Cast block and the Follow block so when the Follow badge disappears they don't sit too close */}
           <div className="mt-6">
             {/* Follow quest rendering:
-                - show a small "already follow" message when alreadyFollowingJester === true
-                - render the Claim QuestCard only when followQuestVisible === true (claim and card are gated)
-                - always render the "Follow now" CTA button so users can open Farcaster regardless of gating
+              - render the Claim QuestCard when followQuestVisible is true
+              - always render the "Follow now" CTA button so users can open Farcaster
             */}
             
 
@@ -207,7 +209,8 @@ export default function QuestsPage() {
                     !address ||
                     !!error ||
                     switchingChain ||
-                    !isFollowMarkedToday()
+                    !isFollowMarkedToday() ||
+                    !isOver50IQ
                   }
                   onClaim={async () => {
                     setInlineError(null);
@@ -222,6 +225,9 @@ export default function QuestsPage() {
                   }}
                   loading={loading}
                 />
+                {!isOver50IQ && !claimedFollowJester && (
+                  <div className="mt-2 text-xs text-[#b14f5f]">Requires more than 50 iQ to claim the +50 iQ follow reward.</div>
+                )}
               </>
             )}
 
@@ -246,7 +252,7 @@ export default function QuestsPage() {
                     setFollowBurst(true);
                     setTimeout(() => setFollowBurst(false), 900);
                   }}
-                  // intentionally always clickable — do not gate with checkingFollow/isFollowMarkedToday/iq/etc.
+                  // intentionally always clickable — do not gate with isFollowMarkedToday
                 >
                   <span className="cta-emoji">👤</span>
                   Follow now
