@@ -129,27 +129,23 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
       setLoading(true);
       try {
         const board = await getLeaderboard();
-        // board contains walletAddress and tPoints; for IQ view we'll augment with iqPoints
-        let finalList: any[] = board;
-        if (view === 'iq') {
-          // Fetch IQ points for each address in parallel (best-effort)
-          const entries = await Promise.all(
-            board.map(async (b: any) => {
-              const addr = (b.walletAddress || '').toLowerCase();
-              try {
-                const v = await getIQPoints(addr as `0x${string}`);
-                return { walletAddress: addr, iqPoints: Number(v) };
-              } catch (err) {
-                return { walletAddress: addr, iqPoints: 0 };
-              }
-            })
-          );
-          setLeaderboard(entries);
-          finalList = entries;
-        } else {
-          setLeaderboard(board);
-          finalList = board;
-        }
+        // board contains walletAddress and tPoints. We will augment each entry with iqPoints
+        // by fetching on-chain IQ points in parallel (best-effort). Keep both metrics.
+        const entries = await Promise.all(
+          board.map(async (b: any) => {
+            const addr = (b.walletAddress || b.wallet || b.address || '').toLowerCase();
+            let iq = 0;
+            try {
+              const v = await getIQPoints(addr as `0x${string}`);
+              iq = Number(v);
+            } catch (err) {
+              iq = 0;
+            }
+            return { walletAddress: addr, tPoints: Number(b.tPoints || b.points || 0), iqPoints: iq };
+          })
+        );
+        setLeaderboard(entries);
+        const finalList: any[] = entries;
 
         // Batch fetch Farcaster profiles for the TOP N leaderboard addresses only
         const addresses = finalList
@@ -320,13 +316,15 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
           });
         }
 
-        const points = view === 'iq' ? (entry.iqPoints || 0) : (entry.tPoints || 0);
+        const tPoints = entry.tPoints || entry.points || 0;
+        const iqPoints = entry.iqPoints || 0;
 
         return {
           rank,
           addr,
           profile,
-          points,
+          tPoints,
+          iqPoints,
         };
       });
   }, [limitedLeaderboard, displayCount, profiles, view]);
@@ -360,7 +358,8 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                   const header = [
                     'rank',
                     'address',
-                    view === 'iq' ? 'iq_points' : 't_points',
+                    't_points',
+                    'iq_points',
                     'farcaster_username',
                     'display_name',
                     'fid',
@@ -393,7 +392,8 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                     const csvRow = [
                       String(idx + 1),
                       addr,
-                      String(entry[pointsKey] || 0),
+                      String(entry.tPoints || entry.points || 0),
+                      String(entry.iqPoints || 0),
                       username,
                       displayName,
                       String(fid),
@@ -462,7 +462,8 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                   <tr className="text-xs sm:text-sm text-[#5a3d5c] border-b border-[#f3dbe0]">
                     <th className="py-2">#</th>
                     <th className="py-2">Player</th>
-                    <th className="py-2">{view === 'iq' ? 'iQ' : 'T Points'}</th>
+                    <th className="py-2">T Points</th>
+                    <th className="py-2">iQ</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -481,7 +482,8 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                           )}
                         </div>
                       </td>
-                      <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{r.points.toLocaleString()}</td>
+                      <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{(r.tPoints || 0).toLocaleString()}</td>
+                      <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{(r.iqPoints || 0).toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -505,10 +507,14 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             )}
 
             {/* Total T Points summary */}
-            <div className="mt-6 sm:mt-8 text-center w-full">
-              <div className="bg-[#FFF4F6] border-2 border-[#F4A6B7] rounded-lg p-3 sm:p-4 mb-4 inline-block w-full">
-                <div className="text-sm text-[#5a3d5c]">{view === 'iq' ? 'Total iQ (all players)' : 'Total T Points (all players)'}</div>
-                  <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">{(view === 'iq' ? leaderboard.reduce((s, e) => s + (e.iqPoints || 0), 0) : totalTPoints).toLocaleString()}</div>
+            <div className="mt-6 sm:mt-8 text-center w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="bg-[#FFF4F6] border-2 border-[#F4A6B7] rounded-lg p-3 sm:p-4 inline-block w-full">
+                <div className="text-sm text-[#5a3d5c]">Total T Points (all players)</div>
+                <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">{totalTPoints.toLocaleString()}</div>
+              </div>
+              <div className="bg-[#FFF4F6] border-2 border-[#F4A6B7] rounded-lg p-3 sm:p-4 inline-block w-full">
+                <div className="text-sm text-[#5a3d5c]">Total iQ (all players)</div>
+                <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">{leaderboard.reduce((s, e) => s + (e.iqPoints || 0), 0).toLocaleString()}</div>
               </div>
             </div>
 
