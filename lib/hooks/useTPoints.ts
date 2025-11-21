@@ -21,8 +21,9 @@ export default function useTPoints(address?: `0x${string}`) {
         return
       }
       try {
-        // wagmi's readContract expects the config object and the wagmiConfig as a second arg
-        const res = await readContract(
+        // Cast readContract to any to avoid mismatched Config typing across @wagmi/core versions.
+        // This keeps the call working in builds where readContract's type signature differs from runtime usage.
+        const res = await (readContract as any)(
           {
             address: TPOINTS_ADDRESS,
             abi: TPOINTS_ABI as any,
