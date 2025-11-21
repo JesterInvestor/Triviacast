@@ -72,7 +72,7 @@ function ConnectControls() {
           >
             {c.name}{!c.ready ? ' (unavailable)' : ''}
           </button>
-        ))}
+        ))
       </div>
     </div>
   );
