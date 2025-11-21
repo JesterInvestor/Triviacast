@@ -28,7 +28,20 @@ export function useQuestIQ(address?: `0x${string}`) {
 
   // Listen to global quest claimed event to refresh status
   useEffect(() => {
-    const handler = () => {
+    const handler = (ev: Event) => {
+      // If the event provides a quest id in its detail, optimistically mark that quest as claimed for today.
+      try {
+        const custom = ev as CustomEvent | undefined
+        const id = custom?.detail?.id
+        if (typeof id === 'number' && address) {
+          setLastDays(prev => ({ ...prev, [id]: BigInt(today) }))
+          return
+        }
+      } catch (e) {
+        // fall through to full refresh
+      }
+
+      // Fallback: refresh all quest days from chain (preserves original behavior)
       if (!address) return
       const ids = [1,2,3,4,5]
       Promise.all(ids.map(id => getLastClaimDay(address, id)))
@@ -40,10 +53,10 @@ export function useQuestIQ(address?: `0x${string}`) {
         .catch(() => {})
     }
     if (typeof window !== 'undefined') {
-      window.addEventListener('triviacast:questClaimed', handler)
-      return () => window.removeEventListener('triviacast:questClaimed', handler)
+      window.addEventListener('triviacast:questClaimed', handler as EventListener)
+      return () => window.removeEventListener('triviacast:questClaimed', handler as EventListener)
     }
-  }, [address])
+  }, [address, today])
 
   const secondsUntilReset = useMemo(() => ((today+1)*86400) - now, [today, now])
 

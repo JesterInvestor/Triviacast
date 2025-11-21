@@ -139,11 +139,11 @@ export default function QuestsPage() {
         <div className="space-y-4">
           {/* Quests that can be claimed directly by user without relayer. */}
 
-          {/* Cast quest: +1 iQ */}
+          {/* Share quest: +1 iQ */}
           <QuestCard
-            title="Cast about Triviacast"
+            title="Share about Triviacast"
             emoji="📣"
-            description="Post a quick cast about Triviacast. You can use the cast shortcut, then claim."
+            description="Post a quick share about Triviacast. You can use the share shortcut, then claim."
             reward="+1 iQ"
             claimed={claimedShare}
             disabled={claimedShare || !address || !!error || switchingChain || !isShareMarkedToday()}
@@ -153,7 +153,10 @@ export default function QuestsPage() {
               if (!ok) return;
               await claimShare();
               try {
-                window.dispatchEvent(new Event('triviacast:questClaimed'));
+                // Mark local share action so the UI and local storage reflect the action immediately
+                try { markShareDone(); } catch {}
+                // Inform hooks about the specific quest id that changed so they can optimistically update
+                window.dispatchEvent(new CustomEvent('triviacast:questClaimed', { detail: { id: 1 } }));
                 window.dispatchEvent(new Event('triviacast:iqUpdated'));
                 window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+1 iQ claimed' } }));
               } catch {}
@@ -164,11 +167,11 @@ export default function QuestsPage() {
             <div className="relative">
               <button
                 type="button"
-                aria-label="Cast now"
+                aria-label="Share now"
                 className={`btn-cta ${isShareMarkedToday() ? '' : 'pulsing'}`}
                 onClick={() => {
                   markShareDone();
-                  showToast('Cast action recorded — Claim enabled for today', 'success');
+                  showToast('Share action recorded — Claim enabled for today', 'success');
                   try { openShareUrl(shareAppUrl()); } catch {}
                   // small emoji burst
                   setCastBurst(true);
@@ -177,11 +180,11 @@ export default function QuestsPage() {
                 disabled={!address}
               >
                 <span className="cta-emoji">📣</span>
-                Cast now
+                Share now
               </button>
               {castBurst && <span className="emoji-burst">✨</span>}
             </div>
-            <span className="opacity-80">Click Cast Now, and Cast. Then you can claim another +1 iQ.</span>
+            <span className="opacity-80">Click Share Now, and share. Then you can claim another +1 iQ.</span>
           </div>
           
 
@@ -200,7 +203,7 @@ export default function QuestsPage() {
                       <h2 className="text-xl sm:text-2xl font-extrabold text-[#2d1b2e]">Follow @jesterinvestor</h2>
                       <span className="px-2 py-1 bg-[#FFE4EC] border border-[#F4A6B7] rounded text-xs font-semibold text-[#5a3d5c]">+50 iQ</span>
                     </div>
-                    <p className="text-sm text-[#5a3d5c] mb-3 leading-relaxed">Follow @jesterinvestor on Farcaster (manual trust now).</p>
+                    <p className="text-sm text-[#5a3d5c] mb-3 leading-relaxed">Follow @jesterinvestor in the App (manual trust now).</p>
                     <div className="flex items-center gap-3">
                       <button
                         disabled={!isUnder50IQ || !address || !!error || switchingChain || !isFollowMarkedToday() || loading}
@@ -210,7 +213,8 @@ export default function QuestsPage() {
                           if (!ok) return;
                           await claimFollowJester();
                           try {
-                            window.dispatchEvent(new Event('triviacast:questClaimed'));
+                            try { markFollowDone(); } catch {}
+                            window.dispatchEvent(new CustomEvent('triviacast:questClaimed', { detail: { id: 4 } }));
                             window.dispatchEvent(new Event('triviacast:iqUpdated'));
                             window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+50 iQ claimed' } }));
                           } catch {}
@@ -293,7 +297,7 @@ export default function QuestsPage() {
         )}
 
         <div className="mt-8 text-center text-xs text-[#5a3d5c]">
-          Simplified quests: Cast (+1 iQ), Follow (+50 iQ), Daily Claim (+1 iQ). Quiz/Challenge. We trust you to be honest!
+          Simplified quests: Share (+1 iQ), Follow (+50 iQ), Daily Claim (+1 iQ). Quiz/Challenge. We trust you to be honest!
         </div>
         {/* Leaderboard intentionally removed from Quests page */}
       </div>

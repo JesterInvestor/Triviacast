@@ -18,7 +18,7 @@ export default function InfoPage() {
   const [form, setForm] = useState(DEFAULT_FORM);
 
   const FARCASTER_MINIAPP = "https://farcaster.xyz/miniapps/UmWywlPILouA/triviacast";
-  const WARPCAST_COMPOSE = "https://warpcast.com/compose";
+  const FARCASTER_COMPOSE = "https://farcaster.xyz/compose";
   const TRIVIACAST_INFO = "https://triviacast.xyz/info";
   const OPEN_TDB_URL = "https://opentdb.com/trivia_add_question.php";
 
@@ -61,11 +61,11 @@ export default function InfoPage() {
     return parts.join("\n");
   };
 
-  const composeToWarpcast = async () => {
+  const composeToFarcaster = async () => {
     if (!canCast) {
       // simple guard
       // eslint-disable-next-line no-alert
-      alert("Please fill at least the question and correct answer before composing a cast.");
+      alert("Please fill at least the question and correct answer before composing a share.");
       return;
     }
     const message = buildCastMessage();
@@ -74,14 +74,14 @@ export default function InfoPage() {
       const anyWindow = window as any;
 
       // 1) If the Farcaster miniapp SDK is injected globally as `sdk`, use it
-      if (anyWindow.sdk && anyWindow.sdk.actions && typeof anyWindow.sdk.actions.composeCast === "function") {
+        if (anyWindow.sdk && anyWindow.sdk.actions && typeof anyWindow.sdk.actions.composeCast === "function") {
         const result = await anyWindow.sdk.actions.composeCast({ text: message, embeds: [TRIVIACAST_INFO] });
         if (result?.cast) {
           // eslint-disable-next-line no-alert
-          alert("Cast posted successfully.");
+          alert("Share posted successfully.");
         } else {
           // eslint-disable-next-line no-alert
-          alert("Compose opened — no cast was posted.");
+          alert("Compose opened — no share was posted.");
         }
         return;
       }
@@ -95,10 +95,10 @@ export default function InfoPage() {
           const result = await mod.sdk.actions.composeCast({ text: message, embeds: [TRIVIACAST_INFO] });
           if (result?.cast) {
             // eslint-disable-next-line no-alert
-            alert("Cast posted successfully.");
+            alert("Share posted successfully.");
           } else {
             // eslint-disable-next-line no-alert
-            alert("Compose opened — no cast was posted.");
+            alert("Compose opened — no share was posted.");
           }
           return;
         }
@@ -179,7 +179,7 @@ export default function InfoPage() {
               <img src="/opentdb-logo.png" alt="Open Trivia Database" className="w-20 opacity-60" />
             </div>
           </div>
-          <p className="text-sm text-gray-600 mb-3">Fill the fields to create a multiple-choice question. Share it to Warpcast or add it manually on OpenTDB.</p>
+          <p className="text-sm text-gray-600 mb-3">Fill the fields to create a multiple-choice question. Share it to Farcaster or add it manually on OpenTDB.</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label className="flex flex-col text-sm text-gray-700">
@@ -294,25 +294,25 @@ export default function InfoPage() {
             <p className="mt-2">You have a few options to share or submit the question you create:</p>
             <ul className="list-disc pl-5 mt-2">
               <li>
-                <strong>Compose on Warpcast</strong>: Click <em>Compose on Warpcast</em> to open the Warpcast compose flow (uses SDK if available, otherwise opens a prefilled compose page).
+                <strong>Compose on Farcaster</strong>: Click <em>Compose on Farcaster</em> to open the Farcaster compose flow (uses SDK if available, otherwise opens a prefilled compose page).
               </li>
               <li className="mt-1">
                 <strong>Add directly to OpenTDB</strong>: Click <em>Add directly to OpenTDB</em> to open the OpenTDB submission page. Fill the OpenTDB form manually — no autofill is provided.
               </li>
             </ul>
-            <p className="mt-3 text-sm text-gray-600">Casted questions will be reviewed and, when accepted, added to Triviacast on a weekly cadence.</p>
+            <p className="mt-3 text-sm text-gray-600">Shared questions will be reviewed and, when accepted, added to Triviacast on a weekly cadence.</p>
             <p className="mt-2 text-sm text-gray-600">Readers: you can add your own questions at <a href="https://triviacast.xyz/info" className="underline">triviacast.xyz/info</a>.</p>
           </div>
 
           <div className="mt-4 flex items-center gap-3">
             <button
               type="button"
-              onClick={() => composeToWarpcast()}
+              onClick={() => composeToFarcaster()}
               disabled={!canCast}
               className={`px-4 py-2 rounded text-white ${canCast ? "bg-fuchsia-600 hover:bg-fuchsia-700" : "bg-gray-300 cursor-not-allowed"}`}
-              title={canCast ? "Open Warpcast compose (uses SDK if present)" : "Fill question and correct answer to enable composing"}
+              title={canCast ? "Open Farcaster compose (uses SDK if present)" : "Fill question and correct answer to enable composing"}
             >
-              Compose on Warpcast
+              Compose on Farcaster
             </button>
 
             <button
@@ -353,8 +353,8 @@ export default function InfoPage() {
             <li>Open the Challenge page and search for your friend by Farcaster handle</li>
             <li>Select their profile and click Play Quiz</li>
             <li>After you finish the quiz you will see a preview message that mentions them — edit it if you want</li>
-            <li>Post the cast from your account using Base or Farcaster or copy the message to share manually</li>
-            <li>Your friend will be mentioned in the cast and the challenge begins — may the best brain win</li>
+            <li>Post the share from your account using Base or Farcaster or copy the message to share manually</li>
+                <li>Your friend will be mentioned in the share and the challenge begins — may the best brain win</li>
           </ol>
         </div>
 
@@ -375,7 +375,7 @@ export default function InfoPage() {
             <li>Daily Quest — complete a short set of questions every day to earn bonus T Points</li>
             <li>Weekly Quest — finish a longer challenge for rare rewards and leaderboard boosts</li>
             <li>Event Quest — limited-time themed quizzes with special prizes</li>
-            <li>Jackpot — coming soon for top players and quest masters. Stay tuned for the official launch on Warpcast and in-app</li>
+            <li>Jackpot — coming soon for top players and quest masters. Stay tuned for the official launch on Farcaster and in-app</li>
           </ul>
         </div>
 
@@ -408,9 +408,9 @@ export default function InfoPage() {
         </div>
 
         <div className="mb-6 p-4 bg-fuchsia-50 rounded-xl shadow w-full max-w-2xl">
-          <h2 className="text-xl font-bold mb-2 text-fuchsia-700">Connect and Cast</h2>
+          <h2 className="text-xl font-bold mb-2 text-fuchsia-700">Connect and Share</h2>
           <p className="text-gray-700">
-            Cast to{" "}
+            Share to{" "}
             <a
               href="https://warpcast.com/jesterinvestor"
               className="text-fuchsia-600 underline"
@@ -421,7 +421,7 @@ export default function InfoPage() {
             </a>{" "}
             with a quick message after a great quiz show or share a hot take from your profile
           </p>
-          <p className="mt-2 text-gray-700">Got a trivia fact idea, feature request, or a perfect meme? Cast it our way and we may feature it in a quest.</p>
+          <p className="mt-2 text-gray-700">Got a trivia fact idea, feature request, or a perfect meme? Share it our way and we may feature it in a quest.</p>
 
           {/* Fancy Follow button */}
           <div className="mt-4 flex flex-col sm:flex-row items-center sm:items-start gap-3">
@@ -443,11 +443,11 @@ export default function InfoPage() {
             </a>
 
             <a
-              href="https://warpcast.com/jesterinvestor"
+              href="https://farcaster.xyz/jesterinvestor"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 border rounded-full bg-white text-fuchsia-600 shadow hover:shadow-md transition"
-              title="Visit @jesterinvestor on Warpcast"
+              title="Visit @jesterinvestor on Farcaster"
             >
               View @jesterinvestor
             </a>

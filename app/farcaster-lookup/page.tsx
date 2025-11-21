@@ -388,10 +388,10 @@ export default function FarcasterLookupPage() {
                             onClick={() => {
                               // open their Neynar profile in a new tab
                               const user = p.username ? String(p.username).replace(/^@/, "").replace(/(?:\.farcaster\.eth|\.eth)$/i, "") : String(p.fid);
-                              openInNewTab(`https://warpcast.com/${encodeURIComponent(user)}`);
+                              openInNewTab(`https://farcaster.xyz/${encodeURIComponent(user)}`);
                             }}
                           >
-                            Warpcast
+                            View on Farcaster
                           </button>
                         </div>
                       </div>
@@ -444,21 +444,21 @@ export default function FarcasterLookupPage() {
                 </div>
               )}
 
-              {/* Preview / Compose modal: lets user edit the cast, open Warpcast to post from their account, or post via server */}
+              {/* Preview / Compose modal: lets user edit the share, open Farcaster to post from their account, or post via server */}
               {previewOpen && (
                 <div
                   className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
                   onClick={() => handleClosePreview()}
                 >
                   <div className="w-11/12 max-w-2xl bg-white rounded-lg p-4 shadow-lg" onClick={(e) => e.stopPropagation()}>
-                    <h2 className="text-lg font-bold mb-2">Preview your cast</h2>
+                    <h2 className="text-lg font-bold mb-2">Preview your share</h2>
                     <p className="text-sm text-gray-600 mb-2">Review the message below and post it from your account or copy it to share manually.</p>
                     <textarea className="w-full h-32 p-2 border rounded mb-2 bg-gray-50" value={previewText} readOnly />
-                    <p className="text-xs text-gray-500 mb-3">To edit this message before posting, click "Post from my account" — edits should be done in the Farcaster composer when available; otherwise copy and paste into Warpcast or Base.</p>
+                    <p className="text-xs text-gray-500 mb-3">To edit this message before posting, click "Post from my account" — edits should be done in the Farcaster composer when available; otherwise copy and paste into Farcaster or Base.</p>
 
                     {sdkMissing && (
                       <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-                        Farcaster composer not available in this environment. Please copy the message below and paste it into your Warpcast/Base app to post.
+                        Farcaster composer not available in this environment. Please copy the message below and paste it into your Farcaster or Base app to post.
                         <div className="mt-2">
                           <textarea className="w-full h-20 p-2 border rounded bg-white text-sm" value={`${previewText}${previewLink ? ` ${previewLink}` : ""}`} readOnly />
                         </div>
@@ -477,14 +477,14 @@ export default function FarcasterLookupPage() {
                             // eslint-disable-next-line @typescript-eslint/no-var-requires
                             const mod = await import("@farcaster/miniapp-sdk");
                             const sdk = (mod as any).sdk;
-                            if (sdk && sdk.actions && typeof sdk.actions.composeCast === "function") {
+                              if (sdk && sdk.actions && typeof sdk.actions.composeCast === "function") {
                               const result = await sdk.actions.composeCast({
                                 text: previewText,
                                 embeds: previewLink ? [previewLink] : undefined,
                               });
-                              // If the user posted a cast, optionally close the preview
+                              // If the user posted a share, optionally close the preview
                               if (result?.cast) {
-                                alert("Cast posted");
+                                alert("Share posted");
                                 setPreviewOpen(false);
                                 setPreviewText("");
                                 setPreviewLink("");
@@ -498,9 +498,9 @@ export default function FarcasterLookupPage() {
                             // Not running inside mini app or SDK not available — fall through to show guidance.
                           }
 
-                          // IMPORTANT: Do NOT open Warpcast compose in a new tab here.
+                          // IMPORTANT: Do NOT open an external compose in a new tab here.
                           // On mobile Farcaster, opening a new tab does not work reliably.
-                          // Instead show an inline instruction asking user to copy/paste into their Warpcast/Base app.
+                          // Instead show an inline instruction asking user to copy/paste into their Farcaster/Base app.
                           setSdkMissing(true);
                         }}
                       >
@@ -523,7 +523,7 @@ export default function FarcasterLookupPage() {
                             // ignore and fallback
                           }
 
-                          // Fallback for older browsers: create a temporary textarea and execCommand
+                              // Fallback for older browsers: create a temporary textarea and execCommand
                           try {
                             const ta = document.createElement("textarea");
                             ta.value = textToCopy;
@@ -555,10 +555,10 @@ export default function FarcasterLookupPage() {
                   </div>
                 </div>
               )}
-              {/* Show recent casts if available */}
+              {/* Show recent shares if available */}
               {profile && Array.isArray(profile.casts) && profile.casts.length > 0 && (
                 <div className="mt-4 w-full">
-                  <h3 className="font-bold text-[#2d1b2e] text-base mb-2">Recent Casts</h3>
+                  <h3 className="font-bold text-[#2d1b2e] text-base mb-2">Recent Shares</h3>
                   <ul className="space-y-2">
                     {profile.casts.slice(0, 5).map((cast: any, idx: number) => (
                       <li key={cast.hash || idx}>
