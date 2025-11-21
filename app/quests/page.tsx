@@ -39,14 +39,14 @@ function QuestCard({ title, emoji, description, reward, claimed, disabled, onCla
           <p className="text-sm text-[#5a3d5c] mb-3 leading-relaxed">{description}</p>
           <div className="flex items-center gap-3">
             {claimed ? (
-              <div className="text-green-700 text-sm font-semibold">✅ Claimed</div>
-            ) : (
+                <div className="text-green-700 text-sm font-semibold">✅ Claimed</div>
+              ) : (
               <button
                 disabled={disabled || loading}
                 onClick={() => !disabled && onClaim()}
                 className={`px-4 py-2 rounded-lg text-sm font-bold shadow transition min-w-[120px] ${disabled || loading ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-[#DC8291] hover:bg-[#c96a78] text-white'}`}
               >
-                {loading ? 'Processing…' : 'Claim'}
+                  {loading ? 'Pending...' : 'Claim'}
               </button>
             )}
           </div>
@@ -67,9 +67,6 @@ export default function QuestsPage() {
     return `Chain ${chainId}`;
   }, [chainId]);
   const { iqPoints } = useIQPoints(address as `0x${string}` | undefined);
-  const hasMinimumIQ = useMemo(() => {
-    try { return (iqPoints ?? 0n) >= 54n; } catch { return false; }
-  }, [iqPoints]);
   // Always require Base network for direct on-chain user claims (no gasless backend).
   const requiresBase = true;
   const [inlineError, setInlineError] = useState<string | null>(null);
@@ -95,46 +92,7 @@ export default function QuestsPage() {
     secondsUntilReset,
   } = useQuestIQ(address as `0x${string}` | undefined);
 
-  // --- Follow status check (hide Follow quest if user already follows target fid) ---
-  const TARGET_FID = 1175506; // @jesterinvestor
-  // CAP: users with >= 51 iQ must NOT be able to claim the +50 follow reward
-  const FOLLOW_IQ_CAP = 51;
-  const [checkingFollow, setCheckingFollow] = useState(false);
-  const [alreadyFollowingJester, setAlreadyFollowingJester] = useState<boolean | null>(null);
-  useEffect(() => {
-    let ignore = false;
-    async function run() {
-      setAlreadyFollowingJester(null);
-      if (!address) return;
-      setCheckingFollow(true);
-      try {
-        const res = await fetch(`/api/friends?address=${address}`);
-        const data = await res.json().catch(() => ({}));
-        // Normalize potential arrays in response
-        const arrays: any[] = [];
-        if (Array.isArray(data)) arrays.push(data);
-        if (Array.isArray(data.follows)) arrays.push(data.follows);
-        if (Array.isArray(data.following)) arrays.push(data.following);
-        if (Array.isArray(data.result?.follows)) arrays.push(data.result.follows);
-        if (Array.isArray(data.result?.following)) arrays.push(data.result.following);
-        const flat = arrays.flat().filter(Boolean);
-        const found = flat.some((entry: any) => {
-          const fidVal = entry?.fid ?? entry?.targetFid ?? entry?.userFid ?? entry?.user?.fid;
-          const n = typeof fidVal === 'string' ? parseInt(fidVal, 10) : fidVal;
-          return Number(n) === TARGET_FID;
-        });
-        if (!ignore) setAlreadyFollowingJester(found);
-      } catch (e) {
-        // On error we intentionally leave quest visible; do not set to true.
-        console.warn('[Quests] follow status check failed', e);
-        if (!ignore) setAlreadyFollowingJester(false);
-      } finally {
-        if (!ignore) setCheckingFollow(false);
-      }
-    }
-    run();
-    return () => { ignore = true; };
-  }, [address]);
+  
   const resetHours = Math.floor(secondsUntilReset / 3600);
   const resetMinutes = Math.floor((secondsUntilReset % 3600) / 60);
   const resetSeconds = secondsUntilReset % 60;
@@ -159,12 +117,8 @@ export default function QuestsPage() {
 
   // Gasless claim removed.
 
-  // Determine follow-quest visibility:
-  // - hide if user already follows the target (alreadyFollowingJester === true) -> show a small 'already follow' message (same as before)
-  // - hide if user already claimed the follow reward (claimedFollowJester)
-  // - hide if user has >= FOLLOW_IQ_CAP iQ
-  const userHasTooMuchIQ = (iqPoints ?? 0) >= FOLLOW_IQ_CAP;
-  const followQuestVisible = !claimedFollowJester && alreadyFollowingJester !== true && !userHasTooMuchIQ;
+  // Follow quest is visible unless already claimed
+  const followQuestVisible = !claimedFollowJester;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] py-6 sm:py-10">
@@ -190,7 +144,7 @@ export default function QuestsPage() {
             description="Post a quick cast about Triviacast. You can use the cast shortcut, then claim."
             reward="+1 iQ"
             claimed={claimedShare}
-            disabled={claimedShare || !address || !!error || switchingChain || !isShareMarkedToday() || !hasMinimumIQ}
+            disabled={claimedShare || !address || !!error || switchingChain || !isShareMarkedToday()}
             onClaim={async () => {
               setInlineError(null);
               const ok = await ensureOnBase();
@@ -218,7 +172,7 @@ export default function QuestsPage() {
                   setCastBurst(true);
                   setTimeout(() => setCastBurst(false), 900);
                 }}
-                disabled={!hasMinimumIQ}
+                disabled={!address}
               >
                 <span className="cta-emoji">📣</span>
                 Cast now
@@ -227,9 +181,7 @@ export default function QuestsPage() {
             </div>
             <span className="opacity-80">Click Cast Now, and Cast. Then you can claim another +1 iQ.</span>
           </div>
-          {!hasMinimumIQ && (
-            <div className="-mt-2 mb-3 text-xs text-[#b14f5f]">Requires at least 54 iQ to participate.</div>
-          )}
+          
 
           {/* Add vertical spacing between the Cast block and the Follow block so when the Follow badge disappears they don't sit too close */}
           <div className="mt-6">
@@ -238,11 +190,7 @@ export default function QuestsPage() {
                 - render the Claim QuestCard only when followQuestVisible === true (claim and card are gated)
                 - always render the "Follow now" CTA button so users can open Farcaster regardless of gating
             */}
-            {alreadyFollowingJester === true && (
-              <div className="p-4 bg-white/70 border-2 border-[#DC8291] rounded-lg text-xs text-[#5a3d5c]">
-                ✅ You already follow @jesterinvestor — quest hidden.
-              </div>
-            )}
+            
 
             {/* Claim card: only visible when user is eligible to claim (gated) */}
             {followQuestVisible && (
@@ -259,8 +207,7 @@ export default function QuestsPage() {
                     !address ||
                     !!error ||
                     switchingChain ||
-                    !isFollowMarkedToday() ||
-                    checkingFollow
+                    !isFollowMarkedToday()
                   }
                   onClaim={async () => {
                     setInlineError(null);
@@ -273,7 +220,7 @@ export default function QuestsPage() {
                       window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+50 iQ claimed' } }));
                     } catch {}
                   }}
-                  loading={loading || checkingFollow}
+                  loading={loading}
                 />
               </>
             )}
@@ -302,11 +249,11 @@ export default function QuestsPage() {
                   // intentionally always clickable — do not gate with checkingFollow/isFollowMarkedToday/iq/etc.
                 >
                   <span className="cta-emoji">👤</span>
-                  {checkingFollow ? 'Checking…' : 'Follow now'}
+                  Follow now
                 </button>
                 {followBurst && <span className="emoji-burst">🎉</span>}
               </div>
-              <span className="opacity-80">{checkingFollow ? 'Verifying existing follow…' : 'Open Farcaster to follow, then come back and press Claim (if eligible).'}</span>
+              <span className="opacity-80">Open Farcaster to follow, then come back and press Claim (if eligible).</span>
             </div>
           </div>
 

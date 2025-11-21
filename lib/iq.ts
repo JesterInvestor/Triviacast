@@ -125,9 +125,13 @@ async function writeQuest(functionName: 'claimShare' | 'claimDailyQuizPlay' | 'c
     args: [],
     chainId: base.id
   })
-  try {
-    await waitForTransactionReceipt(wagmiConfig, { hash })
-  } catch {}
+  // Don't block the caller waiting for confirmation. Return the tx hash immediately
+  // and wait for the receipt in the background so UI can optimistically update.
+  ;(async () => {
+    try {
+      await waitForTransactionReceipt(wagmiConfig, { hash })
+    } catch {}
+  })()
   // Invalidate lastClaimDay for this quest for any consumer refreshing soon
   // (Exact user not known here; caller updates local state)
   return hash
