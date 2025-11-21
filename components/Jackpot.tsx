@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+const SpinWheel = React.lazy(() => import("./SpinWheel"));
 import { useAccount } from "wagmi";
 
 export default function Jackpot() {
@@ -62,7 +63,11 @@ export default function Jackpot() {
         <p className="text-sm text-gray-700 mb-3">Jackpot: <strong>{jackpot ?? "—"} TRIV</strong></p>
         <p className="text-sm text-gray-700 mb-3">Cost per spin: <strong>0.10 USDC</strong></p>
         <div className="flex gap-2">
-          <button disabled={loading} onClick={spin} className="px-4 py-2 bg-[#D1FAE5] rounded font-semibold">Spin</button>
+          <div className="w-full">
+            <React.Suspense fallback={<button disabled className="px-4 py-2 bg-gray-200 rounded">Loading wheel…</button>}>
+              <SpinWheel />
+            </React.Suspense>
+          </div>
         </div>
         {loading && <div className="mt-3 text-sm">Processing...</div>}
         {result && (
