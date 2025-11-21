@@ -25,11 +25,11 @@ export default function JackpotPage() {
         role="region"
         aria-label="Jackpot section"
       >
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] mb-4">Jackpot coming soon.....</h1>
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] mb-4">Jackpot is Here!!!</h1>
         <div className="mb-4">
           <ConnectControls />
         </div>
-        <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">Only for players with 100,000 T points and 60 iQ.</p>
+        <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">Only 1 USDC per ticket. Only for players with 100,000 T points and 60 iQ.</p>
 
         {/* Removed countdown */}
         <div className="w-full mt-6">
