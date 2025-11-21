@@ -67,8 +67,8 @@ export default function QuestsPage() {
     return `Chain ${chainId}`;
   }, [chainId]);
   const { iqPoints } = useIQPoints(address as `0x${string}` | undefined);
-  const isOver50IQ = useMemo(() => {
-    try { return (iqPoints ?? 0n) >= 50n; } catch { return false; }
+  const isUnder50IQ = useMemo(() => {
+    try { return (iqPoints ?? 0n) < 50n; } catch { return false; }
   }, [iqPoints]);
   // Always require Base network for direct on-chain user claims (no gasless backend).
   const requiresBase = true;
@@ -120,8 +120,7 @@ export default function QuestsPage() {
 
   // Gasless claim removed.
 
-  // Follow quest is visible unless already claimed
-  const followQuestVisible = !claimedFollowJester;
+  // Follow quest visibility handled inline
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] py-6 sm:py-10">
@@ -188,47 +187,47 @@ export default function QuestsPage() {
 
           {/* Add vertical spacing between the Cast block and the Follow block so when the Follow badge disappears they don't sit too close */}
           <div className="mt-6">
-            {/* Follow quest rendering:
-              - render the Claim QuestCard when followQuestVisible is true
-              - always render the "Follow now" CTA button so users can open Farcaster
-            */}
+            {/* Follow section: claim and follow CTA */}
             
 
-            {/* Claim card: only visible when user is eligible to claim (gated) */}
-            {followQuestVisible && (
-              <>
-                <QuestCard
-                  title="Follow @jesterinvestor"
-                  emoji="👤"
-                  description="Follow @jesterinvestor on Farcaster (manual trust now)."
-                  reward="+50 iQ"
-                  claimed={claimedFollowJester}
-                  // gated: the claim (QuestCard) is disabled when not eligible to claim
-                  disabled={
-                    claimedFollowJester ||
-                    !address ||
-                    !!error ||
-                    switchingChain ||
-                    !isFollowMarkedToday() ||
-                    !isOver50IQ
-                  }
-                  onClaim={async () => {
-                    setInlineError(null);
-                    const ok = await ensureOnBase();
-                    if (!ok) return;
-                    await claimFollowJester();
-                    try {
-                      window.dispatchEvent(new Event('triviacast:questClaimed'));
-                      window.dispatchEvent(new Event('triviacast:iqUpdated'));
-                      window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+50 iQ claimed' } }));
-                    } catch {}
-                  }}
-                  loading={loading}
-                />
-                {!isOver50IQ && !claimedFollowJester && (
-                  <div className="mt-2 text-xs text-[#b14f5f]">Requires more than 50 iQ to claim the +50 iQ follow reward.</div>
-                )}
-              </>
+            {/* Follow claim: simplified UI (claim available when >=50 iQ) */}
+            {!claimedFollowJester ? (
+              <div className="p-4 sm:p-5 bg-white rounded-lg border-4 border-[#F4A6B7] shadow">
+                <div className="flex items-start gap-3">
+                  <div className="text-3xl sm:text-4xl leading-none drop-shadow-sm">👤</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <h2 className="text-xl sm:text-2xl font-extrabold text-[#2d1b2e]">Follow @jesterinvestor</h2>
+                      <span className="px-2 py-1 bg-[#FFE4EC] border border-[#F4A6B7] rounded text-xs font-semibold text-[#5a3d5c]">+50 iQ</span>
+                    </div>
+                    <p className="text-sm text-[#5a3d5c] mb-3 leading-relaxed">Follow @jesterinvestor on Farcaster (manual trust now).</p>
+                    <div className="flex items-center gap-3">
+                      <button
+                        disabled={!isUnder50IQ || !address || !!error || switchingChain || !isFollowMarkedToday() || loading}
+                        onClick={async () => {
+                          setInlineError(null);
+                          const ok = await ensureOnBase();
+                          if (!ok) return;
+                          await claimFollowJester();
+                          try {
+                            window.dispatchEvent(new Event('triviacast:questClaimed'));
+                            window.dispatchEvent(new Event('triviacast:iqUpdated'));
+                            window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+50 iQ claimed' } }));
+                          } catch {}
+                        }}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold shadow transition min-w-[120px] ${!isUnder50IQ || !address || !!error || switchingChain || !isFollowMarkedToday() || loading ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-[#DC8291] hover:bg-[#c96a78] text-white'}`}
+                      >
+                        {loading ? 'Pending...' : 'Claim +50 iQ'}
+                      </button>
+                    </div>
+                    {!isUnder50IQ && (
+                      <div className="mt-2 text-xs text-[#b14f5f]">Only available for users with less than 50 iQ.</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 bg-white/70 border-2 border-[#DC8291] rounded-lg text-xs text-[#5a3d5c]">✅ You claimed the follow reward.</div>
             )}
 
             {/* Follow-now CTA: always rendered and always clickable (per request).
