@@ -4,6 +4,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import StakingWidget from "../../components/StakingWidget";
 import WagmiWalletConnect from "../../components/WagmiWalletConnect";
 import { useConnect, useAccount } from 'wagmi';
+import {
+  Jackpot as MegapotJackpot,
+  MainnetJackpotName,
+  MegapotProvider,
+  JACKPOT,
+  TestnetJackpotName,
+} from '@coordinationlabs/megapot-ui-kit';
+import { base, baseSepolia } from 'viem/chains';
 
 function pad(n: number) {
   return n.toString().padStart(2, "0");
@@ -34,6 +42,10 @@ export default function JackpotPage() {
 
   const hoursTotal = days * 24 + hours;
   const finished = remainingMs <= 0;
+
+  // Resolve megapot contract info if available
+  const mainnetJackpotContract = JACKPOT[base.id]?.[MainnetJackpotName.USDC];
+  const testnetJackpotContract = JACKPOT[baseSepolia.id]?.[TestnetJackpotName.MPUSDC];
 
   return (
     // full-screen center container
@@ -87,6 +99,22 @@ export default function JackpotPage() {
         </div>
         {/* Staking widget inserted below the countdown card */}
         <StakingWidget />
+
+        {/* Megapot jackpot UI */}
+        <div className="w-full mt-6">
+          <MegapotWrapper>
+            <div className="w-full flex flex-col items-center gap-4">
+              {/* Base Mainnet */}
+              {mainnetJackpotContract && (
+                <MegapotJackpot contract={mainnetJackpotContract} />
+              )}
+              {/* Base Sepolia (test) */}
+              {testnetJackpotContract && (
+                <MegapotJackpot contract={testnetJackpotContract} />
+              )}
+            </div>
+          </MegapotWrapper>
+        </div>
       </div>
     </main>
   );
@@ -133,4 +161,23 @@ function TimeBlock({ label, value }: { label: string; value: string }) {
 
 function Separator() {
   return <div className="text-[#b38897] font-bold text-xl sm:text-2xl select-none">:</div>;
+}
+
+function MegapotWrapper({ children }: { children: React.ReactNode }) {
+  const { connectors } = useConnect();
+
+  return (
+    <MegapotProvider
+      onConnectWallet={() => {
+        // attempt to connect using the first available connector
+        try {
+          connectors[0]?.connect();
+        } catch (e) {
+          // ignore — user can connect via UI
+        }
+      }}
+    >
+      {children}
+    </MegapotProvider>
+  );
 }
