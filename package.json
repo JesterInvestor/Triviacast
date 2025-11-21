@@ -13,6 +13,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@coinbase/cdp-sdk": "^1.38.6",
     "@coinbase/onchainkit": "^1.1.2",
     "@coinbase/x402": "^0.7.1",
     "@farcaster/auth-kit": "^0.1.4",
@@ -28,6 +29,7 @@
     "@sentry/nextjs": "^10.19.0",
     "@tanstack/react-query": "^5.90.5",
     "@wagmi/connectors": "^6.0.1",
+    "dotenv": "^17.2.3",
     "hls.js": "^1.6.14",
     "jose": "^5.10.0",
     "next": "15.5.4",

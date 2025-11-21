@@ -11,6 +11,8 @@
     "verify:base": "hardhat verify --network base",
     "deploy:dist:base": "hardhat run scripts/deploy_distributor.ts --network base",
     "deploy:dist:sepolia": "hardhat run scripts/deploy_distributor.ts --network baseSepolia",
+    "deploy:jackpot:base": "hardhat run scripts/deploy-jackpot-claim.ts --network base",
+    "deploy:jackpot:sepolia": "hardhat run scripts/deploy-jackpot-claim.ts --network baseSepolia",
     "airdrop:top5:base": "hardhat run scripts/airdrop_top5.ts --network base",
     "airdrop:top5:sepolia": "hardhat run scripts/airdrop_top5.ts --network baseSepolia"
   },

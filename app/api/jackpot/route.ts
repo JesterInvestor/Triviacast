@@ -57,6 +57,7 @@ export async function POST(req: Request) {
       roll,
       tier,
       prize,
+      paid: false,
     };
 
     try {
@@ -67,7 +68,20 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, tier, prize, roll });
   } catch (e: any) {
-    // Return a helpful error message for debugging. In production consider returning a generic message.
+    // Return a helpful error message for debugging. Also write an error log to disk so
+    // you can inspect it from the filesystem if the response is an HTML error page.
+    try {
+      const errPath = path.join(process.cwd(), "data", "jackpot_error.log");
+      const payload = {
+        time: new Date().toISOString(),
+        error: String(e),
+        stack: e?.stack,
+      };
+      await fs.mkdir(path.dirname(errPath), { recursive: true }).catch(() => {});
+      await fs.appendFile(errPath, JSON.stringify(payload) + "\n").catch(() => {});
+    } catch (writeErr) {
+      // ignore
+    }
     console.error("/api/jackpot error:", e);
     return NextResponse.json({ success: false, error: String(e), stack: e?.stack }, { status: 500 });
   }

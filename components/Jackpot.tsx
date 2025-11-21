@@ -37,7 +37,16 @@ export default function Jackpot() {
         res = await fetch("/api/jackpot", { method: "POST", body: JSON.stringify({ address }), headers: { "content-type": "application/json" } });
       }
 
-      const data = await res.json();
+      // Safely handle responses that are not JSON (e.g., HTML error pages)
+      const contentType = res.headers.get("content-type") || "";
+      let data: any = null;
+      if (contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        // Non-JSON response (often HTML error page) — capture text for debugging
+        const text = await res.text();
+        data = { success: false, error: `Non-JSON response (status ${res.status})`, body: text, status: res.status };
+      }
       setResult(data);
     } catch (e) {
       setResult({ success: false, error: String(e) });

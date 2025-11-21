@@ -1,0 +1,251 @@
+[
+  {
+    "timestamp": "2025-11-21T05:35:38.264Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 248696,
+    "tier": "small",
+    "prize": 100
+  },
+  {
+    "timestamp": "2025-11-21T05:35:43.096Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 489591,
+    "tier": "none",
+    "prize": 0
+  },
+  {
+    "timestamp": "2025-11-21T05:35:45.258Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 416017,
+    "tier": "none",
+    "prize": 0
+  },
+  {
+    "timestamp": "2025-11-21T05:35:47.614Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 45370,
+    "tier": "small",
+    "prize": 100
+  },
+  {
+    "timestamp": "2025-11-21T05:35:49.194Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 46167,
+    "tier": "small",
+    "prize": 100
+  },
+  {
+    "timestamp": "2025-11-21T05:35:50.591Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 580804,
+    "tier": "none",
+    "prize": 0
+  },
+  {
+    "timestamp": "2025-11-21T05:35:51.831Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 788878,
+    "tier": "none",
+    "prize": 0
+  },
+  {
+    "timestamp": "2025-11-21T05:52:41.640Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 532515,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:52:43.673Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 906231,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:52:46.274Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 347435,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:52:48.195Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 141700,
+    "tier": "small",
+    "prize": 100,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:53:09.426Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 268234,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:53:11.516Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 602289,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:53:13.583Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 971820,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:53:15.237Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 676277,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:53:16.182Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 241763,
+    "tier": "small",
+    "prize": 100,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:53:17.884Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 538550,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:53:18.739Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 906917,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:53:19.373Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 716079,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:53:20.377Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 651520,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:53:21.078Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 927819,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:53:21.990Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 246007,
+    "tier": "small",
+    "prize": 100,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:53:22.633Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 703818,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:54:01.028Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 216669,
+    "tier": "small",
+    "prize": 100,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:55:45.586Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 943585,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:55:48.977Z",
+    "address": "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b",
+    "roll": 521526,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:56:06.746Z",
+    "address": "0x933327198F11BD9f830976Ba59DD0D110B29dde5",
+    "roll": 96543,
+    "tier": "small",
+    "prize": 100,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:56:10.555Z",
+    "address": "0x933327198F11BD9f830976Ba59DD0D110B29dde5",
+    "roll": 639125,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:56:14.274Z",
+    "address": null,
+    "roll": 932774,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:56:20.952Z",
+    "address": null,
+    "roll": 914111,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:56:28.403Z",
+    "address": "0x933327198F11BD9f830976Ba59DD0D110B29dde5",
+    "roll": 661887,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  },
+  {
+    "timestamp": "2025-11-21T05:56:31.724Z",
+    "address": null,
+    "roll": 278893,
+    "tier": "none",
+    "prize": 0,
+    "paid": false
+  }
+]
