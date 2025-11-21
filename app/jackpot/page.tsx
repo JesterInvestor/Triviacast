@@ -34,11 +34,15 @@ export default function JackpotPage() {
         {/* Removed countdown */}
         <div className="w-full mt-6">
           <MegapotWrapper>
-            <div className="w-full flex flex-col items-center gap-4">
-              {/* Base Mainnet */}
-              {mainnetJackpotContract && (
-                <MegapotJackpot contract={mainnetJackpotContract} />
-              )}
+            {/* Make the megapot widget horizontally scrollable on very small screens.
+                inline-block + min-w-max preserves the widget width; overflow-x-auto lets users scroll. */}
+            <div className="w-full overflow-x-auto">
+              <div className="inline-block min-w-max">
+                {/* Base Mainnet */}
+                {mainnetJackpotContract && (
+                  <MegapotJackpot contract={mainnetJackpotContract} />
+                )}
+              </div>
             </div>
           </MegapotWrapper>
         </div>
@@ -72,7 +76,7 @@ function ConnectControls() {
           >
             {c.name}{!c.ready ? ' (unavailable)' : ''}
           </button>
-        ))
+        ))}
       </div>
     </div>
   );
