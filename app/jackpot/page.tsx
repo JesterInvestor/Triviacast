@@ -2,15 +2,9 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import StakingWidget from "../../components/StakingWidget";
+import Megapot from "../../components/Megapot";
 import WagmiWalletConnect from "../../components/WagmiWalletConnect";
 import { useConnect, useAccount } from 'wagmi';
-import {
-  Jackpot as MegapotJackpot,
-  MainnetJackpotName,
-  MegapotProvider,
-  JACKPOT,
-} from '@coordinationlabs/megapot-ui-kit';
-import { base } from 'viem/chains';
 
 function pad(n: number) {
   return n.toString().padStart(2, "0");
@@ -42,16 +36,12 @@ export default function JackpotPage() {
   const hoursTotal = days * 24 + hours;
   const finished = remainingMs <= 0;
 
-  // Resolve megapot contract info if available (mainnet only)
-  const mainnetJackpotContract = JACKPOT[base.id]?.[MainnetJackpotName.USDC];
-
   return (
     // full-screen center container
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] p-8">
       {/* card centered and constrained */}
-      {/* NOTE: added overflow-visible so embedded Megapot UI can extend beyond internal padding without being clipped */}
       <div
-        className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center text-center bg-white/80 backdrop-blur px-8 py-12 rounded-2xl border border-[#F4A6B7] shadow-lg overflow-visible"
+        className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center text-center bg-white/80 backdrop-blur px-8 py-12 rounded-2xl border border-[#F4A6B7] shadow-lg"
         role="region"
         aria-label="Jackpot countdown"
       >
@@ -97,27 +87,10 @@ export default function JackpotPage() {
             : `Time remaining: ${days} days, ${pad(hoursTotal)} hours, ${pad(minutes)} minutes, ${pad(seconds)} seconds`}
         </div>
 
-        {/* Megapot jackpot UI - moved above the staking widget */}
-        {/* Key changes to avoid horizontal clipping on small screens:
-            - neutralize the card's internal horizontal padding with negative margins so the widget can use full width
-            - allow horizontal scrolling on the smallest screens (overflow-x-auto) while keeping overflow-visible on larger viewports
-            - ensure internal wrapper uses max-w-full so children don't exceed available width unwisely
-        */}
-        <div className="w-full mt-6 -mx-6 sm:-mx-8 px-6 sm:px-8 overflow-x-auto sm:overflow-visible">
-          <MegapotWrapper>
-            <div className="w-full flex flex-col items-center gap-4 max-w-full">
-              {/* Base Mainnet */}
-              {mainnetJackpotContract && (
-                // wrap the MegapotJackpot so we can ensure it won't overflow its container visually
-                <div className="w-full max-w-full flex justify-center">
-                  <MegapotJackpot contract={mainnetJackpotContract} />
-                </div>
-              )}
-            </div>
-          </MegapotWrapper>
-        </div>
+        {/* Megapot moved above the staking widget */}
+        <Megapot />
 
-        {/* Staking widget inserted below the megapot UI */}
+        {/* Staking widget inserted below the Megapot */}
         <StakingWidget />
       </div>
     </main>
@@ -165,26 +138,4 @@ function TimeBlock({ label, value }: { label: string; value: string }) {
 
 function Separator() {
   return <div className="text-[#b38897] font-bold text-xl sm:text-2xl select-none">:</div>;
-}
-
-function MegapotWrapper({ children }: { children: React.ReactNode }) {
-  const { connectors } = useConnect();
-
-  return (
-    <MegapotProvider
-      onConnectWallet={() => {
-        // attempt to connect using the first available connector
-        try {
-          connectors[0]?.connect();
-        } catch (e) {
-          // ignore — user can connect via UI
-        }
-      }}
-    >
-      {/* ensure provider child container doesn't clip */}
-      <div className="w-full max-w-full overflow-visible">
-        {children}
-      </div>
-    </MegapotProvider>
-  );
 }
