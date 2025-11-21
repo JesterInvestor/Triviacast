@@ -68,7 +68,7 @@ export default function QuestsPage() {
   }, [chainId]);
   const { iqPoints } = useIQPoints(address as `0x${string}` | undefined);
   const isOver50IQ = useMemo(() => {
-    try { return (iqPoints ?? 0n) > 50n; } catch { return false; }
+    try { return (iqPoints ?? 0n) >= 50n; } catch { return false; }
   }, [iqPoints]);
   // Always require Base network for direct on-chain user claims (no gasless backend).
   const requiresBase = true;

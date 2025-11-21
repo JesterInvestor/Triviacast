@@ -49,12 +49,18 @@ export function useQuestIQ(address?: `0x${string}`) {
 
   const run = useCallback(async (fn: ()=>Promise<`0x${string}`>, id:number) => {
     if (!address) return
+    const MIN_LOADING_MS = 600
+    const started = Date.now()
     setLoading(true); setError(null)
     try {
       await fn()
       setLastDays(prev => ({ ...prev, [id]: BigInt(today) }))
     } catch (e:any) { setError(e.message || 'claim failed') }
-    finally { setLoading(false) }
+    finally {
+      const elapsed = Date.now() - started
+      const remaining = Math.max(0, MIN_LOADING_MS - elapsed)
+      setTimeout(() => setLoading(false), remaining)
+    }
   }, [address, today])
 
   return {
