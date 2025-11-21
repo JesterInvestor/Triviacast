@@ -8,7 +8,9 @@ const TPOINTS_ABI = [
   { name: 'getPoints', type: 'function', stateMutability: 'view', inputs: [{ name: 'user', type: 'address' }], outputs: [{ type: 'uint256' }] }
 ] as const
 
-const TPOINTS_ADDRESS = process.env.NEXT_PUBLIC_TPOINTS_ADDRESS as `0x${string}` | undefined
+// Prefer the new variable NEXT_PUBLIC_TRIVIA_POINTS_ADDRESS, fall back to legacy NEXT_PUBLIC_TPOINTS_ADDRESS
+const TPOINTS_ADDRESS = (process.env.NEXT_PUBLIC_TRIVIA_POINTS_ADDRESS ||
+                         process.env.NEXT_PUBLIC_TPOINTS_ADDRESS) as `0x${string}` | undefined
 
 // Hook: returns bigint or null while loading/not available
 export default function useTPoints(address?: `0x${string}`) {
@@ -22,7 +24,6 @@ export default function useTPoints(address?: `0x${string}`) {
       }
       try {
         // Cast readContract to any to avoid mismatched Config typing across @wagmi/core versions.
-        // This keeps the call working in builds where readContract's type signature differs from runtime usage.
         const res = await (readContract as any)(
           {
             address: TPOINTS_ADDRESS,
@@ -35,13 +36,12 @@ export default function useTPoints(address?: `0x${string}`) {
         )
         if (!cancelled) setTPoints(BigInt(res ?? 0))
       } catch (e) {
-        // on error, leave as null (caller can treat as 0)
         if (!cancelled) setTPoints(null)
       }
     }
     load()
     return () => { cancelled = true }
-  }, [address])
+  }, [address, TPOINTS_ADDRESS])
 
   return { tPoints }
 }
