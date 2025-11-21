@@ -30,6 +30,14 @@ export default function SpinWheel() {
         res = await fetch("/api/jackpot", { method: "POST", body: JSON.stringify({ address }), headers: { "content-type": "application/json" } });
       }
 
+      // If the server responds with 402, capture the X-PAYMENT header for debugging and UX
+      if (res.status === 402) {
+        const xPayment = res.headers.get("x-payment") || res.headers.get("X-PAYMENT");
+        console.warn("/api/jackpot returned 402. X-PAYMENT:", xPayment);
+        // Return a structured error so the UI can show a modal with instructions
+        return { success: false, error: `payment_required`, prize: 0, tier: "none" } as SpinResult & { xPayment?: string };
+      }
+
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
         const data = await res.json();
@@ -52,6 +60,14 @@ export default function SpinWheel() {
     setRotation((r) => r + 360 * 3 + 60);
 
     const result = await doFetch();
+
+    // If payment required, show a modal instructing the user
+    if (!result.success && result.error === 'payment_required') {
+      // Log and surface the instruction to the user
+      setMessage('Payment required: please approve the 0.10 USDC payment in your wallet. If you do not see a prompt, ensure the site origin is allowlisted in the payment provider dashboard and your wallet popup is enabled.');
+      setSpinning(false);
+      return;
+    }
 
     // Map server tier to final stop angle (so wheel lands on a corresponding label)
     const sectorAngles: Record<string, number> = {
