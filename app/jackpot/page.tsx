@@ -49,8 +49,9 @@ export default function JackpotPage() {
     // full-screen center container
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] p-8">
       {/* card centered and constrained */}
+      {/* NOTE: added overflow-visible so embedded Megapot UI can extend beyond internal padding without being clipped */}
       <div
-        className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center text-center bg-white/80 backdrop-blur px-8 py-12 rounded-2xl border border-[#F4A6B7] shadow-lg"
+        className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center text-center bg-white/80 backdrop-blur px-8 py-12 rounded-2xl border border-[#F4A6B7] shadow-lg overflow-visible"
         role="region"
         aria-label="Jackpot countdown"
       >
@@ -97,12 +98,20 @@ export default function JackpotPage() {
         </div>
 
         {/* Megapot jackpot UI - moved above the staking widget */}
-        <div className="w-full mt-6">
+        {/* Key changes to avoid horizontal clipping on small screens:
+            - neutralize the card's internal horizontal padding with negative margins so the widget can use full width
+            - allow horizontal scrolling on the smallest screens (overflow-x-auto) while keeping overflow-visible on larger viewports
+            - ensure internal wrapper uses max-w-full so children don't exceed available width unwisely
+        */}
+        <div className="w-full mt-6 -mx-6 sm:-mx-8 px-6 sm:px-8 overflow-x-auto sm:overflow-visible">
           <MegapotWrapper>
-            <div className="w-full flex flex-col items-center gap-4">
+            <div className="w-full flex flex-col items-center gap-4 max-w-full">
               {/* Base Mainnet */}
               {mainnetJackpotContract && (
-                <MegapotJackpot contract={mainnetJackpotContract} />
+                // wrap the MegapotJackpot so we can ensure it won't overflow its container visually
+                <div className="w-full max-w-full flex justify-center">
+                  <MegapotJackpot contract={mainnetJackpotContract} />
+                </div>
               )}
             </div>
           </MegapotWrapper>
@@ -172,7 +181,10 @@ function MegapotWrapper({ children }: { children: React.ReactNode }) {
         }
       }}
     >
-      {children}
+      {/* ensure provider child container doesn't clip */}
+      <div className="w-full max-w-full overflow-visible">
+        {children}
+      </div>
     </MegapotProvider>
   );
 }
