@@ -89,8 +89,6 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
   const ITEMS_PER_PAGE = 20;
 
   const [leaderboard, setLeaderboard] = useState<Array<any>>([]);
-  const [walletTPoints, setWalletTPoints] = useState<number | null>(null);
-  const [viewState, setViewState] = useState<'tpoints' | 'iq'>(view);
   const [profiles, setProfiles] = useState<Record<string, any>>({});
   const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -108,11 +106,14 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
 
   // Sorted leaderboard memoized so we can paginate the sorted list consistently
   const sortedLeaderboard = useMemo(() => {
-    if (viewState === 'iq') {
-      return leaderboard.slice().sort((a, b) => (b.iqPoints || 0) - (a.iqPoints || 0));
-    }
-    return leaderboard.slice().sort((a, b) => (b.tPoints || 0) - (a.tPoints || 0));
-  }, [leaderboard, viewState]);
+    return leaderboard
+      .slice()
+      .sort((a, b) => {
+        const aPoints = view === 'iq' ? (a.iqPoints || 0) : (a.tPoints || 0);
+        const bPoints = view === 'iq' ? (b.iqPoints || 0) : (b.tPoints || 0);
+        return bPoints - aPoints;
+      });
+  }, [leaderboard, view]);
 
   // Limit to top 100 entries only (user request)
   const MAX_DISPLAY = 100;
@@ -121,54 +122,43 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
   // Reset displayCount when leaderboard or view change
   useEffect(() => {
     setDisplayCount(ITEMS_PER_PAGE);
-  }, [limitedLeaderboard, viewState]);
+  }, [limitedLeaderboard, view]);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       try {
-        if (address) {
-          // When a wallet is connected, show only that wallet's selected metric.
-          setLeaderboard([]);
-          setProfiles({});
-          try {
-            if (viewState === 'tpoints') {
-              const total = await getWalletTotalPoints(address as `0x${string}`);
-              setWalletTPoints(Number(total || 0));
-            } else {
-              const iq = await getIQPoints(address as `0x${string}`);
-              setWalletTPoints(Number(iq || 0));
-            }
-          } catch (e) {
-            setWalletTPoints(null);
-          }
-          return;
-        }
-
-        // No connected wallet: fetch the leaderboard. When view is 'iq' we fetch iqPoints too.
         const board = await getLeaderboard();
-        const entries = await Promise.all(
-          board.map(async (b: any) => {
-            const addr = (b.walletAddress || b.wallet || b.address || '').toLowerCase();
-            if (viewState === 'iq') {
-              let iq = 0;
+        // board contains walletAddress and tPoints; for IQ view we'll augment with iqPoints
+        let finalList: any[] = board;
+        if (view === 'iq') {
+          // Fetch IQ points for each address in parallel (best-effort)
+          const entries = await Promise.all(
+            board.map(async (b: any) => {
+              const addr = (b.walletAddress || '').toLowerCase();
               try {
                 const v = await getIQPoints(addr as `0x${string}`);
-                iq = Number(v);
+                return { walletAddress: addr, iqPoints: Number(v) };
               } catch (err) {
-                iq = 0;
+                return { walletAddress: addr, iqPoints: 0 };
               }
-              return { walletAddress: addr, tPoints: Number(b.tPoints || b.points || 0), iqPoints: iq };
-            }
-            return { walletAddress: addr, tPoints: Number(b.tPoints || b.points || 0) };
-          })
-        );
-        setLeaderboard(entries as any[]);
+            })
+          );
+          setLeaderboard(entries);
+          finalList = entries;
+        } else {
+          setLeaderboard(board);
+          finalList = board;
+        }
 
-        // Batch fetch profiles for the TOP N leaderboard addresses only
-        const addresses = entries
+        // Batch fetch Farcaster profiles for the TOP N leaderboard addresses only
+        const addresses = finalList
           .slice()
-          .sort((a: any, b: any) => (b.tPoints || 0) - (a.tPoints || 0))
+          .sort((a: any, b: any) => {
+            const aPoints = view === 'iq' ? (a.iqPoints || 0) : (a.tPoints || 0);
+            const bPoints = view === 'iq' ? (b.iqPoints || 0) : (b.tPoints || 0);
+            return bPoints - aPoints;
+          })
           .slice(0, MAX_DISPLAY)
           .map((b: any) => (b.walletAddress || b.wallet || b.address || '').toLowerCase())
           .filter(Boolean);
@@ -185,6 +175,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             setProfileErrors({});
           } else {
             const parsed = JSON.parse(data);
+            // Client-side normalize avatar URLs as a safety net in case server didn't resolve them.
             try {
               if (parsed && parsed.result && typeof parsed.result === 'object') {
                 for (const [addr, p] of Object.entries(parsed.result)) {
@@ -192,11 +183,32 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                     const src = (p as any).pfpUrl || (p as any).avatarImgUrl || (p as any).pfp_url || (p as any).avatar || (p as any).raw?.pfpUrl || (p as any).raw?.pfp_url || null;
                     (p as any).pfpUrl = resolveAvatarUrl(src) || null;
                     (p as any).avatarImgUrl = (p as any).pfpUrl || (p as any).avatarImgUrl || null;
-                  } catch (e) {}
+                  } catch (e) {
+                    // ignore per-profile errors
+                  }
                 }
               }
             } catch (e) {
               console.debug('[Leaderboard] avatar normalization failed', String(e));
+            }
+            // Debug: log the raw parsed response so we can inspect pfp field names
+            try {
+              console.debug('[Leaderboard] Neynar parsed response', parsed);
+              if (parsed && parsed.result) {
+                Object.entries(parsed.result).forEach(([k, v]) => {
+                  try {
+                    const p = v as any;
+                    console.debug('[Leaderboard] profile', k, {
+                      username: p?.username,
+                      fid: p?.fid,
+                      pfpUrl: p?.pfpUrl ?? p?.pfp_url ?? p?.avatar ?? p?.raw?.pfpUrl ?? p?.raw?.pfp_url,
+                      raw: p?.raw ?? null,
+                    });
+                  } catch (e) {}
+                });
+              }
+            } catch (e) {
+              console.debug('[Leaderboard] error logging parsed response', String(e));
             }
             setProfiles(prev => ({ ...prev, ...parsed.result }));
             setProfileErrors(parsed.errors || {});
@@ -205,12 +217,14 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
           setProfiles(prev => ({ ...prev }));
           setProfileErrors({ api: String(err) });
         }
+
+        // walletTotal badge removed — no per-wallet fetch here
       } finally {
         setLoading(false);
       }
     }
     fetchData();
-  }, [address, viewState]);
+  }, [address, view]);
 
   // loadMore callback used by both IntersectionObserver and scroll fallback
   const loadMore = useCallback(() => {
@@ -306,39 +320,25 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
           });
         }
 
-        const tPoints = entry.tPoints || entry.points || 0;
-        const iqPoints = (entry as any).iqPoints || 0;
+        const points = view === 'iq' ? (entry.iqPoints || 0) : (entry.tPoints || 0);
 
-        return viewState === 'iq'
-          ? { rank, addr, profile, tPoints, iqPoints }
-          : { rank, addr, profile, tPoints };
+        return {
+          rank,
+          addr,
+          profile,
+          points,
+        };
       });
-  }, [limitedLeaderboard, displayCount, profiles, viewState]);
+  }, [limitedLeaderboard, displayCount, profiles, view]);
 
   return (
     <div className="w-full px-0 sm:px-6">
       <div className="bg-white rounded-lg shadow-xl p-2 sm:p-6 border-4 border-[#F4A6B7] w-full max-w-full">
         <div className="flex items-center justify-center gap-3 sm:gap-4 mb-2">
           <Image src="/brain-large.svg" alt="Brain" width={64} height={64} priority />
-          <div className="flex flex-col items-center">
-            <h1 className="text-2xl sm:text-4xl font-bold text-center text-[#2d1b2e]">
-              Leaderboard
-            </h1>
-            <div className="mt-2 inline-flex bg-[#FFF4F6] rounded-full p-1 border border-[#F4A6B7]">
-              <button
-                className={`px-3 py-1 rounded-full text-sm font-semibold ${viewState === 'tpoints' ? 'bg-[#DC8291] text-white' : 'text-[#5a3d5c]'}`}
-                onClick={() => setViewState('tpoints')}
-              >
-                T Points
-              </button>
-              <button
-                className={`px-3 py-1 rounded-full text-sm font-semibold ${viewState === 'iq' ? 'bg-[#DC8291] text-white' : 'text-[#5a3d5c]'}`}
-                onClick={() => setViewState('iq')}
-              >
-                iQ
-              </button>
-            </div>
-          </div>
+          <h1 className="text-2xl sm:text-4xl font-bold text-center text-[#2d1b2e]">
+            Leaderboard
+          </h1>
           {limitedLeaderboard.length > 0 && (
             <div className="ml-2 flex flex-col items-center justify-center">
               <div className="px-2 py-1 rounded-lg bg-[#FFE4EC] border border-[#F4A6B7] text-[10px] sm:text-xs font-semibold text-[#5a3d5c] tracking-wide">
@@ -354,12 +354,13 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             <button
               onClick={() => {
                 try {
+                  const pointsKey = view === 'iq' ? 'iqPoints' : 'tPoints';
                   const sorted = sortedLeaderboard;
                   const rows: string[] = [];
                   const header = [
                     'rank',
                     'address',
-                    viewState === 'iq' ? 'iq_points' : 't_points',
+                    view === 'iq' ? 'iq_points' : 't_points',
                     'farcaster_username',
                     'display_name',
                     'fid',
@@ -367,7 +368,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                     'verified_eth_addresses',
                   ];
                   rows.push(header.join(','));
-                  sorted.forEach((entry: any, idx: number) => {
+                  sorted.forEach((entry, idx) => {
                     const addr = (entry.walletAddress || '').toLowerCase();
                     let profile: any = profiles[addr];
                     if (!profile) {
@@ -389,11 +390,10 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                     const fid = profile?.fid ?? '';
                     const custody = (profile?.custody_address || '').toLowerCase();
                     const verifiedEth: string[] = (profile?.verified_addresses?.eth_addresses || []).map((x: string) => x.toLowerCase());
-                    const metric = viewState === 'iq' ? String(entry.iqPoints || 0) : String(entry.tPoints || entry.points || 0);
                     const csvRow = [
                       String(idx + 1),
                       addr,
-                      metric,
+                      String(entry[pointsKey] || 0),
                       username,
                       displayName,
                       String(fid),
@@ -454,23 +454,15 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
           </div>
         ) : null}
 
-          {address ? (
-            <div className="mt-6 flex flex-col items-center justify-center">
-              <div className="bg-[#FFF4F6] border-2 border-[#F4A6B7] rounded-lg p-6 w-full max-w-md text-center">
-                <div className="text-sm text-[#5a3d5c]">Your T Points</div>
-                <div className="text-3xl sm:text-4xl font-bold text-[#DC8291] mt-2">{walletTPoints !== null ? walletTPoints.toLocaleString() : '-'}</div>
-                <div className="mt-3 text-xs text-[#5a3d5c] break-words">{address}</div>
-              </div>
-            </div>
-          ) : (
-            <>
+          {limitedLeaderboard.length > 0 && (
+          <>
             <div className="mt-4 overflow-x-auto w-full">
               <table className="min-w-[320px] w-full text-left table-auto">
                 <thead>
                   <tr className="text-xs sm:text-sm text-[#5a3d5c] border-b border-[#f3dbe0]">
                     <th className="py-2">#</th>
                     <th className="py-2">Player</th>
-                    <th className="py-2">{viewState === 'iq' ? 'iQ' : 'T Points'}</th>
+                    <th className="py-2">{view === 'iq' ? 'iQ' : 'T Points'}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -489,11 +481,13 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                           )}
                         </div>
                       </td>
-                      <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{(viewState === 'iq' ? ((r as any).iqPoints || 0) : (r.tPoints || 0)).toLocaleString()}</td>
+                      <td className="py-3 align-middle font-bold text-[#DC8291] text-sm">{r.points.toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              {/* Sentinel element observed by IntersectionObserver to trigger loading more */}
+              {/* give it a small height so some mobile browsers can detect intersection */}
               <div ref={sentinelRef} style={{ height: 1 }} aria-hidden="true" />
             </div>
 
@@ -510,11 +504,11 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
               </div>
             )}
 
-            {/* Total summary for selected metric */}
+            {/* Total T Points summary */}
             <div className="mt-6 sm:mt-8 text-center w-full">
-              <div className="bg-[#FFF4F6] border-2 border-[#F4A6B7] rounded-lg p-4 inline-block w-full max-w-md mx-auto">
-                <div className="text-sm text-[#5a3d5c]">Total {viewState === 'iq' ? 'iQ' : 'T Points'} (all players)</div>
-                <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">{(viewState === 'iq' ? leaderboard.reduce((s, e: any) => s + (e.iqPoints || 0), 0) : totalTPoints).toLocaleString()}</div>
+              <div className="bg-[#FFF4F6] border-2 border-[#F4A6B7] rounded-lg p-3 sm:p-4 mb-4 inline-block w-full">
+                <div className="text-sm text-[#5a3d5c]">{view === 'iq' ? 'Total iQ (all players)' : 'Total T Points (all players)'}</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-[#DC8291]">{(view === 'iq' ? leaderboard.reduce((s, e) => s + (e.iqPoints || 0), 0) : totalTPoints).toLocaleString()}</div>
               </div>
             </div>
 
