@@ -175,48 +175,78 @@ export default function StakingWidget() {
   }
 
   return (
+    // container constrained width but flexible height; allow inner scrolling if outer container small
     <div className="mt-6 w-full max-w-2xl text-left">
-      <div className="p-6 rounded-xl bg-white/90 border border-[#F4A6B7] shadow-sm text-gray-900">
+      <div className="p-6 rounded-xl bg-white/90 border border-[#F4A6B7] shadow-sm text-gray-900 overflow-auto">
         <h2 className="text-lg font-semibold text-gray-900 mb-3">Stake TRIV for Rewards</h2>
         <div className="mb-3">
           <span className="inline-block px-3 py-1 rounded-full bg-[#FFF3F6] text-gray-800 font-semibold text-sm">Current APR: 80%</span>
         </div>
         <p className="text-sm text-gray-700 mb-4">You can stake using Base App. Works in Farcaster desktop and browser w/ wallet extension — sorry for any inconvenience. (Dec 17th)</p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
-          <div className="p-3 bg-[#fff0f4] rounded">Your TRIV: <strong>{format6(tokenBalance)}</strong></div>
-          <div className="p-3 bg-[#fff0f4] rounded">Staked: <strong>{format6(stakedBalance)}</strong></div>
-          <div className="p-3 bg-[#fff0f4] rounded">Earned: <strong>{format6(earned)}</strong></div>
-          <div className="p-3 bg-[#fff0f4] rounded">Total Staked: <strong>{format6(totalStaked)}</strong></div>
+        {/* 2 columns on small screens to reduce vertical stacking and avoid overflow; cells can shrink */}
+        <div className="mb-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="p-3 bg-[#fff0f4] rounded min-w-0 break-words text-sm sm:text-base">Your TRIV: <strong>{format6(tokenBalance)}</strong></div>
+          <div className="p-3 bg-[#fff0f4] rounded min-w-0 break-words text-sm sm:text-base">Staked: <strong>{format6(stakedBalance)}</strong></div>
+          <div className="p-3 bg-[#fff0f4] rounded min-w-0 break-words text-sm sm:text-base">Earned: <strong>{format6(earned)}</strong></div>
+          <div className="p-3 bg-[#fff0f4] rounded min-w-0 break-words text-sm sm:text-base">Total Staked: <strong>{format6(totalStaked)}</strong></div>
         </div>
 
         {!isConnected ? (
           <div className="text-sm text-gray-700">Connect your wallet to stake.</div>
         ) : (
-          <div className="flex flex-col sm:flex-row gap-3">
-            <input
-              className="flex-1 px-3 py-2 rounded border border-gray-200"
-              placeholder="Amount to stake / withdraw"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
-            <div className="flex flex-col sm:flex-row gap-2 w-full">
-                <button disabled={loading} onClick={doApproveAndStake} className="w-full sm:w-auto px-4 py-2 bg-[#FFC4D1] rounded font-semibold">Stake</button>
-                <button disabled={loading} onClick={doWithdraw} className="w-full sm:w-auto px-4 py-2 bg-white border rounded">Withdraw</button>
-                <button disabled={loading} onClick={doClaim} className="w-full sm:w-auto px-4 py-3 bg-white border rounded font-semibold">Claim</button>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch">
+              <input
+                className="flex-1 min-w-0 px-3 py-2 rounded border border-gray-200 text-sm"
+                placeholder="Amount to stake / withdraw"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                inputMode="decimal"
+                aria-label="Amount to stake or withdraw"
+              />
+              <div className="flex gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+                <button
+                  disabled={loading}
+                  onClick={doApproveAndStake}
+                  className="w-full sm:w-auto px-4 py-2 bg-[#FFC4D1] rounded font-semibold text-sm min-w-0 whitespace-normal break-words"
+                >
+                  Stake
+                </button>
+                <button
+                  disabled={loading}
+                  onClick={doWithdraw}
+                  className="w-full sm:w-auto px-4 py-2 bg-white border rounded text-sm min-w-0 whitespace-normal break-words"
+                >
+                  Withdraw
+                </button>
+                <button
+                  disabled={loading}
+                  onClick={doClaim}
+                  className="w-full sm:w-auto px-4 py-2 bg-white border rounded font-semibold text-sm min-w-0 whitespace-normal break-words"
+                >
+                  Claim
+                </button>
               </div>
-          </div>
-        )}
-        {txStatus !== "idle" && (
-          <div className="mt-3 text-sm">
-            <strong>Status:</strong> {txStatus}
-            {txHash && (
-              <div>
-                <a className="text-blue-700" target="_blank" rel="noreferrer" href={`https://basescan.org/tx/${txHash}`}>
-                  View tx
-                </a>
-              </div>
-            )}
+            </div>
+
+            <div className="flex items-center justify-between gap-3">
+              <button disabled={loading} onClick={doExit} className="px-3 py-2 bg-white border rounded text-sm">Exit</button>
+
+              {/* Status area (wraps on narrow screens) */}
+              {txStatus !== "idle" && (
+                <div className="text-sm break-words text-right">
+                  <strong>Status:</strong> {txStatus}
+                  {txHash && (
+                    <div>
+                      <a className="text-blue-700 break-words" target="_blank" rel="noreferrer" href={`https://basescan.org/tx/${txHash}`}>
+                        View tx
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
