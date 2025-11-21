@@ -3,14 +3,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import StakingWidget from "../../components/StakingWidget";
 import WagmiWalletConnect from "../../components/WagmiWalletConnect";
-import { useConnect, useAccount } from 'wagmi';
+import { useConnect, useAccount } from "wagmi";
 import {
   Jackpot as MegapotJackpot,
   MainnetJackpotName,
   MegapotProvider,
   JACKPOT,
-} from '@coordinationlabs/megapot-ui-kit';
-import { base } from 'viem/chains';
+} from "@coordinationlabs/megapot-ui-kit";
+import { base } from "viem/chains";
 
 function pad(n: number) {
   return n.toString().padStart(2, "0");
@@ -44,6 +44,33 @@ export default function JackpotPage() {
 
   // Resolve megapot contract info if available (mainnet only)
   const mainnetJackpotContract = JACKPOT[base.id]?.[MainnetJackpotName.USDC];
+
+  // Read wallet/account info to get iQ from the connected wallet (address-based lookup)
+  const { address, isConnected } = useAccount();
+
+  // User stats (tPoints and iQ). iQ is read using the connected wallet address when available.
+  // This implementation expects iQ to be available in browser storage keyed by address (e.g. localStorage key `iQ_<address>`).
+  // tPoints are read from localStorage key `tPoints` (or `tPoints_<address>` when available).
+  // Replace these lookups with your real data source (on-chain call, API, or secure storage) as needed.
+  const [tPoints, setTPoints] = useState<number>(0);
+  const [iQ, setIQ] = useState<number>(0);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // Try address-scoped keys first (when wallet connected), otherwise fall back to global keys
+    const tPointsKey = address ? `tPoints_${address}` : "tPoints";
+    const iQKey = address ? `iQ_${address}` : "iQ";
+
+    const storedTP = Number(localStorage.getItem(tPointsKey) ?? localStorage.getItem("tPoints") ?? 0);
+    const storedIQ = Number(localStorage.getItem(iQKey) ?? localStorage.getItem("iQ") ?? 0);
+
+    setTPoints(Number.isFinite(storedTP) ? storedTP : 0);
+    setIQ(Number.isFinite(storedIQ) ? storedIQ : 0);
+  }, [address, isConnected]);
+
+  // Gate only by tPoints and iQ (no countdown gating)
+  const meetsThresholds = tPoints >= 100000 && iQ >= 60;
 
   return (
     // full-screen center container
@@ -96,13 +123,26 @@ export default function JackpotPage() {
             : `Time remaining: ${days} days, ${pad(hoursTotal)} hours, ${pad(minutes)} minutes, ${pad(seconds)} seconds`}
         </div>
 
-        {/* Megapot jackpot UI - moved above the staking widget */}
+        {/* Megapot jackpot UI - gated only by tPoints and iQ (uses wallet address to read iQ when connected) */}
         <div className="w-full mt-6">
           <MegapotWrapper>
             <div className="w-full flex flex-col items-center gap-4">
-              {/* Base Mainnet */}
-              {mainnetJackpotContract && (
-                <MegapotJackpot contract={mainnetJackpotContract} />
+              {meetsThresholds ? (
+                mainnetJackpotContract ? (
+                  <MegapotJackpot contract={mainnetJackpotContract} />
+                ) : (
+                  <div className="text-sm text-[#7a516d]">Jackpot contract not configured for this network.</div>
+                )
+              ) : (
+                <div className="rounded-md bg-yellow-50 border border-yellow-200 px-4 py-3 text-left w-full">
+                  <div className="font-semibold text-[#7a516d] mb-1">Access requirements not met</div>
+                  <div className="text-sm text-[#6b4460]">
+                    This jackpot is available only to players with at least <strong>100,000 T points</strong> and <strong>60 iQ</strong>.
+                  </div>
+                  <div className="mt-2 text-sm text-[#6b4460]">
+                    Your stats: <strong>{tPoints.toLocaleString()} T points</strong>, <strong>{iQ} iQ</strong>.
+                  </div>
+                </div>
               )}
             </div>
           </MegapotWrapper>
@@ -135,7 +175,8 @@ function ConnectControls() {
             className="px-3 py-2 rounded bg-white border text-sm shadow-sm"
             title={c.name}
           >
-            {c.name}{!c.ready ? ' (unavailable)' : ''}
+            {c.name}
+            {!c.ready ? " (unavailable)" : ""}
           </button>
         ))}
       </div>
