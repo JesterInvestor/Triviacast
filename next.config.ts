@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Enable browser source maps in production to get readable stack traces in deployed previews.
+  productionBrowserSourceMaps: true,
   // Prevent Next from trying to process the hardhat folder
   experimental: {
     // no specific flag for ignore, but keeping minimal config here
@@ -16,13 +18,15 @@ const nextConfig: NextConfig = {
       "default-src 'self'",
       // Using eval-based dynamic imports in a few optional modules; keep 'unsafe-eval'.
       // Next also injects small inline scripts; allow inline to avoid breakage.
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      // Add vercel.live, WalletConnect pulse, and the x402/cloud.reown domains to allow the client libraries to load in preview.
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://pulse.walletconnect.org https://cloud.reown.com",
       "style-src 'self' 'unsafe-inline'",
       // Allow common image sources used by the app (self + data/blob + stamp avatars)
       "img-src 'self' data: blob: https://cdn.stamp.fyi",
       "font-src 'self' data:",
       // Allow HTTPS and WSS connections for RPCs/wallets/providers to avoid brittle allowlists
-      "connect-src 'self' https: wss:",
+      // Include WalletConnect pulse and cloud.reown so payment handshakes can complete from previews.
+      "connect-src 'self' https: wss: https://pulse.walletconnect.org https://cloud.reown.com https://vercel.live",
       // Allow framing by known Mini App hosts (Farcaster/Warpcast and subdomains)
       "frame-ancestors 'self' https://farcaster.xyz https://client.farcaster.xyz https://*.farcaster.xyz https://warpcast.com https://client.warpcast.com https://*.warpcast.com https://base.org https://*.base.org",
       // Disallow plugins/objects
