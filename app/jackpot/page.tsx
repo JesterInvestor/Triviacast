@@ -29,7 +29,7 @@ export default function JackpotPage() {
         <div className="mb-4">
           <ConnectControls />
         </div>
-        <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">Only for players with 100,000 T points and 60 iQ.</p>
+        <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">Only 1 USDC per ticket. Only for players with 100,000 T points and 60 iQ.</p>
 
         {/* Removed countdown */}
         <div className="w-full mt-6">
