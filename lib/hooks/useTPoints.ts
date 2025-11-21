@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { readContract } from '@wagmi/core'
 import { base } from 'wagmi/chains'
-import { wagmiConfig } from '@/lib/wagmi'
 
 // Minimal ABI fragments for candidate function names (only the signature matters)
 const ABI_CANDIDATES = {
@@ -34,6 +33,8 @@ export default function useTPoints(address?: `0x${string}`) {
       for (const name of candidates) {
         const abi = (ABI_CANDIDATES as any)[name]
         try {
+          // Call readContract with only the config object (no wagmiConfig second arg).
+          // Cast to any to avoid TypeScript mismatches across @wagmi/core versions.
           const res = await (readContract as any)(
             {
               address: TPOINTS_ADDRESS,
@@ -41,8 +42,7 @@ export default function useTPoints(address?: `0x${string}`) {
               functionName: name,
               args: [address],
               chainId: base.id,
-            },
-            wagmiConfig
+            }
           )
           // If result is undefined/null, continue trying; otherwise set value
           if (res === undefined || res === null) {
@@ -72,8 +72,7 @@ export default function useTPoints(address?: `0x${string}`) {
           } catch (loggingErr) {
             console.error('[useTPoints] failed to log error details', loggingErr)
           }
-          // If this was a rate-limit error (-32016 or HTTP 429), we may bail and leave null to avoid hammering.
-          // Continue to next candidate otherwise.
+          // Continue to next candidate
           continue
         }
       }
