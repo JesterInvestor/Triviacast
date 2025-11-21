@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useAccount } from "wagmi";
 
 type SpinResult = {
@@ -104,6 +104,32 @@ export default function SpinWheel() {
 
     setSpinning(false);
   };
+
+  // Expose a debug helper on window so you can force the x402 payment flow from DevTools.
+  // Usage in console: await window.__x402_retry()
+  useEffect(() => {
+    (window as any).__x402_retry = async () => {
+      try {
+        const mod = await import('x402-fetch');
+        const wagmiMod = await import('wagmi/actions');
+        const walletClient = await (wagmiMod as any).getWalletClient?.();
+        const fetchWithPayment = mod.wrapFetchWithPayment(fetch, walletClient);
+        const resp = await fetchWithPayment('/api/jackpot', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ address: walletClient?.account?.address })
+        } as any);
+        console.log('window.__x402_retry response status', resp.status);
+        try { console.log('body:', await resp.json()); } catch (e) { console.log('text body:', await resp.text()); }
+        return resp;
+      } catch (err) {
+        console.error('window.__x402_retry error', err);
+        throw err;
+      }
+    };
+
+    return () => { try { delete (window as any).__x402_retry; } catch (e) {} };
+  }, []);
 
   return (
     <div className="w-full max-w-md mx-auto text-center">
