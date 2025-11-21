@@ -25,7 +25,7 @@ export default function JackpotPage() {
         role="region"
         aria-label="Jackpot section"
       >
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] mb-4">Jackpot coming soon.....</h1>
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] mb-4">Jackpot is Here!!!</h1>
         <div className="mb-4">
           <ConnectControls />
         </div>
