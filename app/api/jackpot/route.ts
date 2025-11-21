@@ -12,12 +12,17 @@ const LOG_PATH = path.join(process.cwd(), "data", "jackpot_log.json");
 
 async function appendLog(entry: any) {
   try {
+    // Ensure directory exists
+    const dir = path.dirname(LOG_PATH);
+    await fs.mkdir(dir, { recursive: true }).catch(() => {});
+
     const existing = await fs.readFile(LOG_PATH, "utf8").catch(() => "");
     const arr = existing ? JSON.parse(existing) : [];
     arr.push(entry);
     await fs.writeFile(LOG_PATH, JSON.stringify(arr, null, 2));
   } catch (e) {
-    // ignore logging errors
+    // log to server console for debugging in dev/staging
+    console.error("appendLog error:", e);
   }
 }
 
@@ -54,11 +59,17 @@ export async function POST(req: Request) {
       prize,
     };
 
-    await appendLog(entry);
+    try {
+      await appendLog(entry);
+    } catch (e) {
+      console.error("Failed to append jackpot log:", e);
+    }
 
     return NextResponse.json({ success: true, tier, prize, roll });
   } catch (e: any) {
-    return NextResponse.json({ success: false, error: String(e) }, { status: 500 });
+    // Return a helpful error message for debugging. In production consider returning a generic message.
+    console.error("/api/jackpot error:", e);
+    return NextResponse.json({ success: false, error: String(e), stack: e?.stack }, { status: 500 });
   }
 }
 
