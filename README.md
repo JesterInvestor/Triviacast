@@ -199,6 +199,22 @@ Please open issues or PRs against the `main` branch. Follow the repo's existing 
 
 ---
 
+## Jackpot (x402)
+
+This repo includes a simple TRIV jackpot feature protected by x402 payments. Key points:
+- Endpoint: `POST /api/jackpot` — costs `0.10 USDC` per spin and is protected by x402 middleware in `middleware.ts`.
+- Metadata: `GET /api/jackpot` returns `{ jackpot: 10000000, price: "$0.10" }`.
+- UI: `components/Jackpot.tsx` provides a client-side spin button which attempts to use `x402-fetch` + `wagmi/actions#getWalletClient` when available, and falls back to a plain fetch.
+- Logs: spin attempts are appended to `data/jackpot_log.json` (local filesystem — in production replace with persistent storage or on-chain payouts).
+- Chance to win full jackpot: **25% per spin** (implementation uses a 1-in-4 random check).
+
+Environment vars required for x402 integration (see docs/CDP.md for more):
+- `RESOURCE_WALLET_ADDRESS` — wallet that receives USDC payments
+- `NETWORK` — e.g., `base-sepolia` for testing or `base` for mainnet
+- `NEXT_PUBLIC_ONCHAINKIT_API_KEY` — OnchainKit API key (optional for advanced flows)
+
+Note: This is a starter implementation. For real payouts you should implement secure server-side settlement, on-chain transfers (or third-party custodial settlement), and thorough testing on testnet.
+
 ## Suggested next steps (after this README)
 
 - Run `npm run build` and verify production output

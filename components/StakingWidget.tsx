@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { ethers } from "ethers";
 import { TRIV_ABI, STAKING_ABI } from "../lib/stakingClient";
+import Jackpot from "./Jackpot";
 
 const STAKING_ADDRESS = process.env.NEXT_PUBLIC_STAKING_ADDRESS || "";
 const TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || "";
@@ -181,6 +182,8 @@ export default function StakingWidget() {
         <div className="mb-3">
           <span className="inline-block px-3 py-1 rounded-full bg-[#FFF3F6] text-gray-800 font-semibold text-sm">Current APR: 80%</span>
         </div>
+
+        <Jackpot />
         <p className="text-sm text-gray-700 mb-4">You can stake using Base App. Works in Farcaster desktop and browser w/ wallet extension — sorry for any inconvenience. (Dec 17th)</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
