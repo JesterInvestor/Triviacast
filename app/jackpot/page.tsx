@@ -9,9 +9,8 @@ import {
   MainnetJackpotName,
   MegapotProvider,
   JACKPOT,
-  TestnetJackpotName,
 } from '@coordinationlabs/megapot-ui-kit';
-import { base, baseSepolia } from 'viem/chains';
+import { base } from 'viem/chains';
 
 function pad(n: number) {
   return n.toString().padStart(2, "0");
@@ -43,9 +42,8 @@ export default function JackpotPage() {
   const hoursTotal = days * 24 + hours;
   const finished = remainingMs <= 0;
 
-  // Resolve megapot contract info if available
+  // Resolve megapot contract info if available (mainnet only)
   const mainnetJackpotContract = JACKPOT[base.id]?.[MainnetJackpotName.USDC];
-  const testnetJackpotContract = JACKPOT[baseSepolia.id]?.[TestnetJackpotName.MPUSDC];
 
   return (
     // full-screen center container
@@ -97,10 +95,8 @@ export default function JackpotPage() {
             ? "Jackpot is live"
             : `Time remaining: ${days} days, ${pad(hoursTotal)} hours, ${pad(minutes)} minutes, ${pad(seconds)} seconds`}
         </div>
-        {/* Staking widget inserted below the countdown card */}
-        <StakingWidget />
 
-        {/* Megapot jackpot UI */}
+        {/* Megapot jackpot UI - moved above the staking widget */}
         <div className="w-full mt-6">
           <MegapotWrapper>
             <div className="w-full flex flex-col items-center gap-4">
@@ -108,13 +104,12 @@ export default function JackpotPage() {
               {mainnetJackpotContract && (
                 <MegapotJackpot contract={mainnetJackpotContract} />
               )}
-              {/* Base Sepolia (test) */}
-              {testnetJackpotContract && (
-                <MegapotJackpot contract={testnetJackpotContract} />
-              )}
             </div>
           </MegapotWrapper>
         </div>
+
+        {/* Staking widget inserted below the megapot UI */}
+        <StakingWidget />
       </div>
     </main>
   );
