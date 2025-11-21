@@ -28,9 +28,10 @@ export default function Jackpot() {
       try {
         const mod = await import("x402-fetch");
         const wagmiMod = await import("wagmi/actions");
-        const walletClient = await wagmiMod.getWalletClient();
+        // getWalletClient expects arguments in some typings; call dynamically to avoid build-time type check errors
+        const walletClient = await (wagmiMod as any).getWalletClient?.();
         const fetchWithPayment = mod.wrapFetchWithPayment(fetch, walletClient);
-        res = await fetchWithPayment("/api/jackpot", { method: "POST", body: JSON.stringify({ address }), headers: { "content-type": "application/json" } });
+        res = await fetchWithPayment("/api/jackpot", { method: "POST", body: JSON.stringify({ address }), headers: { "content-type": "application/json" } } as any);
       } catch (e) {
         // fallback to direct fetch; if middleware replies 402 the client must handle it
         res = await fetch("/api/jackpot", { method: "POST", body: JSON.stringify({ address }), headers: { "content-type": "application/json" } });
@@ -58,8 +59,8 @@ export default function Jackpot() {
         {result && (
           <div className="mt-3 text-sm">
             {result.success ? (
-              result.isWinner ? (
-                <div className="text-green-700">Congratulations! You won {result.prize} TRIV 🎉</div>
+              result.tier && result.tier !== "none" ? (
+                <div className="text-green-700">Congratulations! You won {result.prize} TRIV ({result.tier}) 🎉</div>
               ) : (
                 <div className="text-gray-700">No win this time — better luck next spin.</div>
               )

@@ -76,6 +76,26 @@ Key ideas:
 - [Quick start](#quick-start)
 - [Environment / Configuration](#environment--configuration)
 - [Architecture & Key files](#architecture--key-files)
+
+Tiered prizes
+
+The jackpot endpoint now supports tiered prizes:
+
+- **Jackpot (0.01%)** — `10,000,000 TRIV` (1 in 10,000)
+- **Medium (1%)** — `10,000 TRIV`
+- **Small (25%)** — `100 TRIV`
+
+Probabilities are implemented at 1,000,000 resolution in `app/api/jackpot/route.ts`:
+- `roll < 100` => jackpot (100 / 1_000_000 = 0.01%)
+- `roll < 100 + 10_000` => medium (10_000 / 1_000_000 = 1%)
+- `roll < 100 + 10_000 + 250_000` => small (250_000 / 1_000_000 = 25%)
+
+Environment vars required for x402 integration (see docs/CDP.md for more):
+- `RESOURCE_WALLET_ADDRESS` — wallet that receives USDC payments
+- `NETWORK` — e.g., `base-sepolia` for testing or `base` for mainnet
+- `NEXT_PUBLIC_ONCHAINKIT_API_KEY` — OnchainKit API key (optional for advanced flows)
+
+Note: This is a starter implementation. For real payouts you should implement secure server-side settlement, on-chain transfers (or third-party custodial settlement), and thorough testing on testnet.
 - [Smart contracts](#smart-contracts)
 - [Deployment](#deployment)
 - [Contributing](#contributing)
