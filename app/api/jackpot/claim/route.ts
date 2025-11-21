@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     // read logs and find unpaid winner for this address
     const logs = await readLogs();
     // find the most recent unpaid winning entry for this address
-    const entryIndex = logs.map((e: any, i: number) => ({ e, i })).reverse().find((r) => {
+    const entryIndex = logs.map((e: any, i: number) => ({ e, i })).reverse().find((r: any) => {
       const e = r.e;
       return e.address && e.address.toLowerCase() === address.toLowerCase() && e.prize > 0 && !e.paid;
     })?.i;
