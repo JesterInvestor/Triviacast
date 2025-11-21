@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import StakingWidget from "../../components/StakingWidget";
 import WagmiWalletConnect from "../../components/WagmiWalletConnect";
-import { useConnect, useAccount } from 'wagmi';
+import { useConnect, useAccount, useChainId } from 'wagmi';
 import {
   Jackpot as MegapotJackpot,
   MainnetJackpotName,
@@ -21,6 +21,9 @@ export default function JackpotPage() {
   const mainnetJackpotContract = JACKPOT[base.id]?.[MainnetJackpotName.USDC];
 
   const { address } = useAccount();
+  const chainId = useChainId();
+  const isOnBase = chainId === base.id;
+
   const { iqPoints } = useIQPoints(address as `0x${string}` | undefined);
   const { tPoints } = useTPoints(address as `0x${string}` | undefined);
 
@@ -28,8 +31,7 @@ export default function JackpotPage() {
   const REQUIRED_T_POINTS = 100_000n;
   const REQUIRED_IQ = 60n;
 
-  // Eligibility: widget is UNBLURRED only when BOTH thresholds are met.
-  // This means the widget will be blurred when EITHER threshold is unmet.
+  // Eligibility: UNBLURRED only when BOTH thresholds are met (so blurred when EITHER unmet)
   const isEligible = useMemo(() => {
     try {
       const tp = tPoints ?? 0n;
@@ -39,6 +41,11 @@ export default function JackpotPage() {
       return false;
     }
   }, [tPoints, iqPoints]);
+
+  // Expose env var value used by hook for debugging
+  const triviaPointsEnv = (process.env.NEXT_PUBLIC_TRIVIA_POINTS_ADDRESS ||
+                           process.env.NEXT_PUBLIC_TPOINTS_ADDRESS ||
+                           '') as string;
 
   return (
     // full-screen center container
@@ -55,7 +62,19 @@ export default function JackpotPage() {
         </div>
         <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">Only for players with 100,000 T points and 60 iQ.</p>
 
-        {/* Removed countdown */}
+        {/* Debug overlay (visible while connected) */}
+        <div className="w-full max-w-xl mb-4">
+          <DebugBox
+            address={address}
+            chainId={chainId}
+            isOnBase={isOnBase}
+            iqPoints={iqPoints}
+            tPoints={tPoints}
+            triviaPointsEnv={triviaPointsEnv}
+            isEligible={isEligible}
+          />
+        </div>
+
         <div className="w-full mt-6">
           <MegapotWrapper>
             <div className="w-full flex flex-col items-center gap-4">
@@ -187,6 +206,33 @@ function MegapotGate({ children, isEligible }: { children: React.ReactNode; isEl
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* Small debug box component to help diagnose gating issues */
+function DebugBox({ address, chainId, isOnBase, iqPoints, tPoints, triviaPointsEnv, isEligible }: {
+  address?: `0x${string}` | undefined;
+  chainId?: number | undefined;
+  isOnBase: boolean;
+  iqPoints?: bigint | null;
+  tPoints?: bigint | null;
+  triviaPointsEnv: string;
+  isEligible: boolean;
+}) {
+  if (!address) {
+    return <div className="text-sm text-[#7a516d]">Not connected — connect a wallet to see on-chain values.</div>;
+  }
+
+  return (
+    <div className="text-left text-xs text-[#5a3d5c] bg-[#fff0f5] border border-[#f4a6b7] rounded p-3">
+      <div><strong>Address:</strong> {address}</div>
+      <div><strong>ChainId:</strong> {String(chainId)} {isOnBase ? '(Base)' : '(not Base — switch to Base!)'}</div>
+      <div><strong>T-points contract env:</strong> {triviaPointsEnv || '<not set>'}</div>
+      <div><strong>iQ points (raw):</strong> {iqPoints === null ? 'null' : String(iqPoints)}</div>
+      <div><strong>T points (raw):</strong> {tPoints === null ? 'null' : String(tPoints)}</div>
+      <div><strong>Eligibility:</strong> {isEligible ? 'UNLOCKED' : 'LOCKED'}</div>
+      <div className="mt-2 text-xs text-[#884060]">If T-points or iQ show null/0, check env var, contract ABI, and ensure wallet is on Base chain.</div>
     </div>
   );
 }
