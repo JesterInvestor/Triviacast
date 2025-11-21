@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@coinbase/onchainkit": "^1.1.2",
+    "@coordinationlabs/megapot-ui-kit": "^0.0.50",
     "@farcaster/auth-kit": "^0.1.4",
     "@farcaster/miniapp-node": "^0.1.10",
     "@farcaster/miniapp-sdk": "^0.2.0",
