@@ -180,7 +180,7 @@ export default function StakingWidget() {
       <div className="p-6 rounded-xl bg-white/90 border border-[#F4A6B7] shadow-sm text-gray-900 overflow-auto">
         <h2 className="text-lg font-semibold text-gray-900 mb-3">Stake TRIV for Rewards</h2>
         <div className="mb-3">
-          <span className="inline-block px-3 py-1 rounded-full bg-[#FFF3F6] text-gray-800 font-semibold text-sm">Current APR: 80%</span>
+          <span className="inline-block px-3 py-1 rounded-full bg-[#FFF3F6] text-gray-800 font-semibold text-sm">Current APY: 80%</span>
         </div>
         <p className="text-sm text-gray-700 mb-4">You can stake using Base App. Works in Farcaster desktop and browser w/ wallet extension — sorry for any inconvenience. (Dec 17th)</p>
 
