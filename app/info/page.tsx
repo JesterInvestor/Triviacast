@@ -375,7 +375,7 @@ export default function InfoPage() {
             <li>Daily Quest — complete a short set of questions every day to earn bonus T Points</li>
             <li>Weekly Quest — finish a longer challenge for rare rewards and leaderboard boosts</li>
             <li>Event Quest — limited-time themed quizzes with special prizes</li>
-            <li>Jackpot — coming soon for top players and quest masters. Stay tuned for the official launch on Farcaster and in-app</li>
+            <li>Jackpot — Live on Jackpot Page $800,000+ Jackpot</li>
           </ul>
         </div>
 
