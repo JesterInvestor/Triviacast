@@ -33,7 +33,7 @@ export default function Home() {
 
           {/* Short subtitle */}
           <p className="mt-2 text-sm text-[#5a3d5c] text-center max-w-xl">
-            1)Play Quiz 2)If you like it, go to Quests🗺️ 3)Challenge Friend 🎯 4)Share your own Question ℹ️ Of you hold 100,000 T points and 60 iQ you can play Megapot Jackpot
+            1)Play Quiz 2)If you like it, go to Quests🗺️ 3)Challenge Friend 🎯 4)Share your own Question ℹ️ If you hold 100,000 T points and 60 iQ you can play Megapot Jackpot
           </p>
         </div>
 
