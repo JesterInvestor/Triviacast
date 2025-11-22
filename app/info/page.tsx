@@ -161,7 +161,7 @@ export default function InfoPage() {
         </div>
 
         <div className="mb-4 text-lg text-gray-800 text-center">
-          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and on-chain rewards. Connect your wallet and show your Farc[...]
+          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and onchain rewards. Connect your wallet and show your Farc[...]
         </div>
 
         <div className="mb-4 text-lg text-fuchsia-800 font-semibold text-center">
@@ -341,7 +341,7 @@ export default function InfoPage() {
             <li>Answer timed trivia drawn from open source sets — speed and accuracy score you higher</li>
             <li>Earn T Points for correct answers and win bonus points for streaks</li>
             <li>See your Farcaster profile and avatar on the leaderboard in real time</li>
-            <li>Claim your rewards on chain and show off your trivia skill</li>
+            <li>Claim your rewards onchain and show off your trivia skill</li>
             <li>Challenge friends or climb solo to prove you are the fastest thinker in the room</li>
           </ul>
         </div>
@@ -394,15 +394,15 @@ export default function InfoPage() {
         </div>
 
         <div className="mb-6 p-4 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-xl shadow w-full max-w-2xl">
-          <h2 className="text-xl font-bold mb-2 text-orange-700 flex items-center gap-2">
+            <h2 className="text-xl font-bold mb-2 text-orange-700 flex items-center gap-2">
             <Image src="/brain-small.svg" alt="Brain" width={24} height={24} />
-            About $TRIV
+            About TRIV
           </h2>
           <ul className="list-disc pl-6 text-gray-700">
-            <li>$TRIV is the native token contract address 0xa889A10126024F39A0ccae31D09C18095CB461B8</li>
-            <li>Claim $TRIV when the app prompts you to do so</li>
+            <li>TRIV is the native token contract address 0xa889A10126024F39A0ccae31D09C18095CB461B8</li>
+            <li>Claim TRIV when the app prompts you to do so</li>
             <li className="font-bold text-orange-600">Top T Point holders will be eligible for major airdrops and jackpot prize pools</li>
-            <li className="text-sm italic">You will be able to buy $TRIV with swaps in app when liquidity is available</li>
+            <li className="text-sm italic">You will be able to buy TRIV with swaps in app when liquidity is available</li>
             <li className="text-sm italic">Jackpot details will drop soon and will reward the biggest trivia champions</li>
           </ul>
         </div>
@@ -457,16 +457,16 @@ export default function InfoPage() {
         <div className="mb-6 p-4 bg-white rounded-xl shadow w-full max-w-2xl border flex items-center justify-between gap-3">
           <div>
             <h2 className="text-xl font-bold mb-1 text-[#2d1b2e]">Support Triviacast</h2>
-            <p className="text-sm text-[#5a3d5c]">If you enjoy the game you can tip in crypto to help us build more features and bigger events.</p>
+            <p className="text-sm text-[#5a3d5c]">If you enjoy the game you can tip onchain to help us build more features and bigger events.</p>
           </div>
           <a
             href="https://tip.md/jesterinvestor"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Tip in Crypto"
+            aria-label="Tip onchain"
             className="inline-flex items-center border-2 border-[#F4A6B7] rounded-lg p-1.5 bg-white shadow min-h-[40px]"
           >
-            <img src="https://tip.md/badge.svg" alt="Tip in Crypto" height={24} />
+            <img src="https://tip.md/badge.svg" alt="Tip onchain" height={24} />
           </a>
         </div>
 
