@@ -118,7 +118,7 @@ export default function StakingDailyClaimPrompt() {
             <div className="flex-1">
               <h3 className="text-base font-semibold">Daily Claim</h3>
               <p className="mt-1 text-sm text-neutral-600">
-                Claim your daily reward. Staking coming soon.....
+                Claim your daily reward. Staking is Live on Info Page!
               </p>
             </div>
             <button aria-label="Close" onClick={dismiss} className="-m-1 rounded p-1 text-neutral-500 hover:text-neutral-900">×</button>
