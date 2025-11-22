@@ -1,7 +1,12 @@
 import { ethers } from "hardhat";
 import * as dotenv from "dotenv";
+import path from "path";
 
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
+
+function bump(v: bigint) {
+  return ((v * 125n) / 100n) + 1n;
+}
 
 async function main() {
   const [caller] = await ethers.getSigners();
@@ -41,13 +46,31 @@ async function main() {
   // duration = 24 hours
   const duration = 60 * 60 * 24;
 
-  console.log(`Approving ${dailyFormatted} TRIV to staking contract (${stakingAddress})`);
-  const approveTx = await TRIV.approve(stakingAddress, dailyWei.toString());
+  // prepare bumped fee data to avoid 'replacement transaction underpriced' errors
+  const fee = await ethers.provider.getFeeData();
+  const maxFeePerGas = bump(fee.maxFeePerGas ?? fee.gasPrice ?? 0n);
+  const maxPriorityFeePerGas = bump(fee.maxPriorityFeePerGas ?? 0n);
+
+  const signer = (await ethers.getSigners())[0];
+  let nonce = await ethers.provider.getTransactionCount(await signer.getAddress(), 'pending');
+
+  console.log(`Approving ${dailyFormatted} TRIV to staking contract (${stakingAddress}) with nonce ${nonce}`);
+  const approveTx = await TRIV.connect(signer).approve(stakingAddress, dailyWei.toString(), {
+    maxFeePerGas,
+    maxPriorityFeePerGas,
+    nonce,
+  } as any);
   await approveTx.wait();
   console.log("Approve tx mined", approveTx.hash);
 
-  console.log(`Calling notifyRewardAmount(${dailyWei.toString()}, ${duration})`);
-  const fundTx = await STAKING.notifyRewardAmount(dailyWei.toString(), duration);
+  nonce++;
+
+  console.log(`Calling notifyRewardAmount(${dailyWei.toString()}, ${duration}) with nonce ${nonce}`);
+  const fundTx = await STAKING.connect(signer).notifyRewardAmount(dailyWei.toString(), duration, {
+    maxFeePerGas,
+    maxPriorityFeePerGas,
+    nonce,
+  } as any);
   await fundTx.wait();
   console.log("Funded rewards — tx", fundTx.hash);
 

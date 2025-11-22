@@ -12,10 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node 18
+      - name: Use Node 22
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Install dependencies
         run: npm ci
@@ -28,9 +28,10 @@ jobs:
           TRIV_TOKEN_ADDRESS: ${{ secrets.TRIV_TOKEN_ADDRESS }}
           STAKING_ADDRESS: ${{ secrets.STAKING_ADDRESS }}
           REWARD_APR_PERCENT: '80'
+        working-directory: hardhat
         run: |
           echo "Running compute-and-fund-apr.ts with 80% APR"
-          npx hardhat run hardhat/scripts/compute-and-fund-apr.ts --network base
+          npx hardhat run scripts/compute-and-fund-apr.ts --network base
 
     # NOTE: Required secrets (to set in repo Settings → Secrets):
     # - PRIVATE_KEY : private key of the owner account that will approve and notify rewards
