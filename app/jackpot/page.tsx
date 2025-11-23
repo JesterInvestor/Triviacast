@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
 import StakingWidget from "../../components/StakingWidget";
 import WagmiWalletConnect from "../../components/WagmiWalletConnect";
 import { useConnect, useAccount } from 'wagmi';
@@ -9,116 +9,43 @@ import {
   MainnetJackpotName,
   MegapotProvider,
   JACKPOT,
-  TestnetJackpotName,
 } from '@coordinationlabs/megapot-ui-kit';
-import { base, baseSepolia } from 'viem/chains';
+import { base } from 'viem/chains';
 import JackpotBanner from "../../components/JackpotBanner";
 
-function pad(n: number) {
-  return n.toString().padStart(2, "0");
-}
-
 export default function JackpotPage() {
-  // Fixed target: Nov 22, 2025 at 00:00 (midnight) in the user's local timezone.
-  // If you prefer UTC midnight, replace with: Date.UTC(2025, 10, 22, 0, 0, 0)
-  const target = useMemo(() => new Date("2025-11-22T00:00:00").getTime(), []);
-
-  const [remainingMs, setRemainingMs] = useState(Math.max(0, target - Date.now()));
-
-  useEffect(() => {
-    const tick = () => {
-      const rem = Math.max(0, target - Date.now());
-      setRemainingMs(rem);
-    };
-
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [target]);
-
-  const days = Math.floor(remainingMs / (24 * 60 * 60 * 1000));
-  const hours = Math.floor((remainingMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-  const minutes = Math.floor((remainingMs % (60 * 60 * 1000)) / (60 * 1000));
-  const seconds = Math.floor((remainingMs % (60 * 1000)) / 1000);
-
-  const hoursTotal = days * 24 + hours;
-  const finished = remainingMs <= 0;
-
-  // Resolve megapot contract info if available
+  // Resolve megapot contract info if available (mainnet only)
   const mainnetJackpotContract = JACKPOT[base.id]?.[MainnetJackpotName.USDC];
-  const testnetJackpotContract = JACKPOT[baseSepolia.id]?.[TestnetJackpotName.MPUSDC];
 
   return (
-    // full-screen center container
     <main className="min-h-screen flex flex-col items-center justify-start bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] p-0">
-      {/* streaming banner */}
       <JackpotBanner />
+
       <div className="w-full flex-grow flex items-center justify-center p-8">
-      {/* card centered and constrained */}
-      <div
-        className="w-full max-w-3xl mx-auto mt-6 flex flex-col items-center justify-center text-center bg-white/80 backdrop-blur px-8 py-12 rounded-2xl border border-[#F4A6B7] shadow-lg"
-        role="region"
-        aria-label="Jackpot countdown"
-      >
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] mb-4">Jackpot coming soon.....</h1>
-        <div className="mb-4">
-          <ConnectControls />
-        </div>
-        <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">Only for players with 100,000 T points and 60 iQ.</p>
+        <div className="w-full max-w-3xl mx-auto mt-6 flex flex-col items-center justify-center text-center bg-white/80 backdrop-blur px-8 py-12 rounded-2xl border border-[#F4A6B7] shadow-lg">
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] mb-4">Jackpot</h1>
 
-        <div className="w-full flex flex-col items-center gap-6">
-          <div className="rounded-xl bg-gradient-to-b from-white/60 to-white/30 px-6 py-5 border border-[#F4A6B7] shadow-md w-full">
-            <div className="text-sm uppercase tracking-wider text-[#6b4460] mb-4">Time remaining</div>
-
-            {/* center the countdown row */}
-            <div className="w-full flex items-center justify-center gap-4 sm:gap-6">
-              <div className="flex flex-col items-center">
-                <div className="text-xs text-[#7a516d] mb-2">Days</div>
-                <div className="w-20 sm:w-24 h-20 sm:h-24 rounded-lg bg-[#ffeaf0] flex items-center justify-center border border-[#f2bccb] shadow-inner">
-                  <div className="text-2xl sm:text-3xl font-extrabold text-[#b84d6a]">{days}</div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 sm:gap-4">
-                <TimeBlock label="Hours" value={pad(hoursTotal)} />
-                <Separator />
-                <TimeBlock label="Minutes" value={pad(minutes)} />
-                <Separator />
-                <TimeBlock label="Seconds" value={pad(seconds)} />
-              </div>
-            </div>
+          <div className="mb-4">
+            <ConnectControls />
           </div>
 
-          {finished ? (
-            <div className="mt-2 text-green-700 font-semibold">The jackpot is live! Claim now 🎉</div>
-          ) : (
-            <p className="text-2xl sm:text-3xl font-bold text-[#DC8291] animate-pulse">Get Triviacasting and share + claim daily!</p>
-          )}
-        </div>
+          <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">Participate in the mainnet jackpot.</p>
 
-        <div aria-live="polite" className="sr-only">
-          {finished
-            ? "Jackpot is live"
-            : `Time remaining: ${days} days, ${pad(hoursTotal)} hours, ${pad(minutes)} minutes, ${pad(seconds)} seconds`}
-        </div>
-        {/* Staking widget inserted below the countdown card */}
-        <StakingWidget />
+          {/* Staking widget placed above the jackpot UI */}
+          <StakingWidget />
 
-        {/* Megapot jackpot UI */}
-        <div className="w-full mt-6">
-          <MegapotWrapper>
-            <div className="w-full flex flex-col items-center gap-4">
-              {/* Base Mainnet */}
-              {mainnetJackpotContract && (
-                <MegapotJackpot contract={mainnetJackpotContract} />
-              )}
-              {/* Base Sepolia (test) */}
-              {testnetJackpotContract && (
-                <MegapotJackpot contract={testnetJackpotContract} />
-              )}
-            </div>
-          </MegapotWrapper>
-        </div>
+          {/* Megapot jackpot UI (mainnet only) */}
+          <div className="w-full mt-6">
+            <MegapotWrapper>
+              <div className="w-full flex flex-col items-center gap-4">
+                {mainnetJackpotContract ? (
+                  <MegapotJackpot contract={mainnetJackpotContract} />
+                ) : (
+                  <div className="text-sm text-[#7a516d]">Mainnet jackpot not configured.</div>
+                )}
+              </div>
+            </MegapotWrapper>
+          </div>
         </div>
       </div>
     </main>
