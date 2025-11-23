@@ -23,58 +23,55 @@ export default function JackpotPage() {
       <JackpotBanner />
       {/* full-screen center container */}
       <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] p-8">
-        {/* card centered and constrained */}
-        <div
-          className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center text-center bg-white/80 backdrop-blur px-8 py-12 rounded-2xl border border-[#F4A6B7] shadow-lg"
-          style={{ overflowX: "auto" }} /* Ensure horizontal scrolling for overflow */
-          role="region"
-          aria-label="Jackpot section"
-        >
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] mb-4">
-            Jackpot is Here!!!
-          </h1>
-          <div className="mb-4">
-            <ConnectControls />
-          </div>
-          <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">
-            Only 1 USDC per ticket. Only for players with 100,000 T points and 60
-            iQ soon. Get T points and iQ!!!
-          </p>
-
-          {/* Removed countdown */}
-          <div style={{ width: "100%", maxWidth: "100%", overflowX: "auto" }}>
-            <MegapotWrapper>
-              <div className="w-full flex flex-col items-center gap-4">
-                {/* Base Mainnet */}
-                {mainnetJackpotContract && (
-                  <MegapotJackpot
-                    contract={mainnetJackpotContract}
-                    style={{
-                      width: "100%",
-                      minWidth: "300px", // Ensuring a minimum width for scrollability
-                    }}
-                  />
-                )}
-              </div>
-            </MegapotWrapper>
-          </div>
-
-          {/* Staking widget inserted below the megapot UI */}
-          <StakingWidget />
-
-          {/* Small external debug link (keeps layout unchanged) */}
-          <div className="mt-4">
-            <a
-              href="https://triviacast.xyz/farcaster-debug"
-              className="text-sm text-[#7a516d] hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Farcaster debug
-            </a>
-          </div>
+      {/* card centered and constrained */}
+      <div
+        className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center text-center bg-white/80 backdrop-blur px-8 py-12 rounded-2xl border border-[#F4A6B7] shadow-lg"
+        style={{ overflowX: "auto" }} /* Ensure horizontal scrolling for overflow */
+        role="region"
+        aria-label="Jackpot section"
+      >
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-[#2d1b2e] mb-4">
+          Jackpot is Here!!!
+        </h1>
+        <div className="mb-4">
+          <ConnectControls />
         </div>
+        <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">
+          Only 1 USDC per ticket. Only for players with 100,000 T points and 60
+          iQ soon. Get T points and iQ!!!
+        </p>
+
+        {/* Removed countdown */}
+        <div style={{ width: "100%", maxWidth: "100%", overflowX: "auto" }}>
+          <MegapotWrapper>
+            <div className="w-full flex flex-col items-center gap-4">
+              {/* Base Mainnet */}
+              {mainnetJackpotContract && (
+                <MegapotJackpot
+                  contract={mainnetJackpotContract}
+                  style={{
+                    width: "100%",
+                    minWidth: "300px", // Ensuring a minimum width for scrollability
+                  }}
+                />
+              )}
+            </div>
+          </MegapotWrapper>
+        </div>
+
+        {/* Staking widget inserted below the megapot UI */}
+        <StakingWidget />
+      </div>
       </main>
+      {/* small fixed link to farcaster debug */}
+      <a
+        href="https://triviacast.xyz/farcaster-debug"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-xs text-[#5a3d5c] opacity-80 hover:opacity-100 fixed bottom-3 right-3 bg-white/60 backdrop-blur px-2 py-1 rounded-lg border border-[#F4A6B7] shadow-sm"
+      >
+        farcaster-debug
+      </a>
     </>
   );
 }
@@ -100,6 +97,7 @@ function ConnectControls() {
             title={c.name}
           >
             {c.name}
+            {!c.ready ? " (unavailable)" : ""}
           </button>
         ))}
       </div>
@@ -107,10 +105,21 @@ function ConnectControls() {
   );
 }
 
-/**
- * MegapotWrapper exists so we can insert a provider/context later if needed.
- * Kept minimal for now to preserve layout.
- */
 function MegapotWrapper({ children }: { children: React.ReactNode }) {
-  return <div style={{ width: "100%" }}>{children}</div>;
+  const { connectors } = useConnect();
+
+  return (
+    <MegapotProvider
+      onConnectWallet={() => {
+        // attempt to connect using the first available connector
+        try {
+          connectors[0]?.connect();
+        } catch (e) {
+          // ignore — user can connect via UI
+        }
+      }}
+    >
+      {children}
+    </MegapotProvider>
+  );
 }
