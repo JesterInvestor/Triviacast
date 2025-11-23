@@ -85,7 +85,8 @@ export async function openShareUrl(url: string): Promise<void> {
     }
   } catch (error) {
     // SDK not available or failed - fall through to other methods
-    console.log('Farcaster SDK not available or composeCast failed, using fallback', error);
+    const { error: logError } = await import('./logger');
+    logError(error, { context: 'openShareUrl.composeCastFallback' });
   }
   
   // For Base or Farcaster miniapp, open the app URL directly instead of Warpcast compose

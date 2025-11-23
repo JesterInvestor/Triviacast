@@ -280,7 +280,9 @@ export default function QuestsPage() {
               if (!ok) return;
               await claimDailyOneIQ();
               try {
-                window.dispatchEvent(new Event('triviacast:questClaimed'));
+                // Dispatch a custom event with the quest id so the useQuestIQ hook
+                // can take the optimistic path and mark this quest as claimed immediately.
+                window.dispatchEvent(new CustomEvent('triviacast:questClaimed', { detail: { id: 5 } }));
                 window.dispatchEvent(new Event('triviacast:iqUpdated'));
                 window.dispatchEvent(new CustomEvent('triviacast:toast', { detail: { type: 'success', message: '+1 iQ claimed' } }));
               } catch {}
