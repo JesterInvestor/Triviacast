@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import StakingWidget from "../../components/StakingWidget";
 import WagmiWalletConnect from "../../components/WagmiWalletConnect";
 import { useConnect, useAccount } from "wagmi";
@@ -63,18 +62,16 @@ export default function JackpotPage() {
           {/* Staking widget inserted below the megapot UI */}
           <StakingWidget />
 
-          {/* Small debug button for Farcaster environment checks */}
+          {/* Small external debug link (keeps layout unchanged) */}
           <div className="mt-4">
-            <Link href="/farcaster-debug" legacyBehavior>
-              <a className="inline-block">
-                <button
-                  type="button"
-                  className="text-sm text-[#7a516d] hover:underline px-2 py-1 bg-transparent border rounded"
-                >
-                  Farcaster debug
-                </button>
-              </a>
-            </Link>
+            <a
+              href="https://triviacast.xyz/farcaster-debug"
+              className="text-sm text-[#7a516d] hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Farcaster debug
+            </a>
           </div>
         </div>
       </main>
