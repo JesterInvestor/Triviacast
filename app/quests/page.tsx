@@ -141,9 +141,9 @@ export default function QuestsPage() {
 
           {/* Share quest: +1 iQ */}
           <QuestCard
-            title="Share about Triviacast"
+            title="Share about Claim Daily"
             emoji="📣"
-            description="Post a quick share about Triviacast. You can use the share shortcut, then claim."
+            description="Post a quick share daily about Triviacast. You can use the share shortcut, then claim daily."
             reward="+1 iQ"
             claimed={claimedShare}
             disabled={claimedShare || !address || !!error || switchingChain || !isShareMarkedToday()}
@@ -180,11 +180,11 @@ export default function QuestsPage() {
                 disabled={!address}
               >
                 <span className="cta-emoji">📣</span>
-                Share now
+                Share and Claim
               </button>
               {castBurst && <span className="emoji-burst">✨</span>}
             </div>
-            <span className="opacity-80">Click Share Now, and share. Then you can claim another +1 iQ.</span>
+            <span className="opacity-80">Click Share and Claim another +1 iQ Daily.</span>
           </div>
           
 
