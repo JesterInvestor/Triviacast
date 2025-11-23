@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import ClientOnlyWidgets from "@/components/ClientOnlyWidgets";
+import { openShareUrl, shareAppUrl } from '@/lib/farcaster';
 import Quiz from "@/components/Quiz";
 
 export default function Home() {
@@ -10,6 +11,33 @@ export default function Home() {
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex flex-col items-center justify-center">
         {/* Top bar (wallet connect + share handled inside ClientOnlyWidgets) */}
         <div className="w-full flex items-center justify-end gap-2 mb-2 sm:mb-4">
+          {/* Farcaster share logo (upper-right) */}
+          <button
+            aria-label="Share on Farcaster"
+            title="Share Triviacast on Farcaster"
+            onClick={async (e) => {
+              e.preventDefault();
+              try {
+                void openShareUrl(shareAppUrl());
+              } catch (err) {
+                console.debug('[Share] openShareUrl failed', err);
+                try {
+                  // fallback to opening the canonical share link
+                  window.open(shareAppUrl(), '_blank', 'noopener');
+                } catch (err2) {
+                  // last resort: navigate
+                  window.location.href = shareAppUrl();
+                }
+              }
+            }}
+            className="inline-flex items-center justify-center rounded-full p-1 bg-white/80 hover:bg-white transition shadow">
+            {/* Inline Farcaster-ish SVG mark */}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-8 h-8 block" aria-hidden>
+              <circle cx="12" cy="12" r="11" fill="#071427" />
+              <path fill="#7AD0FF" d="M7.8 11.2c0-1.5 1.2-2.7 2.7-2.7h3.6c.3 0 .6.3.6.6v.9c0 .3-.3.6-.6.6h-3.6c-.9 0-1.5.6-1.5 1.5v.6c0 .9.6 1.5 1.5 1.5h3.6c.3 0 .6.3.6.6v.9c0 .3-.3.6-.6.6h-3.6c-1.5 0-2.7-1.2-2.7-2.7v-.9z" />
+            </svg>
+          </button>
+
           <ClientOnlyWidgets />
         </div>
 

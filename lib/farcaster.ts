@@ -153,8 +153,8 @@ export function shareAppText(): string {
   const url = getBaseUrl();
   // A few punchy variants to keep casts feeling fresh
   const variants = [
-    (u: string) => `I’m playing Triviacast — daily crypto + pop culture trivia! 🧠⚡\nJump in: ${u}\n#Triviacast #Trivia #Farcaster`,
-    (u: string) => `Got brain power? Prove it on Triviacast and rack up T Points. 🏆\nPlay now → ${u}\n#Triviacast #Onchain`,
+    (u: string) => `This trivia game is freaking awesome. Farcaster Themed Trivia! 🧠⚡\nJump in: ${u}\n#Triviacast #Trivia #Farcaster`,
+    (u: string) => `Farcaster Themed Trivia on Triviacast and rack up T Points. Can you get 10/10 🏆\nPlay now → ${u}\n#Triviacast #Onchain`,
     (u: string) => `Snackable trivia, real onchain flex. 🧠✨ Earn T Points and climb the board.\nStart here: ${u} #Triviacast`
   ];
   const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
