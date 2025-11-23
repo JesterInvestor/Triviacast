@@ -230,9 +230,7 @@ export default function StakingWidget() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between gap-3">
-              <button disabled={loading} onClick={doExit} className="px-3 py-2 bg-white border rounded text-sm">Exit</button>
-
+            <div className="flex items-center justify-end gap-3">
               {/* Status area (wraps on narrow screens) */}
               {txStatus !== "idle" && (
                 <div className="text-sm break-words text-right">
@@ -249,6 +247,17 @@ export default function StakingWidget() {
             </div>
           </div>
         )}
+      </div>
+      {/* small link to farcaster debug placed inside the staking widget */}
+      <div className="mt-3 flex justify-end">
+        <a
+          href="https://triviacast.xyz/farcaster-debug"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-[#5a3d5c] opacity-80 hover:opacity-100"
+        >
+          farcaster-debug
+        </a>
       </div>
     </div>
   );
