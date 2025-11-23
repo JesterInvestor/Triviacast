@@ -49,6 +49,13 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     }
 
     try {
+      // Use the shared toggle logic so the Start button and Play/Pause
+      // button behave identically and share state.
+      try {
+        await togglePlay(true);
+      } catch (_) {
+        // ignore — the lifecycle effect will try again
+      }
       // Request questions without specifying a difficulty (allow all difficulties)
       const response = await fetch(`/api/questions?amount=10&source=${questionSource}`);
       const data = await response.json();
@@ -161,6 +168,50 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
       }
     };
   }, [quizState.quizStarted, quizState.quizCompleted]);
+
+  // Centralized audio control used by both the Start button and Play/Pause button
+  async function togglePlay(shouldPlay?: boolean) {
+    // ensure audio element exists
+    if (!audioRef.current) {
+      const a = new Audio('/giggly-bubbles-222533.mp3');
+      a.loop = true;
+      a.volume = sound.disabled ? 0 : 0.14;
+      a.muted = !!sound.disabled;
+      audioRef.current = a;
+    }
+
+    const audio = audioRef.current;
+    const play = typeof shouldPlay === 'undefined' ? audio.paused : !!shouldPlay;
+
+    if (play) {
+      // Unmute preference: if the global sound setting is disabled, enable it
+      // when user explicitly requests playback via Start or Play button.
+      try {
+        if (sound.disabled) {
+          try { sound.set(false); } catch {}
+        }
+      } catch {}
+
+      try {
+        audio.muted = false;
+        audio.volume = 0.14;
+        const p = audio.play();
+        if (p && typeof p.then === 'function') {
+          await p.then(() => setIsMusicPlaying(true)).catch(() => setIsMusicPlaying(false));
+        } else {
+          setIsMusicPlaying(!audio.paused);
+        }
+      } catch (err) {
+        setIsMusicPlaying(false);
+        throw err;
+      }
+    } else {
+      try {
+        audio.pause();
+      } catch (_) {}
+      setIsMusicPlaying(false);
+    }
+  }
 
   // React to mute/unmute without recreating the audio element
   useEffect(() => {
@@ -388,28 +439,11 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         <div className="flex items-center gap-2">
           <Timer timeRemaining={quizState.timeRemaining} />
           <button
-            onPointerUp={() => {
-              const audio = audioRef.current;
-              if (!audio) return;
-              if (!audio.paused) {
-                try { audio.pause(); } catch (_) {}
-                setIsMusicPlaying(false);
-              } else {
-                if (sound.disabled) {
-                  try { sound.set(false); } catch (_) {}
-                }
-                try {
-                  audio.muted = false;
-                  audio.volume = 0.14;
-                  const p = audio.play();
-                  if (p && typeof p.then === 'function') {
-                    p.then(() => setIsMusicPlaying(true)).catch(() => setIsMusicPlaying(false));
-                  } else {
-                    setIsMusicPlaying(!audio.paused);
-                  }
-                } catch (_) {
-                  setIsMusicPlaying(false);
-                }
+            onPointerUp={async () => {
+              try {
+                await togglePlay(!isMusicPlaying);
+              } catch (_) {
+                // ignore
               }
             }}
             aria-pressed={isMusicPlaying}
