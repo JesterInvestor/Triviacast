@@ -161,7 +161,7 @@ export default function InfoPage() {
         </div>
 
         <div className="mb-4 text-lg text-gray-800 text-center">
-          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and onchain rewards. Connect your wallet and show your Farc[...]
+          <strong>Triviacast</strong> is not just a trivia game. It is a place to test speed, memory and wit while you earn bragging rights and onchain rewards. Connect your wallet and become a Triviacaster!
         </div>
 
         <div className="mb-4 text-lg text-fuchsia-800 font-semibold text-center">
