@@ -142,28 +142,6 @@ export default function StakingWidget() {
     }
   };
 
-  const doExit = async () => {
-    if (!address) return;
-    setLoading(true);
-    setTxStatus("pending");
-    setTxHash(null);
-    try {
-      if (typeof window === "undefined" || !(window as any).ethereum) throw new Error("No injected wallet available");
-      const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
-      const signerObj = await browserProvider.getSigner();
-      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signerObj as any);
-      const tx = await staking.exit();
-      setTxHash(tx.hash ?? null);
-      await tx.wait();
-      setTxStatus("success");
-    } catch (e) {
-      setTxStatus("error");
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (!STAKING_ADDRESS || !TRIV_ADDRESS) {
     return (
       <div className="mt-6 w-full max-w-2xl text-left">
