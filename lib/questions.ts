@@ -43,7 +43,9 @@ export async function fetchOpenTDB(amount: number = 10, difficulty?: string): Pr
 
     return collected.sort(() => Math.random() - 0.5).slice(0, amount);
   } catch (error) {
-    console.error('Error fetching from OpenTDB:', error);
+    // Log and rethrow with generic message
+    const { default: logger, error: logError } = await import('./logger');
+    logError(error, { context: 'fetchOpenTDB' });
     throw new Error('Failed to fetch questions from OpenTDB');
   }
 }

@@ -3,11 +3,58 @@ import { base, baseSepolia } from "viem/chains";
 import { createWalletClient, createPublicClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import crypto from "crypto";
+import Redis from "ioredis";
+import * as log from '@/lib/logger';
 
-// Rate limiting store (in production, use Redis or similar)
+// Redis-backed rate limiter (falls back to in-memory Map when Redis not configured)
+// Do NOT create a Redis client at module import time — lazy-create inside the
+// runtime path to avoid connection attempts during Next.js build/SSG.
+const redisUrl = process.env.REDIS_URL || process.env.NEXT_PUBLIC_REDIS_URL || null;
+let redis: Redis | null = null;
+let redisInitialized = false;
+
+function initRedisIfNeeded() {
+  if (!redisUrl || redisInitialized) return;
+  try {
+    redis = new Redis(redisUrl);
+    // Attach safe error handler to avoid unhandled exceptions (NOAUTH etc.)
+    redis.on('error', (err) => {
+      try {
+        log.error(err, { context: 'redis', msg: 'Redis client error' });
+      } catch (_) {
+        // swallow
+      }
+    });
+  } catch (e) {
+    // If client creation fails, keep redis as null and fall back to memory limiter
+    try { log.error(e, { context: 'redis.init' }); } catch (_) {}
+    redis = null;
+  } finally {
+    redisInitialized = true;
+  }
+}
+
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
-function checkRateLimit(identifier: string, maxRequests: number = 5, windowMs: number = 15 * 60 * 1000): boolean {
+async function checkRateLimit(identifier: string, maxRequests: number = 5, windowMs: number = 15 * 60 * 1000): Promise<boolean> {
+  // Lazy-init Redis at runtime only
+  initRedisIfNeeded();
+  if (redis) {
+    try {
+      const key = `rate:${identifier}`;
+      const windowSec = Math.max(1, Math.floor(windowMs / 1000));
+      const current = await redis.incr(key);
+      if (current === 1) {
+        await redis.expire(key, windowSec);
+      }
+      return current <= maxRequests;
+    } catch (err) {
+      // On Redis errors, fall back to in-memory
+      try { log.error(err, { context: 'rate-limit', msg: 'Redis error, falling back to memory limiter' }); } catch (_) {}
+    }
+  }
+
+  // In-memory fallback
   const now = Date.now();
   const record = rateLimitStore.get(identifier);
 
@@ -65,7 +112,7 @@ export async function POST(req: Request) {
                      "unknown";
 
     // Rate limiting: 5 requests per 15 minutes per IP
-    if (!checkRateLimit(clientIP)) {
+    if (!(await checkRateLimit(clientIP))) {
       return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
     }
 

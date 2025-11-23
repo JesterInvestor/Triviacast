@@ -3,6 +3,8 @@
  * @param fid Farcaster ID
  * @returns Username if found, null otherwise
  */
+import * as log from './logger';
+
 export async function resolveFarcasterUsernameByFid(fid: number): Promise<string | null> {
   try {
   const apiKey = process.env.NEYNAR_API_KEY || process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
@@ -23,7 +25,7 @@ export async function resolveFarcasterUsernameByFid(fid: number): Promise<string
     }
     return null;
   } catch (error) {
-    console.error('Error resolving Farcaster username by FID:', error);
+    log.error(error, { context: 'resolveFarcasterUsernameByFid', fid });
     return null;
   }
 }
@@ -40,18 +42,19 @@ export async function resolveENS(address: string): Promise<string | null> {
   try {
     // Use a public ENS resolver
     const response = await fetch(`https://api.ensideas.com/ens/resolve/${address}`);
-    console.log(`ENS API response for ${address}:`, response.status);
+    log.debug(`ENS API response for ${address}: ${response.status}`);
     
     if (!response.ok) {
-      console.log(`ENS API not OK for ${address}`);
+      log.debug(`ENS API not OK for ${address}`);
       return null;
     }
     
     const data = await response.json();
-    console.log(`ENS data for ${address}:`, data);
+    // Avoid logging full ENS response payloads (may contain unexpected user content).
+    log.debug(`ENS data received for ${address}`);
     return data.name || null;
   } catch (error) {
-    console.error('Error resolving ENS:', error);
+    log.error(error, { context: 'resolveENS', address });
     return null;
   }
 }
@@ -76,28 +79,29 @@ export async function resolveFarcasterUsername(address: string): Promise<string 
       }
     );
     
-    console.log(`Farcaster API response for ${address}:`, response.status);
+    log.debug(`Farcaster API response for ${address}: ${response.status}`);
     
     if (!response.ok) {
-      console.log(`Farcaster API not OK for ${address}`);
+      log.debug(`Farcaster API not OK for ${address}`);
       return null;
     }
     
   const data = await response.json();
-  console.log(`Farcaster data for ${address}:`, data);
+  // Avoid logging full Farcaster API payloads which may include sensitive/PII fields.
+  log.debug(`Farcaster data received for ${address}`);
   const key = address.toLowerCase();
   // data may use lowercase keys or original; guard with safe typing
   const raw = (data as Record<string, unknown>)[key] || (data as Record<string, unknown>)[address] || undefined;
   if (Array.isArray(raw) && raw.length > 0) {
     const first = raw[0] as { username?: string };
-    console.log(`Found Farcaster username for ${address}:`, first.username);
+    log.debug(`Found Farcaster username for ${address}: ${first.username}`);
     return first.username || null;
   }
     
-    console.log(`No Farcaster users found for ${address}`);
+    log.debug(`No Farcaster users found for ${address}`);
     return null;
   } catch (error) {
-    console.error('Error resolving Farcaster username:', error);
+    log.error(error, { context: 'resolveFarcasterUsername', address });
     return null;
   }
 }
@@ -174,7 +178,7 @@ export async function pollFarcasterUsernames(
   const remaining = new Set(addresses.map((a) => a.toLowerCase()));
 
   for (let i = 0; i < attempts && remaining.size > 0; i++) {
-    console.debug(`pollFarcasterUsernames attempt ${i + 1}/${attempts} — remaining: ${remaining.size}`);
+    log.debug(`pollFarcasterUsernames attempt ${i + 1}/${attempts} — remaining: ${remaining.size}`);
     try {
       // Add a breadcrumb so Sentry can show polling progress when debugging
       const Sentry = await import('@sentry/nextjs');
@@ -223,7 +227,7 @@ export async function pollFarcasterUsernames(
     const rawDelay = Math.min(maxDelayMs, Math.round(delayMs * Math.pow(backoffFactor, i)));
     const jitter = 0.9 + Math.random() * 0.2; // 0.9 - 1.1
     const nextDelay = Math.round(rawDelay * jitter);
-    console.debug(`Waiting ${nextDelay}ms before next poll attempt`);
+    log.debug(`Waiting ${nextDelay}ms before next poll attempt`);
     await wait(nextDelay);
   }
 
@@ -292,7 +296,7 @@ export async function resolveFarcasterProfile(
       raw: user,
     };
   } catch (e) {
-    console.error('Error fetching Farcaster profile for', address, e);
+    log.error(e, { context: 'resolveFarcasterProfile', address });
     return null;
   }
 }

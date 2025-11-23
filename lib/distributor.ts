@@ -2,6 +2,7 @@ import { readContract, simulateContract, writeContract, waitForTransactionReceip
 import { base, baseSepolia } from 'viem/chains';
 import { wagmiConfig } from './wagmi';
 import { extendAbiWithErrors } from './contract';
+import * as log from './logger';
 
 const DISTRIBUTOR_ABI = [
   {
@@ -53,7 +54,7 @@ export async function getDistributorOwner(): Promise<string | null> {
     });
     return owner as unknown as string;
   } catch (e) {
-    console.error("getDistributorOwner error", e);
+    log.error(e, { context: 'getDistributorOwner' });
     return null;
   }
 }

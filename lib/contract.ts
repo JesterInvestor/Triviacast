@@ -1,6 +1,7 @@
 import { readContract, writeContract, waitForTransactionReceipt, simulateContract, getAccount } from "@wagmi/core";
 import { base, baseSepolia } from "viem/chains";
 import { wagmiConfig } from "./wagmi";
+import * as log from './logger';
 
 // Contract ABI - only the functions we need
 // We include the standard Solidity error types so libraries like viem can
@@ -80,7 +81,7 @@ export function isContractConfigured(): boolean {
   // Helpful debug for runtime checks
   if (!configured) {
     try {
-      console.info('[Triviacast] contract not configured', { CONTRACT_ADDRESS });
+      log.info('[Triviacast] contract not configured', { CONTRACT_ADDRESS });
     } catch (_e) {}
   }
   return configured;
@@ -103,12 +104,7 @@ export async function addPointsOnChain(
   if (!isContractConfigured()) {
     throw new Error("Smart contract not configured");
   }
-  console.info('[Triviacast] addPointsOnChain', {
-    contract: CONTRACT_ADDRESS,
-    chainId: CHAIN_ID,
-    walletAddress,
-    points
-  });
+  log.info('[Triviacast] addPointsOnChain', { contract: CONTRACT_ADDRESS, chainId: CHAIN_ID, walletAddress, points });
   // Sanity check: ensure the connected account address matches the target wallet
   try {
     const acc = getAccount(wagmiConfig);
@@ -120,8 +116,8 @@ export async function addPointsOnChain(
     if (activeAddress.toLowerCase() !== walletAddress.toLowerCase()) {
       throw new Error(`Connected account (${activeAddress}) does not match target wallet (${walletAddress}). The contract requires the caller to be the target wallet.`);
     }
-  } catch (e) {
-    console.error('[Triviacast] addPointsOnChain pre-check failed', e);
+    } catch (e) {
+    log.error(e, { context: 'addPointsOnChain.precheck' });
     throw e;
   }
   try {
@@ -145,7 +141,7 @@ export async function addPointsOnChain(
       await waitForTransactionReceipt(wagmiConfig, { hash, chainId: activeChain.id });
       return hash;
     } catch (writeError) {
-      console.warn('[Triviacast] writeContract failed, attempting eth_sendTransaction fallback', writeError);
+    log.warn('[Triviacast] writeContract failed, attempting eth_sendTransaction fallback', { err: String(writeError) });
 
       // Fallback: attempt to use the injected provider directly (window.ethereum)
       try {
@@ -180,23 +176,20 @@ export async function addPointsOnChain(
 
           const sendResult = await w.ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
           const txHash = sendResult as string;
-          console.info('[Triviacast] eth_sendTransaction fallback sent tx', { txHash });
+          log.info('[Triviacast] eth_sendTransaction fallback sent tx', { txHash });
           await waitForTransactionReceipt(wagmiConfig, { hash: txHash as `0x${string}`, chainId: activeChain.id });
           return txHash as `0x${string}`;
         }
       } catch (fallbackErr) {
-        console.error('[Triviacast] eth_sendTransaction fallback failed', fallbackErr);
+        log.error(fallbackErr, { context: 'eth_sendTransaction.fallback' });
       }
 
       // If fallback did not work, rethrow the original write error to surface it.
       throw writeError;
     }
-  } catch (error: any) {
+    } catch (error: any) {
     // Try to surface a revert reason if available
-    console.error('[Triviacast] addPointsOnChain transaction failed', {
-      error: error?.message || error,
-      details: error
-    });
+    log.error(error, { context: 'addPointsOnChain.transaction', details: error?.message || String(error) });
     throw error;
   }
 }
@@ -221,7 +214,7 @@ export async function getPointsFromChain(walletAddress: string): Promise<number>
     });
     return Number(result as unknown as bigint);
   } catch (error) {
-    console.error("Error fetching points from chain:", error);
+    log.error(error, { context: 'getPointsFromChain', walletAddress });
     return 0;
   }
 }
@@ -237,11 +230,7 @@ export async function getLeaderboardFromChain(limit: number = 100): Promise<Arra
   }
 
   try {
-    console.info('[Triviacast] getLeaderboardFromChain calling', {
-      contract: CONTRACT_ADDRESS,
-      chainId: CHAIN_ID,
-      limit
-    });
+    log.info('[Triviacast] getLeaderboardFromChain calling', { contract: CONTRACT_ADDRESS, chainId: CHAIN_ID, limit });
     const result = await readContract(wagmiConfig, {
       address: CONTRACT_ADDRESS as `0x${string}`,
       abi: CONTRACT_ABI_WITH_ERRORS as any,
@@ -251,16 +240,13 @@ export async function getLeaderboardFromChain(limit: number = 100): Promise<Arra
     });
 
     const [addresses, points] = result as [string[], bigint[]];
-    console.info('[Triviacast] getLeaderboardFromChain result', {
-      count: addresses.length,
-      sample: addresses.slice(0, 5)
-    });
+    log.info('[Triviacast] getLeaderboardFromChain result', { count: addresses.length, sample: addresses.slice(0, 5) });
     return addresses.map((address, index) => ({
       walletAddress: address,
       tPoints: Number(points[index]),
     }));
   } catch (error) {
-    console.error("Error fetching leaderboard from chain:", error);
+    log.error(error, { context: 'getLeaderboardFromChain' });
     return [];
   }
 }
@@ -275,10 +261,7 @@ export async function getTotalWalletsFromChain(): Promise<number> {
   }
 
   try {
-    console.info('[Triviacast] getTotalWalletsFromChain calling', {
-      contract: CONTRACT_ADDRESS,
-      chainId: CHAIN_ID,
-    });
+    log.info('[Triviacast] getTotalWalletsFromChain calling', { contract: CONTRACT_ADDRESS, chainId: CHAIN_ID });
     const result = await readContract(wagmiConfig, {
       address: CONTRACT_ADDRESS as `0x${string}`,
       abi: CONTRACT_ABI_WITH_ERRORS as any,
@@ -287,10 +270,10 @@ export async function getTotalWalletsFromChain(): Promise<number> {
       chainId: activeChain.id,
     });
     const total = Number(result as unknown as bigint);
-    console.info('[Triviacast] getTotalWalletsFromChain result', { total });
+    log.info('[Triviacast] getTotalWalletsFromChain result', { total });
     return total;
   } catch (error) {
-    console.error("Error fetching total wallets from chain:", error);
+    log.error(error, { context: 'getTotalWalletsFromChain' });
     return 0;
   }
 }

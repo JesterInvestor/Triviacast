@@ -4,6 +4,7 @@ import {
   getLeaderboardFromChain, 
   isContractConfigured 
 } from './contract';
+import * as log from './logger';
 
 export function calculateTPoints(
   consecutiveCorrect: number,
@@ -32,7 +33,7 @@ export function calculateTPoints(
  */
 export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
   if (!isContractConfigured()) {
-    console.warn('Contract not configured - cannot fetch leaderboard');
+    log.warn('Contract not configured - cannot fetch leaderboard');
     return [];
   }
 
@@ -40,16 +41,16 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
     // Get total number of wallets to fetch all entries
     const { getTotalWalletsFromChain } = await import('./contract');
     const totalWallets = await getTotalWalletsFromChain();
-    console.info('[Triviacast] getLeaderboard totalWallets', totalWallets);
+    log.info('[Triviacast] getLeaderboard totalWallets', { totalWallets });
     
     // Fetch all wallets with points (use a large limit or the total count)
     const limit = Math.max(totalWallets, 1000); // At least 1000 to be safe
-    console.info('[Triviacast] getLeaderboard using limit', limit);
+    log.info('[Triviacast] getLeaderboard using limit', { limit });
     const chainLeaderboard = await getLeaderboardFromChain(limit);
     
     return chainLeaderboard;
   } catch (error) {
-    console.error('Failed to fetch leaderboard from chain:', error);
+    log.error(error, { context: 'getLeaderboard' });
     return [];
   }
 }
@@ -61,7 +62,7 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
  */
 export async function getWalletTotalPoints(walletAddress: string): Promise<number> {
   if (!isContractConfigured()) {
-    console.warn('Contract not configured - cannot fetch points');
+    log.warn('Contract not configured - cannot fetch points');
     return 0;
   }
 
@@ -69,7 +70,7 @@ export async function getWalletTotalPoints(walletAddress: string): Promise<numbe
     const chainPoints = await getPointsFromChain(walletAddress);
     return chainPoints;
   } catch (error) {
-    console.error('Failed to fetch points from chain:', error);
+    log.error(error, { context: 'getWalletTotalPoints', walletAddress });
     return 0;
   }
 }
