@@ -165,7 +165,7 @@ export default function InfoPage() {
         </div>
 
         <div className="mb-4 text-lg text-fuchsia-800 font-semibold text-center">
-          🚀 Connect with Farcaster and your Base wallet to unlock the full Triviacast experience
+          🚀 Connect with Farcaster, Rainbow, or your Base wallet to unlock the full Triviacast experience
         </div>
 
         {/* OpenTDB-like Add Question form (moved to top) */}
