@@ -1,0 +1,108 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+
+export default function FarcasterDebugPage() {
+  const [info, setInfo] = useState<any>({ loading: true });
+  const [lastAction, setLastAction] = useState<string>('');
+
+  useEffect(() => {
+    const runDetection = async () => {
+      const out: any = { loading: false, navigator: {}, windowEthereum: null, sdkAvailable: false, errors: [] };
+
+      try {
+        out.navigator = {
+          userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+          platform: typeof navigator !== 'undefined' ? navigator.platform : null,
+        };
+      } catch (e) {
+        out.errors.push(String(e));
+      }
+
+      try {
+        // Basic window.ethereum presence and flags
+        const eth = (window as any).ethereum;
+        out.windowEthereum = !!eth ? {
+          present: true,
+          isFarcaster: !!eth.isFarcaster || !!eth.isMiniApp,
+          keys: Object.keys(eth).slice(0, 30), // show first 30 keys to avoid giant dumps
+        } : { present: false };
+      } catch (e) {
+        out.errors.push(String(e));
+      }
+
+      // Try to detect Farcaster miniapp SDK (if available)
+      try {
+        const mod = await import('@farcaster/miniapp-sdk').catch(() => null);
+        if (mod && (mod as any).sdk) {
+          out.sdkAvailable = true;
+        }
+      } catch (e) {
+        // ignore
+      }
+
+      setInfo(out);
+    };
+
+    runDetection();
+  }, []);
+
+  const runRequest = async (method: string, params?: any[]) => {
+    setLastAction('running ' + method);
+    try {
+      const eth = (window as any).ethereum;
+      if (!eth || typeof eth.request !== 'function') throw new Error('window.ethereum not available or not requestable');
+      const result = await eth.request({ method, params: params ?? [] });
+      setLastAction(`result ${method}: ${JSON.stringify(result)}`);
+    } catch (e: any) {
+      setLastAction('error: ' + (e?.message || String(e)));
+    }
+  };
+
+  const signTest = async () => {
+    setLastAction('signing test message');
+    try {
+      const eth = (window as any).ethereum;
+      if (!eth || typeof eth.request !== 'function') throw new Error('window.ethereum not available or not requestable');
+      const accounts = await eth.request({ method: 'eth_requestAccounts' });
+      const account = accounts && accounts[0];
+      if (!account) throw new Error('no account returned');
+      // personal_sign requires message in hex or string depending on provider; we'll use a simple string
+      const msg = 'Triviacast debug: sign this to test provider';
+      const sig = await eth.request({ method: 'personal_sign', params: [msg, account] });
+      setLastAction(`signature: ${sig}`);
+    } catch (e: any) {
+      setLastAction('error: ' + (e?.message || String(e)));
+    }
+  };
+
+  return (
+    <div style={{ padding: 20, fontFamily: 'system-ui, sans-serif' }}>
+      <h2>Farcaster / EVM provider debug</h2>
+      {info.loading ? <div>Detecting…</div> : (
+        <>
+          <pre style={{ background: '#f6f8fa', padding: 12, borderRadius: 8 }}>
+            {JSON.stringify(info, null, 2)}
+          </pre>
+
+          <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button onClick={() => runRequest('eth_chainId')}>eth_chainId</button>
+            <button onClick={() => runRequest('eth_requestAccounts')}>eth_requestAccounts</button>
+            <button onClick={() => runRequest('eth_accounts')}>eth_accounts</button>
+            <button onClick={() => runRequest('net_version')}>net_version</button>
+            <button onClick={signTest}>sign (personal_sign)</button>
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <strong>Last action:</strong>
+            <div style={{ marginTop: 6, padding: 8, background: '#fff6', borderRadius: 6 }}>{lastAction}</div>
+          </div>
+
+          <p style={{ color: '#666', marginTop: 12 }}>
+            If window.ethereum.present === true and eth_requestAccounts returns an address, the Farcaster environment injected a usable EIP‑1193 provider and the staking UI should be able to sign txs from that wallet.
+          </p>
+        </>
+      )}
+    </div>
+  );
+}
