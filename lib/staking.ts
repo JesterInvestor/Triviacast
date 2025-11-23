@@ -1,6 +1,7 @@
 import { readContract, simulateContract, writeContract, waitForTransactionReceipt, getAccount } from '@wagmi/core';
 import { base, baseSepolia } from 'viem/chains';
 import { wagmiConfig } from './wagmi';
+import * as log from './logger';
 
 const STAKING_ABI = [
   {
@@ -68,7 +69,7 @@ export async function getAllowance(owner: string, spender: string, tokenAddress?
     });
     return BigInt(result as unknown as bigint);
   } catch (e) {
-    console.error('allowance read failed', e);
+    log.error(e, { context: 'getAllowance', owner, spender });
     return BigInt(0);
   }
 }
@@ -108,7 +109,7 @@ export async function callStake(amount: bigint | number): Promise<`0x${string}`>
         await approveToken(spender, MAX_UINT256, TRIV_TOKEN_ADDRESS);
       }
     } catch (e) {
-      console.warn('Approval flow failed or skipped', e);
+      log.warn('Approval flow failed or skipped', { err: String(e) });
     }
   }
 
