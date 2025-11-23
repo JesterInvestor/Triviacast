@@ -182,7 +182,7 @@ export default function StakingWidget() {
         <div className="mb-3">
           <span className="inline-block px-3 py-1 rounded-full bg-[#FFF3F6] text-gray-800 font-semibold text-sm">Current APY: 80%</span>
         </div>
-        <p className="text-sm text-gray-700 mb-4">You can stake using Base App. Works in Farcaster desktop and browser w/ wallet extension — sorry for any inconvenience. (Dec 17th)</p>
+        <p className="text-sm text-gray-700 mb-4">You can stake using Base App and Rainbow Wallet. Also works in Farcaster desktop and browser w/ wallet extension — sorry for any inconvenience. (Dec 17th)</p>
 
         {/* 2 columns on small screens to reduce vertical stacking and avoid overflow; cells can shrink */}
         <div className="mb-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
