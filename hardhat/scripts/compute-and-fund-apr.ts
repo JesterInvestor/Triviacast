@@ -43,8 +43,12 @@ async function main() {
   const dailyFormatted = ethers.formatUnits(dailyWei.toString(), 18);
   console.log(`Computed daily reward for ${APR_PERCENT}% APR: ${dailyFormatted} TRIV (${dailyWei.toString()} wei)`);
 
-  // duration = 24 hours
-  const duration = 60 * 60 * 24;
+  // duration in days (default 1). You can set REWARD_DURATION_DAYS in env to fund multiple days (e.g. 30).
+  const durationDays = process.env.REWARD_DURATION_DAYS ? Number(process.env.REWARD_DURATION_DAYS) : 1;
+  if (!Number.isFinite(durationDays) || durationDays <= 0) throw new Error("REWARD_DURATION_DAYS must be a positive number");
+
+  // duration (seconds) = days * 24 hours
+  const duration = durationDays * 60 * 60 * 24;
 
   // prepare bumped fee data to avoid 'replacement transaction underpriced' errors
   const fee = await ethers.provider.getFeeData();
@@ -54,8 +58,12 @@ async function main() {
   const signer = (await ethers.getSigners())[0];
   let nonce = await ethers.provider.getTransactionCount(await signer.getAddress(), 'pending');
 
-  console.log(`Approving ${dailyFormatted} TRIV to staking contract (${stakingAddress}) with nonce ${nonce}`);
-  const approveTx = await TRIV.connect(signer).approve(stakingAddress, dailyWei.toString(), {
+  // approve the total reward amount for the full duration (daily * days)
+  const totalRewardWei = BigInt(dailyWei.toString()) * BigInt(durationDays);
+  const totalRewardFormatted = ethers.formatUnits(totalRewardWei.toString(), 18);
+
+  console.log(`Approving total reward ${totalRewardFormatted} TRIV (daily ${dailyFormatted} x ${durationDays} days) to staking contract (${stakingAddress}) with nonce ${nonce}`);
+  const approveTx = await TRIV.connect(signer).approve(stakingAddress, totalRewardWei.toString(), {
     maxFeePerGas,
     maxPriorityFeePerGas,
     nonce,
@@ -64,18 +72,16 @@ async function main() {
   console.log("Approve tx mined", approveTx.hash);
 
   nonce++;
-
-  console.log(`Calling notifyRewardAmount(${dailyWei.toString()}, ${duration}) with nonce ${nonce}`);
-  const fundTx = await STAKING.connect(signer).notifyRewardAmount(dailyWei.toString(), duration, {
+  console.log(`Calling notifyRewardAmount(${totalRewardWei.toString()}, ${duration}) with nonce ${nonce}`);
+  const fundTx = await STAKING.connect(signer).notifyRewardAmount(totalRewardWei.toString(), duration, {
     maxFeePerGas,
     maxPriorityFeePerGas,
     nonce,
   } as any);
   await fundTx.wait();
   console.log("Funded rewards — tx", fundTx.hash);
-
   // compute rewardRate (wei/sec)
-  const rewardRate = BigInt(dailyWei.toString()) / BigInt(duration);
+  const rewardRate = BigInt(totalRewardWei.toString()) / BigInt(duration);
   console.log("rewardRate (wei/sec):", rewardRate.toString());
   console.log("rewardRate (TRIV/sec):", ethers.formatUnits(rewardRate.toString(), 18));
 }
