@@ -18,9 +18,11 @@ export default function JackpotPage() {
   const mainnetJackpotContract = JACKPOT[base.id]?.[MainnetJackpotName.USDC];
 
   return (
-    // full-screen center container
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] p-8">
+    <>
+      {/* banner placed outside the centered container */}
       <JackpotBanner />
+      {/* full-screen center container */}
+      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FFE4EC] to-[#FFC4D1] p-8">
       {/* card centered and constrained */}
       <div
         className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center text-center bg-white/80 backdrop-blur px-8 py-12 rounded-2xl border border-[#F4A6B7] shadow-lg"
@@ -60,7 +62,8 @@ export default function JackpotPage() {
         {/* Staking widget inserted below the megapot UI */}
         <StakingWidget />
       </div>
-    </main>
+      </main>
+    </>
   );
 }
 
