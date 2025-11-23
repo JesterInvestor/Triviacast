@@ -128,7 +128,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   useEffect(() => {
     if (quizState.quizStarted && !quizState.quizCompleted) {
       if (!audioRef.current) {
-        const audio = new Audio('/giggly-bubbles-222533.mp3');
+        const audio = new Audio('/giggly-bubble-222533.mp3');
         audio.loop = true;
         audio.volume = sound.disabled ? 0 : 0.14;
         audio.muted = !!sound.disabled;
@@ -173,7 +173,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   async function togglePlay(shouldPlay?: boolean) {
     // ensure audio element exists
     if (!audioRef.current) {
-      const a = new Audio('/giggly-bubbles-222533.mp3');
+      const a = new Audio('/giggly-bubble-222533.mp3');
       a.loop = true;
       a.volume = sound.disabled ? 0 : 0.14;
       a.muted = !!sound.disabled;
