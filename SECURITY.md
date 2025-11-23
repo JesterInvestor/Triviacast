@@ -116,5 +116,5 @@ Implement proper secret management
 Add security headers and CSP policies
 Compliance Considerations
 GDPR: Debug endpoints may expose user data without consent
-Web3 Security: Smart contract access controls need review
+Onchain security: Smart contract access controls need review
 API Security: Follow OWASP API security guidelines

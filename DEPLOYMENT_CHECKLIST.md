@@ -65,7 +65,7 @@ Security Hygiene:
 - MUST: Set alerts: high error rate, failed API calls, jackpot payout attempt failures.
 - SHOULD: Log VRF fulfill latency (difference between request block and fulfill block) to detect congestion.
 - SHOULD: Track USDC fee revenue and TRIV payout sums daily (simple script or dashboard).
-- NICE: On-chain event indexer / TheGraph subgraph for analytics.
+- NICE: Onchain event indexer / TheGraph subgraph for analytics.
 
 ## 6. Operational Scripts Validation
 Run locally against production (READ operations, minimal WRITE):
@@ -135,7 +135,7 @@ Record results (block numbers, transaction hashes) in a deployment log.
 ## Future Enhancements
 - Feature flag framework for dynamic tier adjustments without redeploy.
 - Native payment toggle for VRF (set `nativePayment=true` in extraArgs when ready).
-- On-chain merkle-based proof for eligibility snapshot (if TriviaPoints becomes expensive to query).
+- Onchain merkle-based proof for eligibility snapshot (if TriviaPoints becomes expensive to query).
 - Subgraph + real-time leaderboard of jackpot wins.
 
 Keep this file updated with each production cycle.

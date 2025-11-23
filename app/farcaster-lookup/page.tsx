@@ -192,7 +192,7 @@ export default function FarcasterLookupPage() {
         setResult(data);
       }
 
-      // Backend relayer disabled; skip on-chain mark.
+      // Backend relayer disabled; skip onchain mark.
     } catch (err: unknown) {
       const e = err as { message?: string } | null;
       setError(e?.message || "unknown error");

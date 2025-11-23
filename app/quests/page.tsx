@@ -20,7 +20,7 @@ import { base } from 'wagmi/chains';
 // Minimal client-side flag: set localStorage 'triviacast:lastQuizCompletedDay' when quiz finishes.
 // We'll read it here to decide if Daily Quiz Play claim is enabled.
 
-// Removed on-chain day marker hooks; quiz & challenge quests disabled without relayer.
+// Removed onchain day marker hooks; quiz & challenge quests disabled without relayer.
 
 interface QuestCardProps {
   title: string; emoji: string; description: string; reward: string; claimed: boolean; disabled: boolean; onClaim: ()=>void; loading: boolean;
@@ -70,7 +70,7 @@ export default function QuestsPage() {
   const isUnder50IQ = useMemo(() => {
     try { return (iqPoints ?? 0n) < 50n; } catch { return false; }
   }, [iqPoints]);
-  // Always require Base network for direct on-chain user claims (no gasless backend).
+  // Always require Base for direct onchain user claims (no gasless backend).
   const requiresBase = true;
   const [inlineError, setInlineError] = useState<string | null>(null);
   // Toasts
@@ -114,7 +114,7 @@ export default function QuestsPage() {
       setInlineError(err?.message ? `Switch network: ${err.message}` : 'Switch to Base to claim quests.');
       return false;
     }
-    setInlineError('Switch to Base network in your wallet to claim quests.');
+    setInlineError('Switch to Base in your wallet to claim quests.');
     return false;
   }, [isOnBase, requiresBase, setInlineError, switchChainAsync]);
 
