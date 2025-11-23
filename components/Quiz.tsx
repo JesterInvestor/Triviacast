@@ -52,8 +52,11 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
       // Use the shared toggle logic so the Start button and Play/Pause
       // button behave identically and share state.
       try {
+        console.debug('[Quiz] startQuiz: attempting to togglePlay(true)', { soundDisabled: sound.disabled });
         await togglePlay(true);
-      } catch (_) {
+        console.debug('[Quiz] startQuiz: togglePlay(true) resolved', { isMusicPlaying });
+      } catch (err) {
+        console.debug('[Quiz] startQuiz: togglePlay(true) failed', err);
         // ignore — the lifecycle effect will try again
       }
       // Request questions without specifying a difficulty (allow all difficulties)
@@ -183,26 +186,34 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     const audio = audioRef.current;
     const play = typeof shouldPlay === 'undefined' ? audio.paused : !!shouldPlay;
 
+    console.debug('[Quiz] togglePlay called', { shouldPlay, currentPaused: audio.paused, soundDisabled: sound.disabled });
     if (play) {
       // Unmute preference: if the global sound setting is disabled, enable it
       // when user explicitly requests playback via Start or Play button.
       try {
         if (sound.disabled) {
-          try { sound.set(false); } catch {}
+          try { sound.set(false); } catch (e) { console.debug('[Quiz] sound.set(false) failed', e); }
         }
-      } catch {}
 
-      try {
         audio.muted = false;
         audio.volume = 0.14;
         const p = audio.play();
         if (p && typeof p.then === 'function') {
-          await p.then(() => setIsMusicPlaying(true)).catch(() => setIsMusicPlaying(false));
+          await p.then(() => {
+            setIsMusicPlaying(true);
+            console.debug('[Quiz] audio.play() succeeded');
+          }).catch((e) => {
+            setIsMusicPlaying(false);
+            console.debug('[Quiz] audio.play() rejected', e);
+            throw e;
+          });
         } else {
           setIsMusicPlaying(!audio.paused);
+          console.debug('[Quiz] audio.play() sync path, paused=', audio.paused);
         }
       } catch (err) {
         setIsMusicPlaying(false);
+        console.debug('[Quiz] togglePlay play error', err);
         throw err;
       }
     } else {
@@ -439,11 +450,12 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         <div className="flex items-center gap-2">
           <Timer timeRemaining={quizState.timeRemaining} />
           <button
-            onPointerUp={async () => {
+            onClick={async () => {
               try {
+                console.debug('[Quiz] Play/Pause button clicked — toggling', { isMusicPlaying });
                 await togglePlay(!isMusicPlaying);
-              } catch (_) {
-                // ignore
+              } catch (err) {
+                console.debug('[Quiz] Play/Pause toggle failed', err);
               }
             }}
             aria-pressed={isMusicPlaying}
