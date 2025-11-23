@@ -31,11 +31,15 @@ export default function Home() {
               }
             }}
             className="inline-flex items-center justify-center rounded-full p-1 bg-white/80 hover:bg-white transition shadow">
-            {/* Inline Farcaster-ish SVG mark */}
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-8 h-8 block" aria-hidden>
-              <circle cx="12" cy="12" r="11" fill="#071427" />
-              <path fill="#7AD0FF" d="M7.8 11.2c0-1.5 1.2-2.7 2.7-2.7h3.6c.3 0 .6.3.6.6v.9c0 .3-.3.6-.6.6h-3.6c-.9 0-1.5.6-1.5 1.5v.6c0 .9.6 1.5 1.5 1.5h3.6c.3 0 .6.3.6.6v.9c0 .3-.3.6-.6.6h-3.6c-1.5 0-2.7-1.2-2.7-2.7v-.9z" />
-            </svg>
+            {/* Farcaster SVG asset */}
+            <Image
+              src="/farcaster.svg"
+              alt="Farcaster logo"
+              width={32}
+              height={32}
+              className="w-8 h-8 block"
+              priority
+            />
           </button>
 
           <ClientOnlyWidgets />
