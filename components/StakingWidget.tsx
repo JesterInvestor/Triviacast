@@ -226,16 +226,26 @@ export default function StakingWidget() {
           </div>
         )}
       </div>
-      {/* small link to farcaster debug placed inside the staking widget */}
+      {/* deeplinks for MetaMask and Rainbow placed inside the staking widget */}
       <div className="mt-3 flex justify-end">
-        <a
-          href="https://triviacast.xyz/farcaster-debug"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-[#5a3d5c] opacity-80 hover:opacity-100"
-        >
-          farcaster-debug
-        </a>
+        <div className="inline-flex gap-3 items-center">
+          <a
+            href="https://metamask.app.link/dapp/triviacast.xyz/jackpot"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-[#2d1b2e] hover:underline"
+          >
+            Open in MetaMask
+          </a>
+          <a
+            href="https://rnbw.app/ul?url=https://triviacast.xyz/jackpot"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-[#2d1b2e] hover:underline"
+          >
+            Open in Rainbow
+          </a>
+        </div>
       </div>
     </div>
   );
