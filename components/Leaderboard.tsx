@@ -115,8 +115,8 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
       });
   }, [leaderboard, view]);
 
-  // Limit to top 100 entries only (user request)
-  const MAX_DISPLAY = 100;
+  // Limit to top 50 entries only (user request)
+  const MAX_DISPLAY = 50;
   const limitedLeaderboard = useMemo(() => sortedLeaderboard.slice(0, MAX_DISPLAY), [sortedLeaderboard]);
 
   // Reset displayCount when leaderboard or view change
