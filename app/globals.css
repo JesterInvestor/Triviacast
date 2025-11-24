@@ -61,7 +61,7 @@ body {
   /* Improve tap highlight */
   -webkit-tap-highlight-color: rgba(244, 166, 183, 0.2);
   /* Keep content above fixed BottomNav (height + safe area) */
-  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0));
 }
 
 /* Mobile-first: Ensure touch targets meet minimum size */
