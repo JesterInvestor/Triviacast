@@ -230,7 +230,7 @@ export default function StakingWidget() {
       <div className="mt-3 flex justify-end">
         <div className="inline-flex gap-3 items-center">
           <a
-            href="https://metamask.app.link/dapp/triviacast.xyz/jackpot"
+            href="https://link.metamask.io/dapp/https://triviacast.xyz/jackpot"
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-[#2d1b2e] hover:underline"
@@ -238,7 +238,7 @@ export default function StakingWidget() {
             Open in MetaMask
           </a>
           <a
-            href="https://rnbw.app/ul?url=https://triviacast.xyz/jackpot"
+            href={`https://rnbwapp.com/wc?uri=${encodeURIComponent('https://triviacast.xyz/jackpot')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-[#2d1b2e] hover:underline"

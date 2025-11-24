@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import StakingWidget from "../../components/StakingWidget";
 import WagmiWalletConnect from "../../components/WagmiWalletConnect";
 import { useConnect, useAccount } from "wagmi";
@@ -12,10 +12,35 @@ import {
 } from "@coordinationlabs/megapot-ui-kit";
 import { base } from "viem/chains";
 import JackpotBanner from "../../components/JackpotBanner";
+import { getWalletTotalPoints } from "../../lib/tpoints";
+import { useIQPoints } from "../../lib/hooks/useIQPoints";
 
 export default function JackpotPage() {
   // Resolve megapot contract info if available (mainnet only)
   const mainnetJackpotContract = JACKPOT[base.id]?.[MainnetJackpotName.USDC];
+  const { address } = useAccount();
+  const { iqPoints } = useIQPoints(address as `0x${string}` | undefined);
+  const [tPoints, setTPoints] = useState<number | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      if (!address) {
+        if (mounted) setTPoints(null);
+        return;
+      }
+      try {
+        const pts = await getWalletTotalPoints(address);
+        if (mounted) setTPoints(pts);
+      } catch (e) {
+        if (mounted) setTPoints(null);
+      }
+    }
+    load();
+    return () => { mounted = false };
+  }, [address]);
+
+  const hasAccess = (tPoints ?? 0) >= 100000 && (iqPoints ?? 0n) >= 60n;
 
   return (
     <>
@@ -47,13 +72,31 @@ export default function JackpotPage() {
             <div className="w-full flex flex-col items-center gap-4">
               {/* Base Mainnet */}
               {mainnetJackpotContract && (
-                <MegapotJackpot
-                  contract={mainnetJackpotContract}
-                  style={{
-                    width: "100%",
-                    minWidth: "300px", // Ensuring a minimum width for scrollability
-                  }}
-                />
+                <div className="w-full relative">
+                  <div
+                    style={{
+                      width: "100%",
+                      minWidth: "300px",
+                      filter: hasAccess ? undefined : "blur(6px)",
+                      pointerEvents: hasAccess ? undefined : "none",
+                    }}
+                  >
+                    <MegapotJackpot
+                      contract={mainnetJackpotContract}
+                      style={{ width: "100%", minWidth: "300px" }}
+                    />
+                  </div>
+
+                  {!hasAccess && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="bg-white/90 px-4 py-3 rounded-lg border border-[#F4A6B7] text-center pointer-events-auto">
+                        <div className="text-sm text-[#5a3d5c] font-semibold mb-1">Access restricted</div>
+                        <div className="text-xs text-[#7a516d]">Requires 100,000 T points and 60 iQ to interact with the Jackpot.</div>
+                        <div className="text-xs text-[#5a3d5c] mt-2">You have: <strong>{(tPoints ?? 0).toLocaleString()}</strong> T and <strong>{Number(iqPoints ?? 0n)}</strong> iQ</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </MegapotWrapper>
