@@ -63,15 +63,27 @@ export default function JackpotPage() {
         <StakingWidget />
       </div>
       </main>
-      {/* small fixed link to farcaster debug */}
-      <a
-        href="https://triviacast.xyz/farcaster-debug"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-xs text-[#5a3d5c] opacity-80 hover:opacity-100 fixed bottom-3 right-3 bg-white/60 backdrop-blur px-2 py-1 rounded-lg border border-[#F4A6B7] shadow-sm"
-      >
-        farcaster-debug
-      </a>
+      {/* deeplinks for mobile wallets (open jackpot in wallet apps) */}
+      <div className="fixed bottom-3 left-0 right-0 flex justify-center">
+        <div className="inline-flex gap-3 bg-white/70 backdrop-blur px-3 py-1 rounded-lg border border-[#F4A6B7] shadow-sm">
+          <a
+            href="https://metamask.app.link/dapp/triviacast.xyz/jackpot"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-[#2d1b2e] hover:underline"
+          >
+            Open in MetaMask
+          </a>
+          <a
+            href="https://rnbw.app/ul?url=https://triviacast.xyz/jackpot"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-[#2d1b2e] hover:underline"
+          >
+            Open in Rainbow
+          </a>
+        </div>
+      </div>
     </>
   );
 }
