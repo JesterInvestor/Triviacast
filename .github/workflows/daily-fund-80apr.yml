@@ -1,8 +1,7 @@
-name: Daily fund 80% APR
+name: Daily fund 80% APR (schedule disabled)
 
+# Schedule removed per request — keep manual dispatch available
 on:
-  schedule:
-    - cron: '0 0 * * *' # daily at UTC midnight — adjust if needed
   workflow_dispatch: {}
 
 jobs:
