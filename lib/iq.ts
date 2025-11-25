@@ -5,6 +5,31 @@ const _cache: Map<string, { v: bigint; t: number }> = new Map()
 const TTL_MS = 15_000 // 15s is enough; values only change after a claim or mark action
 import { wagmiConfig } from '@/lib/wagmi'
 
+// Helper to retry readContract calls on transient rate-limit errors (429 / over rate limit)
+async function safeReadContract(config: any, opts: any, maxAttempts = 3) {
+  let attempt = 0
+  let lastErr: any = null
+  while (attempt < maxAttempts) {
+    try {
+      return await readContract(config, opts)
+    } catch (err: any) {
+      lastErr = err
+      const msg = String(err?.message || '')
+      const code = err?.code
+      // Detect viem / RPC rate limit responses
+      const isRateLimit = code === -32016 || msg.toLowerCase().includes('rate limit') || msg.includes('429')
+      if (!isRateLimit) throw err
+      // Exponential backoff: 200ms, 400ms, 800ms ...
+      const delay = 200 * Math.pow(2, attempt)
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise(r => setTimeout(r, delay))
+      attempt += 1
+      continue
+    }
+  }
+  throw lastErr
+}
+
 export const IQPOINTS_ADDRESS = process.env.NEXT_PUBLIC_IQPOINTS_ADDRESS as `0x${string}` | undefined
 export const QUEST_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_QUEST_MANAGER_ADDRESS as `0x${string}` | undefined
 
@@ -27,7 +52,7 @@ export const QUEST_MANAGER_ABI = [
 
 export async function getIQPoints(user: `0x${string}`) {
   if (!IQPOINTS_ADDRESS) throw new Error('IQPoints address not set')
-  return readContract(wagmiConfig, {
+  return safeReadContract(wagmiConfig, {
     address: IQPOINTS_ADDRESS,
     abi: IQPOINTS_ABI as any,
     functionName: 'getPoints',
@@ -42,7 +67,7 @@ export async function getLastClaimDay(user: `0x${string}`, questId: number) {
   const now = Date.now()
   const hit = _cache.get(key)
   if (hit && (now - hit.t) < TTL_MS) return hit.v
-  const v = await readContract(wagmiConfig, {
+  const v = await safeReadContract(wagmiConfig, {
     address: QUEST_MANAGER_ADDRESS,
     abi: QUEST_MANAGER_ABI as any,
     functionName: 'lastClaimDay',
@@ -59,7 +84,7 @@ export async function getQuizPlayedDay(user: `0x${string}`) {
   const now = Date.now()
   const hit = _cache.get(key)
   if (hit && (now - hit.t) < TTL_MS) return hit.v
-  const v = await readContract(wagmiConfig, {
+  const v = await safeReadContract(wagmiConfig, {
     address: QUEST_MANAGER_ADDRESS,
     abi: QUEST_MANAGER_ABI as any,
     functionName: 'quizPlayedDay',
@@ -76,7 +101,7 @@ export async function getFriendSearchedDay(user: `0x${string}`) {
   const now = Date.now()
   const hit = _cache.get(key)
   if (hit && (now - hit.t) < TTL_MS) return hit.v
-  const v = await readContract(wagmiConfig, {
+  const v = await safeReadContract(wagmiConfig, {
     address: QUEST_MANAGER_ADDRESS,
     abi: QUEST_MANAGER_ABI as any,
     functionName: 'friendSearchedDay',
