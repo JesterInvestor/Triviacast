@@ -9,7 +9,7 @@ type StakingWidgetProps = {
   onStake?: () => void;
   onUnstake?: () => void;
   /**
-   * Optional handler invoked when the Deposit Liquidity button is clicked.
+   * Optional handler invoked when the Deposit Liquidity link is clicked.
    * If the handler returns false, navigation to Uniswap will be prevented.
    */
   onDepositClick?: (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void | boolean;
@@ -20,22 +20,10 @@ type StakingWidgetProps = {
 /**
  * StakingWidget
  *
- * A compact, self-contained React + TypeScript staking widget that includes the
- * "Deposit Liquidity" button (opens the Uniswap positions page in a new tab).
- *
- * Paste this file into your project and import:
+ * Minimal staking widget. I kept the simple interface exactly as before and
+ * added a plain "Deposit Liquidity" link that is always visible (not gated
+ * behind the wallet connection). Paste this file into your project and import:
  * import StakingWidget from "./StakingWidget";
- *
- * Example usage:
- * <StakingWidget
- *   poolName="ABC / XYZ"
- *   apr="18.2%"
- *   tvl="$1.2M"
- *   isConnected={true}
- *   onConnect={() => console.log("connect")}
- *   onStake={() => console.log("stake")}
- *   onUnstake={() => console.log("unstake")}
- * />
  */
 export default function StakingWidget({
   poolName = "LP Pool",
@@ -140,7 +128,6 @@ export default function StakingWidget({
     if (onDepositClick) {
       const result = onDepositClick(e);
       if (result === false) {
-        // caller prevented navigation
         e.preventDefault();
       }
     }
@@ -187,54 +174,54 @@ export default function StakingWidget({
             <button type="button" onClick={onUnstake} style={ghostButton} aria-label="Unstake">
               Unstake
             </button>
-
-            {/* Simple link (styled as button) that opens Uniswap positions in a new tab */}
-            <a
-              href={uniswapUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={handleDepositClick}
-              style={ghostButton}
-              aria-label="Deposit Liquidity"
-            >
-              Deposit Liquidity
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-                style={{ marginLeft: 4 }}
-              >
-                <path
-                  d="M14 3h7v7"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M10 14L21 3"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M21 21H3V3"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </a>
           </>
         ) : (
           <button type="button" onClick={onConnect} style={primaryButton} aria-label="Connect">
             Connect Wallet
           </button>
         )}
+
+        {/* Simple plain link always visible, next to the buttons */}
+        <a
+          href={uniswapUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={handleDepositClick}
+          style={ghostButton}
+          aria-label="Deposit Liquidity"
+        >
+          Deposit Liquidity
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+            style={{ marginLeft: 4 }}
+          >
+            <path
+              d="M14 3h7v7"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M10 14L21 3"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M21 21H3V3"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </a>
       </div>
 
       <div style={{ marginTop: 12, fontSize: 12, color: "#81a3c6" }}>
