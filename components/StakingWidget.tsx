@@ -160,7 +160,9 @@ export default function StakingWidget() {
         <div className="mb-3">
           <span className="inline-block px-3 py-1 rounded-full bg-[#FFF3F6] text-gray-800 font-semibold text-sm">Current APY: 80%</span>
         </div>
-        <p className="text-sm text-gray-700 mb-4">You can stake using Base App and Rainbow Wallet. Also works in Farcaster desktop and browser w/ wallet extension — sorry for any inconvenience. (Dec[...]
+        <p className="text-sm text-gray-700 mb-4">
+          You can stake using Base App and Rainbow Wallet. Also works in Farcaster desktop and browser w/ wallet extension — sorry for any inconvenience.
+        </p>
 
         {/* 2 columns on small screens to reduce vertical stacking and avoid overflow; cells can shrink */}
         <div className="mb-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -226,7 +228,7 @@ export default function StakingWidget() {
           </div>
         )}
       </div>
-      {/* deeplinks for MetaMask and Rainbow placed inside the staking widget */}
+      {/* deeplinks for MetaMask, Rainbow, and Uniswap placed inside the staking widget */}
       <div className="mt-3 flex justify-end">
         <div className="inline-flex gap-3 items-center">
           <a
@@ -238,7 +240,7 @@ export default function StakingWidget() {
             Open in MetaMask
           </a>
           <a
-            href={`https://rnbwapp.com/wc?uri=${encodeURIComponent('https://triviacast.xyz/jackpot')}`}
+            href={`https://rnbwapp.com/wc?uri=${encodeURIComponent("https://triviacast.xyz/jackpot")}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-[#2d1b2e] hover:underline"
@@ -251,7 +253,7 @@ export default function StakingWidget() {
             rel="noopener noreferrer"
             className="text-xs text-[#2d1b2e] hover:underline"
           >
-            Deposit Liquidity
+            Open in Uniswap
           </a>
         </div>
       </div>
