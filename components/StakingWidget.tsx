@@ -248,7 +248,7 @@ export default function StakingWidget() {
             Open in Rainbow
           </a>
           <a
-            href="https://app.uniswap.org/positions/v4/base/538435"
+            href="https://app.uniswap.org/explore/v4/base/538435"
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-[#2d1b2e] hover:underline"
