@@ -8,6 +8,11 @@ type StakingWidgetProps = {
   onConnect?: () => void;
   onStake?: () => void;
   onUnstake?: () => void;
+  /**
+   * Optional handler invoked when the Deposit Liquidity button is clicked.
+   * If the handler returns false, navigation to Uniswap will be prevented.
+   */
+  onDepositClick?: (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void | boolean;
   className?: string;
   style?: React.CSSProperties;
 };
@@ -15,20 +20,21 @@ type StakingWidgetProps = {
 /**
  * StakingWidget
  *
- * A self-contained React + TypeScript component that shows a compact staking UI.
- * It includes action links/buttons styled consistently. The Uniswap link labeled
- * "Deposit Liquidity" (https://app.uniswap.org/positions/v4/base/538435) is added
- * alongside the other links as requested.
+ * A compact, self-contained React + TypeScript staking widget that includes the
+ * "Deposit Liquidity" button (opens the Uniswap positions page in a new tab).
  *
- * Usage:
+ * Paste this file into your project and import:
+ * import StakingWidget from "./StakingWidget";
+ *
+ * Example usage:
  * <StakingWidget
  *   poolName="ABC / XYZ"
  *   apr="18.2%"
  *   tvl="$1.2M"
  *   isConnected={true}
- *   onConnect={() => { ... }}
- *   onStake={() => { ... }}
- *   onUnstake={() => { ... }}
+ *   onConnect={() => console.log("connect")}
+ *   onStake={() => console.log("stake")}
+ *   onUnstake={() => console.log("unstake")}
  * />
  */
 export default function StakingWidget({
@@ -39,6 +45,7 @@ export default function StakingWidget({
   onConnect,
   onStake,
   onUnstake,
+  onDepositClick,
   className = "",
   style,
 }: StakingWidgetProps) {
@@ -48,7 +55,7 @@ export default function StakingWidget({
     width: 360,
     borderRadius: 12,
     padding: 16,
-    background: "linear-gradient(180deg,#0f172a,#071028)",
+    background: "#0b1220",
     color: "#e6eef8",
     fontFamily:
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
@@ -88,7 +95,7 @@ export default function StakingWidget({
 
   const statBlock: React.CSSProperties = {
     flex: 1,
-    background: "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))",
+    background: "rgba(255,255,255,0.02)",
     padding: "8px 10px",
     borderRadius: 8,
     textAlign: "center",
@@ -102,7 +109,7 @@ export default function StakingWidget({
     flexWrap: "wrap",
   };
 
-  const linkButtonBase: React.CSSProperties = {
+  const buttonBase: React.CSSProperties = {
     display: "inline-flex",
     alignItems: "center",
     gap: 8,
@@ -118,15 +125,26 @@ export default function StakingWidget({
   };
 
   const primaryButton: React.CSSProperties = {
-    ...linkButtonBase,
+    ...buttonBase,
     background: "linear-gradient(180deg,#06b6d4,#0891b2)",
     border: "none",
     color: "white",
   };
 
   const ghostButton: React.CSSProperties = {
-    ...linkButtonBase,
+    ...buttonBase,
     background: "transparent",
+  };
+
+  const handleDepositClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    if (onDepositClick) {
+      const result = onDepositClick(e);
+      if (result === false) {
+        // caller prevented navigation
+        e.preventDefault();
+      }
+    }
+    // otherwise allow default anchor behavior (opens in new tab)
   };
 
   return (
@@ -135,12 +153,16 @@ export default function StakingWidget({
         <div>
           <h3 style={titleStyles}>{poolName}</h3>
           <div style={{ fontSize: 13, color: "#9fb2cf", marginTop: 6 }}>
-            A compact interface for staking / LP actions
+            Simple staking interface
           </div>
         </div>
         <div style={metaStyles}>
-          <div>APR: <strong style={{ color: "#fff" }}>{apr}</strong></div>
-          <div>TVL: <strong style={{ color: "#fff" }}>{tvl}</strong></div>
+          <div>
+            APR: <strong style={{ color: "#fff" }}>{apr}</strong>
+          </div>
+          <div>
+            TVL: <strong style={{ color: "#fff" }}>{tvl}</strong>
+          </div>
         </div>
       </div>
 
@@ -158,48 +180,22 @@ export default function StakingWidget({
       <div style={actionsRow}>
         {isConnected ? (
           <>
-            <button
-              type="button"
-              onClick={onStake}
-              style={primaryButton}
-              aria-label="Stake"
-            >
+            <button type="button" onClick={onStake} style={primaryButton} aria-label="Stake">
               Stake
             </button>
 
-            <button
-              type="button"
-              onClick={onUnstake}
-              style={ghostButton}
-              aria-label="Unstake"
-            >
+            <button type="button" onClick={onUnstake} style={ghostButton} aria-label="Unstake">
               Unstake
             </button>
 
-            {/* Existing links placed as styled anchors */}
-            <a
-              href="#/view"
-              style={ghostButton}
-              onClick={(e) => {
-                // Example of internal navigation prevention for demo
-                e.preventDefault();
-                window.alert("Open view pool (replace with your navigation).");
-              }}
-              aria-label="View Pool"
-            >
-              View Pool
-            </a>
-
-            {/* NEW: Deposit Liquidity link — opens Uniswap positions in a new tab */}
+            {/* Simple link (styled as button) that opens Uniswap positions in a new tab */}
             <a
               href={uniswapUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={handleDepositClick}
               style={ghostButton}
               aria-label="Deposit Liquidity"
-              onClick={() => {
-                // Optional tracking or analytics could be added here
-              }}
             >
               Deposit Liquidity
               <svg
@@ -235,20 +231,14 @@ export default function StakingWidget({
             </a>
           </>
         ) : (
-          <button
-            type="button"
-            onClick={onConnect}
-            style={primaryButton}
-            aria-label="Connect wallet"
-          >
+          <button type="button" onClick={onConnect} style={primaryButton} aria-label="Connect">
             Connect Wallet
           </button>
         )}
       </div>
 
       <div style={{ marginTop: 12, fontSize: 12, color: "#81a3c6" }}>
-        Tip: Click "Deposit Liquidity" to open the Uniswap positions page in a new tab
-        so you can add or adjust your LP position.
+        Tip: Click "Deposit Liquidity" to add or adjust your LP position on Uniswap.
       </div>
     </div>
   );
