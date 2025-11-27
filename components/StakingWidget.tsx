@@ -226,21 +226,6 @@ export default function StakingWidget() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const openMatchaSDK = async (e?: React.MouseEvent<HTMLButtonElement>) => {
-    e?.preventDefault();
-    const url =
-      "https://matcha.xyz/tokens/base/0xa889A10126024F39A0ccae31D09C18095CB461B8?sellChain=8453&sellAddress=0x4200000000000000000000000000000000000006";
-
-    try {
-      const ok = await tryOpenMiniApp(url);
-      if (ok) return;
-    } catch (err) {
-      console.error("openMatchaSDK failed:", err);
-    }
-
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
-
   if (!STAKING_ADDRESS || !TRIV_ADDRESS) {
     return (
       <div className="mt-6 w-full max-w-2xl text-left">
@@ -327,48 +312,18 @@ export default function StakingWidget() {
           </div>
         )}
       </div>
-      {/* deeplinks for MetaMask, Rainbow, Mint Club, and Matcha (prefer openMiniApp via miniapp SDK) placed inside the staking widget */}
-      <div className="mt-3 flex justify-end">
-        <div className="inline-flex gap-3 items-center">
-          <a
-            href="https://link.metamask.io/dapp/https://triviacast.xyz/jackpot"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-[#2d1b2e] hover:underline"
-          >
-            Open in MetaMask
-          </a>
-          <a
-            href={`https://rnbwapp.com/wc?uri=${encodeURIComponent("https://triviacast.xyz/jackpot")}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-[#2d1b2e] hover:underline"
-          >
-            Open in Rainbow
-          </a>
 
-          {/* Mint Club: prefer sdk.actions.openMiniApp({ url }) */}
-          <button
-            onClick={openMintClubSDK}
-            className="px-4 py-2 bg-[#FFC4D1] rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
-            aria-label="Open in Mint Club"
-            title="Open in Mint Club"
-            type="button"
-          >
-            Open in Mint Club
-          </button>
-
-          {/* Matcha: prefer sdk.actions.openMiniApp({ url }) */}
-          <button
-            onClick={openMatchaSDK}
-            className="px-4 py-2 bg-white border rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
-            aria-label="Open in Matcha"
-            title="Open in Matcha"
-            type="button"
-          >
-            Open in Matcha
-          </button>
-        </div>
+      {/* Prominent Mint Club call-to-action (removed MetaMask and Rainbow links as requested) */}
+      <div className="mt-4 flex justify-end">
+        <button
+          onClick={openMintClubSDK}
+          className="px-6 py-3 rounded-full bg-[#00E6B8] text-black font-semibold text-sm shadow-lg hover:brightness-95 transition focus:outline-none focus:ring-4 focus:ring-[#00E6B8]/30"
+          aria-label="Open in Mint Club"
+          title="Open in Mint Club"
+          type="button"
+        >
+          Open in Mint Club
+        </button>
       </div>
     </div>
   );
