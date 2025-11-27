@@ -142,29 +142,59 @@ export default function StakingWidget() {
     }
   };
 
-  // Attempt to open Mint Club via an available SDK, falling back to a normal window.open
+  // Attempt to open Mint Club via an available SDK using "openMiniApp" (or several common variants),
+  // falling back to open/other methods and finally window.open
   const openMintClubSDK = (e?: React.MouseEvent) => {
     e?.preventDefault();
     const url = "https://mint.club/staking/base/160";
 
     try {
-      // Common global SDK objects (guess-and-check): mintClub, MintClub, MintClubSDK
       const globalAny = window as any;
       const sdkCandidates = [globalAny.mintClub, globalAny.MintClub, globalAny.MintClubSDK];
+
+      // prefer openMiniApp/openMiniapp if available
       for (const candidate of sdkCandidates) {
-        if (candidate && typeof candidate.open === "function") {
-          // If the SDK exposes an open() method, call it
+        if (!candidate) continue;
+        if (typeof candidate.openMiniApp === "function") {
+          try {
+            candidate.openMiniApp(url);
+            return;
+          } catch {
+            try {
+              candidate.openMiniApp({ url });
+              return;
+            } catch {
+              // continue trying other methods
+            }
+          }
+        }
+        if (typeof candidate.openMiniapp === "function") {
+          try {
+            candidate.openMiniapp(url);
+            return;
+          } catch {
+            try {
+              candidate.openMiniapp({ url });
+              return;
+            } catch {
+              // continue
+            }
+          }
+        }
+      }
+
+      // fallback to previously used method names
+      for (const candidate of sdkCandidates) {
+        if (!candidate) continue;
+        if (typeof candidate.open === "function") {
           candidate.open(url);
           return;
         }
-      }
-      // Some SDKs might expose a different method name, try openUrl or navigate
-      for (const candidate of sdkCandidates) {
-        if (candidate && typeof candidate.openUrl === "function") {
+        if (typeof candidate.openUrl === "function") {
           candidate.openUrl(url);
           return;
         }
-        if (candidate && typeof candidate.navigate === "function") {
+        if (typeof candidate.navigate === "function") {
           candidate.navigate(url);
           return;
         }
@@ -173,40 +203,69 @@ export default function StakingWidget() {
       // ignore and fallback
     }
 
-    // Fallback to opening the URL in a new tab/window
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  // Attempt to open Matcha (0x Matcha) via an available SDK, falling back to window.open
+  // Attempt to open Matcha via an available SDK using "openMiniApp" (or variants), falling back to other methods
   const openMatchaSDK = (e?: React.MouseEvent) => {
     e?.preventDefault();
     const url = "https://matcha.xyz/tokens/base/0xa889A10126024F39A0ccae31D09C18095CB461B8?sellChain=8453&sellAddress=0x4200000000000000000000000000000000000006";
 
     try {
-      // Guess common global SDK objects: matcha, Matcha, MatchaSDK, MatchaApp
       const globalAny = window as any;
       const sdkCandidates = [globalAny.matcha, globalAny.Matcha, globalAny.MatchaSDK, globalAny.MatchaApp];
+
+      // prefer openMiniApp/openMiniapp if available
       for (const candidate of sdkCandidates) {
-        if (candidate && typeof candidate.open === "function") {
+        if (!candidate) continue;
+        if (typeof candidate.openMiniApp === "function") {
+          try {
+            candidate.openMiniApp(url);
+            return;
+          } catch {
+            try {
+              candidate.openMiniApp({ url });
+              return;
+            } catch {
+              // continue trying other methods
+            }
+          }
+        }
+        if (typeof candidate.openMiniapp === "function") {
+          try {
+            candidate.openMiniapp(url);
+            return;
+          } catch {
+            try {
+              candidate.openMiniapp({ url });
+              return;
+            } catch {
+              // continue
+            }
+          }
+        }
+      }
+
+      // fallback to other common method names
+      for (const candidate of sdkCandidates) {
+        if (!candidate) continue;
+        if (typeof candidate.open === "function") {
           candidate.open(url);
           return;
         }
-      }
-      for (const candidate of sdkCandidates) {
-        if (candidate && typeof candidate.openUrl === "function") {
+        if (typeof candidate.openUrl === "function") {
           candidate.openUrl(url);
           return;
         }
-        if (candidate && typeof candidate.navigate === "function") {
+        if (typeof candidate.navigate === "function") {
           candidate.navigate(url);
           return;
         }
-        // some SDKs might expose a 'show' or 'launch' method
-        if (candidate && typeof candidate.show === "function") {
+        if (typeof candidate.show === "function") {
           candidate.show(url);
           return;
         }
-        if (candidate && typeof candidate.launch === "function") {
+        if (typeof candidate.launch === "function") {
           candidate.launch(url);
           return;
         }
@@ -304,7 +363,7 @@ export default function StakingWidget() {
           </div>
         )}
       </div>
-      {/* deeplinks for MetaMask, Rainbow, Mint Club, and Matcha (SDK open) placed inside the staking widget */}
+      {/* deeplinks for MetaMask, Rainbow, Mint Club, and Matcha (SDK openMiniApp preferred) placed inside the staking widget */}
       <div className="mt-3 flex justify-end">
         <div className="inline-flex gap-3 items-center">
           <a
@@ -324,7 +383,7 @@ export default function StakingWidget() {
             Open in Rainbow
           </a>
 
-          {/* Mint Club SDK open: tries SDK first, falls back to window.open */}
+          {/* Mint Club SDK openMiniApp: tries SDK first, falls back to window.open */}
           <button
             onClick={openMintClubSDK}
             className="px-4 py-2 bg-[#FFC4D1] rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
@@ -335,7 +394,7 @@ export default function StakingWidget() {
             Open in Mint Club
           </button>
 
-          {/* Matcha SDK open: tries SDK first, falls back to window.open */}
+          {/* Matcha SDK openMiniApp: tries SDK first, falls back to window.open */}
           <button
             onClick={openMatchaSDK}
             className="px-4 py-2 bg-white border rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
