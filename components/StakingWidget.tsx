@@ -142,6 +142,41 @@ export default function StakingWidget() {
     }
   };
 
+  // Attempt to open Mint Club via an available SDK, falling back to a normal window.open
+  const openMintClubSDK = (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    const url = "https://mint.club/staking/base/160";
+
+    try {
+      // Common global SDK objects (guess-and-check): mintClub, MintClub, MintClubSDK
+      const globalAny = window as any;
+      const sdkCandidates = [globalAny.mintClub, globalAny.MintClub, globalAny.MintClubSDK];
+      for (const candidate of sdkCandidates) {
+        if (candidate && typeof candidate.open === "function") {
+          // If the SDK exposes an open() method, call it
+          candidate.open(url);
+          return;
+        }
+      }
+      // Some SDKs might expose a different method name, try openUrl or navigate
+      for (const candidate of sdkCandidates) {
+        if (candidate && typeof candidate.openUrl === "function") {
+          candidate.openUrl(url);
+          return;
+        }
+        if (candidate && typeof candidate.navigate === "function") {
+          candidate.navigate(url);
+          return;
+        }
+      }
+    } catch (err) {
+      // ignore and fallback
+    }
+
+    // Fallback to opening the URL in a new tab/window
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   if (!STAKING_ADDRESS || !TRIV_ADDRESS) {
     return (
       <div className="mt-6 w-full max-w-2xl text-left">
@@ -228,7 +263,7 @@ export default function StakingWidget() {
           </div>
         )}
       </div>
-      {/* deeplinks for MetaMask, Rainbow, and Uniswap placed inside the staking widget */}
+      {/* deeplinks for MetaMask, Rainbow, and Mint Club (SDK open) placed inside the staking widget */}
       <div className="mt-3 flex justify-end">
         <div className="inline-flex gap-3 items-center">
           <a
@@ -247,14 +282,17 @@ export default function StakingWidget() {
           >
             Open in Rainbow
           </a>
-          <a
-            href="https://app.uniswap.org/explore/v4/base/538435"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-[#2d1b2e] hover:underline"
+
+          {/* Mint Club SDK open: tries SDK first, falls back to window.open */}
+          <button
+            onClick={openMintClubSDK}
+            className="text-xs text-[#2d1b2e] hover:underline bg-transparent p-0 m-0"
+            aria-label="Open in Mint Club"
+            title="Open in Mint Club"
+            type="button"
           >
-            Open in Uniswap
-          </a>
+            Open in Mint Club
+          </button>
         </div>
       </div>
     </div>
