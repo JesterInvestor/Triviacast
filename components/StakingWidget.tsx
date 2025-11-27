@@ -226,6 +226,96 @@ export default function StakingWidget() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  // --- MintClub SDK integration (attempt dynamic import and safe call) ---
+  const [mintNetwork, setMintNetwork] = useState<string>("base");
+  const [mintToken, setMintToken] = useState<string>("CHICKEN");
+  const [mintQuantity, setMintQuantity] = useState<string>("1");
+  const [mintLoading, setMintLoading] = useState(false);
+  const [mintStatus, setMintStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
+  const [mintResult, setMintResult] = useState<string | null>(null);
+
+  const tryMintWithSDK = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
+    if (!isConnected) {
+      setMintStatus("error");
+      setMintResult("Connect your wallet to mint.");
+      return;
+    }
+
+    setMintLoading(true);
+    setMintStatus("pending");
+    setMintResult(null);
+
+    try {
+      // attempt dynamic import; if not installed this will throw and we fallback to opening Mint Club
+      const sdkMod = await import("mint.club-v2-sdk");
+      // `mintclub` may be exported as named or default
+      const mintclub = (sdkMod as any).mintclub ?? (sdkMod as any).default ?? (sdkMod as any);
+
+      const networkArg = mintNetwork || "base";
+      const tokenArg = mintToken || "CHICKEN";
+      const qty = Math.max(1, Math.floor(Number(mintQuantity) || 1));
+
+      // follow documented pattern: mintclub.network(...).token(...)
+      const tokenObj = mintclub.network(networkArg).token(tokenArg);
+
+      // try common method names used by mint SDKs, be permissive
+      if (typeof tokenObj.mint === "function") {
+        const resp = await tokenObj.mint({ to: address, quantity: qty });
+        setMintStatus("success");
+        setMintResult(String(resp?.transactionHash ?? resp?.txHash ?? resp?.url ?? JSON.stringify(resp)));
+        setMintLoading(false);
+        return;
+      }
+
+      if (typeof tokenObj.mintTo === "function") {
+        const resp = await tokenObj.mintTo(address, qty);
+        setMintStatus("success");
+        setMintResult(String(resp?.transactionHash ?? resp?.txHash ?? resp?.url ?? JSON.stringify(resp)));
+        setMintLoading(false);
+        return;
+      }
+
+      if (typeof tokenObj.purchase === "function") {
+        const resp = await tokenObj.purchase({ quantity: qty, to: address });
+        setMintStatus("success");
+        setMintResult(String(resp?.transactionHash ?? resp?.txHash ?? resp?.url ?? JSON.stringify(resp)));
+        setMintLoading(false);
+        return;
+      }
+
+      // If SDK doesn't expose a minting function, try opening a UI if available
+      if (typeof tokenObj.open === "function") {
+        try {
+          await tokenObj.open({ network: networkArg, token: tokenArg });
+          setMintStatus("success");
+          setMintResult("Opened MintClub UI");
+          setMintLoading(false);
+          return;
+        } catch (err) {
+          // ignore and fallback
+        }
+      }
+
+      // nothing worked: fallback to opening Mint Club web URL
+      setMintStatus("error");
+      setMintResult("SDK present but mint method not found; falling back to web UI.");
+      openMintClubSDK();
+    } catch (err) {
+      // dynamic import failed or call errored — fallback to open URL
+      console.warn("MintClub SDK not available or mint failed:", err);
+      setMintStatus("error");
+      setMintResult("MintClub SDK unavailable — opening web UI.");
+      try {
+        openMintClubSDK();
+      } catch (e) {
+        // last resort: nothing we can do
+      }
+    } finally {
+      setMintLoading(false);
+    }
+  };
+
   if (!STAKING_ADDRESS || !TRIV_ADDRESS) {
     return (
       <div className="mt-6 w-full max-w-2xl text-left">
@@ -313,17 +403,76 @@ export default function StakingWidget() {
         )}
       </div>
 
-      {/* Prominent Mint Club call-to-action (removed MetaMask and Rainbow links as requested) */}
-      <div className="mt-4 flex justify-end">
-        <button
-          onClick={openMintClubSDK}
-          className="px-6 py-3 rounded-full bg-[#00E6B8] text-black font-semibold text-sm shadow-lg hover:brightness-95 transition focus:outline-none focus:ring-4 focus:ring-[#00E6B8]/30"
-          aria-label="Open in Mint Club"
-          title="Open in Mint Club"
-          type="button"
-        >
-          Open in Mint Club
-        </button>
+      {/* Mint Club integration panel */}
+      <div className="mt-4 p-4 rounded-lg bg-white/95 border border-gray-200 shadow-sm">
+        <h3 className="text-sm font-semibold mb-2">Mint in Mint Club</h3>
+        <p className="text-xs text-gray-600 mb-3">Quick mint using the Mint Club SDK when available, otherwise opens Mint Club web UI.</p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <input
+            className="px-3 py-2 rounded border border-gray-200 text-sm w-full"
+            placeholder="Network (e.g. base or chain id)"
+            value={mintNetwork}
+            onChange={(e) => setMintNetwork(e.target.value)}
+            aria-label="MintClub network"
+          />
+          <input
+            className="px-3 py-2 rounded border border-gray-200 text-sm w-full"
+            placeholder="Token symbol or address (e.g. CHICKEN)"
+            value={mintToken}
+            onChange={(e) => setMintToken(e.target.value)}
+            aria-label="Token symbol or address"
+          />
+          <input
+            className="px-3 py-2 rounded border border-gray-200 text-sm w-full"
+            placeholder="Quantity"
+            value={mintQuantity}
+            onChange={(e) => setMintQuantity(e.target.value)}
+            inputMode="numeric"
+            aria-label="Quantity to mint"
+          />
+        </div>
+
+        <div className="flex gap-2 mt-3">
+          <button
+            onClick={tryMintWithSDK}
+            disabled={mintLoading}
+            className="px-4 py-2 rounded bg-[#00E6B8] text-black font-semibold text-sm shadow hover:brightness-95 disabled:opacity-60"
+          >
+            {mintLoading ? "Minting…" : "Mint"}
+          </button>
+          <button
+            onClick={openMintClubSDK}
+            className="px-4 py-2 rounded bg-white border text-sm"
+            type="button"
+          >
+            Open Web UI
+          </button>
+        </div>
+
+        <div className="mt-3 text-sm text-gray-700">
+          {mintStatus !== "idle" && (
+            <div className="break-words">
+              <strong>Status:</strong> {mintStatus}
+              {mintResult && (
+                <div className="mt-1">
+                  {/* If mintResult looks like a URL, link it; otherwise just show brief text */}
+                  {/^https?:\/\//i.test(mintResult) ? (
+                    <a href={mintResult} target="_blank" rel="noreferrer" className="text-blue-700">
+                      Open result
+                    </a>
+                  ) : mintResult.length > 0 && /^[0-9a-fA-F]{64}$/.test(mintResult) ? (
+                    <a className="text-blue-700" target="_blank" rel="noreferrer" href={`https://basescan.org/tx/${mintResult}`}>
+                      View tx
+                    </a>
+                  ) : (
+                    <div className="text-xs text-gray-600">{mintResult}</div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

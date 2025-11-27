@@ -31,11 +31,12 @@
     "hls.js": "^1.6.14",
     "ioredis": "^5.8.2",
     "jose": "^5.10.0",
+    "mint.club-v2-sdk": "^1.4.14",
     "next": "15.5.4",
+    "pino": "^8.16.0",
     "pino-pretty": "^13.1.2",
     "polished": "^4.3.1",
     "react": "19.1.0",
-    "pino": "^8.16.0",
     "react-dom": "19.1.0",
     "react-redux": "^9.2.0",
     "redis": "^5.10.0",
@@ -62,6 +63,8 @@
   },
   "overrides": {
     "happy-dom": ">=20.0.2",
-    "tar": ">=7.5.2"
+    "tar": ">=7.5.2",
+    "parse-duration": "2.1.3"
   }
 }
+
