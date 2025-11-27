@@ -8,6 +8,16 @@ import { TRIV_ABI, STAKING_ABI } from "../lib/stakingClient";
 const STAKING_ADDRESS = process.env.NEXT_PUBLIC_STAKING_ADDRESS || "";
 const TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || "";
 
+/**
+ * Notes:
+ * - This version aggressively waits/polls briefly for the Farcaster miniapp SDK to be injected,
+ *   then calls sdk.actions.swapToken(...) per the API you pasted.
+ * - It also attempts to call swapToken on a few other likely globals and even on window.parent/window.top
+ *   (wrapped in try/catch to avoid cross-origin errors).
+ * - sellToken uses CAIP-19 "eip155:8453/native" and buyToken uses "eip155:8453/erc20:<TRIV_ADDRESS>".
+ * - sellAmount (if provided) is passed as a base-unit string (wei) using ethers.parseUnits(amount, 18).
+ */
+
 export default function StakingWidget() {
   const { address, isConnected } = useAccount();
 
@@ -147,7 +157,167 @@ export default function StakingWidget() {
     }
   };
 
-  // Open Mint Club (keeps web fallback)
+  // Wait/poll for 'sdk' (or variations) for up to timeoutMs.
+  // Returns the found object and a name string representing where it was found.
+  const waitForSdk = async (timeoutMs = 3000, intervalMs = 200) => {
+    const start = Date.now();
+    const candidateGetters: Array<() => { name: string; obj: any } | null> = [
+      () => ({ name: "window.sdk", obj: (window as any).sdk }),
+      () => ({ name: "window.farcaster?.sdk", obj: (window as any).farcaster?.sdk }),
+      () => ({ name: "window.farcasterSdk", obj: (window as any).farcasterSdk }),
+      () => ({ name: "window.farcasterMiniAppSdk", obj: (window as any).farcasterMiniAppSdk }),
+      () => ({ name: "window.MiniAppSDK", obj: (window as any).MiniAppSDK }),
+      () => ({ name: "window.miniAppSdk", obj: (window as any).miniAppSdk }),
+      () => ({ name: "window.parent.sdk", obj: (() => { try { return (window.parent as any)?.sdk; } catch { return undefined; } })() }),
+      () => ({ name: "window.top.sdk", obj: (() => { try { return (window.top as any)?.sdk; } catch { return undefined; } })() }),
+    ];
+
+    while (Date.now() - start < timeoutMs) {
+      for (const getter of candidateGetters) {
+        try {
+          const got = getter();
+          if (got && got.obj) {
+            return got;
+          }
+        } catch {
+          // ignore
+        }
+      }
+      await new Promise((r) => setTimeout(r, intervalMs));
+    }
+
+    // last-ditch: return first non-null that exists (without waiting)
+    for (const getter of candidateGetters) {
+      try {
+        const got = getter();
+        if (got && got.obj) return got;
+      } catch {}
+    }
+    return null;
+  };
+
+  // Farcaster / Base native swap using sdk.actions.swapToken per the Farcaster miniapp docs you provided
+  // - sellToken: eip155:8453/native (Base native)
+  // - buyToken: eip155:8453/erc20:<TRIV_ADDRESS>
+  // - sellAmount (optional): string in base units (wei)
+  const openBuyTRIV = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
+
+    setNativeError(null);
+    setDetectedGlobals(null);
+    setSwapTxs(null);
+
+    if (!TRIV_ADDRESS) {
+      setNativeError("TRIV contract address not configured (NEXT_PUBLIC_TRIV_ADDRESS).");
+      return;
+    }
+
+    // Ensure lowercase address in CAIP string
+    const tokenAddress = TRIV_ADDRESS.toLowerCase();
+    const sellToken = "eip155:8453/native";
+    const buyToken = `eip155:8453/erc20:${tokenAddress}`;
+
+    // Convert amount to wei string if provided and valid
+    let sellAmount: string | undefined = undefined;
+    if (amount && amount.trim() !== "") {
+      try {
+        sellAmount = ethers.parseUnits(amount.trim(), 18).toString();
+      } catch (err) {
+        console.warn("Could not parse sell amount, ignoring:", err);
+        // keep sellAmount undefined (pre-fill tokens only)
+      }
+    }
+
+    const payload: any = { sellToken, buyToken } as any;
+    if (sellAmount) payload.sellAmount = sellAmount;
+
+    // Wait briefly for SDK to be injected (Farcaster miniapp often injects sdk after page load)
+    const found = await waitForSdk(3000, 200);
+    if (!found) {
+      // Nothing found after polling; record helpful diagnostic
+      setDetectedGlobals([]);
+      setNativeError(
+        "No Farcaster miniapp SDK detected (window.sdk). Please open this page inside the Farcaster mobile app (in-app browser) or the Base wallet that exposes a native SDK."
+      );
+      return;
+    }
+
+    setDetectedGlobals([found.name]);
+
+    const sdkObj = found.obj;
+
+    // Try the documented call: sdk.actions.swapToken({ sellToken, buyToken, sellAmount })
+    try {
+      if (sdkObj.actions && typeof sdkObj.actions.swapToken === "function") {
+        const result = await sdkObj.actions.swapToken(payload);
+        // result is SwapTokenResult union
+        if (result && (result.success === true || result.success === false)) {
+          if (result.success) {
+            setSwapTxs(result.swap?.transactions ?? null);
+            setNativeError(null);
+          } else {
+            setNativeError(`Swap failed: ${result.reason ?? "unknown"} ${result.error?.message ?? ""}`);
+          }
+          return;
+        } else {
+          // If SDK returned something else (or void), still treat as success (the SDK UI likely opened)
+          setNativeError("swapToken invoked (no structured result returned).");
+          return;
+        }
+      }
+    } catch (err: any) {
+      console.error("sdk.actions.swapToken failed:", err);
+      setNativeError(`sdk.actions.swapToken threw: ${err?.message ?? String(err)}`);
+      return;
+    }
+
+    // If we get here, sdk object didn't have the documented actions.swapToken method.
+    // Try some fallback names directly on the sdk object.
+    try {
+      if (typeof sdkObj.swapToken === "function") {
+        const result = await sdkObj.swapToken(payload);
+        if (result && (result.success === true || result.success === false)) {
+          if (result.success) {
+            setSwapTxs(result.swap?.transactions ?? null);
+            setNativeError(null);
+          } else {
+            setNativeError(`Swap failed: ${result.reason ?? "unknown"} ${result.error?.message ?? ""}`);
+          }
+          return;
+        }
+        setNativeError("swapToken invoked (no structured result returned).");
+        return;
+      }
+      if (typeof sdkObj.swap === "function") {
+        // some implementations expect (sellToken, buyToken, sellAmount)
+        const args = sellAmount ? [sellToken, buyToken, sellAmount] : [sellToken, buyToken];
+        const result = await sdkObj.swap(...args);
+        if (result && (result.success === true || result.success === false)) {
+          if (result.success) {
+            setSwapTxs(result.swap?.transactions ?? null);
+            setNativeError(null);
+          } else {
+            setNativeError(`Swap failed: ${result.reason ?? "unknown"} ${result.error?.message ?? ""}`);
+          }
+          return;
+        }
+        setNativeError("swap invoked (no structured result returned).");
+        return;
+      }
+    } catch (err: any) {
+      console.error("Fallback SDK swap invocation threw:", err);
+      setNativeError(`Fallback swap invocation threw: ${err?.message ?? String(err)}`);
+      return;
+    }
+
+    // If we reach here, sdk exists but the expected swapToken method wasn't found.
+    setNativeError(
+      "Found SDK but it does not expose actions.swapToken. Detected sdk global: " +
+        found.name +
+        ". If you control the Farcaster client or Base wallet, ensure it exposes sdk.actions.swapToken as documented."
+    );
+  };
+
   const openMintClubSDK = async (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.preventDefault();
     const url = "https://mint.club/staking/base/160";
@@ -179,177 +349,6 @@ export default function StakingWidget() {
 
     // fallback to web
     window.open(url, "_blank", "noopener,noreferrer");
-  };
-
-  // Farcaster / Base native swap using sdk.actions.swapToken per the Farcaster miniapp docs you provided
-  // - sellToken: eip155:8453/native (Base native ETH)
-  // - buyToken: eip155:8453/erc20:<TRIV_ADDRESS>
-  // - optionally pass sellAmount if user entered an amount (converted to base units)
-  const openBuyTRIV = async (e?: React.MouseEvent<HTMLButtonElement>) => {
-    e?.preventDefault();
-
-    setNativeError(null);
-    setDetectedGlobals(null);
-    setSwapTxs(null);
-
-    if (!TRIV_ADDRESS) {
-      setNativeError("TRIV contract address not configured (NEXT_PUBLIC_TRIV_ADDRESS).");
-      return;
-    }
-
-    const tokenAddress = TRIV_ADDRESS.toLowerCase();
-    const sellToken = "eip155:8453/native";
-    const buyToken = `eip155:8453/erc20:${tokenAddress}`;
-
-    // If user entered an amount, convert to wei (string). Otherwise undefined to just prefill tokens.
-    let sellAmount: string | undefined = undefined;
-    try {
-      if (amount && amount.trim() !== "") {
-        // parseUnits may throw; guard it
-        sellAmount = ethers.parseUnits(amount, 18).toString();
-      }
-    } catch (err) {
-      console.warn("Could not parse sell amount, ignoring sellAmount param:", err);
-      sellAmount = undefined;
-    }
-
-    const payload: any = {
-      sellToken,
-      buyToken,
-    } as any;
-    if (sellAmount) payload.sellAmount = sellAmount;
-
-    // Candidate globals to check (Farcaster primary, but include a few variants)
-    const globalAny = window as any;
-    const candidates = [
-      { name: "sdk", obj: globalAny.sdk },
-      { name: "farcaster.sdk", obj: globalAny.farcaster?.sdk },
-      { name: "farcasterSdk", obj: globalAny.farcasterSdk },
-      { name: "farcasterMiniAppSdk", obj: globalAny.farcasterMiniAppSdk },
-      { name: "MiniAppSDK", obj: globalAny.MiniAppSDK },
-      { name: "miniAppSdk", obj: globalAny.miniAppSdk },
-      // also try some Base wallet/global names in case the Base SDK exposes a similar API
-      { name: "baseSDK", obj: globalAny.baseSDK },
-      { name: "BaseSDK", obj: globalAny.BaseSDK },
-      { name: "BaseWallet", obj: globalAny.BaseWallet },
-      { name: "baseWallet", obj: globalAny.baseWallet },
-    ];
-
-    const found: string[] = [];
-
-    // Helper to attempt calling a function and return the result or false
-    const tryCall = async (fn: Function, arg: any) => {
-      try {
-        const res = fn.call(undefined, arg);
-        if (res && typeof (res as any).then === "function") {
-          return await res;
-        }
-        return res;
-      } catch (err) {
-        return false;
-      }
-    };
-
-    try {
-      for (const c of candidates) {
-        const candidate = c.obj;
-        if (!candidate) continue;
-        found.push(c.name);
-
-        // Preferred shape per Farcaster docs: candidate.actions.swapToken({ ... })
-        try {
-          if (candidate.actions && typeof candidate.actions.swapToken === "function") {
-            const res = await tryCall(candidate.actions.swapToken, payload);
-            // Expecting SwapTokenResult-like object
-            if (res && (res.success === true || res.success === false)) {
-              if (res.success) {
-                setSwapTxs(res.swap?.transactions ?? null);
-                setNativeError(null);
-              } else {
-                setNativeError(`Swap failed: ${res.reason ?? "unknown"} ${res.error?.message ?? ""}`);
-              }
-              setDetectedGlobals(found);
-              return;
-            }
-          }
-        } catch (err) {
-          // continue to other shapes
-        }
-
-        // Also try direct candidate.actions.swapToken if candidate.actions exists but different shape
-        try {
-          if (candidate.actions && typeof candidate.actions === "object" && typeof (candidate.actions as any)["swapToken"] === "function") {
-            const res = await tryCall((candidate.actions as any)["swapToken"], payload);
-            if (res && (res.success === true || res.success === false)) {
-              if (res.success) {
-                setSwapTxs(res.swap?.transactions ?? null);
-                setNativeError(null);
-              } else {
-                setNativeError(`Swap failed: ${res.reason ?? "unknown"} ${res.error?.message ?? ""}`);
-              }
-              setDetectedGlobals(found);
-              return;
-            }
-          }
-        } catch {}
-
-        // Try candidate.swapToken directly
-        try {
-          if (typeof candidate.swapToken === "function") {
-            const res = await tryCall(candidate.swapToken, payload);
-            if (res && (res.success === true || res.success === false)) {
-              if (res.success) {
-                setSwapTxs(res.swap?.transactions ?? null);
-                setNativeError(null);
-              } else {
-                setNativeError(`Swap failed: ${res.reason ?? "unknown"} ${res.error?.message ?? ""}`);
-              }
-              setDetectedGlobals(found);
-              return;
-            }
-          }
-        } catch {}
-
-        // Some implementations accept (sellToken, buyToken, sellAmount)
-        try {
-          if (typeof candidate.swap === "function") {
-            const args = sellAmount ? [sellToken, buyToken, sellAmount] : [sellToken, buyToken];
-            const res = await tryCall(candidate.swap, args);
-            // if res is an object with transactions or boolean, try to interpret it
-            if (res && typeof res === "object" && (res.transactions || res.success !== undefined)) {
-              // try reading transactions
-              if ((res as any).transactions) {
-                setSwapTxs((res as any).transactions);
-                setNativeError(null);
-              } else if ((res as any).success === true && (res as any).swap?.transactions) {
-                setSwapTxs((res as any).swap.transactions);
-                setNativeError(null);
-              } else {
-                setNativeError("Swap invoked but no transactions returned.");
-              }
-              setDetectedGlobals(found);
-              return;
-            }
-            // if res === true assume invoked
-            if (res === true) {
-              setDetectedGlobals(found);
-              setNativeError("Swap invoked (no transactions returned by SDK).");
-              return;
-            }
-          }
-        } catch {}
-      }
-
-      // nothing found / invoked
-      setDetectedGlobals(found.length ? found : []);
-      setNativeError(
-        "No Farcaster or Base mini-app SDK with swapToken support detected. Please open this page in a Farcaster client (with mini-app support) or the Base wallet."
-      );
-    } catch (err: any) {
-      console.error("openBuyTRIV error:", err);
-      setNativeError(`Error invoking native swap: ${err?.message ?? String(err)}`);
-      setDetectedGlobals(found.length ? found : []);
-    }
   };
 
   if (!STAKING_ADDRESS || !TRIV_ADDRESS) {
