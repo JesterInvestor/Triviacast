@@ -322,7 +322,7 @@ export default function StakingWidget() {
           title="Open in Mint Club"
           type="button"
         >
-          Open in Mint Club
+          Stake on Mint Club
         </button>
       </div>
     </div>
