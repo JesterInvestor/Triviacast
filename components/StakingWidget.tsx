@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 import { TRIV_ABI, STAKING_ABI } from "../lib/stakingClient";
 
 const STAKING_ADDRESS = process.env.NEXT_PUBLIC_STAKING_ADDRESS || "";
-const TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || "0xa889a10126024f39a0ccae31d09c18095cb461b8";
+const TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || "";
 
 export default function StakingWidget() {
   const { address, isConnected } = useAccount();
@@ -19,6 +19,16 @@ export default function StakingWidget() {
   const [loading, setLoading] = useState(false);
   const [txStatus, setTxStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
   const [txHash, setTxHash] = useState<string | null>(null);
+
+  const format6 = (val: string) => {
+    try {
+      const n = Number(val);
+      if (!isFinite(n)) return "0.000000";
+      return n.toFixed(6);
+    } catch (e) {
+      return "0.000000";
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -132,110 +142,88 @@ export default function StakingWidget() {
     }
   };
 
-  // Try to open Mint Club as an in-host miniapp for the TRIV staking page.
-  // This will:
-  // 1) Prefer calling host SDKs' openMiniApp (sdk.actions.openMiniApp / openMiniApp variants)
-  // 2) If available, pass the URL for the TRIV staking pool (includes TRIV address as token param)
-  // 3) As a last resort postMessage to parent/top to request the host open the miniapp
-  // 4) If none of the above succeed, fall back to window.open (keeps current behavior)
-  const openMintClubMiniApp = async (e?: React.MouseEvent<HTMLButtonElement>) => {
-    e?.preventDefault();
-    const token = TRIV_ADDRESS.toLowerCase();
-    const url = `https://mint.club/staking/base/160?token=${encodeURIComponent(token)}`;
-
+  // Use Farcaster Mini App SDK's openMiniApp when available:
+  // sdk.actions.openMiniApp({ url })
+  // Fallback to other SDK method names or window.open
+  const tryOpenMiniApp = async (url: string) => {
+    // list of candidate globals that might expose the miniapp sdk
     const globalAny = window as any;
     const candidates = [
-      { name: "window.sdk", obj: globalAny.sdk },
-      { name: "window.farcaster?.sdk", obj: globalAny.farcaster?.sdk },
-      { name: "window.MiniAppSDK", obj: globalAny.MiniAppSDK },
-      { name: "window.miniAppSdk", obj: globalAny.miniAppSdk },
-      { name: "window.farcasterMiniAppSdk", obj: globalAny.farcasterMiniAppSdk },
+      // common global from farcaster examples
+      globalAny.sdk,
+      // possible vendor names / wrappers
+      globalAny.farcaster?.sdk,
+      globalAny.MiniAppSDK,
+      globalAny.miniAppSdk,
+      globalAny.farcasterMiniAppSdk,
     ];
 
-    // Preferred documented shape: sdk.actions.openMiniApp({ url })
-    for (const c of candidates) {
+    for (const candidate of candidates) {
+      if (!candidate) continue;
       try {
-        const candidate = c.obj;
-        if (!candidate) continue;
-
-        // candidate.actions.openMiniApp({ url })
+        // prefer the official actions.openMiniApp API shape
         if (candidate.actions && typeof candidate.actions.openMiniApp === "function") {
-          try {
-            await candidate.actions.openMiniApp({ url });
-            return;
-          } catch (err) {
-            // try alternative param shapes
-            try {
-              await candidate.actions.openMiniApp({ name: "mint.club", params: { url } });
-              return;
-            } catch {}
-          }
+          await candidate.actions.openMiniApp({ url });
+          return true;
         }
-
-        // candidate.openMiniApp({ url }) or candidate.openMiniApp(url)
+        // also accept direct openMiniApp on the candidate
         if (typeof candidate.openMiniApp === "function") {
+          // some implementations accept an object, others accept a string
           try {
             await candidate.openMiniApp({ url });
-            return;
           } catch {
-            try {
-              await candidate.openMiniApp(url);
-              return;
-            } catch {}
+            await candidate.openMiniApp(url);
           }
+          return true;
         }
-
-        // candidate.open({ url }) / candidate.openUrl
-        if (typeof candidate.open === "function") {
+        if (typeof candidate.openMiniapp === "function") {
           try {
-            await candidate.open(url);
-            return;
-          } catch {}
-        }
-        if (typeof candidate.openUrl === "function") {
-          try {
-            await candidate.openUrl(url);
-            return;
-          } catch {}
+            await candidate.openMiniapp({ url });
+          } catch {
+            await candidate.openMiniapp(url);
+          }
+          return true;
         }
       } catch (err) {
-        // ignore candidate errors and continue
-        // eslint-disable-next-line no-console
-        console.warn("openMintClubMiniApp candidate error", c.name, err);
+        // If the SDK throws, treat as failure and continue to next candidate
+        console.error("MiniApp open attempt failed on candidate:", err);
+      }
+
+      // Last resort: try other usual open/navigate methods on the candidate
+      try {
+        if (typeof candidate.open === "function") {
+          await candidate.open(url);
+          return true;
+        }
+        if (typeof candidate.openUrl === "function") {
+          await candidate.openUrl(url);
+          return true;
+        }
+        if (typeof candidate.navigate === "function") {
+          await candidate.navigate(url);
+          return true;
+        }
+      } catch (err) {
+        // ignore and continue
       }
     }
 
-    // If no SDK candidate invoked, try posting a host message (many MiniKit hosts listen for postMessage)
+    return false;
+  };
+
+  const openMintClubSDK = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
+    const url = "https://mint.club/staking/base/160";
+
     try {
-      const messageVariants = [
-        { type: "miniapp:open", url },
-        { type: "miniapp:openMiniApp", url },
-        { type: "miniapp:open", payload: { url } },
-        { type: "miniapp:open", name: "mint.club", params: { url } },
-        { type: "miniapp:open", name: "staking", params: { url } },
-      ];
-      for (const m of messageVariants) {
-        try {
-          window.parent?.postMessage?.(m, "*");
-        } catch {}
-        try {
-          window.top?.postMessage?.(m, "*");
-        } catch {}
-        // small delay so host can pick up messages in order
-        // eslint-disable-next-line no-await-in-loop
-        await new Promise((r) => setTimeout(r, 100));
-      }
-      // leave a small time and then still fallback to window.open if host didn't pick up
-      // Give host a chance; many native hosts will act on the postMessage immediately.
-      setTimeout(() => {
-        // If nothing else, open the URL as a fallback (keeps current behavior)
-        window.open(url, "_blank", "noopener,noreferrer");
-      }, 500);
-      return;
+      const ok = await tryOpenMiniApp(url);
+      if (ok) return;
     } catch (err) {
-      // fallback to web open
-      window.open(url, "_blank", "noopener,noreferrer");
+      console.error("openMintClubSDK failed:", err);
     }
+
+    // Fallback to a simple window.open if SDK-based navigation isn't available
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   if (!STAKING_ADDRESS || !TRIV_ADDRESS) {
@@ -248,17 +236,8 @@ export default function StakingWidget() {
     );
   }
 
-  const format6 = (val: string) => {
-    try {
-      const n = Number(val);
-      if (!isFinite(n)) return "0.000000";
-      return n.toFixed(6);
-    } catch (e) {
-      return "0.000000";
-    }
-  };
-
   return (
+    // container constrained width but flexible height; allow inner scrolling if outer container small
     <div className="mt-6 w-full max-w-2xl text-left">
       <div className="p-6 rounded-xl bg-white/90 border border-[#F4A6B7] shadow-sm text-gray-900 overflow-auto">
         <h2 className="text-lg font-semibold text-gray-900 mb-3">Stake TRIV for Rewards</h2>
@@ -269,6 +248,7 @@ export default function StakingWidget() {
           You can stake using Base App and Rainbow Wallet. Also works in Farcaster desktop and browser w/ wallet extension — sorry for any inconvenience.
         </p>
 
+        {/* 2 columns on small screens to reduce vertical stacking and avoid overflow; cells can shrink */}
         <div className="mb-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="p-3 bg-[#fff0f4] rounded min-w-0 break-words text-sm sm:text-base">Your TRIV: <strong>{format6(tokenBalance)}</strong></div>
           <div className="p-3 bg-[#fff0f4] rounded min-w-0 break-words text-sm sm:text-base">Staked: <strong>{format6(stakedBalance)}</strong></div>
@@ -315,6 +295,7 @@ export default function StakingWidget() {
             </div>
 
             <div className="flex items-center justify-end gap-3">
+              {/* Status area (wraps on narrow screens) */}
               {txStatus !== "idle" && (
                 <div className="text-sm break-words text-right">
                   <strong>Status:</strong> {txStatus}
@@ -332,35 +313,17 @@ export default function StakingWidget() {
         )}
       </div>
 
-      <div className="mt-3 flex justify-end">
-        <div className="inline-flex gap-3 items-center">
-          <a
-            href="https://link.metamask.io/dapp/https://triviacast.xyz/jackpot"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-[#2d1b2e] hover:underline"
-          >
-            Open in MetaMask
-          </a>
-          <a
-            href={`https://rnbwapp.com/wc?uri=${encodeURIComponent("https://triviacast.xyz/jackpot")}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-[#2d1b2e] hover:underline"
-          >
-            Open in Rainbow
-          </a>
-
-          <button
-            onClick={openMintClubMiniApp}
-            className="px-4 py-2 bg-[#FFC4D1] rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
-            aria-label="Open Mint Club miniapp (TRIV staking)"
-            title="Open Mint Club miniapp (TRIV staking)"
-            type="button"
-          >
-            Open Mint Club (Staking TRIV)
-          </button>
-        </div>
+      {/* Prominent Mint Club call-to-action (removed MetaMask and Rainbow links as requested) */}
+      <div className="mt-4 flex justify-end">
+        <button
+          onClick={openMintClubSDK}
+          className="px-6 py-3 rounded-full bg-[#00E6B8] text-black font-semibold text-sm shadow-lg hover:brightness-95 transition focus:outline-none focus:ring-4 focus:ring-[#00E6B8]/30"
+          aria-label="Open in Mint Club"
+          title="Open in Mint Club"
+          type="button"
+        >
+          Open in Mint Club
+        </button>
       </div>
     </div>
   );
