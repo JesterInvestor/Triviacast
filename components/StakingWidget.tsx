@@ -5,49 +5,9 @@ import { useAccount } from "wagmi";
 import { ethers } from "ethers";
 import { TRIV_ABI, STAKING_ABI } from "../lib/stakingClient";
 
-/**
- * StakingWidget — improved "Buy TRIV" native attempt with broader host messaging
- *
- * Changes in this version:
- * - Keeps the Farcaster sdk.actions.swapToken attempt (where available).
- * - If no SDK globals are present (your Detect output showed none), sends a set of
- *   postMessage variants to window.parent and window.top that many hosts / MiniKit
- *   integrations listen for. The messages cover several common shapes:
- *     - { type: "miniapp:swap", ... }
- *     - { type: "onchainkit:send", ... } (json-rpc-like)
- *     - { jsonrpc: "2.0", method: "onchainkit.send", params: ... }
- *     - { type: "base:swap", ... }
- *   The payloads include CAIP-19 asset IDs and metadata for transaction trays (per your "Custom Transaction Trays" reference).
- * - If postMessage variants are posted, the UI reports that a request was posted (the host must support it).
- * - If nothing is detected and postMessage fails to trigger anything, shows helpful diagnostics (detected globals + userAgent) and next steps.
- *
- * Why this should help:
- * - Your Detect SDK output showed every global probe as missing. Many Mini App hosts do not expose a global on window,
- *   and instead the proper integration is via postMessage between the iframe and the host. By broadcasting multiple
- *   message shapes we increase the chance the host will respond and open the native swap UI.
- *
- * How to proceed if this still doesn't work:
- * 1. Open the page in the Base app (or Farcaster mobile) and press "Detect SDK" — if you still see no globals copy the "Diagnostics" block and paste it here.
- * 2. If possible, enable remote web inspector and paste console logs for the page when you press "Buy TRIV".
- * 3. As a last resort we can add a web fallback (Uniswap/Matcha) — but you previously asked to avoid web fallbacks.
- */
-
 const STAKING_ADDRESS = process.env.NEXT_PUBLIC_STAKING_ADDRESS || "";
-const TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || "";
-
-type DetectionEntry = {
-  location: string;
-  globalName: string;
-  exists: boolean;
-  type?: string;
-  hasActions?: boolean;
-  actionsHasSwapToken?: boolean;
-  hasSwapToken?: boolean;
-  hasSwap?: boolean;
-  hasOpenMiniApp?: boolean;
-  hasWalletSend?: boolean;
-  sampleMethods?: string[];
-};
+const TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || "0xa889a10126024f39a0ccae31d09c18095cb461b8";
+const FALLBACK_FROM = "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b";
 
 export default function StakingWidget() {
   const { address, isConnected } = useAccount();
@@ -61,17 +21,19 @@ export default function StakingWidget() {
   const [txStatus, setTxStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
   const [txHash, setTxHash] = useState<string | null>(null);
 
-  // diagnostics + results
-  const [detecting, setDetecting] = useState(false);
-  const [detectionResults, setDetectionResults] = useState<DetectionEntry[] | null>(null);
-  const [detectError, setDetectError] = useState<string | null>(null);
-  const [swapResult, setSwapResult] = useState<any | null>(null);
+  // Posted messages feedback
   const [postedMessages, setPostedMessages] = useState<string[] | null>(null);
-  const [ua, setUa] = useState<string>("");
+  const [nativeNotice, setNativeNotice] = useState<string | null>(null);
 
-  useEffect(() => {
-    setUa(typeof navigator !== "undefined" ? navigator.userAgent : "");
-  }, []);
+  const format6 = (val: string) => {
+    try {
+      const n = Number(val);
+      if (!isFinite(n)) return "0.000000";
+      return n.toFixed(6);
+    } catch (e) {
+      return "0.000000";
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -185,354 +147,61 @@ export default function StakingWidget() {
     }
   };
 
-  // safe access helper
-  const safeGet = (root: any, key: string) => {
-    try {
-      return root?.[key];
-    } catch {
-      return undefined;
-    }
-  };
+  // Simplified Buy TRIV: post the exact message shapes you provided to the host (parent/top).
+  const buyTrivNative = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
+    setPostedMessages(null);
+    setNativeNotice(null);
 
-  const sampleMethods = (obj: any, limit = 12) => {
-    try {
-      if (!obj || (typeof obj !== "object" && typeof obj !== "function")) return [];
-      const names = new Set<string>();
-      Object.getOwnPropertyNames(obj || {}).forEach((n) => names.add(n));
-      try {
-        const proto = Object.getPrototypeOf(obj);
-        if (proto) Object.getOwnPropertyNames(proto || {}).forEach((n) => names.add(n));
-      } catch {}
-      const arr = Array.from(names);
-      const funcs = arr.filter((n) => {
-        try {
-          return typeof (obj as any)[n] === "function";
-        } catch {
-          return false;
-        }
-      });
-      return funcs.slice(0, limit);
-    } catch {
-      return [];
-    }
-  };
-
-  // Detect common SDK globals (non-invasive)
-  const detectSdk = async () => {
-    setDetecting(true);
-    setDetectError(null);
-    setDetectionResults(null);
-    setSwapResult(null);
-
-    try {
-      const toProbe = [
-        { location: "window", root: typeof window !== "undefined" ? window : undefined },
-        {
-          location: "window.parent",
-          root: (() => {
-            try {
-              return window.parent;
-            } catch {
-              return undefined;
-            }
-          })(),
-        },
-        {
-          location: "window.top",
-          root: (() => {
-            try {
-              return window.top;
-            } catch {
-              return undefined;
-            }
-          })(),
-        },
-      ];
-
-      const candidateNames = [
-        "sdk",
-        "farcaster",
-        "farcasterSdk",
-        "farcasterSDK",
-        "farcasterMiniAppSdk",
-        "MiniAppSDK",
-        "miniAppSdk",
-        "fc",
-        "fcSdk",
-        "__fc__",
-        "base",
-        "baseSDK",
-        "BaseSDK",
-        "BaseWallet",
-        "baseWallet",
-        "onchainkit",
-        "OnchainKit",
-        "onchain",
-        "wallet",
-        "walletSdk",
-        "app",
-      ];
-
-      const results: DetectionEntry[] = [];
-
-      for (const probe of toProbe) {
-        const root = probe.root;
-        if (!root) continue;
-        for (const name of candidateNames) {
-          const obj = safeGet(root, name);
-          const exists = typeof obj !== "undefined";
-          if (!exists) {
-            results.push({
-              location: probe.location,
-              globalName: name,
-              exists: false,
-            });
-            continue;
-          }
-
-          const hasActions = typeof safeGet(obj, "actions") === "object";
-          const actionsHasSwapToken = hasActions && typeof safeGet(obj.actions, "swapToken") === "function";
-          const hasSwapToken = typeof safeGet(obj, "swapToken") === "function";
-          const hasSwap = typeof safeGet(obj, "swap") === "function";
-          const hasOpenMiniApp = typeof safeGet(obj, "openMiniApp") === "function" || (obj.actions && typeof safeGet(obj.actions, "openMiniApp") === "function");
-          const walletObj = safeGet(obj, "wallet") ?? obj;
-          const hasWalletSend = walletObj && typeof safeGet(walletObj, "send") === "function";
-
-          results.push({
-            location: probe.location,
-            globalName: name,
-            exists: true,
-            type: typeof obj,
-            hasActions,
-            actionsHasSwapToken,
-            hasSwapToken,
-            hasSwap,
-            hasOpenMiniApp,
-            hasWalletSend,
-            sampleMethods: sampleMethods(obj, 12),
-          });
-        }
-      }
-
-      setDetectionResults(results);
-    } catch (err: any) {
-      console.error("detectSdk error:", err);
-      setDetectError(String(err?.message ?? err));
-    } finally {
-      setDetecting(false);
-    }
-  };
-
-  // Wait briefly for known SDK injection points
-  const waitForSdk = async (timeoutMs = 3000, intervalMs = 200) => {
-    const start = Date.now();
-    const candidateGetters: Array<() => { name: string; obj: any } | null> = [
-      () => ({ name: "window.sdk", obj: (window as any).sdk }),
-      () => ({ name: "window.farcaster?.sdk", obj: (window as any).farcaster?.sdk }),
-      () => ({ name: "window.farcasterSdk", obj: (window as any).farcasterSdk }),
-      () => ({ name: "window.farcasterMiniAppSdk", obj: (window as any).farcasterMiniAppSdk }),
-      () => ({ name: "window.MiniAppSDK", obj: (window as any).MiniAppSDK }),
-      () => ({ name: "window.miniAppSdk", obj: (window as any).miniAppSdk }),
-      () => ({ name: "window.base", obj: (window as any).base }),
-      () => ({ name: "window.onchainkit", obj: (window as any).onchainkit }),
-      () => ({ name: "window.parent.sdk", obj: (() => { try { return (window.parent as any)?.sdk; } catch { return undefined; } })() }),
-      () => ({ name: "window.top.sdk", obj: (() => { try { return (window.top as any)?.sdk; } catch { return undefined; } })() }),
-    ];
-
-    while (Date.now() - start < timeoutMs) {
-      for (const getter of candidateGetters) {
-        try {
-          const got = getter();
-          if (got && got.obj) return got;
-        } catch {}
-      }
-      await new Promise((r) => setTimeout(r, intervalMs));
-    }
-
-    for (const getter of candidateGetters) {
-      try {
-        const got = getter();
-        if (got && got.obj) return got;
-      } catch {}
-    }
-    return null;
-  };
-
-  // Build metadata for transaction tray per documentation
-  const buildMetadata = () => {
-    const hostname = typeof window !== "undefined" ? window.location.hostname : "triviacast";
-    const origin = typeof window !== "undefined" ? window.location.origin : "";
-    return {
+    const fromAddr = (address as string) || FALLBACK_FROM;
+    const token = TRIV_ADDRESS.toLowerCase();
+    const metadata = {
       description: "Buy TRIV",
-      hostname,
-      faviconUrl: `${origin}/favicon.ico`,
+      hostname: "triviacast.xyz",
+      faviconUrl: "https://triviacast.xyz/favicon.ico",
       title: "Triviacast — Buy TRIV",
     };
-  };
 
-  // Broad postMessage shapes we will try (host may listen for one of these)
-  const makePostMessageVariants = (payload: any) => {
-    return [
-      // Simple intent
+    const payload = {
+      sellToken: "eip155:8453/native",
+      buyToken: `eip155:8453/erc20:${token}`,
+      metadata,
+      from: fromAddr,
+      chainId: 8453,
+    };
+
+    const messages = [
       { type: "miniapp:swap", payload },
-      // onchainkit-style 'send' wrapper
       { type: "onchainkit:send", payload },
-      // JSON-RPC-like for hosts that route RPC
       { jsonrpc: "2.0", method: "onchainkit.send", params: payload },
-      // Alternate method name
       { type: "base:swap", payload },
-      // generic swap intent
       { type: "swap", payload },
-      // Name the intent in an envelope
       { type: "miniapp:action", action: "swap", payload },
     ];
-  };
 
-  // Attempt to post messages to parent/top and record which we posted
-  const postMessageToHost = async (messages: any[]) => {
     const posted: string[] = [];
-    try {
-      for (const m of messages) {
-        try {
-          // post to parent and top safely
-          try {
-            window.parent?.postMessage?.(m, "*");
-          } catch {}
-          try {
-            window.top?.postMessage?.(m, "*");
-          } catch {}
-          posted.push(JSON.stringify(m));
-        } catch (err) {
-          // continue
-        }
-        // small delay between posts to increase chance host picks one up in order
-        // (some hosts inspect first message only)
-        // eslint-disable-next-line no-await-in-loop
-        await new Promise((r) => setTimeout(r, 120));
-      }
-    } catch (err) {
-      console.error("postMessageToHost error:", err);
-    }
-    return posted;
-  };
-
-  // Main Buy TRIV native flow:
-  // 1) Try Farcaster sdk.actions.swapToken
-  // 2) If none found, send a series of postMessage variants to the host
-  // 3) As fallback attempt base:// deep link to hint host app
-  const trySwapToken = async (e?: React.MouseEvent<HTMLButtonElement>) => {
-    e?.preventDefault();
-    setDetectError(null);
-    setSwapResult(null);
-    setPostedMessages(null);
-
-    if (!TRIV_ADDRESS) {
-      setDetectError("TRIV contract address not configured (NEXT_PUBLIC_TRIV_ADDRESS).");
-      return;
-    }
-
-    const sellToken = "eip155:8453/native";
-    const buyToken = `eip155:8453/erc20:${TRIV_ADDRESS.toLowerCase()}`;
-
-    let sellAmount: string | undefined = undefined;
-    if (amount && amount.trim() !== "") {
+    for (const m of messages) {
       try {
-        sellAmount = ethers.parseUnits(amount.trim(), 18).toString();
-      } catch (err) {
-        console.warn("Could not parse sell amount:", err);
-      }
-    }
-
-    const farcasterPayload: any = { sellToken, buyToken };
-    if (sellAmount) farcasterPayload.sellAmount = sellAmount;
-
-    // 1) Try Farcaster SDK if present
-    try {
-      const found = await waitForSdk(2000, 150);
-      if (found && found.obj) {
-        const sdkObj = found.obj;
-        if (sdkObj.actions && typeof sdkObj.actions.swapToken === "function") {
-          const res = await sdkObj.actions.swapToken(farcasterPayload);
-          setSwapResult({ method: `${found.name}.actions.swapToken`, result: res });
-          return;
-        }
-        if (typeof sdkObj.swapToken === "function") {
-          const res = await sdkObj.swapToken(farcasterPayload);
-          setSwapResult({ method: `${found.name}.swapToken`, result: res });
-          return;
-        }
-      }
-    } catch (err) {
-      console.warn("Farcaster attempt threw:", err);
-    }
-
-    // 2) PostMessage variants (host-driven integrations often listen for postMessage)
-    try {
-      const metadata = buildMetadata();
-      const hostPayload = {
-        sellToken,
-        buyToken,
-        sellAmount: sellAmount || undefined,
-        metadata,
-        from: address ?? undefined,
-        chainId: 8453,
-      };
-
-      const variants = makePostMessageVariants(hostPayload);
-      const posted = await postMessageToHost(variants);
-      setPostedMessages(posted);
-
-      // Give the host a moment to react; show message to user explaining what's happened
-      setDetectError(
-        "Posted native swap requests to the host (several message shapes). If you're inside Base App or Farcaster, the host may open the swap UI. " +
-          "If nothing happens, press Detect SDK and paste the detection JSON here so I can adapt to the exact integration the host exposes."
-      );
-
-      // Try a base:// deep link as an additional hint (mobile only). We won't open a web Uniswap fallback.
-      try {
-        const deepLink = `base://swap?sellToken=ETH&buyToken=${encodeURIComponent(TRIV_ADDRESS)}`;
-        // Try assign first (works in many in-app browsers), then open
         try {
-          window.location.assign(deepLink);
+          window.parent?.postMessage?.(m, "*");
         } catch {}
-        setTimeout(() => {
-          try {
-            window.open(deepLink, "_blank");
-          } catch {}
-        }, 250);
-      } catch {}
-      return;
-    } catch (err) {
-      console.error("postMessage variants failed:", err);
+        try {
+          window.top?.postMessage?.(m, "*");
+        } catch {}
+        posted.push(JSON.stringify(m));
+      } catch (err) {
+        // ignore individual failures
+      }
+      // small gap to increase chance host picks up the messages in order
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((r) => setTimeout(r, 120));
     }
 
-    // 3) Final diagnostics: nothing worked
-    setDetectError(
-      "No native SDK detected and host postMessage attempts were sent but there was no visible response. " +
-        "Please paste the 'SDK detection results' JSON and the browser userAgent shown below so I can tailor the exact call to your environment."
+    setPostedMessages(posted);
+    setNativeNotice(
+      "Posted several native swap messages to the host. If you're inside Base App or Farcaster the host may open the swap UI. " +
+        "If nothing happens, enable remote web inspector and check host console or paste the posted messages + userAgent here and I'll adapt further."
     );
-  };
-
-  const openMintClub = async (e?: React.MouseEvent<HTMLButtonElement>) => {
-    e?.preventDefault();
-    const url = "https://mint.club/staking/base/160";
-    // Try Farcaster open first if present
-    try {
-      const sdk = (window as any).sdk ?? (window as any).farcaster?.sdk;
-      if (sdk && sdk.actions && typeof sdk.actions.openMiniApp === "function") {
-        await sdk.actions.openMiniApp({ url });
-        return;
-      }
-      if (sdk && typeof sdk.openMiniApp === "function") {
-        try {
-          await sdk.openMiniApp({ url });
-        } catch {
-          await sdk.openMiniApp(url);
-        }
-        return;
-      }
-    } catch {}
-    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   if (!STAKING_ADDRESS || !TRIV_ADDRESS) {
@@ -544,16 +213,6 @@ export default function StakingWidget() {
       </div>
     );
   }
-
-  const format6 = (val: string) => {
-    try {
-      const n = Number(val);
-      if (!isFinite(n)) return "0.000000";
-      return n.toFixed(6);
-    } catch (e) {
-      return "0.000000";
-    }
-  };
 
   return (
     <div className="mt-6 w-full max-w-2xl text-left">
@@ -649,28 +308,7 @@ export default function StakingWidget() {
           </a>
 
           <button
-            onClick={openMintClub}
-            className="px-4 py-2 bg-[#FFC4D1] rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
-            aria-label="Open in Mint Club"
-            title="Open in Mint Club"
-            type="button"
-          >
-            Open in Mint Club
-          </button>
-
-          <button
-            onClick={detectSdk}
-            disabled={detecting}
-            className="px-4 py-2 bg-white border rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
-            aria-label="Detect SDK"
-            title="Detect Farcaster/Base SDK in this environment"
-            type="button"
-          >
-            {detecting ? "Detecting…" : "Detect SDK"}
-          </button>
-
-          <button
-            onClick={trySwapToken}
+            onClick={buyTrivNative}
             className="px-4 py-2 bg-white border rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
             aria-label="Buy TRIV (native)"
             title="Buy TRIV (native)"
@@ -681,45 +319,18 @@ export default function StakingWidget() {
         </div>
       </div>
 
-      {/* Diagnostics */}
-      <div className="mt-4">
-        {detectError && (
-          <div className="p-3 rounded bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm mb-3">
-            {detectError}
-          </div>
-        )}
+      {nativeNotice && (
+        <div className="mt-3 p-3 rounded bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm">
+          {nativeNotice}
+        </div>
+      )}
 
-        {detectionResults && detectionResults.length > 0 && (
-          <div className="p-3 rounded bg-gray-50 border border-gray-200 text-sm text-gray-900 mb-3">
-            <div className="font-semibold mb-2">SDK detection results (copy & paste here if things fail):</div>
-            <pre className="whitespace-pre-wrap text-xs max-h-56 overflow-auto">
-              {JSON.stringify(detectionResults, null, 2)}
-            </pre>
-            <div className="mt-2 text-xs text-gray-600">
-              If you see an entry with exists:true and actionsHasSwapToken:true (or hasWalletSend:true), press Buy TRIV.
-              If nothing works, paste this JSON into the chat and I will adapt the call to the exact global/method your client exposes.
-            </div>
-          </div>
-        )}
-
-        {postedMessages && postedMessages.length > 0 && (
-          <div className="p-3 rounded bg-blue-50 border border-blue-200 text-sm text-blue-800 mb-3">
-            <div className="font-semibold mb-1">Posted messages to host (multiple shapes):</div>
-            <pre className="whitespace-pre-wrap text-xs max-h-56 overflow-auto">{postedMessages.join("\n\n")}</pre>
-            <div className="mt-2 text-xs text-gray-600">
-              If the host supports a message shape above it should open the native swap UI. If nothing happens, please paste the detection JSON + this userAgent:
-              <div className="mt-1 font-mono text-xs">{ua}</div>
-            </div>
-          </div>
-        )}
-
-        {swapResult && (
-          <div className="p-3 rounded bg-green-50 border border-green-200 text-sm text-green-800 mb-3">
-            <div className="font-semibold mb-1">Swap invocation result:</div>
-            <pre className="whitespace-pre-wrap text-xs max-h-56 overflow-auto">{JSON.stringify(swapResult, null, 2)}</pre>
-          </div>
-        )}
-      </div>
+      {postedMessages && postedMessages.length > 0 && (
+        <div className="mt-3 p-3 rounded bg-blue-50 border border-blue-200 text-sm text-blue-800">
+          <div className="font-semibold mb-1">Posted messages to host (these exact shapes):</div>
+          <pre className="whitespace-pre-wrap text-xs max-h-56 overflow-auto">{postedMessages.join("\n\n")}</pre>
+        </div>
+      )}
     </div>
   );
 }
