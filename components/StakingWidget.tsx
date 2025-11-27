@@ -20,6 +20,11 @@ export default function StakingWidget() {
   const [txStatus, setTxStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
   const [txHash, setTxHash] = useState<string | null>(null);
 
+  // Diagnostics + swap result state
+  const [nativeError, setNativeError] = useState<string | null>(null);
+  const [detectedGlobals, setDetectedGlobals] = useState<string[] | null>(null);
+  const [swapTxs, setSwapTxs] = useState<string[] | null>(null);
+
   const format6 = (val: string) => {
     try {
       const n = Number(val);
@@ -142,183 +147,208 @@ export default function StakingWidget() {
     }
   };
 
-  // Use Farcaster Mini App SDK's openMiniApp when available:
-  // sdk.actions.openMiniApp({ url }) or sdk.actions.openMiniApp({ name, params }) depending on SDK
-  // Fallbacks below try common Base SDK globals and methods, but NO web fallbacks are used here.
-  const tryOpenMiniApp = async (payload: any) => {
-    const globalAny = window as any;
-    const candidates = [
-      globalAny.sdk,
-      globalAny.farcaster?.sdk,
-      globalAny.MiniAppSDK,
-      globalAny.miniAppSdk,
-      globalAny.farcasterMiniAppSdk,
-    ];
-
-    for (const candidate of candidates) {
-      if (!candidate) continue;
-      try {
-        // prefer actions.openMiniApp with a URL or structured payload
-        if (candidate.actions && typeof candidate.actions.openMiniApp === "function") {
-          await candidate.actions.openMiniApp(payload);
-          return true;
-        }
-        // direct openMiniApp variants
-        if (typeof candidate.openMiniApp === "function") {
-          try {
-            await candidate.openMiniApp(payload);
-          } catch {
-            // try calling with payload.url if payload is an object
-            if (payload && payload.url) {
-              await candidate.openMiniApp(payload.url);
-            } else {
-              await candidate.openMiniApp(String(payload));
-            }
-          }
-          return true;
-        }
-        if (typeof candidate.openMiniapp === "function") {
-          try {
-            await candidate.openMiniapp(payload);
-          } catch {
-            if (payload && payload.url) {
-              await candidate.openMiniapp(payload.url);
-            } else {
-              await candidate.openMiniapp(String(payload));
-            }
-          }
-          return true;
-        }
-      } catch (err) {
-        console.error("MiniApp open attempt failed on candidate:", err);
-      }
-    }
-
-    return false;
-  };
-
+  // Open Mint Club (keeps web fallback)
   const openMintClubSDK = async (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.preventDefault();
     const url = "https://mint.club/staking/base/160";
 
+    // Try Farcaster mini-app open first
     try {
-      const ok = await tryOpenMiniApp({ url });
-      if (ok) return;
+      const globalAny = window as any;
+      const sdkCandidates = [globalAny.sdk, globalAny.farcaster?.sdk, globalAny.MiniAppSDK, globalAny.miniAppSdk, globalAny.farcasterMiniAppSdk];
+      for (const candidate of sdkCandidates) {
+        if (!candidate) continue;
+        try {
+          if (candidate.actions && typeof candidate.actions.openMiniApp === "function") {
+            await candidate.actions.openMiniApp({ url });
+            return;
+          }
+          if (typeof candidate.openMiniApp === "function") {
+            try {
+              await candidate.openMiniApp({ url });
+            } catch {
+              await candidate.openMiniApp(url);
+            }
+            return;
+          }
+        } catch {}
+      }
     } catch (err) {
-      console.error("openMintClubSDK failed:", err);
+      console.error("openMintClubSDK native attempt failed:", err);
     }
 
-    // Fallback to a simple window.open if SDK-based navigation isn't available
+    // fallback to web
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  // Native-only Buy TRIV flow:
-  // - Try Farcaster mini app using structured payloads (no web fallback)
-  // - Try Base-native SDK globals and their swap/openSwap methods
-  // - If no native SDK found, show an alert (NO web redirect)
+  // Farcaster / Base native swap using sdk.actions.swapToken per the Farcaster miniapp docs you provided
+  // - sellToken: eip155:8453/native (Base native ETH)
+  // - buyToken: eip155:8453/erc20:<TRIV_ADDRESS>
+  // - optionally pass sellAmount if user entered an amount (converted to base units)
   const openBuyTRIV = async (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.preventDefault();
-    const tokenAddress = TRIV_ADDRESS || "0xa889A10126024F39A0ccae31D09C18095CB461B8";
-    const chainId = 8453; // Base chain id used in your app previously
 
-    // 1) Try Farcaster Mini App open with a structured payload (preferred)
-    try {
-      // Many Farcaster miniapp implementations accept an object like { url } but some accept structured params.
-      // We attempt both common shapes but do NOT provide an http web fallback.
-      const payloads = [
-        // structured params (some SDKs accept { name, params })
-        { name: "swap", params: { sellToken: "ETH", buyToken: tokenAddress, chainId } },
-        // legacy URL-like scheme that an SDK may map internally
-        { url: `base://swap?sellToken=ETH&buyToken=${tokenAddress}&chainId=${chainId}` },
-        // generic intent-style payload
-        { intent: "swap", sellToken: "ETH", buyToken: tokenAddress, chainId },
-      ];
+    setNativeError(null);
+    setDetectedGlobals(null);
+    setSwapTxs(null);
 
-      for (const p of payloads) {
-        try {
-          const ok = await tryOpenMiniApp(p);
-          if (ok) return;
-        } catch (err) {
-          // try next payload
-        }
-      }
-    } catch (err) {
-      console.error("Farcaster mini-app attempts failed:", err);
+    if (!TRIV_ADDRESS) {
+      setNativeError("TRIV contract address not configured (NEXT_PUBLIC_TRIV_ADDRESS).");
+      return;
     }
 
-    // 2) Try Base-native SDK globals: call swap/openSwap if available (native-only)
+    const tokenAddress = TRIV_ADDRESS.toLowerCase();
+    const sellToken = "eip155:8453/native";
+    const buyToken = `eip155:8453/erc20:${tokenAddress}`;
+
+    // If user entered an amount, convert to wei (string). Otherwise undefined to just prefill tokens.
+    let sellAmount: string | undefined = undefined;
     try {
-      const globalAny = window as any;
-      const baseCandidates = [
-        globalAny.baseSDK,
-        globalAny.BaseSDK,
-        globalAny.BaseWallet,
-        globalAny.baseWallet,
-        globalAny.base,
-      ];
+      if (amount && amount.trim() !== "") {
+        // parseUnits may throw; guard it
+        sellAmount = ethers.parseUnits(amount, 18).toString();
+      }
+    } catch (err) {
+      console.warn("Could not parse sell amount, ignoring sellAmount param:", err);
+      sellAmount = undefined;
+    }
 
-      for (const candidate of baseCandidates) {
+    const payload: any = {
+      sellToken,
+      buyToken,
+    } as any;
+    if (sellAmount) payload.sellAmount = sellAmount;
+
+    // Candidate globals to check (Farcaster primary, but include a few variants)
+    const globalAny = window as any;
+    const candidates = [
+      { name: "sdk", obj: globalAny.sdk },
+      { name: "farcaster.sdk", obj: globalAny.farcaster?.sdk },
+      { name: "farcasterSdk", obj: globalAny.farcasterSdk },
+      { name: "farcasterMiniAppSdk", obj: globalAny.farcasterMiniAppSdk },
+      { name: "MiniAppSDK", obj: globalAny.MiniAppSDK },
+      { name: "miniAppSdk", obj: globalAny.miniAppSdk },
+      // also try some Base wallet/global names in case the Base SDK exposes a similar API
+      { name: "baseSDK", obj: globalAny.baseSDK },
+      { name: "BaseSDK", obj: globalAny.BaseSDK },
+      { name: "BaseWallet", obj: globalAny.BaseWallet },
+      { name: "baseWallet", obj: globalAny.baseWallet },
+    ];
+
+    const found: string[] = [];
+
+    // Helper to attempt calling a function and return the result or false
+    const tryCall = async (fn: Function, arg: any) => {
+      try {
+        const res = fn.call(undefined, arg);
+        if (res && typeof (res as any).then === "function") {
+          return await res;
+        }
+        return res;
+      } catch (err) {
+        return false;
+      }
+    };
+
+    try {
+      for (const c of candidates) {
+        const candidate = c.obj;
         if (!candidate) continue;
+        found.push(c.name);
 
-        // Prefer a structured swap API if present
+        // Preferred shape per Farcaster docs: candidate.actions.swapToken({ ... })
+        try {
+          if (candidate.actions && typeof candidate.actions.swapToken === "function") {
+            const res = await tryCall(candidate.actions.swapToken, payload);
+            // Expecting SwapTokenResult-like object
+            if (res && (res.success === true || res.success === false)) {
+              if (res.success) {
+                setSwapTxs(res.swap?.transactions ?? null);
+                setNativeError(null);
+              } else {
+                setNativeError(`Swap failed: ${res.reason ?? "unknown"} ${res.error?.message ?? ""}`);
+              }
+              setDetectedGlobals(found);
+              return;
+            }
+          }
+        } catch (err) {
+          // continue to other shapes
+        }
+
+        // Also try direct candidate.actions.swapToken if candidate.actions exists but different shape
+        try {
+          if (candidate.actions && typeof candidate.actions === "object" && typeof (candidate.actions as any)["swapToken"] === "function") {
+            const res = await tryCall((candidate.actions as any)["swapToken"], payload);
+            if (res && (res.success === true || res.success === false)) {
+              if (res.success) {
+                setSwapTxs(res.swap?.transactions ?? null);
+                setNativeError(null);
+              } else {
+                setNativeError(`Swap failed: ${res.reason ?? "unknown"} ${res.error?.message ?? ""}`);
+              }
+              setDetectedGlobals(found);
+              return;
+            }
+          }
+        } catch {}
+
+        // Try candidate.swapToken directly
+        try {
+          if (typeof candidate.swapToken === "function") {
+            const res = await tryCall(candidate.swapToken, payload);
+            if (res && (res.success === true || res.success === false)) {
+              if (res.success) {
+                setSwapTxs(res.swap?.transactions ?? null);
+                setNativeError(null);
+              } else {
+                setNativeError(`Swap failed: ${res.reason ?? "unknown"} ${res.error?.message ?? ""}`);
+              }
+              setDetectedGlobals(found);
+              return;
+            }
+          }
+        } catch {}
+
+        // Some implementations accept (sellToken, buyToken, sellAmount)
         try {
           if (typeof candidate.swap === "function") {
-            // try structured param object first
-            try {
-              await candidate.swap({ sellToken: "ETH", buyToken: tokenAddress, chainId });
-            } catch {
-              // fallback to positional args if provider expects them
-              await candidate.swap("ETH", tokenAddress, chainId);
+            const args = sellAmount ? [sellToken, buyToken, sellAmount] : [sellToken, buyToken];
+            const res = await tryCall(candidate.swap, args);
+            // if res is an object with transactions or boolean, try to interpret it
+            if (res && typeof res === "object" && (res.transactions || res.success !== undefined)) {
+              // try reading transactions
+              if ((res as any).transactions) {
+                setSwapTxs((res as any).transactions);
+                setNativeError(null);
+              } else if ((res as any).success === true && (res as any).swap?.transactions) {
+                setSwapTxs((res as any).swap.transactions);
+                setNativeError(null);
+              } else {
+                setNativeError("Swap invoked but no transactions returned.");
+              }
+              setDetectedGlobals(found);
+              return;
             }
-            return;
-          }
-
-          if (typeof candidate.openSwap === "function") {
-            try {
-              await candidate.openSwap({ sellToken: "ETH", buyToken: tokenAddress, chainId });
-            } catch {
-              await candidate.openSwap(`sell=ETH&buy=${tokenAddress}&chain=${chainId}`);
+            // if res === true assume invoked
+            if (res === true) {
+              setDetectedGlobals(found);
+              setNativeError("Swap invoked (no transactions returned by SDK).");
+              return;
             }
-            return;
           }
-
-          // Some SDKs expose a generic "open" or "openUrl" and might accept a base:// style deep intent
-          if (typeof candidate.open === "function") {
-            try {
-              await candidate.open({ action: "swap", sellToken: "ETH", buyToken: tokenAddress, chainId });
-            } catch {
-              // best-effort: try with a small structured intent
-              await candidate.open({ urlScheme: `base://swap?sellToken=ETH&buyToken=${tokenAddress}&chainId=${chainId}` });
-            }
-            return;
-          }
-
-          if (typeof candidate.openUrl === "function") {
-            try {
-              await candidate.openUrl({ sellToken: "ETH", buyToken: tokenAddress, chainId });
-            } catch {
-              await candidate.openUrl(`base://swap?sellToken=ETH&buyToken=${tokenAddress}&chainId=${chainId}`);
-            }
-            return;
-          }
-        } catch (err) {
-          // move to next candidate if this one failed
-          console.error("Base candidate swap/open attempt failed:", err);
-        }
+        } catch {}
       }
-    } catch (err) {
-      console.error("Base SDK attempts threw:", err);
-    }
 
-    // 3) NO web fallbacks per your request. Notify user that native SDK wasn't found.
-    try {
-      // Use a non-intrusive alert; you can replace this with a UI toast/modal as desired.
-      window.alert(
-        "No native swap SDK detected. Please open the Base wallet or a Farcaster client with mini-app support to buy TRIV directly from your app."
+      // nothing found / invoked
+      setDetectedGlobals(found.length ? found : []);
+      setNativeError(
+        "No Farcaster or Base mini-app SDK with swapToken support detected. Please open this page in a Farcaster client (with mini-app support) or the Base wallet."
       );
-    } catch (err) {
-      // If alerts are blocked, fail silently.
-      console.error("Could not display alert about missing native SDK:", err);
+    } catch (err: any) {
+      console.error("openBuyTRIV error:", err);
+      setNativeError(`Error invoking native swap: ${err?.message ?? String(err)}`);
+      setDetectedGlobals(found.length ? found : []);
     }
   };
 
@@ -333,7 +363,6 @@ export default function StakingWidget() {
   }
 
   return (
-    // container constrained width but flexible height; allow inner scrolling if outer container small
     <div className="mt-6 w-full max-w-2xl text-left">
       <div className="p-6 rounded-xl bg-white/90 border border-[#F4A6B7] shadow-sm text-gray-900 overflow-auto">
         <h2 className="text-lg font-semibold text-gray-900 mb-3">Stake TRIV for Rewards</h2>
@@ -344,7 +373,6 @@ export default function StakingWidget() {
           You can stake using Base App and Rainbow Wallet. Also works in Farcaster desktop and browser w/ wallet extension — sorry for any inconvenience.
         </p>
 
-        {/* 2 columns on small screens to reduce vertical stacking and avoid overflow; cells can shrink */}
         <div className="mb-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="p-3 bg-[#fff0f4] rounded min-w-0 break-words text-sm sm:text-base">Your TRIV: <strong>{format6(tokenBalance)}</strong></div>
           <div className="p-3 bg-[#fff0f4] rounded min-w-0 break-words text-sm sm:text-base">Staked: <strong>{format6(stakedBalance)}</strong></div>
@@ -391,7 +419,6 @@ export default function StakingWidget() {
             </div>
 
             <div className="flex items-center justify-end gap-3">
-              {/* Status area (wraps on narrow screens) */}
               {txStatus !== "idle" && (
                 <div className="text-sm break-words text-right">
                   <strong>Status:</strong> {txStatus}
@@ -408,7 +435,7 @@ export default function StakingWidget() {
           </div>
         )}
       </div>
-      {/* deeplinks for MetaMask, Rainbow, Mint Club, and the native-only Buy TRIV button */}
+
       <div className="mt-3 flex justify-end">
         <div className="inline-flex gap-3 items-center">
           <a
@@ -428,7 +455,6 @@ export default function StakingWidget() {
             Open in Rainbow
           </a>
 
-          {/* Mint Club: prefer sdk.actions.openMiniApp({ url }) */}
           <button
             onClick={openMintClubSDK}
             className="px-4 py-2 bg-[#FFC4D1] rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
@@ -439,7 +465,6 @@ export default function StakingWidget() {
             Open in Mint Club
           </button>
 
-          {/* Buy TRIV: native SDKs only (Farcaster / Base SDK). No Uniswap or web fallback per request */}
           <button
             onClick={openBuyTRIV}
             className="px-4 py-2 bg-white border rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
@@ -451,6 +476,34 @@ export default function StakingWidget() {
           </button>
         </div>
       </div>
+
+      {/* Native SDK diagnostics & messages */}
+      {nativeError && (
+        <div className="mt-3 p-3 rounded bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm">
+          {nativeError}
+          {detectedGlobals && detectedGlobals.length > 0 && (
+            <div className="mt-2 text-xs text-gray-700">
+              Detected globals: {detectedGlobals.join(", ")}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Swap transactions (if any) */}
+      {swapTxs && swapTxs.length > 0 && (
+        <div className="mt-3 p-3 rounded bg-green-50 border border-green-200 text-green-800 text-sm">
+          Swap invoked successfully. Transactions:
+          <ul className="mt-2 list-disc list-inside text-xs text-gray-700">
+            {swapTxs.map((t) => (
+              <li key={t}>
+                <a href={`https://basescan.org/tx/${t}`} target="_blank" rel="noreferrer" className="text-blue-700 hover:underline">
+                  {t}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
