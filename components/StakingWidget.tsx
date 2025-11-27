@@ -142,136 +142,100 @@ export default function StakingWidget() {
     }
   };
 
-  // Attempt to open Mint Club via an available SDK using "openMiniApp" (or several common variants),
-  // falling back to open/other methods and finally window.open
-  const openMintClubSDK = (e?: React.MouseEvent) => {
+  // Use Farcaster Mini App SDK's openMiniApp when available:
+  // sdk.actions.openMiniApp({ url })
+  // Fallback to other SDK method names or window.open
+  const tryOpenMiniApp = async (url: string) => {
+    // list of candidate globals that might expose the miniapp sdk
+    const globalAny = window as any;
+    const candidates = [
+      // common global from farcaster examples
+      globalAny.sdk,
+      // possible vendor names / wrappers
+      globalAny.farcaster?.sdk,
+      globalAny.MiniAppSDK,
+      globalAny.miniAppSdk,
+      globalAny.farcasterMiniAppSdk,
+    ];
+
+    for (const candidate of candidates) {
+      if (!candidate) continue;
+      try {
+        // prefer the official actions.openMiniApp API shape
+        if (candidate.actions && typeof candidate.actions.openMiniApp === "function") {
+          await candidate.actions.openMiniApp({ url });
+          return true;
+        }
+        // also accept direct openMiniApp on the candidate
+        if (typeof candidate.openMiniApp === "function") {
+          // some implementations accept an object, others accept a string
+          try {
+            await candidate.openMiniApp({ url });
+          } catch {
+            await candidate.openMiniApp(url);
+          }
+          return true;
+        }
+        if (typeof candidate.openMiniapp === "function") {
+          try {
+            await candidate.openMiniapp({ url });
+          } catch {
+            await candidate.openMiniapp(url);
+          }
+          return true;
+        }
+      } catch (err) {
+        // If the SDK throws, treat as failure and continue to next candidate
+        console.error("MiniApp open attempt failed on candidate:", err);
+      }
+
+      // Last resort: try other usual open/navigate methods on the candidate
+      try {
+        if (typeof candidate.open === "function") {
+          await candidate.open(url);
+          return true;
+        }
+        if (typeof candidate.openUrl === "function") {
+          await candidate.openUrl(url);
+          return true;
+        }
+        if (typeof candidate.navigate === "function") {
+          await candidate.navigate(url);
+          return true;
+        }
+      } catch (err) {
+        // ignore and continue
+      }
+    }
+
+    return false;
+  };
+
+  const openMintClubSDK = async (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.preventDefault();
     const url = "https://mint.club/staking/base/160";
 
     try {
-      const globalAny = window as any;
-      const sdkCandidates = [globalAny.mintClub, globalAny.MintClub, globalAny.MintClubSDK];
-
-      // prefer openMiniApp/openMiniapp if available
-      for (const candidate of sdkCandidates) {
-        if (!candidate) continue;
-        if (typeof candidate.openMiniApp === "function") {
-          try {
-            candidate.openMiniApp(url);
-            return;
-          } catch {
-            try {
-              candidate.openMiniApp({ url });
-              return;
-            } catch {
-              // continue trying other methods
-            }
-          }
-        }
-        if (typeof candidate.openMiniapp === "function") {
-          try {
-            candidate.openMiniapp(url);
-            return;
-          } catch {
-            try {
-              candidate.openMiniapp({ url });
-              return;
-            } catch {
-              // continue
-            }
-          }
-        }
-      }
-
-      // fallback to previously used method names
-      for (const candidate of sdkCandidates) {
-        if (!candidate) continue;
-        if (typeof candidate.open === "function") {
-          candidate.open(url);
-          return;
-        }
-        if (typeof candidate.openUrl === "function") {
-          candidate.openUrl(url);
-          return;
-        }
-        if (typeof candidate.navigate === "function") {
-          candidate.navigate(url);
-          return;
-        }
-      }
+      const ok = await tryOpenMiniApp(url);
+      if (ok) return;
     } catch (err) {
-      // ignore and fallback
+      console.error("openMintClubSDK failed:", err);
     }
 
+    // Fallback to a simple window.open if SDK-based navigation isn't available
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  // Attempt to open Matcha via an available SDK using "openMiniApp" (or variants), falling back to other methods
-  const openMatchaSDK = (e?: React.MouseEvent) => {
+  const openMatchaSDK = async (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.preventDefault();
-    const url = "https://matcha.xyz/tokens/base/0xa889A10126024F39A0ccae31D09C18095CB461B8?sellChain=8453&sellAddress=0x4200000000000000000000000000000000000006";
+    const url =
+      "https://matcha.xyz/tokens/base/0xa889A10126024F39A0ccae31D09C18095CB461B8?sellChain=8453&sellAddress=0x4200000000000000000000000000000000000006";
 
     try {
-      const globalAny = window as any;
-      const sdkCandidates = [globalAny.matcha, globalAny.Matcha, globalAny.MatchaSDK, globalAny.MatchaApp];
-
-      // prefer openMiniApp/openMiniapp if available
-      for (const candidate of sdkCandidates) {
-        if (!candidate) continue;
-        if (typeof candidate.openMiniApp === "function") {
-          try {
-            candidate.openMiniApp(url);
-            return;
-          } catch {
-            try {
-              candidate.openMiniApp({ url });
-              return;
-            } catch {
-              // continue trying other methods
-            }
-          }
-        }
-        if (typeof candidate.openMiniapp === "function") {
-          try {
-            candidate.openMiniapp(url);
-            return;
-          } catch {
-            try {
-              candidate.openMiniapp({ url });
-              return;
-            } catch {
-              // continue
-            }
-          }
-        }
-      }
-
-      // fallback to other common method names
-      for (const candidate of sdkCandidates) {
-        if (!candidate) continue;
-        if (typeof candidate.open === "function") {
-          candidate.open(url);
-          return;
-        }
-        if (typeof candidate.openUrl === "function") {
-          candidate.openUrl(url);
-          return;
-        }
-        if (typeof candidate.navigate === "function") {
-          candidate.navigate(url);
-          return;
-        }
-        if (typeof candidate.show === "function") {
-          candidate.show(url);
-          return;
-        }
-        if (typeof candidate.launch === "function") {
-          candidate.launch(url);
-          return;
-        }
-      }
+      const ok = await tryOpenMiniApp(url);
+      if (ok) return;
     } catch (err) {
-      // ignore and fallback
+      console.error("openMatchaSDK failed:", err);
     }
 
     window.open(url, "_blank", "noopener,noreferrer");
@@ -363,7 +327,7 @@ export default function StakingWidget() {
           </div>
         )}
       </div>
-      {/* deeplinks for MetaMask, Rainbow, Mint Club, and Matcha (SDK openMiniApp preferred) placed inside the staking widget */}
+      {/* deeplinks for MetaMask, Rainbow, Mint Club, and Matcha (prefer openMiniApp via miniapp SDK) placed inside the staking widget */}
       <div className="mt-3 flex justify-end">
         <div className="inline-flex gap-3 items-center">
           <a
@@ -383,7 +347,7 @@ export default function StakingWidget() {
             Open in Rainbow
           </a>
 
-          {/* Mint Club SDK openMiniApp: tries SDK first, falls back to window.open */}
+          {/* Mint Club: prefer sdk.actions.openMiniApp({ url }) */}
           <button
             onClick={openMintClubSDK}
             className="px-4 py-2 bg-[#FFC4D1] rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
@@ -394,7 +358,7 @@ export default function StakingWidget() {
             Open in Mint Club
           </button>
 
-          {/* Matcha SDK openMiniApp: tries SDK first, falls back to window.open */}
+          {/* Matcha: prefer sdk.actions.openMiniApp({ url }) */}
           <button
             onClick={openMatchaSDK}
             className="px-4 py-2 bg-white border rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
