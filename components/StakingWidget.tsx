@@ -143,73 +143,54 @@ export default function StakingWidget() {
   };
 
   // Use Farcaster Mini App SDK's openMiniApp when available:
-  // sdk.actions.openMiniApp({ url })
-  // Fallback to other SDK method names or window.open
-  const tryOpenMiniApp = async (url: string) => {
-    // list of candidate globals that might expose the miniapp sdk
+  // sdk.actions.openMiniApp({ url }) or sdk.actions.openMiniApp({ name, params }) depending on SDK
+  // Fallbacks below try common Base SDK globals and methods, but NO web fallbacks are used here.
+  const tryOpenMiniApp = async (payload: any) => {
     const globalAny = window as any;
     const candidates = [
-      // Farcaster / generic candidate
       globalAny.sdk,
-      // possible vendor names / wrappers
       globalAny.farcaster?.sdk,
       globalAny.MiniAppSDK,
       globalAny.miniAppSdk,
       globalAny.farcasterMiniAppSdk,
-      // Base-related SDK candidates (common naming patterns)
-      globalAny.baseSDK,
-      globalAny.BaseSDK,
-      globalAny.BaseWallet,
-      globalAny.baseWallet,
-      globalAny.base,
     ];
 
     for (const candidate of candidates) {
       if (!candidate) continue;
       try {
-        // prefer the official actions.openMiniApp API shape
+        // prefer actions.openMiniApp with a URL or structured payload
         if (candidate.actions && typeof candidate.actions.openMiniApp === "function") {
-          await candidate.actions.openMiniApp({ url });
+          await candidate.actions.openMiniApp(payload);
           return true;
         }
-        // also accept direct openMiniApp on the candidate
+        // direct openMiniApp variants
         if (typeof candidate.openMiniApp === "function") {
           try {
-            await candidate.openMiniApp({ url });
+            await candidate.openMiniApp(payload);
           } catch {
-            await candidate.openMiniApp(url);
+            // try calling with payload.url if payload is an object
+            if (payload && payload.url) {
+              await candidate.openMiniApp(payload.url);
+            } else {
+              await candidate.openMiniApp(String(payload));
+            }
           }
           return true;
         }
         if (typeof candidate.openMiniapp === "function") {
           try {
-            await candidate.openMiniapp({ url });
+            await candidate.openMiniapp(payload);
           } catch {
-            await candidate.openMiniapp(url);
+            if (payload && payload.url) {
+              await candidate.openMiniapp(payload.url);
+            } else {
+              await candidate.openMiniapp(String(payload));
+            }
           }
           return true;
         }
       } catch (err) {
-        // If the SDK throws, treat as failure and continue to next candidate
         console.error("MiniApp open attempt failed on candidate:", err);
-      }
-
-      // Last resort: try other usual open/navigate methods on the candidate
-      try {
-        if (typeof candidate.open === "function") {
-          await candidate.open(url);
-          return true;
-        }
-        if (typeof candidate.openUrl === "function") {
-          await candidate.openUrl(url);
-          return true;
-        }
-        if (typeof candidate.navigate === "function") {
-          await candidate.navigate(url);
-          return true;
-        }
-      } catch (err) {
-        // ignore and continue
       }
     }
 
@@ -221,7 +202,7 @@ export default function StakingWidget() {
     const url = "https://mint.club/staking/base/160";
 
     try {
-      const ok = await tryOpenMiniApp(url);
+      const ok = await tryOpenMiniApp({ url });
       if (ok) return;
     } catch (err) {
       console.error("openMintClubSDK failed:", err);
@@ -231,23 +212,41 @@ export default function StakingWidget() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  // New: Open buy TRIV via Farcaster or Base SDK (fallback to Uniswap on Base)
+  // Native-only Buy TRIV flow:
+  // - Try Farcaster mini app using structured payloads (no web fallback)
+  // - Try Base-native SDK globals and their swap/openSwap methods
+  // - If no native SDK found, show an alert (NO web redirect)
   const openBuyTRIV = async (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.preventDefault();
     const tokenAddress = TRIV_ADDRESS || "0xa889A10126024F39A0ccae31D09C18095CB461B8";
+    const chainId = 8453; // Base chain id used in your app previously
 
-    // Uniswap URL pre-filled for Base (chain id 8453). This is a broadly compatible web swap UI:
-    const uniswapUrl = `https://app.uniswap.org/#/swap?chain=8453&inputCurrency=ETH&outputCurrency=${encodeURIComponent(tokenAddress)}`;
-
-    // First try Farcaster / mini-app open which some Farcaster clients will route to the in-app browser or Base integration
+    // 1) Try Farcaster Mini App open with a structured payload (preferred)
     try {
-      const ok = await tryOpenMiniApp(uniswapUrl);
-      if (ok) return;
+      // Many Farcaster miniapp implementations accept an object like { url } but some accept structured params.
+      // We attempt both common shapes but do NOT provide an http web fallback.
+      const payloads = [
+        // structured params (some SDKs accept { name, params })
+        { name: "swap", params: { sellToken: "ETH", buyToken: tokenAddress, chainId } },
+        // legacy URL-like scheme that an SDK may map internally
+        { url: `base://swap?sellToken=ETH&buyToken=${tokenAddress}&chainId=${chainId}` },
+        // generic intent-style payload
+        { intent: "swap", sellToken: "ETH", buyToken: tokenAddress, chainId },
+      ];
+
+      for (const p of payloads) {
+        try {
+          const ok = await tryOpenMiniApp(p);
+          if (ok) return;
+        } catch (err) {
+          // try next payload
+        }
+      }
     } catch (err) {
-      console.error("tryOpenMiniApp for buy TRIV failed:", err);
+      console.error("Farcaster mini-app attempts failed:", err);
     }
 
-    // Next try invoking Base wallet SDKs directly if present and expose a swap / openSwap API
+    // 2) Try Base-native SDK globals: call swap/openSwap if available (native-only)
     try {
       const globalAny = window as any;
       const baseCandidates = [
@@ -261,66 +260,66 @@ export default function StakingWidget() {
       for (const candidate of baseCandidates) {
         if (!candidate) continue;
 
-        // try high-level swap-like method if available
+        // Prefer a structured swap API if present
         try {
           if (typeof candidate.swap === "function") {
-            // common param shape { sellToken, buyToken, chainId }
+            // try structured param object first
             try {
-              await candidate.swap({ sellToken: "ETH", buyToken: tokenAddress, chainId: 8453 });
+              await candidate.swap({ sellToken: "ETH", buyToken: tokenAddress, chainId });
             } catch {
-              await candidate.swap("ETH", tokenAddress, 8453);
+              // fallback to positional args if provider expects them
+              await candidate.swap("ETH", tokenAddress, chainId);
             }
             return;
           }
+
           if (typeof candidate.openSwap === "function") {
             try {
-              await candidate.openSwap({ sellToken: "ETH", buyToken: tokenAddress, chainId: 8453 });
+              await candidate.openSwap({ sellToken: "ETH", buyToken: tokenAddress, chainId });
             } catch {
-              await candidate.openSwap(`sell=ETH&buy=${tokenAddress}&chain=8453`);
+              await candidate.openSwap(`sell=ETH&buy=${tokenAddress}&chain=${chainId}`);
+            }
+            return;
+          }
+
+          // Some SDKs expose a generic "open" or "openUrl" and might accept a base:// style deep intent
+          if (typeof candidate.open === "function") {
+            try {
+              await candidate.open({ action: "swap", sellToken: "ETH", buyToken: tokenAddress, chainId });
+            } catch {
+              // best-effort: try with a small structured intent
+              await candidate.open({ urlScheme: `base://swap?sellToken=ETH&buyToken=${tokenAddress}&chainId=${chainId}` });
+            }
+            return;
+          }
+
+          if (typeof candidate.openUrl === "function") {
+            try {
+              await candidate.openUrl({ sellToken: "ETH", buyToken: tokenAddress, chainId });
+            } catch {
+              await candidate.openUrl(`base://swap?sellToken=ETH&buyToken=${tokenAddress}&chainId=${chainId}`);
             }
             return;
           }
         } catch (err) {
-          console.error("candidate.swap/openSwap attempt failed:", err);
-        }
-
-        // try generic open/openUrl methods on candidate
-        try {
-          if (typeof candidate.open === "function") {
-            await candidate.open(uniswapUrl);
-            return;
-          }
-          if (typeof candidate.openUrl === "function") {
-            await candidate.openUrl(uniswapUrl);
-            return;
-          }
-          if (typeof candidate.navigate === "function") {
-            await candidate.navigate(uniswapUrl);
-            return;
-          }
-        } catch (err) {
-          // continue to next candidate
+          // move to next candidate if this one failed
+          console.error("Base candidate swap/open attempt failed:", err);
         }
       }
     } catch (err) {
-      console.error("Base SDK attempts failed:", err);
+      console.error("Base SDK attempts threw:", err);
     }
 
-    // Try base:// deep link (some mobile apps register these). If it fails, it will simply not navigate.
+    // 3) NO web fallbacks per your request. Notify user that native SDK wasn't found.
     try {
-      const deepLink = `base://open?url=${encodeURIComponent(uniswapUrl)}`;
-      window.open(deepLink, "_blank", "noopener,noreferrer");
-      // give the deep link a moment; also open the web fallback after a short delay
-      setTimeout(() => {
-        window.open(uniswapUrl, "_blank", "noopener,noreferrer");
-      }, 600);
-      return;
+      // Use a non-intrusive alert; you can replace this with a UI toast/modal as desired.
+      window.alert(
+        "No native swap SDK detected. Please open the Base wallet or a Farcaster client with mini-app support to buy TRIV directly from your app."
+      );
     } catch (err) {
-      // final fallback
+      // If alerts are blocked, fail silently.
+      console.error("Could not display alert about missing native SDK:", err);
     }
-
-    // Final fallback: open the Uniswap swap page in the browser
-    window.open(uniswapUrl, "_blank", "noopener,noreferrer");
   };
 
   if (!STAKING_ADDRESS || !TRIV_ADDRESS) {
@@ -409,7 +408,7 @@ export default function StakingWidget() {
           </div>
         )}
       </div>
-      {/* deeplinks for MetaMask, Rainbow, Mint Club, and the new Farcaster/Base SDK "Buy TRIV" button */}
+      {/* deeplinks for MetaMask, Rainbow, Mint Club, and the native-only Buy TRIV button */}
       <div className="mt-3 flex justify-end">
         <div className="inline-flex gap-3 items-center">
           <a
@@ -440,7 +439,7 @@ export default function StakingWidget() {
             Open in Mint Club
           </button>
 
-          {/* Buy TRIV: first try Farcaster / Base SDKs, then fallback to Uniswap on Base chain */}
+          {/* Buy TRIV: native SDKs only (Farcaster / Base SDK). No Uniswap or web fallback per request */}
           <button
             onClick={openBuyTRIV}
             className="px-4 py-2 bg-white border rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
