@@ -6,25 +6,30 @@ import { ethers } from "ethers";
 import { TRIV_ABI, STAKING_ABI } from "../lib/stakingClient";
 
 /**
- * StakingWidget — improved native swap handling for Farcaster + Base Mini Apps
+ * StakingWidget — improved "Buy TRIV" native attempt with broader host messaging
  *
- * What changed (summary)
- * - First attempts the documented Farcaster mini-app API: sdk.actions.swapToken({...})
- * - If that is not present, attempts several Base / OnchainKit / host wallet globals and methods:
- *   - candidate.actions.swapToken(payload)
- *   - candidate.actions.openMiniApp({ name: "swap", params, metadata })
- *   - candidate.wallet?.send(walletPayload) (includes metadata to show a transaction tray per docs)
- *   - fallback: try window.parent.postMessage / window.top.postMessage to ask host to invoke a swap
- * - Includes metadata in wallet.send calls per "Custom Transaction Trays" doc section:
- *   { description, hostname, faviconUrl, title }
- * - Keeps a Detect SDK button and prints detection results so you can paste them if a target
- *   client exposes a different global name / API. This helps me iterate to the exact method your
- *   Farcaster or Base client exposes.
+ * Changes in this version:
+ * - Keeps the Farcaster sdk.actions.swapToken attempt (where available).
+ * - If no SDK globals are present (your Detect output showed none), sends a set of
+ *   postMessage variants to window.parent and window.top that many hosts / MiniKit
+ *   integrations listen for. The messages cover several common shapes:
+ *     - { type: "miniapp:swap", ... }
+ *     - { type: "onchainkit:send", ... } (json-rpc-like)
+ *     - { jsonrpc: "2.0", method: "onchainkit.send", params: ... }
+ *     - { type: "base:swap", ... }
+ *   The payloads include CAIP-19 asset IDs and metadata for transaction trays (per your "Custom Transaction Trays" reference).
+ * - If postMessage variants are posted, the UI reports that a request was posted (the host must support it).
+ * - If nothing is detected and postMessage fails to trigger anything, shows helpful diagnostics (detected globals + userAgent) and next steps.
  *
- * Notes
- * - No web Uniswap/Matcha fallbacks here — this tries native SDK/host first and surfaces diagnostics.
- * - The wallet.send payload uses an empty `calls` array so wallets will show a transaction tray with metadata.
- *   If your wallet requires a specific call shape (router + calldata), paste the detection output and I will adapt it.
+ * Why this should help:
+ * - Your Detect SDK output showed every global probe as missing. Many Mini App hosts do not expose a global on window,
+ *   and instead the proper integration is via postMessage between the iframe and the host. By broadcasting multiple
+ *   message shapes we increase the chance the host will respond and open the native swap UI.
+ *
+ * How to proceed if this still doesn't work:
+ * 1. Open the page in the Base app (or Farcaster mobile) and press "Detect SDK" — if you still see no globals copy the "Diagnostics" block and paste it here.
+ * 2. If possible, enable remote web inspector and paste console logs for the page when you press "Buy TRIV".
+ * 3. As a last resort we can add a web fallback (Uniswap/Matcha) — but you previously asked to avoid web fallbacks.
  */
 
 const STAKING_ADDRESS = process.env.NEXT_PUBLIC_STAKING_ADDRESS || "";
@@ -61,6 +66,12 @@ export default function StakingWidget() {
   const [detectionResults, setDetectionResults] = useState<DetectionEntry[] | null>(null);
   const [detectError, setDetectError] = useState<string | null>(null);
   const [swapResult, setSwapResult] = useState<any | null>(null);
+  const [postedMessages, setPostedMessages] = useState<string[] | null>(null);
+  const [ua, setUa] = useState<string>("");
+
+  useEffect(() => {
+    setUa(typeof navigator !== "undefined" ? navigator.userAgent : "");
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -174,7 +185,7 @@ export default function StakingWidget() {
     }
   };
 
-  // helper: safe access to avoid cross-origin errors
+  // safe access helper
   const safeGet = (root: any, key: string) => {
     try {
       return root?.[key];
@@ -206,7 +217,7 @@ export default function StakingWidget() {
     }
   };
 
-  // Probe for likely SDK / wallet globals and report capabilities (does not invoke)
+  // Detect common SDK globals (non-invasive)
   const detectSdk = async () => {
     setDetecting(true);
     setDetectError(null);
@@ -312,7 +323,7 @@ export default function StakingWidget() {
     }
   };
 
-  // Wait briefly for SDK injection points (some in-app browsers inject after load)
+  // Wait briefly for known SDK injection points
   const waitForSdk = async (timeoutMs = 3000, intervalMs = 200) => {
     const start = Date.now();
     const candidateGetters: Array<() => { name: string; obj: any } | null> = [
@@ -359,16 +370,61 @@ export default function StakingWidget() {
     };
   };
 
+  // Broad postMessage shapes we will try (host may listen for one of these)
+  const makePostMessageVariants = (payload: any) => {
+    return [
+      // Simple intent
+      { type: "miniapp:swap", payload },
+      // onchainkit-style 'send' wrapper
+      { type: "onchainkit:send", payload },
+      // JSON-RPC-like for hosts that route RPC
+      { jsonrpc: "2.0", method: "onchainkit.send", params: payload },
+      // Alternate method name
+      { type: "base:swap", payload },
+      // generic swap intent
+      { type: "swap", payload },
+      // Name the intent in an envelope
+      { type: "miniapp:action", action: "swap", payload },
+    ];
+  };
+
+  // Attempt to post messages to parent/top and record which we posted
+  const postMessageToHost = async (messages: any[]) => {
+    const posted: string[] = [];
+    try {
+      for (const m of messages) {
+        try {
+          // post to parent and top safely
+          try {
+            window.parent?.postMessage?.(m, "*");
+          } catch {}
+          try {
+            window.top?.postMessage?.(m, "*");
+          } catch {}
+          posted.push(JSON.stringify(m));
+        } catch (err) {
+          // continue
+        }
+        // small delay between posts to increase chance host picks one up in order
+        // (some hosts inspect first message only)
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((r) => setTimeout(r, 120));
+      }
+    } catch (err) {
+      console.error("postMessageToHost error:", err);
+    }
+    return posted;
+  };
+
   // Main Buy TRIV native flow:
   // 1) Try Farcaster sdk.actions.swapToken
-  // 2) Try many Base wallet/onchainkit globals:
-  //    - actions.swapToken
-  //    - actions.openMiniApp({ name: 'swap', params, metadata })
-  //    - wallet.send({ version, from, chainId, calls, metadata })
-  // 3) Try postMessage to parent/top to let host handle swap (last resort)
-  const trySwapToken = async () => {
+  // 2) If none found, send a series of postMessage variants to the host
+  // 3) As fallback attempt base:// deep link to hint host app
+  const trySwapToken = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
     setDetectError(null);
     setSwapResult(null);
+    setPostedMessages(null);
 
     if (!TRIV_ADDRESS) {
       setDetectError("TRIV contract address not configured (NEXT_PUBLIC_TRIV_ADDRESS).");
@@ -390,210 +446,77 @@ export default function StakingWidget() {
     const farcasterPayload: any = { sellToken, buyToken };
     if (sellAmount) farcasterPayload.sellAmount = sellAmount;
 
-    // 1) Farcaster SDK
+    // 1) Try Farcaster SDK if present
     try {
-      const found = await waitForSdk(3000, 200);
+      const found = await waitForSdk(2000, 150);
       if (found && found.obj) {
         const sdkObj = found.obj;
-        // documented method
         if (sdkObj.actions && typeof sdkObj.actions.swapToken === "function") {
           const res = await sdkObj.actions.swapToken(farcasterPayload);
           setSwapResult({ method: `${found.name}.actions.swapToken`, result: res });
-          // update detectionResults so you see it
-          setDetectionResults((prev) => {
-            const entry: DetectionEntry = {
-              location: found.name.split(".")[0],
-              globalName: found.name,
-              exists: true,
-              type: typeof sdkObj,
-              hasActions: true,
-              actionsHasSwapToken: true,
-              sampleMethods: sampleMethods(sdkObj, 12),
-            };
-            return prev ? [entry, ...prev] : [entry];
-          });
           return;
         }
-        // try other shapes on sdk object
         if (typeof sdkObj.swapToken === "function") {
           const res = await sdkObj.swapToken(farcasterPayload);
           setSwapResult({ method: `${found.name}.swapToken`, result: res });
           return;
         }
-        if (typeof sdkObj.swap === "function") {
-          const args = sellAmount ? [sellToken, buyToken, sellAmount] : [sellToken, buyToken];
-          const res = await sdkObj.swap(...args);
-          setSwapResult({ method: `${found.name}.swap`, result: res });
-          return;
-        }
       }
-    } catch (err: any) {
-      console.warn("Farcaster attempt threw:", err);
-      // continue to other attempts
-    }
-
-    // 2) Base / OnchainKit / host wallet candidates
-    const metadata = buildMetadata();
-    const walletPayload: any = {
-      version: "1.0",
-      from: address ? (address as `0x${string}`) : undefined,
-      chainId: 8453,
-      calls: [
-        // Intentionally left empty for the wallet to present a transaction tray with our metadata.
-        // If your wallet needs a concrete call to a router contract, paste detection output and we'll adjust.
-      ],
-      metadata,
-    };
-
-    const baseCandidates: Array<{ name: string; obj: any }> = [
-      { name: "window.base", obj: safeGet(window, "base") },
-      { name: "window.base?.wallet", obj: safeGet(safeGet(window, "base"), "wallet") },
-      { name: "window.baseSDK", obj: safeGet(window, "baseSDK") },
-      { name: "window.BaseSDK", obj: safeGet(window, "BaseSDK") },
-      { name: "window.BaseWallet", obj: safeGet(window, "BaseWallet") },
-      { name: "window.baseWallet", obj: safeGet(window, "baseWallet") },
-      { name: "window.onchainkit", obj: safeGet(window, "onchainkit") },
-      { name: "window.OnchainKit", obj: safeGet(window, "OnchainKit") },
-      { name: "window.wallet", obj: safeGet(window, "wallet") },
-      { name: "window.parent.base", obj: (() => { try { return (window.parent as any)?.base; } catch { return undefined; } })() },
-      { name: "window.parent.sdk", obj: (() => { try { return (window.parent as any)?.sdk; } catch { return undefined; } })() },
-    ];
-
-    const tried: string[] = [];
-
-    for (const c of baseCandidates) {
-      const candidate = c.obj;
-      if (!candidate) continue;
-      tried.push(c.name);
-
-      // candidate.actions.swapToken?
-      try {
-        if (candidate.actions && typeof candidate.actions.swapToken === "function") {
-          const res = await candidate.actions.swapToken({ sellToken, buyToken, ...(sellAmount ? { sellAmount } : {}) });
-          setSwapResult({ method: `${c.name}.actions.swapToken`, result: res });
-          setDetectionResults((prev) => {
-            const entry: DetectionEntry = {
-              location: c.name.split(".")[0],
-              globalName: c.name,
-              exists: true,
-              type: typeof candidate,
-              hasActions: true,
-              actionsHasSwapToken: true,
-              sampleMethods: sampleMethods(candidate, 12),
-            };
-            return prev ? [entry, ...prev] : [entry];
-          });
-          return;
-        }
-      } catch (err) {
-        console.warn(`${c.name}.actions.swapToken failed:`, err);
-      }
-
-      // candidate.actions.openMiniApp({ name: "swap", params, metadata })
-      try {
-        if (candidate.actions && typeof candidate.actions.openMiniApp === "function") {
-          await candidate.actions.openMiniApp({ name: "swap", params: { sellToken, buyToken, ...(sellAmount ? { sellAmount } : {}) }, metadata });
-          setSwapResult({ method: `${c.name}.actions.openMiniApp`, result: "invoked" });
-          setDetectionResults((prev) => {
-            const entry: DetectionEntry = {
-              location: c.name.split(".")[0],
-              globalName: c.name,
-              exists: true,
-              type: typeof candidate,
-              hasActions: true,
-              hasOpenMiniApp: true,
-              sampleMethods: sampleMethods(candidate, 12),
-            };
-            return prev ? [entry, ...prev] : [entry];
-          });
-          return;
-        }
-      } catch (err) {
-        console.warn(`${c.name}.actions.openMiniApp failed:`, err);
-      }
-
-      // candidate.openMiniApp(...)
-      try {
-        if (typeof candidate.openMiniApp === "function") {
-          try {
-            await candidate.openMiniApp({ name: "swap", params: { sellToken, buyToken, ...(sellAmount ? { sellAmount } : {}) }, metadata });
-          } catch {
-            // Some implementations accept just a URL-like or name string
-            await candidate.openMiniApp(`swap?sellToken=${sellToken}&buyToken=${buyToken}`);
-          }
-          setSwapResult({ method: `${c.name}.openMiniApp`, result: "invoked" });
-          return;
-        }
-      } catch (err) {
-        console.warn(`${c.name}.openMiniApp failed:`, err);
-      }
-
-      // candidate.wallet?.send(payload) OR candidate.send(payload)
-      try {
-        const walletObj = candidate?.wallet ?? candidate;
-        if (walletObj && typeof walletObj.send === "function") {
-          const res = await walletObj.send(walletPayload);
-          setSwapResult({ method: `${c.name}.wallet.send`, result: res });
-          setDetectionResults((prev) => {
-            const entry: DetectionEntry = {
-              location: c.name.split(".")[0],
-              globalName: c.name,
-              exists: true,
-              type: typeof candidate,
-              hasWalletSend: true,
-              sampleMethods: sampleMethods(candidate, 12),
-            };
-            return prev ? [entry, ...prev] : [entry];
-          });
-          return;
-        }
-        if (typeof candidate.send === "function") {
-          const res = await candidate.send(walletPayload);
-          setSwapResult({ method: `${c.name}.send`, result: res });
-          return;
-        }
-      } catch (err) {
-        console.warn(`${c.name}.wallet.send/send failed:`, err);
-      }
-    }
-
-    // 3) As last resort, ask host via postMessage (parent/top). Many hosts listen for JSON-RPC-like messages.
-    try {
-      const message = {
-        type: "miniapp:swap",
-        payload: { sellToken, buyToken, sellAmount: sellAmount || undefined, metadata: buildMetadata() },
-      };
-      try {
-        window.parent?.postMessage?.(message, "*");
-      } catch {}
-      try {
-        window.top?.postMessage?.(message, "*");
-      } catch {}
-      // show a helpful diagnostic to the user and list what we tried
-      setDetectError(
-        `No accessible Farcaster or Base SDK method worked. Tried candidates: ${tried.join(", ") || "none"}. ` +
-          "A postMessage was sent to the host; if the host supports handling this message it may open the swap UI. " +
-          "If you are in Farcaster or Base app and this still fails, press Detect SDK and paste the JSON output shown in the widget so I can adapt the exact global/method names."
-      );
-      setDetectionResults((prev) => {
-        const fallback: DetectionEntry = {
-          location: "tried",
-          globalName: tried.join(", "),
-          exists: tried.length > 0,
-          type: "candidates attempted",
-        };
-        return prev ? [fallback, ...prev] : [fallback];
-      });
     } catch (err) {
-      console.error("postMessage attempt failed:", err);
-      setDetectError("No native SDK found and postMessage to host failed. Please run Detect SDK and paste the output here.");
+      console.warn("Farcaster attempt threw:", err);
     }
+
+    // 2) PostMessage variants (host-driven integrations often listen for postMessage)
+    try {
+      const metadata = buildMetadata();
+      const hostPayload = {
+        sellToken,
+        buyToken,
+        sellAmount: sellAmount || undefined,
+        metadata,
+        from: address ?? undefined,
+        chainId: 8453,
+      };
+
+      const variants = makePostMessageVariants(hostPayload);
+      const posted = await postMessageToHost(variants);
+      setPostedMessages(posted);
+
+      // Give the host a moment to react; show message to user explaining what's happened
+      setDetectError(
+        "Posted native swap requests to the host (several message shapes). If you're inside Base App or Farcaster, the host may open the swap UI. " +
+          "If nothing happens, press Detect SDK and paste the detection JSON here so I can adapt to the exact integration the host exposes."
+      );
+
+      // Try a base:// deep link as an additional hint (mobile only). We won't open a web Uniswap fallback.
+      try {
+        const deepLink = `base://swap?sellToken=ETH&buyToken=${encodeURIComponent(TRIV_ADDRESS)}`;
+        // Try assign first (works in many in-app browsers), then open
+        try {
+          window.location.assign(deepLink);
+        } catch {}
+        setTimeout(() => {
+          try {
+            window.open(deepLink, "_blank");
+          } catch {}
+        }, 250);
+      } catch {}
+      return;
+    } catch (err) {
+      console.error("postMessage variants failed:", err);
+    }
+
+    // 3) Final diagnostics: nothing worked
+    setDetectError(
+      "No native SDK detected and host postMessage attempts were sent but there was no visible response. " +
+        "Please paste the 'SDK detection results' JSON and the browser userAgent shown below so I can tailor the exact call to your environment."
+    );
   };
 
   const openMintClub = async (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.preventDefault();
     const url = "https://mint.club/staking/base/160";
-    // try Farcaster open first
+    // Try Farcaster open first if present
     try {
       const sdk = (window as any).sdk ?? (window as any).farcaster?.sdk;
       if (sdk && sdk.actions && typeof sdk.actions.openMiniApp === "function") {
@@ -775,6 +698,17 @@ export default function StakingWidget() {
             <div className="mt-2 text-xs text-gray-600">
               If you see an entry with exists:true and actionsHasSwapToken:true (or hasWalletSend:true), press Buy TRIV.
               If nothing works, paste this JSON into the chat and I will adapt the call to the exact global/method your client exposes.
+            </div>
+          </div>
+        )}
+
+        {postedMessages && postedMessages.length > 0 && (
+          <div className="p-3 rounded bg-blue-50 border border-blue-200 text-sm text-blue-800 mb-3">
+            <div className="font-semibold mb-1">Posted messages to host (multiple shapes):</div>
+            <pre className="whitespace-pre-wrap text-xs max-h-56 overflow-auto">{postedMessages.join("\n\n")}</pre>
+            <div className="mt-2 text-xs text-gray-600">
+              If the host supports a message shape above it should open the native swap UI. If nothing happens, please paste the detection JSON + this userAgent:
+              <div className="mt-1 font-mono text-xs">{ua}</div>
             </div>
           </div>
         )}
