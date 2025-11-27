@@ -6,8 +6,7 @@ import { ethers } from "ethers";
 import { TRIV_ABI, STAKING_ABI } from "../lib/stakingClient";
 
 const STAKING_ADDRESS = process.env.NEXT_PUBLIC_STAKING_ADDRESS || "";
-const TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || "0xa889a10126024f39a0ccae31d09c18095cb461b8";
-const FALLBACK_FROM = "0xfEfb14B992640d50ebb00fa9d9674ae39C607d8b";
+const TRIV_ADDRESS = process.env.NEXT_PUBLIC_TRIV_ADDRESS || "";
 
 export default function StakingWidget() {
   const { address, isConnected } = useAccount();
@@ -20,10 +19,6 @@ export default function StakingWidget() {
   const [loading, setLoading] = useState(false);
   const [txStatus, setTxStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
   const [txHash, setTxHash] = useState<string | null>(null);
-
-  // Posted messages feedback
-  const [postedMessages, setPostedMessages] = useState<string[] | null>(null);
-  const [nativeNotice, setNativeNotice] = useState<string | null>(null);
 
   const format6 = (val: string) => {
     try {
@@ -147,61 +142,103 @@ export default function StakingWidget() {
     }
   };
 
-  // Simplified Buy TRIV: post the exact message shapes you provided to the host (parent/top).
-  const buyTrivNative = async (e?: React.MouseEvent<HTMLButtonElement>) => {
-    e?.preventDefault();
-    setPostedMessages(null);
-    setNativeNotice(null);
-
-    const fromAddr = (address as string) || FALLBACK_FROM;
-    const token = TRIV_ADDRESS.toLowerCase();
-    const metadata = {
-      description: "Buy TRIV",
-      hostname: "triviacast.xyz",
-      faviconUrl: "https://triviacast.xyz/favicon.ico",
-      title: "Triviacast — Buy TRIV",
-    };
-
-    const payload = {
-      sellToken: "eip155:8453/native",
-      buyToken: `eip155:8453/erc20:${token}`,
-      metadata,
-      from: fromAddr,
-      chainId: 8453,
-    };
-
-    const messages = [
-      { type: "miniapp:swap", payload },
-      { type: "onchainkit:send", payload },
-      { jsonrpc: "2.0", method: "onchainkit.send", params: payload },
-      { type: "base:swap", payload },
-      { type: "swap", payload },
-      { type: "miniapp:action", action: "swap", payload },
+  // Use Farcaster Mini App SDK's openMiniApp when available:
+  // sdk.actions.openMiniApp({ url })
+  // Fallback to other SDK method names or window.open
+  const tryOpenMiniApp = async (url: string) => {
+    // list of candidate globals that might expose the miniapp sdk
+    const globalAny = window as any;
+    const candidates = [
+      // common global from farcaster examples
+      globalAny.sdk,
+      // possible vendor names / wrappers
+      globalAny.farcaster?.sdk,
+      globalAny.MiniAppSDK,
+      globalAny.miniAppSdk,
+      globalAny.farcasterMiniAppSdk,
     ];
 
-    const posted: string[] = [];
-    for (const m of messages) {
+    for (const candidate of candidates) {
+      if (!candidate) continue;
       try {
-        try {
-          window.parent?.postMessage?.(m, "*");
-        } catch {}
-        try {
-          window.top?.postMessage?.(m, "*");
-        } catch {}
-        posted.push(JSON.stringify(m));
+        // prefer the official actions.openMiniApp API shape
+        if (candidate.actions && typeof candidate.actions.openMiniApp === "function") {
+          await candidate.actions.openMiniApp({ url });
+          return true;
+        }
+        // also accept direct openMiniApp on the candidate
+        if (typeof candidate.openMiniApp === "function") {
+          // some implementations accept an object, others accept a string
+          try {
+            await candidate.openMiniApp({ url });
+          } catch {
+            await candidate.openMiniApp(url);
+          }
+          return true;
+        }
+        if (typeof candidate.openMiniapp === "function") {
+          try {
+            await candidate.openMiniapp({ url });
+          } catch {
+            await candidate.openMiniapp(url);
+          }
+          return true;
+        }
       } catch (err) {
-        // ignore individual failures
+        // If the SDK throws, treat as failure and continue to next candidate
+        console.error("MiniApp open attempt failed on candidate:", err);
       }
-      // small gap to increase chance host picks up the messages in order
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise((r) => setTimeout(r, 120));
+
+      // Last resort: try other usual open/navigate methods on the candidate
+      try {
+        if (typeof candidate.open === "function") {
+          await candidate.open(url);
+          return true;
+        }
+        if (typeof candidate.openUrl === "function") {
+          await candidate.openUrl(url);
+          return true;
+        }
+        if (typeof candidate.navigate === "function") {
+          await candidate.navigate(url);
+          return true;
+        }
+      } catch (err) {
+        // ignore and continue
+      }
     }
 
-    setPostedMessages(posted);
-    setNativeNotice(
-      "Posted several native swap messages to the host. If you're inside Base App or Farcaster the host may open the swap UI. " +
-        "If nothing happens, enable remote web inspector and check host console or paste the posted messages + userAgent here and I'll adapt further."
-    );
+    return false;
+  };
+
+  const openMintClubSDK = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
+    const url = "https://mint.club/staking/base/160";
+
+    try {
+      const ok = await tryOpenMiniApp(url);
+      if (ok) return;
+    } catch (err) {
+      console.error("openMintClubSDK failed:", err);
+    }
+
+    // Fallback to a simple window.open if SDK-based navigation isn't available
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const openMatchaSDK = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
+    const url =
+      "https://matcha.xyz/tokens/base/0xa889A10126024F39A0ccae31D09C18095CB461B8?sellChain=8453&sellAddress=0x4200000000000000000000000000000000000006";
+
+    try {
+      const ok = await tryOpenMiniApp(url);
+      if (ok) return;
+    } catch (err) {
+      console.error("openMatchaSDK failed:", err);
+    }
+
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   if (!STAKING_ADDRESS || !TRIV_ADDRESS) {
@@ -215,6 +252,7 @@ export default function StakingWidget() {
   }
 
   return (
+    // container constrained width but flexible height; allow inner scrolling if outer container small
     <div className="mt-6 w-full max-w-2xl text-left">
       <div className="p-6 rounded-xl bg-white/90 border border-[#F4A6B7] shadow-sm text-gray-900 overflow-auto">
         <h2 className="text-lg font-semibold text-gray-900 mb-3">Stake TRIV for Rewards</h2>
@@ -225,6 +263,7 @@ export default function StakingWidget() {
           You can stake using Base App and Rainbow Wallet. Also works in Farcaster desktop and browser w/ wallet extension — sorry for any inconvenience.
         </p>
 
+        {/* 2 columns on small screens to reduce vertical stacking and avoid overflow; cells can shrink */}
         <div className="mb-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="p-3 bg-[#fff0f4] rounded min-w-0 break-words text-sm sm:text-base">Your TRIV: <strong>{format6(tokenBalance)}</strong></div>
           <div className="p-3 bg-[#fff0f4] rounded min-w-0 break-words text-sm sm:text-base">Staked: <strong>{format6(stakedBalance)}</strong></div>
@@ -239,7 +278,7 @@ export default function StakingWidget() {
             <div className="flex flex-col sm:flex-row gap-3 items-stretch">
               <input
                 className="flex-1 min-w-0 px-3 py-2 rounded border border-gray-200 text-sm"
-                placeholder="Amount to stake / withdraw (optional for prefill)"
+                placeholder="Amount to stake / withdraw"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 inputMode="decimal"
@@ -271,6 +310,7 @@ export default function StakingWidget() {
             </div>
 
             <div className="flex items-center justify-end gap-3">
+              {/* Status area (wraps on narrow screens) */}
               {txStatus !== "idle" && (
                 <div className="text-sm break-words text-right">
                   <strong>Status:</strong> {txStatus}
@@ -287,7 +327,7 @@ export default function StakingWidget() {
           </div>
         )}
       </div>
-
+      {/* deeplinks for MetaMask, Rainbow, Mint Club, and Matcha (prefer openMiniApp via miniapp SDK) placed inside the staking widget */}
       <div className="mt-3 flex justify-end">
         <div className="inline-flex gap-3 items-center">
           <a
@@ -307,30 +347,29 @@ export default function StakingWidget() {
             Open in Rainbow
           </a>
 
+          {/* Mint Club: prefer sdk.actions.openMiniApp({ url }) */}
           <button
-            onClick={buyTrivNative}
-            className="px-4 py-2 bg-white border rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
-            aria-label="Buy TRIV (native)"
-            title="Buy TRIV (native)"
+            onClick={openMintClubSDK}
+            className="px-4 py-2 bg-[#FFC4D1] rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
+            aria-label="Open in Mint Club"
+            title="Open in Mint Club"
             type="button"
           >
-            Buy TRIV
+            Open in Mint Club
+          </button>
+
+          {/* Matcha: prefer sdk.actions.openMiniApp({ url }) */}
+          <button
+            onClick={openMatchaSDK}
+            className="px-4 py-2 bg-white border rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
+            aria-label="Open in Matcha"
+            title="Open in Matcha"
+            type="button"
+          >
+            Open in Matcha
           </button>
         </div>
       </div>
-
-      {nativeNotice && (
-        <div className="mt-3 p-3 rounded bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm">
-          {nativeNotice}
-        </div>
-      )}
-
-      {postedMessages && postedMessages.length > 0 && (
-        <div className="mt-3 p-3 rounded bg-blue-50 border border-blue-200 text-sm text-blue-800">
-          <div className="font-semibold mb-1">Posted messages to host (these exact shapes):</div>
-          <pre className="whitespace-pre-wrap text-xs max-h-56 overflow-auto">{postedMessages.join("\n\n")}</pre>
-        </div>
-      )}
     </div>
   );
 }
