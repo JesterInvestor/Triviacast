@@ -149,13 +149,19 @@ export default function StakingWidget() {
     // list of candidate globals that might expose the miniapp sdk
     const globalAny = window as any;
     const candidates = [
-      // common global from farcaster examples
+      // Farcaster / generic candidate
       globalAny.sdk,
       // possible vendor names / wrappers
       globalAny.farcaster?.sdk,
       globalAny.MiniAppSDK,
       globalAny.miniAppSdk,
       globalAny.farcasterMiniAppSdk,
+      // Base-related SDK candidates (common naming patterns)
+      globalAny.baseSDK,
+      globalAny.BaseSDK,
+      globalAny.BaseWallet,
+      globalAny.baseWallet,
+      globalAny.base,
     ];
 
     for (const candidate of candidates) {
@@ -168,7 +174,6 @@ export default function StakingWidget() {
         }
         // also accept direct openMiniApp on the candidate
         if (typeof candidate.openMiniApp === "function") {
-          // some implementations accept an object, others accept a string
           try {
             await candidate.openMiniApp({ url });
           } catch {
@@ -226,19 +231,96 @@ export default function StakingWidget() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const openMatchaSDK = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+  // New: Open buy TRIV via Farcaster or Base SDK (fallback to Uniswap on Base)
+  const openBuyTRIV = async (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.preventDefault();
-    const url =
-      "https://matcha.xyz/tokens/base/0xa889A10126024F39A0ccae31D09C18095CB461B8?sellChain=8453&sellAddress=0x4200000000000000000000000000000000000006";
+    const tokenAddress = TRIV_ADDRESS || "0xa889A10126024F39A0ccae31D09C18095CB461B8";
 
+    // Uniswap URL pre-filled for Base (chain id 8453). This is a broadly compatible web swap UI:
+    const uniswapUrl = `https://app.uniswap.org/#/swap?chain=8453&inputCurrency=ETH&outputCurrency=${encodeURIComponent(tokenAddress)}`;
+
+    // First try Farcaster / mini-app open which some Farcaster clients will route to the in-app browser or Base integration
     try {
-      const ok = await tryOpenMiniApp(url);
+      const ok = await tryOpenMiniApp(uniswapUrl);
       if (ok) return;
     } catch (err) {
-      console.error("openMatchaSDK failed:", err);
+      console.error("tryOpenMiniApp for buy TRIV failed:", err);
     }
 
-    window.open(url, "_blank", "noopener,noreferrer");
+    // Next try invoking Base wallet SDKs directly if present and expose a swap / openSwap API
+    try {
+      const globalAny = window as any;
+      const baseCandidates = [
+        globalAny.baseSDK,
+        globalAny.BaseSDK,
+        globalAny.BaseWallet,
+        globalAny.baseWallet,
+        globalAny.base,
+      ];
+
+      for (const candidate of baseCandidates) {
+        if (!candidate) continue;
+
+        // try high-level swap-like method if available
+        try {
+          if (typeof candidate.swap === "function") {
+            // common param shape { sellToken, buyToken, chainId }
+            try {
+              await candidate.swap({ sellToken: "ETH", buyToken: tokenAddress, chainId: 8453 });
+            } catch {
+              await candidate.swap("ETH", tokenAddress, 8453);
+            }
+            return;
+          }
+          if (typeof candidate.openSwap === "function") {
+            try {
+              await candidate.openSwap({ sellToken: "ETH", buyToken: tokenAddress, chainId: 8453 });
+            } catch {
+              await candidate.openSwap(`sell=ETH&buy=${tokenAddress}&chain=8453`);
+            }
+            return;
+          }
+        } catch (err) {
+          console.error("candidate.swap/openSwap attempt failed:", err);
+        }
+
+        // try generic open/openUrl methods on candidate
+        try {
+          if (typeof candidate.open === "function") {
+            await candidate.open(uniswapUrl);
+            return;
+          }
+          if (typeof candidate.openUrl === "function") {
+            await candidate.openUrl(uniswapUrl);
+            return;
+          }
+          if (typeof candidate.navigate === "function") {
+            await candidate.navigate(uniswapUrl);
+            return;
+          }
+        } catch (err) {
+          // continue to next candidate
+        }
+      }
+    } catch (err) {
+      console.error("Base SDK attempts failed:", err);
+    }
+
+    // Try base:// deep link (some mobile apps register these). If it fails, it will simply not navigate.
+    try {
+      const deepLink = `base://open?url=${encodeURIComponent(uniswapUrl)}`;
+      window.open(deepLink, "_blank", "noopener,noreferrer");
+      // give the deep link a moment; also open the web fallback after a short delay
+      setTimeout(() => {
+        window.open(uniswapUrl, "_blank", "noopener,noreferrer");
+      }, 600);
+      return;
+    } catch (err) {
+      // final fallback
+    }
+
+    // Final fallback: open the Uniswap swap page in the browser
+    window.open(uniswapUrl, "_blank", "noopener,noreferrer");
   };
 
   if (!STAKING_ADDRESS || !TRIV_ADDRESS) {
@@ -327,7 +409,7 @@ export default function StakingWidget() {
           </div>
         )}
       </div>
-      {/* deeplinks for MetaMask, Rainbow, Mint Club, and Matcha (prefer openMiniApp via miniapp SDK) placed inside the staking widget */}
+      {/* deeplinks for MetaMask, Rainbow, Mint Club, and the new Farcaster/Base SDK "Buy TRIV" button */}
       <div className="mt-3 flex justify-end">
         <div className="inline-flex gap-3 items-center">
           <a
@@ -358,15 +440,15 @@ export default function StakingWidget() {
             Open in Mint Club
           </button>
 
-          {/* Matcha: prefer sdk.actions.openMiniApp({ url }) */}
+          {/* Buy TRIV: first try Farcaster / Base SDKs, then fallback to Uniswap on Base chain */}
           <button
-            onClick={openMatchaSDK}
+            onClick={openBuyTRIV}
             className="px-4 py-2 bg-white border rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
-            aria-label="Open in Matcha"
-            title="Open in Matcha"
+            aria-label="Buy TRIV"
+            title="Buy TRIV"
             type="button"
           >
-            Open in Matcha
+            Buy TRIV
           </button>
         </div>
       </div>
