@@ -177,6 +177,47 @@ export default function StakingWidget() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  // Attempt to open Matcha (0x Matcha) via an available SDK, falling back to window.open
+  const openMatchaSDK = (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    const url = "https://matcha.xyz/tokens/base/0xa889A10126024F39A0ccae31D09C18095CB461B8?sellChain=8453&sellAddress=0x4200000000000000000000000000000000000006";
+
+    try {
+      // Guess common global SDK objects: matcha, Matcha, MatchaSDK, MatchaApp
+      const globalAny = window as any;
+      const sdkCandidates = [globalAny.matcha, globalAny.Matcha, globalAny.MatchaSDK, globalAny.MatchaApp];
+      for (const candidate of sdkCandidates) {
+        if (candidate && typeof candidate.open === "function") {
+          candidate.open(url);
+          return;
+        }
+      }
+      for (const candidate of sdkCandidates) {
+        if (candidate && typeof candidate.openUrl === "function") {
+          candidate.openUrl(url);
+          return;
+        }
+        if (candidate && typeof candidate.navigate === "function") {
+          candidate.navigate(url);
+          return;
+        }
+        // some SDKs might expose a 'show' or 'launch' method
+        if (candidate && typeof candidate.show === "function") {
+          candidate.show(url);
+          return;
+        }
+        if (candidate && typeof candidate.launch === "function") {
+          candidate.launch(url);
+          return;
+        }
+      }
+    } catch (err) {
+      // ignore and fallback
+    }
+
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   if (!STAKING_ADDRESS || !TRIV_ADDRESS) {
     return (
       <div className="mt-6 w-full max-w-2xl text-left">
@@ -263,7 +304,7 @@ export default function StakingWidget() {
           </div>
         )}
       </div>
-      {/* deeplinks for MetaMask, Rainbow, and Mint Club (SDK open) placed inside the staking widget */}
+      {/* deeplinks for MetaMask, Rainbow, Mint Club, and Matcha (SDK open) placed inside the staking widget */}
       <div className="mt-3 flex justify-end">
         <div className="inline-flex gap-3 items-center">
           <a
@@ -286,12 +327,23 @@ export default function StakingWidget() {
           {/* Mint Club SDK open: tries SDK first, falls back to window.open */}
           <button
             onClick={openMintClubSDK}
-            className="text-xs text-[#2d1b2e] hover:underline bg-transparent p-0 m-0"
+            className="px-4 py-2 bg-[#FFC4D1] rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
             aria-label="Open in Mint Club"
             title="Open in Mint Club"
             type="button"
           >
             Open in Mint Club
+          </button>
+
+          {/* Matcha SDK open: tries SDK first, falls back to window.open */}
+          <button
+            onClick={openMatchaSDK}
+            className="px-4 py-2 bg-white border rounded font-semibold text-sm text-[#2d1b2e] hover:brightness-95"
+            aria-label="Open in Matcha"
+            title="Open in Matcha"
+            type="button"
+          >
+            Open in Matcha
           </button>
         </div>
       </div>
