@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
-import { keccak256, toUtf8Bytes } from 'viem';
+import { keccak256, utf8ToBytes } from 'viem';
 
 // Minimal server route that aggregates AddPoints(address,uint256) events
 // into a windowed leaderboard (days param).
@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
 
     // Event signature topic for AddPoints(address,uint256)
     const eventSig = 'AddPoints(address,uint256)';
-    const topic0 = keccak256(toUtf8Bytes(eventSig));
+    const topic0 = keccak256(utf8ToBytes(eventSig));
 
     const logs = await client.getLogs({
       address: CONTRACT_ADDRESS as `0x${string}`,
