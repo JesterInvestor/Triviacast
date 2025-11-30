@@ -4,13 +4,13 @@ import { farcasterMiniApp } from '@farcaster/miniapp-wagmi-connector';
 import { metaMask, walletConnect } from '@wagmi/connectors';
 
 // Prefer a keyed RPC to avoid public endpoint rate limits.
-// Order of preference:
-// 1) NEXT_PUBLIC_RPC_URL (full URL)
-// 2) NEXT_PUBLIC_ALCHEMY_API_KEY (construct Alchemy Base URL)
+// Order of preference (prefer keyed Alchemy URL when available):
+// 1) NEXT_PUBLIC_ALCHEMY_API_KEY (construct Alchemy Base URL)
+// 2) NEXT_PUBLIC_RPC_URL (full URL)
 // 3) NEXT_PUBLIC_INFURA_PROJECT_ID (construct Infura Base URL)
 const rpcUrl =
-  process.env.NEXT_PUBLIC_RPC_URL
-  || (process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ? `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}` : undefined)
+  (process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ? `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}` : undefined)
+  || process.env.NEXT_PUBLIC_RPC_URL
   || (process.env.NEXT_PUBLIC_INFURA_PROJECT_ID ? `https://base-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_PROJECT_ID}` : undefined);
 
 const wcProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;

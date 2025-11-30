@@ -87,11 +87,13 @@ function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?
 
 export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | 'iq' }) {
   const ITEMS_PER_PAGE = 20;
+  const [period, setPeriod] = useState<'all'|'7d'>('7d');
 
   const [leaderboard, setLeaderboard] = useState<Array<any>>([]);
   const [profiles, setProfiles] = useState<Record<string, any>>({});
   const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const { address } = useAccount();
 
   const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
@@ -128,27 +130,65 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
     async function fetchData() {
       setLoading(true);
       try {
-        const board = await getLeaderboard();
-        // board contains walletAddress and tPoints; for IQ view we'll augment with iqPoints
-        let finalList: any[] = board;
+        let board: any[] = [];
+        if (period === 'all') {
+          setFetchError(null);
+          board = await getLeaderboard();
+        } else {
+          const res = await fetch(`/api/leaderboard/windowed?days=7`);
+          if (!res.ok) {
+            // try to parse JSON body for provider error details
+            let body: any = null;
+            try { body = await res.json(); } catch (e) { body = null; }
+            const msg = body?.error || body?.meta?.getLogsError || res.statusText || 'Failed to fetch windowed leaderboard';
+            setFetchError(String(msg));
+            board = [];
+          } else {
+            const data = await res.json();
+            // if provider reported an internal error, surface it
+            if (data?.meta?.getLogsError) {
+              setFetchError(String(data.meta.getLogsError));
+            } else {
+              setFetchError(null);
+            }
+            board = (data.rows || []);
+          }
+        }
+        // Normalize incoming board entries to a consistent shape so UI
+        // logic can rely on `walletAddress`, `tPoints`, and `iqPoints` keys.
+        const normalizeEntry = (b: any) => {
+          const walletAddress = (b.walletAddress || b.wallet || b.address || b.wallet_address || b.addr || b.owner || '').toString().toLowerCase();
+          const tPointsRaw = b.tPoints ?? b.t_points ?? b.points ?? b.points_total ?? b.t ?? 0;
+          const iqPointsRaw = b.iqPoints ?? b.iq_points ?? b.iq ?? 0;
+          return {
+            walletAddress,
+            tPoints: Number(tPointsRaw || 0),
+            iqPoints: Number(iqPointsRaw || 0),
+            // carry through any other fields for downstream profile matching
+            ...b,
+          };
+        };
+
+        let finalList: any[] = board.map(normalizeEntry);
+
         if (view === 'iq') {
           // Fetch IQ points for each address in parallel (best-effort)
           const entries = await Promise.all(
-            board.map(async (b: any) => {
-              const addr = (b.walletAddress || '').toLowerCase();
+            finalList.map(async (b: any) => {
+              const addr = (b.walletAddress || b.wallet || b.address || '').toLowerCase();
               try {
                 const v = await getIQPoints(addr as `0x${string}`);
-                return { walletAddress: addr, iqPoints: Number(v) };
+                return { ...b, walletAddress: addr, iqPoints: Number(v) };
               } catch (err) {
-                return { walletAddress: addr, iqPoints: 0 };
+                return { ...b, walletAddress: addr, iqPoints: 0 };
               }
             })
           );
           setLeaderboard(entries);
           finalList = entries;
         } else {
-          setLeaderboard(board);
-          finalList = board;
+          setLeaderboard(finalList);
+          finalList = finalList;
         }
 
         // Batch fetch Farcaster profiles for the TOP N leaderboard addresses only
@@ -219,12 +259,15 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
         }
 
         // walletTotal badge removed — no per-wallet fetch here
+      } catch (err: any) {
+        setFetchError(String(err?.message ?? err ?? 'Failed to fetch leaderboard'));
       } finally {
         setLoading(false);
       }
     }
     fetchData();
-  }, [address, view]);
+  }, [address, view, period]);
+
 
   // loadMore callback used by both IntersectionObserver and scroll fallback
   const loadMore = useCallback(() => {
@@ -339,6 +382,25 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
           <h1 className="text-2xl sm:text-4xl font-bold text-center text-[#2d1b2e]">
             Leaderboard
           </h1>
+          <div className="ml-4">
+            <label className="sr-only">Period</label>
+            <select
+              value={period}
+              onChange={(e) => setPeriod(e.target.value as any)}
+              className="rounded-md border px-2 py-1 text-sm bg-white"
+              title="Leaderboard period"
+            >
+              <option value="all">All time</option>
+              <option value="7d">Last 7 days</option>
+            </select>
+          </div>
+            {fetchError && (
+              <div className="ml-4">
+                <div className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-md px-2 py-1">
+                  {fetchError}
+                </div>
+              </div>
+            )}
           {limitedLeaderboard.length > 0 && (
             <div className="ml-2 flex flex-col items-center justify-center">
               <div className="px-2 py-1 rounded-lg bg-[#FFE4EC] border border-[#F4A6B7] text-[10px] sm:text-xs font-semibold text-[#5a3d5c] tracking-wide">

@@ -16,8 +16,8 @@ export function pickBaseRpcUrl(): string {
   return (
     process.env.BASE_RPC_URL ||
     process.env.BASE_MAINNET_RPC_URL ||
-    process.env.NEXT_PUBLIC_RPC_URL ||
     (process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ? `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}` : undefined) ||
+    process.env.NEXT_PUBLIC_RPC_URL ||
     (process.env.NEXT_PUBLIC_INFURA_PROJECT_ID ? `https://base-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_PROJECT_ID}` : undefined) ||
     'https://mainnet.base.org'
   )
