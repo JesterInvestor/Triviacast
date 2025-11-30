@@ -22,6 +22,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   const CATEGORIES = [
     'General Knowledge',
     'Farcaster Knowledge',
+    'Base Knowledge',
     'Entertainment: Books',
     'Entertainment: Film',
     'Entertainment: Music',
@@ -84,7 +85,11 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
       }
       // Request questions without specifying a difficulty (allow all difficulties)
       const categoryParam = questionCategory ? `&category=${encodeURIComponent(questionCategory)}` : '';
-      const effectiveSource = questionCategory === 'Farcaster Knowledge' ? 'farcaster' : 'opentdb';
+      const effectiveSource = questionCategory === 'Farcaster Knowledge'
+        ? 'farcaster'
+        : questionCategory === 'Base Knowledge'
+          ? 'base'
+          : 'opentdb';
       const response = await fetch(`/api/questions?amount=10&source=${effectiveSource}${categoryParam}`);
       const data = await response.json();
 

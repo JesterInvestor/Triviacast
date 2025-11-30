@@ -1,5 +1,6 @@
 import type { Question } from '@/types/quiz';
 import farcasterQuestions from '@/data/farcaster_questions.json';
+import baseQuestions from '@/data/base_questions.json';
 
 /**
  * Fetch questions from OpenTDB API
@@ -94,6 +95,13 @@ export function loadLocalFarcasterQuestions(): Question[] {
 }
 
 /**
+ * Load Base questions from local JSON file
+ */
+export function loadLocalBaseQuestions(): Question[] {
+  return baseQuestions as Question[];
+}
+
+/**
  * Pick random questions from a pool, optionally filtering by difficulty
  */
 export function pickRandomQuestions(
@@ -123,13 +131,19 @@ export function pickRandomQuestions(
  * Get questions based on source (opentdb or farcaster)
  */
 export async function getQuestions(
-  source: 'opentdb' | 'farcaster',
+  source: 'opentdb' | 'farcaster' | 'base',
   amount: number = 10,
   difficulty?: string,
   category?: string
 ): Promise<Question[]> {
   if (source === 'farcaster') {
     let allQuestions = loadLocalFarcasterQuestions();
+    if (category) {
+      allQuestions = allQuestions.filter((q) => (q.category || '').toLowerCase() === category.toLowerCase());
+    }
+    return pickRandomQuestions(allQuestions, amount, difficulty);
+  } else if (source === 'base') {
+    let allQuestions = loadLocalBaseQuestions();
     if (category) {
       allQuestions = allQuestions.filter((q) => (q.category || '').toLowerCase() === category.toLowerCase());
     }

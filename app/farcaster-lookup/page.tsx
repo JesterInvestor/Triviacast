@@ -403,8 +403,8 @@ export default function FarcasterLookupPage() {
               </div>
 
               {quizOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                  <div className="w-11/12 max-w-3xl">
+                <div className="fixed inset-0 z-50 overflow-auto bg-black/50 p-4">
+                  <div className="mx-auto w-11/12 max-w-3xl max-h-[90vh] overflow-auto">
                     <Quiz
                       onComplete={(res) => {
                         // Close the quiz modal first
