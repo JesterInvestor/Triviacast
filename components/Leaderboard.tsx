@@ -87,7 +87,8 @@ function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?
 
 export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | 'iq' }) {
   const ITEMS_PER_PAGE = 20;
-  const [period, setPeriod] = useState<'all'|'7d'|'30d'>('all');
+  // Fixed to weekly leaderboard only
+  const period = '7d';
 
   const [leaderboard, setLeaderboard] = useState<Array<any>>([]);
   const [profiles, setProfiles] = useState<Record<string, any>>({});
@@ -366,17 +367,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             Leaderboard
           </h1>
           <div className="ml-4">
-            <label className="sr-only">Period</label>
-            <select
-              value={period}
-              onChange={(e) => setPeriod(e.target.value as any)}
-              className="rounded-md border px-2 py-1 text-sm bg-white"
-              title="Leaderboard period"
-            >
-              <option value="all">All time</option>
-              <option value="7d">Last 7 days</option>
-              <option value="30d">Last 30 days</option>
-            </select>
+            <div className="px-2 py-1 rounded-md text-sm bg-white border">Last 7 days</div>
           </div>
           {limitedLeaderboard.length > 0 && (
             <div className="ml-2 flex flex-col items-center justify-center">

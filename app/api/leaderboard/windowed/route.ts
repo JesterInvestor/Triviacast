@@ -46,9 +46,8 @@ async function findFromBlock(cutoffTs: number): Promise<bigint> {
 
 export async function GET(req: NextRequest) {
   try {
-    const url = new URL(req.url);
-    const daysParam = url.searchParams.get('days') || '7';
-    const days = Number(daysParam) || 7;
+    // Fixed to weekly leaderboard only (7 days). Ignore any `days` query param.
+    const days = 7;
 
     if (!CONTRACT_ADDRESS) {
       return new Response(JSON.stringify({ error: 'Contract address not configured' }), { status: 500 });
