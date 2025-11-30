@@ -218,31 +218,32 @@ export default function InfoPage() {
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
               >
                 <option value="">Select a category</option>
-                <option>General Knowledge</option>
-                <option>Farcaster Knowledge</option>
-                <option>Entertainment: Books</option>
-                <option>Entertainment: Film</option>
-                <option>Entertainment: Music</option>
-                <option>Entertainment: Musicals & Theatres</option>
-                <option>Entertainment: Television</option>
-                <option>Entertainment: Video Games</option>
-                <option>Entertainment: Board Games</option>
-                <option>Science & Nature</option>
-                <option>Science: Computers</option>
-                <option>Science: Mathematics</option>
-                <option>Mythology</option>
-                <option>Sports</option>
-                <option>Geography</option>
-                <option>History</option>
-                <option>Politics</option>
-                <option>Art</option>
-                <option>Celebrities</option>
-                <option>Animals</option>
-                <option>Vehicles</option>
-                <option>Entertainment: Comics</option>
-                <option>Science: Gadgets</option>
-                <option>Entertainment: Japanese Anime & Manga</option>
-                <option>Entertainment: Cartoon & Animations</option>
+                  <option value="General Knowledge">General Knowledge</option>
+                  <option value="Farcaster Knowledge">Farcaster Knowledge</option>
+                  <option value="Base Knowledge">Base Knowledge</option>
+                  <option value="Entertainment: Books">Books</option>
+                  <option value="Entertainment: Film">Film</option>
+                  <option value="Entertainment: Music">Music</option>
+                  <option value="Entertainment: Musicals & Theatres">Musicals & Theatres</option>
+                  <option value="Entertainment: Television">Television</option>
+                  <option value="Entertainment: Video Games">Video Games</option>
+                  <option value="Entertainment: Board Games">Board Games</option>
+                  <option value="Science & Nature">Science & Nature</option>
+                  <option value="Science: Computers">Computers</option>
+                  <option value="Science: Mathematics">Mathematics</option>
+                  <option value="Mythology">Mythology</option>
+                  <option value="Sports">Sports</option>
+                  <option value="Geography">Geography</option>
+                  <option value="History">History</option>
+                  <option value="Politics">Politics</option>
+                  <option value="Art">Art</option>
+                  <option value="Celebrities">Celebrities</option>
+                  <option value="Animals">Animals</option>
+                  <option value="Vehicles">Vehicles</option>
+                  <option value="Entertainment: Comics">Comics</option>
+                  <option value="Science: Gadgets">Gadgets</option>
+                  <option value="Entertainment: Japanese Anime & Manga">Japanese Anime & Manga</option>
+                  <option value="Entertainment: Cartoon & Animations">Cartoon & Animations</option>
               </select>
             </label>
 

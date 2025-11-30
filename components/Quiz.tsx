@@ -18,9 +18,36 @@ const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
 export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: string; score: number; details?: any }) => void } = {}) {
   const sound = useSound();
   const { address: accountAddress, isConnected } = useAccount();
-  const [questionSource, setQuestionSource] = useState<'opentdb' | 'farcaster'>('opentdb');
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [pendingSource, setPendingSource] = useState<'opentdb' | 'farcaster'>('opentdb');
+  const [questionCategory, setQuestionCategory] = useState<string>('');
+  const CATEGORIES = [
+    'General Knowledge',
+    'Farcaster Knowledge',
+    'Base Knowledge',
+    'Entertainment: Books',
+    'Entertainment: Film',
+    'Entertainment: Music',
+    'Entertainment: Musicals & Theatres',
+    'Entertainment: Television',
+    'Entertainment: Video Games',
+    'Entertainment: Board Games',
+    'Science & Nature',
+    'Science: Computers',
+    'Science: Mathematics',
+    'Mythology',
+    'Sports',
+    'Geography',
+    'History',
+    'Politics',
+    'Art',
+    'Celebrities',
+    'Animals',
+    'Vehicles',
+    'Entertainment: Comics',
+    'Science: Gadgets',
+    'Entertainment: Japanese Anime & Manga',
+    'Entertainment: Cartoon & Animations',
+  ];
+  // question source will be derived from the selected category at request time
   const [quizState, setQuizState] = useState<QuizState>({
     questions: [],
     currentQuestionIndex: 0,
@@ -57,7 +84,13 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         // ignore — the lifecycle effect will try again
       }
       // Request questions without specifying a difficulty (allow all difficulties)
-      const response = await fetch(`/api/questions?amount=10&source=${questionSource}`);
+      const categoryParam = questionCategory ? `&category=${encodeURIComponent(questionCategory)}` : '';
+      const effectiveSource = questionCategory === 'Farcaster Knowledge'
+        ? 'farcaster'
+        : questionCategory === 'Base Knowledge'
+          ? 'base'
+          : 'opentdb';
+      const response = await fetch(`/api/questions?amount=10&source=${effectiveSource}${categoryParam}`);
       const data = await response.json();
 
       if (!response.ok || data?.error) {
@@ -115,6 +148,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         details: {
           total: quizState.questions.length,
           tPoints: quizState.tPoints,
+          category: questionCategory || undefined,
         },
       });
     } catch (_) {
@@ -289,26 +323,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     setError(null);
   };
 
-  const handleSourceChange = (newSource: 'opentdb' | 'farcaster') => {
-    if (quizState.quizStarted && !quizState.quizCompleted) {
-      // Show confirmation modal if quiz is active
-      setPendingSource(newSource);
-      setShowConfirmModal(true);
-    } else {
-      // Direct change if quiz not started
-      setQuestionSource(newSource);
-    }
-  };
-
-  const confirmSourceChange = () => {
-    setQuestionSource(pendingSource);
-    setShowConfirmModal(false);
-    restartQuiz();
-  };
-
-  const cancelSourceChange = () => {
-    setShowConfirmModal(false);
-  };
+  // question source is derived from selected category at runtime
 
   // Require wallet connection before showing any quiz UI
   if (!isConnected || !accountAddress) {
@@ -333,34 +348,42 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-[#2d1b2e]">Trivia Challenge</h1>
           
-          {/* Question Source Toggle */}
-          <div className="mb-6 p-4 bg-[#FFE4EC] rounded-lg border-2 border-[#F4A6B7]">
-            <label className="block text-sm font-semibold text-[#2d1b2e] mb-3">
-              Question Source
-            </label>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button
-                onClick={() => handleSourceChange('opentdb')}
-                className={`flex-1 sm:flex-initial px-4 py-3 rounded-lg font-medium transition-all ${
-                  questionSource === 'opentdb'
-                    ? 'bg-[#F4A6B7] text-white shadow-lg scale-105'
-                    : 'bg-white text-[#5a3d5c] border-2 border-[#F4A6B7] hover:bg-[#FFE4EC]'
-                }`}
-              >
-                🌍 Everything else (OpenTDB)
-              </button>
-              <button
-                onClick={() => handleSourceChange('farcaster')}
-                className={`flex-1 sm:flex-initial px-4 py-3 rounded-lg font-medium transition-all ${
-                  questionSource === 'farcaster'
-                    ? 'bg-[#F4A6B7] text-white shadow-lg scale-105'
-                    : 'bg-white text-[#5a3d5c] border-2 border-[#F4A6B7] hover:bg-[#FFE4EC]'
-                }`}
-              >
-                🚀 Farcaster Knowledge (neynar)
-              </button>
+          {/* Category prompt */}
+          <div className="mb-4 flex flex-col items-center w-full">
+            <div className="flex items-center gap-3 justify-center w-full">
+              <div className="text-lg font-semibold text-[#2d1b2e] text-left">What do you want to quiz about?</div>
+              <div className="flex flex-col items-center ml-2">
+                <div className="text-2xl leading-none">   💭</div>
+                <Image src="/brain-small.svg" alt="Brain" width={36} height={36} className="mt-1" />
+              </div>
             </div>
+
+            <div className="mt-3 w-full grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {CATEGORIES.map((cat) => {
+                // Strip common prefixes for display only (preserve full value internally)
+                const shortLabel = String(cat).replace(/^(?:Entertainment|Science):\s*/i, '');
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setQuestionCategory(cat === questionCategory ? '' : cat)}
+                    className={`px-3 py-2 rounded-lg text-sm text-left transition w-full ${
+                      questionCategory === cat
+                        ? 'bg-[#F4A6B7] text-white shadow-lg scale-105'
+                        : 'bg-white text-[#5a3d5c] border-2 border-[#F4A6B7] hover:bg-[#FFE4EC]'
+                    }`}
+                    title={cat}
+                  >
+                    {shortLabel}
+                  </button>
+                );
+              })}
+            </div>
+            {questionCategory && (
+              <div className="mt-2 text-xs text-gray-600">Selected: <strong>{questionCategory}</strong></div>
+            )}
           </div>
+
+          {/* (Question source removed — source is derived from selected category) */}
 
           <p className="text-[#5a3d5c] mb-8 text-base sm:text-lg">
             ⏱️ Only 1 minute ⏱️<br />
@@ -383,31 +406,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
           </button>
         </div>
 
-        {/* Confirmation Modal */}
-        {showConfirmModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full border-4 border-[#F4A6B7]">
-              <h2 className="text-2xl font-bold mb-4 text-[#2d1b2e]">Confirm Source Change</h2>
-              <p className="text-[#5a3d5c] mb-6">
-                Switching question source will restart the current quiz. Do you want to proceed?
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={cancelSourceChange}
-                  className="flex-1 px-4 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold rounded-lg transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmSourceChange}
-                  className="flex-1 px-4 py-3 bg-[#F4A6B7] hover:bg-[#E8949C] text-white font-semibold rounded-lg transition"
-                >
-                  Proceed
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* source-change confirmation removed */}
       </div>
     );
   }
@@ -421,7 +420,8 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         questions={quizState.questions}
         answers={quizState.answers}
         tPoints={quizState.tPoints}
-        onRestart={restartQuiz}
+          onRestart={restartQuiz}
+          category={questionCategory}
       />
     );
   }

@@ -403,8 +403,8 @@ export default function FarcasterLookupPage() {
               </div>
 
               {quizOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                  <div className="w-11/12 max-w-3xl">
+                <div className="fixed inset-0 z-50 overflow-auto bg-black/50 p-4">
+                  <div className="mx-auto w-11/12 max-w-3xl max-h-[90vh] overflow-auto">
                     <Quiz
                       onComplete={(res) => {
                         // Close the quiz modal first
@@ -432,9 +432,10 @@ export default function FarcasterLookupPage() {
                           if (a && b && selfHandle !== friend) return `${a} ${b}`;
                           return a || b; // whichever exists
                         })();
+                        const categoryLabel = (res as any)?.details?.category ? String((res as any).details.category) : '';
                         const defaultText = tags
-                          ? `${tags} — I just played Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink} $(triviacastchallenge)`
-                          : `I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink} $(triviacastchallenge)`;
+                          ? `${tags} — I just played Triviacast${categoryLabel ? ` (${categoryLabel})` : ''} with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink} $(triviacastchallenge)`
+                          : `I just crushed Triviacast${categoryLabel ? ` (${categoryLabel})` : ''} with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink} $(triviacastchallenge)`;
                         setPreviewText(defaultText);
                         setPreviewLink(challengeLink);
                         setPreviewOpen(true);
