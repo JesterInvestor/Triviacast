@@ -76,42 +76,95 @@ export async function GET(req: NextRequest) {
     const eventSig = 'AddPoints(address,uint256)';
     const topic0 = keccak256(new TextEncoder().encode(eventSig));
 
-    // Fetch logs in small chunks to satisfy providers with small eth_getLogs limits
+    // Try to use provider as-is first; if it rejects wide ranges (Alchemy free tier),
+    // parse the suggested workable block-range from the error and fall back to chunking with that size.
     const latestBlockNum = await client.getBlockNumber();
     const latest = BigInt(latestBlockNum);
-    const chunkSize = 10n; // Alchemy Free tier allows ~10-block eth_getLogs ranges
-    const maxChunks = 1000; // safety to avoid runaway requests
 
-    const totalChunks = Number(((latest - fromBlock) / chunkSize) + 1n);
-    if (totalChunks > maxChunks) {
-      return new Response(JSON.stringify({ error: `Requested range requires ${totalChunks} chunks; too large. Use an indexer or smaller window.` }), { status: 400 });
+    // helper to perform chunked fetch with a given chunkSize
+    async function fetchLogsChunked(chunkSize: bigint) {
+      const maxChunks = 1000; // safety to avoid runaway requests
+      const totalChunks = Number(((latest - fromBlock) / chunkSize) + 1n);
+      if (totalChunks > maxChunks) {
+        throw new Error(`Requested range requires ${totalChunks} chunks; too large. Use an indexer or smaller window.`);
+      }
+
+      const allLogs: any[] = [];
+      let attemptedChunks = 0;
+      let successfulChunks = 0;
+      for (let start = fromBlock; start <= latest; start = start + chunkSize) {
+        attemptedChunks++;
+        const to = start + chunkSize - 1n > latest ? latest : start + chunkSize - 1n;
+        try {
+          const chunkLogs = await client.getLogs({
+            address: CONTRACT_ADDRESS as `0x${string}`,
+            fromBlock: start,
+            toBlock: to,
+            topics: [topic0],
+          } as any);
+          if (chunkLogs && chunkLogs.length) {
+            allLogs.push(...chunkLogs);
+          }
+          successfulChunks++;
+          // small delay to avoid bursting provider
+          await new Promise((res) => setTimeout(res, 25));
+        } catch (e: any) {
+          // bubble the error up so caller can decide to parse and retry with a smaller chunkSize
+          throw e;
+        }
+      }
+
+      return { allLogs, attemptedChunks, successfulChunks };
     }
 
-    const allLogs: any[] = [];
+    // First try: attempt to fetch logs in one request (fast path)
+    let logs: any[] = [];
     let attemptedChunks = 0;
     let successfulChunks = 0;
-    for (let start = fromBlock; start <= latest; start = start + chunkSize) {
-      attemptedChunks++;
-      const to = start + chunkSize - 1n > latest ? latest : start + chunkSize - 1n;
-      try {
-        const chunkLogs = await client.getLogs({
-          address: CONTRACT_ADDRESS as `0x${string}`,
-          fromBlock: start,
-          toBlock: to,
-          topics: [topic0],
-        } as any);
-        if (chunkLogs && chunkLogs.length) {
-          allLogs.push(...chunkLogs);
+    let usedChunkSize = 0n;
+    try {
+      const single = await client.getLogs({ address: CONTRACT_ADDRESS as `0x${string}` , fromBlock, toBlock: 'latest', topics: [topic0] } as any);
+      logs = single || [];
+      attemptedChunks = 1;
+      successfulChunks = 1;
+      usedChunkSize = latest - fromBlock + 1n;
+    } catch (err: any) {
+      // If the provider suggests a workable range in the error message (Alchemy Free tier), parse it.
+      const msg = String(err?.message ?? err ?? '');
+      const rangeMatch = msg.match(/should work: \[0x([0-9a-fA-F]+), 0x([0-9a-fA-F]+)\]/);
+      if (rangeMatch) {
+        try {
+          const startHex = BigInt('0x' + rangeMatch[1]);
+          const endHex = BigInt('0x' + rangeMatch[2]);
+          const suggestedSize = endHex - startHex + 1n;
+          // Use the suggested size but cap it reasonably
+          const chunkSize = suggestedSize > 0n ? suggestedSize : 10n;
+          usedChunkSize = chunkSize;
+          const res = await fetchLogsChunked(chunkSize);
+          logs = res.allLogs;
+          attemptedChunks = res.attemptedChunks;
+          successfulChunks = res.successfulChunks;
+        } catch (innerErr) {
+          console.debug('[windowed] retry chunked failed', String(innerErr));
+          // fallthrough to try a safe small chunkSize
         }
-        successfulChunks++;
-        // small delay to avoid bursting provider
-        await new Promise((res) => setTimeout(res, 25));
-      } catch (e: any) {
-        console.debug('[windowed] chunk getLogs failed', { start: String(start), to: String(to), err: String(e) });
+      }
+
+      // If logs still empty, try a safe small chunk size (10 blocks)
+      if (logs.length === 0) {
+        try {
+          const res = await fetchLogsChunked(10n);
+          logs = res.allLogs;
+          attemptedChunks = res.attemptedChunks;
+          successfulChunks = res.successfulChunks;
+          usedChunkSize = 10n;
+        } catch (finalErr) {
+          console.debug('[windowed] final chunked attempt failed', String(finalErr));
+          // Return an error response to client indicating provider limitations
+          return new Response(JSON.stringify({ error: String(finalErr) }), { status: 502 });
+        }
       }
     }
-
-    const logs = allLogs;
 
     // Aggregate per wallet (topics[1] contains indexed address)
     const totals = new Map<string, bigint>();
