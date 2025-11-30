@@ -1,8 +1,13 @@
 {
-  "servers": {
-    "Sentry": {
-      "url": "https://mcp.sentry.dev/mcp/gifmix/triviacast",
-      "type": "http"
-    }
-  }
+	"servers": {
+		"Sentry": {
+			"url": "https://mcp.sentry.dev/mcp/gifmix/triviacast",
+			"type": "http"
+		},
+		"Neynar": {
+			"url": "https://docs.neynar.com/mcp",
+			"type": "http"
+		}
+	},
+	"inputs": []
 }
