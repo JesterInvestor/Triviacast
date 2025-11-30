@@ -18,6 +18,7 @@ interface QuizResultsProps {
   answers: (string | null)[];
   tPoints: number;
   onRestart: () => void;
+  category?: string;
 }
 
 function decodeHtml(html: string): string {
@@ -33,6 +34,7 @@ export default function QuizResults({
   answers, 
   tPoints,
   onRestart 
+  , category
 }: QuizResultsProps) {
   const percentage = Math.round((score / totalQuestions) * 100);
   const { address, status } = useAccount();
@@ -100,6 +102,19 @@ export default function QuizResults({
         }
 
         setPointsSaved(true);
+
+        // Fire-and-forget: record this event server-side for windowed leaderboards
+        (async () => {
+          try {
+            await fetch('/api/points', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ wallet: address, points: tPoints, source: 'quiz' }),
+            });
+          } catch (e) {
+            console.debug('Failed to record points event to server', e);
+          }
+        })();
       } catch (error) {
         console.error('Failed to save points (local or blockchain):', error);
         setSaveError('Failed to save points. Please try again and score even better this time.');
@@ -144,7 +159,7 @@ export default function QuizResults({
         {/* Share results CTA moved to top under header */}
         <div className="text-center mb-4 sm:mb-6">
           <button
-            onClick={() => openShareUrl(shareResultsUrl(score, totalQuestions, percentage, tPoints))}
+            onClick={() => openShareUrl(shareResultsUrl(score, totalQuestions, percentage, tPoints, category))}
             className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-6 rounded-lg text-base sm:text-lg transition inline-flex items-center justify-center shadow-lg min-h-[48px] w-full sm:w-auto gap-2"
             aria-label="Share results on Farcaster"
           >

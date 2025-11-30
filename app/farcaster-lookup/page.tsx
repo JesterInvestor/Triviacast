@@ -432,9 +432,10 @@ export default function FarcasterLookupPage() {
                           if (a && b && selfHandle !== friend) return `${a} ${b}`;
                           return a || b; // whichever exists
                         })();
+                        const categoryLabel = (res as any)?.details?.category ? String((res as any).details.category) : '';
                         const defaultText = tags
-                          ? `${tags} — I just played Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink} $(triviacastchallenge)`
-                          : `I just crushed Triviacast with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink} $(triviacastchallenge)`;
+                          ? `${tags} — I just played Triviacast${categoryLabel ? ` (${categoryLabel})` : ''} with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink} $(triviacastchallenge)`
+                          : `I just crushed Triviacast${categoryLabel ? ` (${categoryLabel})` : ''} with ${res.score} (🔥 ${pointsStr} T Points)! Think you can beat me? Take the Challenge on Triviacast — ${challengeLink} $(triviacastchallenge)`;
                         setPreviewText(defaultText);
                         setPreviewLink(challengeLink);
                         setPreviewOpen(true);

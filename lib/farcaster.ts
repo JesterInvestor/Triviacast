@@ -166,7 +166,7 @@ export function shareAppUrl(): string {
   return buildPlatformShareUrl(shareAppText(), [url], { action: 'share' });
 }
 
-export function shareResultsText(score: number, total: number, percent: number, tPoints: number): string {
+export function shareResultsText(score: number, total: number, percent: number, tPoints: number, category?: string): string {
   const url = getBaseUrl();
   const points = tPoints.toLocaleString();
   // Add a fun flair based on performance
@@ -177,18 +177,19 @@ export function shareResultsText(score: number, total: number, percent: number, 
     : percent >= 60
     ? 'Locked in 🎯'
     : 'Come take my crown? 👑';
+  const catLabel = category ? ` (${category})` : '';
   const variants = [
-    (u: string) => `${flair} — ${score}/${total} (${percent}%) on Triviacast and banked ${points} T Points! 🧠\nBeat me: ${u} #Triviacast`,
-    (u: string) => `Just finished Triviacast: ${score}/${total} (${percent}%) • +${points} T Points 🏆\nThink you can top that? ${u} #Trivia`,
-    (u: string) => `${score}/${total} correct (${percent}%) on Triviacast. +${points} T Points.\nYour turn → ${u} 🧠`
+    (u: string) => `${flair} — ${score}/${total} (${percent}%)${catLabel} on Triviacast and banked ${points} T Points! 🧠\nBeat me: ${u} #Triviacast`,
+    (u: string) => `Just finished Triviacast${catLabel}: ${score}/${total} (${percent}%) • +${points} T Points 🏆\nThink you can top that? ${u} #Trivia`,
+    (u: string) => `${score}/${total} correct (${percent}%)${catLabel} on Triviacast. +${points} T Points.\nYour turn → ${u} 🧠`
   ];
   const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
   return pick(variants)(url);
 }
 
-export function shareResultsUrl(score: number, total: number, percent: number, tPoints: number): string {
+export function shareResultsUrl(score: number, total: number, percent: number, tPoints: number, category?: string): string {
   const url = getBaseUrl();
-  return buildPlatformShareUrl(shareResultsText(score, total, percent, tPoints), [url], { action: 'share' });
+  return buildPlatformShareUrl(shareResultsText(score, total, percent, tPoints, category), [url], { action: 'share' });
 }
 
 export function shareLeaderboardText(rank: number | null, points: number): string {

@@ -148,6 +148,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         details: {
           total: quizState.questions.length,
           tPoints: quizState.tPoints,
+          category: questionCategory || undefined,
         },
       });
     } catch (_) {
@@ -352,7 +353,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
             <div className="flex items-center gap-3 justify-center w-full">
               <div className="text-lg font-semibold text-[#2d1b2e] text-left">What do you want to quiz about?</div>
               <div className="flex flex-col items-center ml-2">
-                <div className="text-2xl leading-none">💭</div>
+                <div className="text-2xl leading-none">   💭</div>
                 <Image src="/brain-small.svg" alt="Brain" width={36} height={36} className="mt-1" />
               </div>
             </div>
@@ -415,7 +416,8 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         questions={quizState.questions}
         answers={quizState.answers}
         tPoints={quizState.tPoints}
-        onRestart={restartQuiz}
+          onRestart={restartQuiz}
+          category={questionCategory}
       />
     );
   }
