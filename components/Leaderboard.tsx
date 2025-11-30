@@ -93,6 +93,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
   const [profiles, setProfiles] = useState<Record<string, any>>({});
   const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const { address } = useAccount();
 
   const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
@@ -131,12 +132,27 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
       try {
         let board: any[] = [];
         if (period === 'all') {
+          setFetchError(null);
           board = await getLeaderboard();
         } else {
           const res = await fetch(`/api/leaderboard/windowed?days=7`);
-          if (!res.ok) throw new Error('Failed to fetch windowed leaderboard');
-          const data = await res.json();
-          board = (data.rows || []);
+          if (!res.ok) {
+            // try to parse JSON body for provider error details
+            let body: any = null;
+            try { body = await res.json(); } catch (e) { body = null; }
+            const msg = body?.error || body?.meta?.getLogsError || res.statusText || 'Failed to fetch windowed leaderboard';
+            setFetchError(String(msg));
+            board = [];
+          } else {
+            const data = await res.json();
+            // if provider reported an internal error, surface it
+            if (data?.meta?.getLogsError) {
+              setFetchError(String(data.meta.getLogsError));
+            } else {
+              setFetchError(null);
+            }
+            board = (data.rows || []);
+          }
         }
         // Normalize incoming board entries to a consistent shape so UI
         // logic can rely on `walletAddress`, `tPoints`, and `iqPoints` keys.
@@ -243,6 +259,8 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
         }
 
         // walletTotal badge removed — no per-wallet fetch here
+      } catch (err: any) {
+        setFetchError(String(err?.message ?? err ?? 'Failed to fetch leaderboard'));
       } finally {
         setLoading(false);
       }
@@ -376,6 +394,13 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
               <option value="7d">Last 7 days</option>
             </select>
           </div>
+            {fetchError && (
+              <div className="ml-4">
+                <div className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-md px-2 py-1">
+                  {fetchError}
+                </div>
+              </div>
+            )}
           {limitedLeaderboard.length > 0 && (
             <div className="ml-2 flex flex-col items-center justify-center">
               <div className="px-2 py-1 rounded-lg bg-[#FFE4EC] border border-[#F4A6B7] text-[10px] sm:text-xs font-semibold text-[#5a3d5c] tracking-wide">
