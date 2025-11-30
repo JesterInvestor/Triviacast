@@ -77,12 +77,42 @@ export async function GET(req: NextRequest) {
     const eventSig = 'AddPoints(address,uint256)';
     const topic0 = keccak256(new TextEncoder().encode(eventSig));
 
-    const logs = await client.getLogs({
-      address: CONTRACT_ADDRESS as `0x${string}`,
-      fromBlock,
-      toBlock: 'latest',
-      topics: [topic0],
-    } as any);
+    // Fetch logs in small chunks to satisfy providers with small eth_getLogs limits
+    const latestBlockNum = await client.getBlockNumber();
+    const latest = BigInt(latestBlockNum);
+    const chunkSize = 10n; // Alchemy Free tier allows ~10-block eth_getLogs ranges
+    const maxChunks = 1000; // safety to avoid runaway requests
+
+    const totalChunks = Number(((latest - fromBlock) / chunkSize) + 1n);
+    if (totalChunks > maxChunks) {
+      return new Response(JSON.stringify({ error: `Requested range requires ${totalChunks} chunks; too large. Use an indexer or smaller window.` }), { status: 400 });
+    }
+
+    const allLogs: any[] = [];
+    let attemptedChunks = 0;
+    let successfulChunks = 0;
+    for (let start = fromBlock; start <= latest; start = start + chunkSize) {
+      attemptedChunks++;
+      const to = start + chunkSize - 1n > latest ? latest : start + chunkSize - 1n;
+      try {
+        const chunkLogs = await client.getLogs({
+          address: CONTRACT_ADDRESS as `0x${string}`,
+          fromBlock: start,
+          toBlock: to,
+          topics: [topic0],
+        } as any);
+        if (chunkLogs && chunkLogs.length) {
+          allLogs.push(...chunkLogs);
+        }
+        successfulChunks++;
+        // small delay to avoid bursting provider
+        await new Promise((res) => setTimeout(res, 25));
+      } catch (e: any) {
+        console.debug('[windowed] chunk getLogs failed', { start: String(start), to: String(to), err: String(e) });
+      }
+    }
+
+    const logs = allLogs;
 
     // Aggregate per wallet (topics[1] contains indexed address)
     const totals = new Map<string, bigint>();
@@ -115,6 +145,9 @@ export async function GET(req: NextRequest) {
         now: nowSec,
         processedAt: new Date().toISOString(),
         countLogs: logs.length,
+        provider: RPC_URL,
+        attemptedChunks,
+        successfulChunks,
       },
     };
 
