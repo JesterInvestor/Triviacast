@@ -64,6 +64,15 @@ export async function GET(req: NextRequest) {
     // Find fromBlock using block timestamps
     const fromBlock = await findFromBlock(cutoff);
 
+    // fetch the fromBlock's timestamp for diagnostic/meta purposes
+    let fromBlockTs: number | null = null;
+    try {
+      const fb = await client.getBlock({ blockNumber: fromBlock });
+      fromBlockTs = Number(fb.timestamp ?? 0n) || null;
+    } catch (e) {
+      fromBlockTs = null;
+    }
+
     // Event signature topic for AddPoints(address,uint256)
     const eventSig = 'AddPoints(address,uint256)';
     const topic0 = keccak256(new TextEncoder().encode(eventSig));
@@ -101,6 +110,9 @@ export async function GET(req: NextRequest) {
       rows,
       meta: {
         fromBlock: String(fromBlock),
+        fromBlockTimestamp: fromBlockTs,
+        cutoffTimestamp: cutoff,
+        now: nowSec,
         processedAt: new Date().toISOString(),
         countLogs: logs.length,
       },
