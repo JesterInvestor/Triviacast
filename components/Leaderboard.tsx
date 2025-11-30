@@ -87,8 +87,7 @@ function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?
 
 export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | 'iq' }) {
   const ITEMS_PER_PAGE = 20;
-  // Fixed to weekly leaderboard only
-  const period = '7d';
+  const [period, setPeriod] = useState<'all'|'7d'>('7d');
 
   const [leaderboard, setLeaderboard] = useState<Array<any>>([]);
   const [profiles, setProfiles] = useState<Record<string, any>>({});
@@ -131,11 +130,14 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
       setLoading(true);
       try {
         let board: any[] = [];
-        // Always use 7-day windowed leaderboard
-        const res = await fetch(`/api/leaderboard/windowed?days=7`);
-        if (!res.ok) throw new Error('Failed to fetch windowed leaderboard');
-        const data = await res.json();
-        board = (data.rows || []);
+        if (period === 'all') {
+          board = await getLeaderboard();
+        } else {
+          const res = await fetch(`/api/leaderboard/windowed?days=7`);
+          if (!res.ok) throw new Error('Failed to fetch windowed leaderboard');
+          const data = await res.json();
+          board = (data.rows || []);
+        }
         // Normalize incoming board entries to a consistent shape so UI
         // logic can rely on `walletAddress`, `tPoints`, and `iqPoints` keys.
         const normalizeEntry = (b: any) => {
@@ -246,7 +248,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
       }
     }
     fetchData();
-  }, [address, view]);
+  }, [address, view, period]);
 
 
   // loadMore callback used by both IntersectionObserver and scroll fallback
@@ -363,7 +365,16 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             Leaderboard
           </h1>
           <div className="ml-4">
-            <div className="px-2 py-1 rounded-md text-sm bg-white border">Last 7 days</div>
+            <label className="sr-only">Period</label>
+            <select
+              value={period}
+              onChange={(e) => setPeriod(e.target.value as any)}
+              className="rounded-md border px-2 py-1 text-sm bg-white"
+              title="Leaderboard period"
+            >
+              <option value="all">All time</option>
+              <option value="7d">Last 7 days</option>
+            </select>
           </div>
           {limitedLeaderboard.length > 0 && (
             <div className="ml-2 flex flex-col items-center justify-center">
