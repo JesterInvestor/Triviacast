@@ -131,15 +131,11 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
       setLoading(true);
       try {
         let board: any[] = [];
-        if (period === 'all') {
-          board = await getLeaderboard();
-        } else {
-          const days = period === '7d' ? 7 : 30;
-          const res = await fetch(`/api/leaderboard/windowed?days=${days}`);
-          if (!res.ok) throw new Error('Failed to fetch windowed leaderboard');
-          const data = await res.json();
-          board = (data.rows || []);
-        }
+        // Always use 7-day windowed leaderboard
+        const res = await fetch(`/api/leaderboard/windowed?days=7`);
+        if (!res.ok) throw new Error('Failed to fetch windowed leaderboard');
+        const data = await res.json();
+        board = (data.rows || []);
         // Normalize incoming board entries to a consistent shape so UI
         // logic can rely on `walletAddress`, `tPoints`, and `iqPoints` keys.
         const normalizeEntry = (b: any) => {
@@ -250,7 +246,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
       }
     }
     fetchData();
-  }, [address, view, period]);
+  }, [address, view]);
 
 
   // loadMore callback used by both IntersectionObserver and scroll fallback
