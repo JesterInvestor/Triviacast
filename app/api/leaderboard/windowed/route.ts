@@ -2,6 +2,8 @@ import { NextRequest } from 'next/server';
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
 import { keccak256 } from 'viem';
+import fs from 'fs';
+import path from 'path';
 
 // Minimal server route that aggregates AddPoints(address,uint256) events
 // into a windowed leaderboard (days param).
@@ -19,6 +21,11 @@ const client = createPublicClient({
   chain: base,
   transport: http(RPC_URL || undefined),
 });
+
+// Optional Postgres DB (created by scripts/indexer.mjs) or SQLite
+const DB_PATH = process.env.LEADERBOARD_DB_PATH || path.join(process.cwd(), 'data', 'leaderboard.db');
+const hasSqliteDb = fs.existsSync(DB_PATH);
+const hasPostgres = Boolean(process.env.DATABASE_URL);
 
 async function findFromBlock(cutoffTs: number): Promise<bigint> {
   // Binary search between block 0 and latest to find first block with timestamp >= cutoffTs
@@ -59,6 +66,31 @@ export async function GET(req: NextRequest) {
 
     const nowSec = Math.floor(Date.now() / 1000);
     const cutoff = nowSec - days * 24 * 60 * 60;
+
+    // If we have a local SQLite DB populated by the indexer, read from it for fast results
+    if (hasSqliteDb) {
+      try {
+        // Dynamically import sqlite if available. The native package may not be
+        // present in all environments (we prefer Postgres). Silence TypeScript
+        // static module resolution for this optional native dependency.
+        // @ts-ignore
+        const Database = (await import('better-sqlite3')).default;
+        const db = new Database(DB_PATH, { readonly: true, fileMustExist: true });
+        if (days === 7) {
+          // weekly
+          const rows = db.prepare(`SELECT wallet as walletAddress, SUM(CAST(amount AS INTEGER)) as tPoints FROM events WHERE timestamp >= ? GROUP BY wallet ORDER BY tPoints DESC`).all(cutoff);
+          const resp = { rows: rows.map((r: any) => ({ walletAddress: (r.walletAddress || '').toLowerCase(), tPoints: Number(r.tPoints || 0) })), meta: { source: 'sqlite', dbPath: DB_PATH, cutoffTimestamp: cutoff, now: nowSec } };
+          return new Response(JSON.stringify(resp), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        } else {
+          const rows = db.prepare(`SELECT wallet as walletAddress, SUM(CAST(amount AS INTEGER)) as tPoints FROM events GROUP BY wallet ORDER BY tPoints DESC`).all();
+          const resp = { rows: rows.map((r: any) => ({ walletAddress: (r.walletAddress || '').toLowerCase(), tPoints: Number(r.tPoints || 0) })), meta: { source: 'sqlite', dbPath: DB_PATH, now: nowSec } };
+          return new Response(JSON.stringify(resp), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        }
+      } catch (e) {
+        // if DB read fails, fall back to on-chain scanning
+        console.debug('[windowed] sqlite read failed, falling back to on-chain', String(e));
+      }
+    }
 
     // Find fromBlock using block timestamps
     const fromBlock = await findFromBlock(cutoff);
@@ -209,4 +241,5 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export const runtime = 'edge';
+// This route may perform DB reads and long-running RPC chunked scans — use Node runtime
+export const runtime = 'nodejs';
