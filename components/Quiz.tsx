@@ -76,13 +76,9 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     }
 
     try {
-      // Use the shared toggle logic so the Start button and Play/Pause
-      // button behave identically and share state.
-      try {
-        await togglePlay(true);
-      } catch (_) {
-        // ignore — the lifecycle effect will try again
-      }
+      // Note: defer starting music until after quiz state flips to avoid
+      // a brief pause caused by the lifecycle effect cleaning up/creating
+      // the audio element during the state transition.
       // Request questions without specifying a difficulty (allow all difficulties)
       const categoryParam = questionCategory ? `&category=${encodeURIComponent(questionCategory)}` : '';
       const effectiveSource = questionCategory === 'Farcaster Knowledge'
@@ -108,6 +104,14 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         consecutiveCorrect: 0,
         tPoints: 0,
       });
+
+      // Start music after quiz state is set so the effect that manages
+      // the audio element doesn't race with an early togglePlay call.
+      try {
+        await togglePlay(true);
+      } catch (_) {
+        // ignore — the lifecycle effect will try again if necessary
+      }
     } catch (err) {
       setError('Failed to load quiz questions. Please try again.');
       console.error(err);
