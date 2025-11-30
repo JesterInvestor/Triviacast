@@ -73,14 +73,14 @@ export async function GET(req: NextRequest) {
       fromBlock,
       toBlock: 'latest',
       topics: [topic0],
-    });
+    } as any);
 
     // Aggregate per wallet (topics[1] contains indexed address)
     const totals = new Map<string, bigint>();
     for (const l of logs) {
       try {
         if (!l.topics || l.topics.length < 2) continue;
-        const walletTopic = l.topics[1]; // 32-byte hex
+        const walletTopic = l.topics![1] as string; // 32-byte hex
         // address is last 20 bytes (40 hex chars)
         const addr = `0x${walletTopic.slice(-40)}`.toLowerCase();
         const amount = l.data ? BigInt(l.data) : 0n;
