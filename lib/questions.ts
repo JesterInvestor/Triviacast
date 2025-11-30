@@ -4,11 +4,47 @@ import farcasterQuestions from '@/data/farcaster_questions.json';
 /**
  * Fetch questions from OpenTDB API
  */
-export async function fetchOpenTDB(amount: number = 10, difficulty?: string): Promise<Question[]> {
+export async function fetchOpenTDB(amount: number = 10, difficulty?: string, category?: string): Promise<Question[]> {
+  const OPEN_TDB_CATEGORY_IDS: Record<string, number> = {
+    'General Knowledge': 9,
+    'Entertainment: Books': 10,
+    'Entertainment: Film': 11,
+    'Entertainment: Music': 12,
+    'Entertainment: Musicals & Theatres': 13,
+    'Entertainment: Television': 14,
+    'Entertainment: Video Games': 15,
+    'Entertainment: Board Games': 16,
+    'Science & Nature': 17,
+    'Science: Computers': 18,
+    'Science: Mathematics': 19,
+    'Mythology': 20,
+    'Sports': 21,
+    'Geography': 22,
+    'History': 23,
+    'Politics': 24,
+    'Art': 25,
+    'Celebrities': 26,
+    'Animals': 27,
+    'Vehicles': 28,
+    'Entertainment: Comics': 29,
+    'Science: Gadgets': 30,
+    'Entertainment: Japanese Anime & Manga': 31,
+    'Entertainment: Cartoon & Animations': 32,
+  };
+
   const buildUrl = (count: number) => {
     let url = `https://opentdb.com/api.php?amount=${count}&type=multiple`;
     if (difficulty) {
       url += `&difficulty=${difficulty}`;
+    }
+    if (category) {
+      // If category is a numeric id string, use it directly; otherwise map the human-readable name
+      const asNumber = Number(category);
+      if (!Number.isNaN(asNumber) && asNumber > 0) {
+        url += `&category=${asNumber}`;
+      } else if (OPEN_TDB_CATEGORY_IDS[category]) {
+        url += `&category=${OPEN_TDB_CATEGORY_IDS[category]}`;
+      }
     }
     return url;
   };
@@ -89,12 +125,16 @@ export function pickRandomQuestions(
 export async function getQuestions(
   source: 'opentdb' | 'farcaster',
   amount: number = 10,
-  difficulty?: string
+  difficulty?: string,
+  category?: string
 ): Promise<Question[]> {
   if (source === 'farcaster') {
-    const allQuestions = loadLocalFarcasterQuestions();
+    let allQuestions = loadLocalFarcasterQuestions();
+    if (category) {
+      allQuestions = allQuestions.filter((q) => (q.category || '').toLowerCase() === category.toLowerCase());
+    }
     return pickRandomQuestions(allQuestions, amount, difficulty);
   } else {
-    return fetchOpenTDB(amount, difficulty);
+    return fetchOpenTDB(amount, difficulty, category);
   }
 }

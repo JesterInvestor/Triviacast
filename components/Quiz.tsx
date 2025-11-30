@@ -344,9 +344,12 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
           
           {/* Category prompt */}
           <div className="mb-4 flex flex-col items-center w-full">
-            <div className="flex items-center gap-3 justify-center">
-              <Image src="/brain-small.svg" alt="Brain" width={36} height={36} />
-              <div className="text-lg font-semibold text-[#2d1b2e]">💭 What do you want to quiz about?</div>
+            <div className="flex items-center gap-3 justify-center w-full">
+              <div className="text-lg font-semibold text-[#2d1b2e] text-left">What do you want to quiz about?</div>
+              <div className="flex flex-col items-center ml-2">
+                <div className="text-2xl leading-none">💭</div>
+                <Image src="/brain-small.svg" alt="Brain" width={36} height={36} className="mt-1" />
+              </div>
             </div>
 
             <div className="mt-3 w-full grid grid-cols-2 sm:grid-cols-4 gap-2">

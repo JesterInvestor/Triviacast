@@ -43,12 +43,14 @@ export async function GET(request: Request) {
   const amount = Math.max(1, Math.min(50, requestedAmount));
   const source = searchParams.get('source') || 'opentdb'; // default to OpenTDB
   const difficulty = searchParams.get('difficulty') || '';
+  const category = searchParams.get('category') || '';
 
   try {
     const questions = await getQuestions(
       source as 'opentdb' | 'farcaster',
       amount,
-      difficulty
+      difficulty,
+      category || undefined
     );
 
     if (questions.length === 0) {
