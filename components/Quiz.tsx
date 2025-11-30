@@ -359,20 +359,24 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
             </div>
 
             <div className="mt-3 w-full grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setQuestionCategory(cat === questionCategory ? '' : cat)}
-                  className={`px-3 py-2 rounded-lg text-sm text-left transition w-full ${
-                    questionCategory === cat
-                      ? 'bg-[#F4A6B7] text-white shadow-lg scale-105'
-                      : 'bg-white text-[#5a3d5c] border-2 border-[#F4A6B7] hover:bg-[#FFE4EC]'
-                  }`}
-                  title={cat}
-                >
-                  {cat}
-                </button>
-              ))}
+              {CATEGORIES.map((cat) => {
+                // Strip common prefixes for display only (preserve full value internally)
+                const shortLabel = String(cat).replace(/^(?:Entertainment|Science):\s*/i, '');
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setQuestionCategory(cat === questionCategory ? '' : cat)}
+                    className={`px-3 py-2 rounded-lg text-sm text-left transition w-full ${
+                      questionCategory === cat
+                        ? 'bg-[#F4A6B7] text-white shadow-lg scale-105'
+                        : 'bg-white text-[#5a3d5c] border-2 border-[#F4A6B7] hover:bg-[#FFE4EC]'
+                    }`}
+                    title={cat}
+                  >
+                    {shortLabel}
+                  </button>
+                );
+              })}
             </div>
             {questionCategory && (
               <div className="mt-2 text-xs text-gray-600">Selected: <strong>{questionCategory}</strong></div>
