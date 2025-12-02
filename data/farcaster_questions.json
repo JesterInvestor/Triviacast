@@ -1003,9 +1003,6 @@
     ],
     "explanation": "Farcaster uses EdDSA (Ed25519) for its message signatures in many implementations.",
     "tags": ["farcaster", "hard", "security"]
-  }
-    "explanation": "Farcaster uses EdDSA with Ed25519 for efficient and secure message signatures.",
-    "tags": ["farcaster", "hard", "cryptography"]
   },
   {
     "id": "fc_068",
