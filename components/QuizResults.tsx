@@ -27,17 +27,17 @@ function decodeHtml(html: string): string {
   return txt.value;
 }
 
-export default function QuizResults({ 
-  score, 
-  totalQuestions, 
-  questions, 
-  answers, 
+export default function QuizResults({
+  score,
+  totalQuestions,
+  questions,
+  answers,
   tPoints,
-  onRestart 
-  , category
+  onRestart,
+  category
 }: QuizResultsProps) {
   const percentage = Math.round((score / totalQuestions) * 100);
-  const { address, status } = useAccount();
+  const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const [signing, setSigning] = useState(false);
   const [signError, setSignError] = useState<Error | null>(null);
@@ -55,13 +55,12 @@ export default function QuizResults({
       });
       return;
     }
-    // All async/await and try/catch must be inside this async function
     const savePoints = async () => {
       console.info('[Triviacast] savePoints called', {
         tPoints,
         pointsSaved,
         contractConfigured: isContractConfigured(),
-              activeAccount: address,
+        activeAccount: address
       });
 
       setSavingPoints(true);
@@ -69,7 +68,6 @@ export default function QuizResults({
       setSigning(true);
       setSignError(null);
       try {
-        // Require user to sign a message before awarding T Points
         const message = `I am claiming ${tPoints} T Points for completing the Triviacast quiz on ${new Date().toISOString()}`;
         console.debug('[Triviacast] Requesting signature:', { address, message });
         let signature;
@@ -83,11 +81,11 @@ export default function QuizResults({
           return;
         }
 
-        // Always save to localStorage first
+        // Save locally first
         console.debug('[Triviacast] addWalletTPoints', { address, tPoints });
         await addWalletTPoints(address, tPoints);
 
-        // If contract is configured, also save to blockchain
+        // Optionally save to chain
         if (isContractConfigured()) {
           try {
             console.debug('[Triviacast] Calling addPointsOnChain', { address, tPoints, signature });
@@ -103,13 +101,13 @@ export default function QuizResults({
 
         setPointsSaved(true);
 
-        // Fire-and-forget: record this event server-side for windowed leaderboards
+        // Record event server-side (fire-and-forget)
         (async () => {
           try {
             await fetch('/api/points', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ wallet: address, points: tPoints, source: 'quiz' }),
+              body: JSON.stringify({ wallet: address, points: tPoints, source: 'quiz' })
             });
           } catch (e) {
             console.debug('Failed to record points event to server', e);
@@ -126,10 +124,8 @@ export default function QuizResults({
 
     savePoints();
   }, [address, tPoints, pointsSaved, signMessageAsync]);
-  
+
   const getResultMessage = () => {
-    // Farcaster-flavored, wacky messages. Harsh-but-funny if they only earned 1000 T Points.
-    // Assumption: 1000 T Points == exactly one correct answer (base 1000 per correct).
     if (tPoints === 1000) return "One lonely warp. Like casting to /alpha at 3am—no recasts, just vibes. 🥲";
     if (percentage === 100) return "Perfect frame flip. Absolute signal. Expect unsolicited warps. 🟣";
     if (percentage >= 90) return "Onchain grey-matter. DWR farm online. 🔥";
@@ -141,10 +137,10 @@ export default function QuizResults({
   };
 
   const getResultColor = () => {
-    if (percentage >= 80) return "text-green-600";
-    if (percentage >= 60) return "text-[#F4A6B7]";
-    if (percentage >= 40) return "text-[#DC8291]";
-    return "text-red-600";
+    if (percentage >= 80) return 'text-green-600';
+    if (percentage >= 60) return 'text-[#F4A6B7]';
+    if (percentage >= 40) return 'text-[#DC8291]';
+    return 'text-red-600';
   };
 
   return (
@@ -152,62 +148,44 @@ export default function QuizResults({
       <div className="bg-white rounded-lg shadow-xl p-4 sm:p-8 border-4 border-[#F4A6B7]">
         <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4">
           <Image src="/brain-large.svg" alt="Brain" width={64} height={64} className="w-16 h-16 sm:w-20 sm:h-20" priority />
-          <h2 className="text-2xl sm:text-3xl font-bold text-center text-[#2d1b2e]">
-            Quiz Complete!
-          </h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-[#2d1b2e]">Quiz Complete!</h2>
         </div>
-        {/* Share results CTA moved to top under header */}
+
         <div className="text-center mb-4 sm:mb-6">
           <button
             onClick={() => openShareUrl(shareResultsUrl(score, totalQuestions, percentage, tPoints, category))}
-            className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-6 rounded-lg text-base sm:text-lg transition inline-flex items-center justify-center shadow-lg min-h-[48px] w-full sm:w-auto gap-2"
+            className="bg-[#DC8291] hover:bg-[#C86D7D] active:bg-[#C86D7D] text-white font-bold py-3 px-6 rounded-lg text-base sm:text-lg transition inline-flex items-center justify-center shadow-lg"
             aria-label="Share results on Farcaster"
           >
-            <Image src="/farcaster.svg" alt="Farcaster" width={16} height={16} className="w-4 h-4" />
+            <Image src="/farcaster.svg" alt="Farcaster" width={16} height={16} className="w-4 h-4 mr-2" />
             Share Results
           </button>
         </div>
-        
+
         <div className="text-center mb-6 sm:mb-8">
-          <div className={`text-4xl sm:text-6xl font-bold mb-2 ${getResultColor()}`}>
-            {score}/{totalQuestions}
-          </div>
-          <div className="text-xl sm:text-2xl text-[#5a3d5c] mb-2">
-            {percentage}% Correct
-          </div>
-          <div className="text-lg sm:text-xl font-semibold text-[#2d1b2e]">
-            {getResultMessage()}
-          </div>
-          
+          <div className={`text-4xl sm:text-6xl font-bold mb-2 ${getResultColor()}`}>{score}/{totalQuestions}</div>
+          <div className="text-xl sm:text-2xl text-[#5a3d5c] mb-2">{percentage}% Correct</div>
+          <div className="text-lg sm:text-xl font-semibold text-[#2d1b2e]">{getResultMessage()}</div>
+
           <div className="mt-4 sm:mt-6 p-4 sm:p-6 bg-gradient-to-r from-[#FFE4EC] to-[#FFC4D1] rounded-lg border-2 border-[#F4A6B7] shadow-lg">
-            <div className="text-2xl sm:text-3xl font-bold text-[#DC8291] mb-2">
-              🏆 {tPoints.toLocaleString()} T Points Earned!
-            </div>
+            <div className="text-2xl sm:text-3xl font-bold text-[#DC8291] mb-2">🏆 {tPoints.toLocaleString()} T Points Earned!</div>
             <div className="text-xs sm:text-sm text-[#5a3d5c] font-medium mb-2">
-              • 1000 T points per correct answer<br/>
-              • 500 bonus for 3 in a row<br/>
-              • 1000 bonus for 5 in a row<br/>
+              • 1000 T points per correct answer<br />
+              • 500 bonus for 3 in a row<br />
+              • 1000 bonus for 5 in a row<br />
               • 2000 bonus for perfect 10!
             </div>
             {savingPoints && (
-              <div className="text-xs text-[#5a3d5c] italic mt-2">
-                {'💾 Saving points to blockchain...'}
-              </div>
+              <div className="text-xs text-[#5a3d5c] italic mt-2">💾 Saving points to blockchain...</div>
             )}
             {signError && (
-              <div className="text-xs text-orange-600 mt-2">
-                ⚠️ Signature error: {signError.message}
-              </div>
+              <div className="text-xs text-orange-600 mt-2">⚠️ Signature error: {signError.message}</div>
             )}
             {pointsSaved && !saveError && isContractConfigured() && (
-              <div className="text-xs text-green-700 font-semibold mt-2">
-                ✅ Points saved to blockchain!
-              </div>
+              <div className="text-xs text-green-700 font-semibold mt-2">✅ Points saved to blockchain!</div>
             )}
             {saveError && (
-              <div className="text-xs text-orange-600 mt-2">
-                ⚠️ {saveError}
-              </div>
+              <div className="text-xs text-orange-600 mt-2">⚠️ {saveError}</div>
             )}
           </div>
         </div>
@@ -221,14 +199,15 @@ export default function QuizResults({
             {questions.map((question, index) => {
               const userAnswer = answers[index];
               const isCorrect = userAnswer === question.correct_answer;
-              
+              // Some question objects may include an optional explanation property.
+              const explanation = (question as any).explanation;
+              const hasExplanation = typeof explanation === 'string' && explanation.trim().length > 0;
+
               return (
-                <div 
+                <div
                   key={index}
                   className={`p-3 sm:p-4 rounded-lg border-2 ${
-                    isCorrect 
-                      ? 'border-green-500 bg-green-50' 
-                      : 'border-red-500 bg-red-50'
+                    isCorrect ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'
                   }`}
                 >
                   <div className="flex items-start gap-2">
@@ -247,19 +226,20 @@ export default function QuizResults({
                         {!isCorrect && (
                           <div className="break-words">
                             <span className="font-semibold text-[#2d1b2e]">Correct answer: </span>
-                            <span className="text-green-700">
-                              {decodeHtml(question.correct_answer)}
-                            </span>
+                            <span className="text-green-700">{decodeHtml(question.correct_answer)}</span>
+                          </div>
+                        )}
+
+                        {hasExplanation && (
+                          <div className="break-words mt-2 p-2 bg-white rounded border border-[#eee] text-sm text-[#4a3a4a]">
+                            <span className="font-semibold text-[#2d1b2e]">Explanation: </span>
+                            <span>{decodeHtml(explanation)}</span>
                           </div>
                         )}
                       </div>
                     </div>
                     <div className="flex-shrink-0">
-                      {isCorrect ? (
-                        <span className="text-xl sm:text-2xl">✓</span>
-                      ) : (
-                        <span className="text-xl sm:text-2xl">✗</span>
-                      )}
+                      {isCorrect ? <span className="text-xl sm:text-2xl">✓</span> : <span className="text-xl sm:text-2xl">✗</span>}
                     </div>
                   </div>
                 </div>
@@ -267,8 +247,6 @@ export default function QuizResults({
             })}
           </div>
         </div>
-
-        
 
         <div className="text-center flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
           <button
@@ -283,7 +261,6 @@ export default function QuizResults({
           >
             View Leaderboard
           </Link>
-          
         </div>
       </div>
     </div>
