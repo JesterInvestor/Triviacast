@@ -7,29 +7,25 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 /**
  * Get leaderboard using SQL on-demand.
  * scope: 'alltime' | 'weekly'
- * limit: number
+ * limit: number (must be positive, defaults to 100)
  */
 async function getLeaderboardSql(scope = 'alltime', limit = 100) {
-  if (scope === 'weekly') {
-    const { rows } = await pool.query(
-      `SELECT user_id, SUM(points) AS total
-       FROM scores
-       WHERE created_at >= now() - interval '7 days'
-       GROUP BY user_id
-       ORDER BY total DESC
-       LIMIT $1`, [limit]
-    );
-    return rows.map(r => ({ user_id: r.user_id, total: Number(r.total) }));
-  } else {
-    const { rows } = await pool.query(
-      `SELECT user_id, SUM(points) AS total
-       FROM scores
-       GROUP BY user_id
-       ORDER BY total DESC
-       LIMIT $1`, [limit]
-    );
-    return rows.map(r => ({ user_id: r.user_id, total: Number(r.total) }));
-  }
+  // Validate and sanitize limit
+  const sanitizedLimit = Math.max(1, Math.min(Number(limit) || 100, 1000));
+
+  // Build query with optional date filter for weekly scope
+  const whereClause = scope === 'weekly' ? `WHERE created_at >= now() - interval '7 days'` : '';
+  const query = `
+    SELECT user_id, SUM(points) AS total
+    FROM scores
+    ${whereClause}
+    GROUP BY user_id
+    ORDER BY total DESC
+    LIMIT $1
+  `;
+
+  const { rows } = await pool.query(query, [sanitizedLimit]);
+  return rows.map(r => ({ user_id: r.user_id, total: Number(r.total) }));
 }
 
 /**

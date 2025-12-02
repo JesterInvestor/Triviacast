@@ -8,7 +8,9 @@ const { getLeaderboardSql } = require('../services/leaderboard_service');
 // GET /api/leaderboard?scope=weekly|alltime&limit=100
 router.get('/', async (req, res) => {
   const scope = req.query.scope === 'weekly' ? 'weekly' : 'alltime';
-  const limit = Math.min(parseInt(req.query.limit, 10) || 100, 1000);
+  const parsedLimit = parseInt(req.query.limit, 10);
+  // Default to 100 if invalid (NaN, negative, or zero), cap at 1000
+  const limit = (Number.isNaN(parsedLimit) || parsedLimit <= 0) ? 100 : Math.min(parsedLimit, 1000);
 
   try {
     const data = await getLeaderboardSql(scope, limit);
