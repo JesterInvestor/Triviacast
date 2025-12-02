@@ -3,76 +3,76 @@
     "id": "fc_001",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "easy",
-    "question": "What is Farcaster?",
-    "correct_answer": "A decentralized social network",
+    "difficulty": "hard",
+    "question": "Which components make up Farcaster's hybrid architecture and what are their primary responsibilities?",
+    "correct_answer": "On-chain ERC-721 registry for FIDs, off-chain Hubs for storing and syncing messages, and Signers for delegated posting authority",
     "incorrect_answers": [
-      "A cryptocurrency exchange",
-      "A weather forecasting app",
-      "A video streaming platform"
+      "Only on-chain smart contracts store messages and identity",
+      "A single centralized server stores identities while clients handle messages",
+      "A federated network of independent blockchains each storing different users"
     ],
-    "explanation": "Farcaster is a sufficiently decentralized social network built on Ethereum.",
-    "tags": ["farcaster", "basics"]
+    "explanation": "Farcaster uses an ERC-721 registry to represent FIDs on-chain, Hubs to store and sync user messages off-chain, and Signers to delegate signing authority to apps without exposing private keys.",
+    "tags": ["farcaster", "architecture", "hard"]
   },
   {
     "id": "fc_002",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "easy",
-    "question": "Who is the co-founder of Farcaster?",
-    "correct_answer": "Dan Romero",
+    "difficulty": "hard",
+    "question": "Which protocol-level guarantee does Farcaster rely on to keep Hubs consistent?",
+    "correct_answer": "Eventual consistency through CRDTs across Hubs",
     "incorrect_answers": [
-      "Vitalik Buterin",
-      "Brian Armstrong",
-      "Mark Zuckerberg"
+      "Synchronous global consensus using Proof-of-Stake",
+      "Immediate finality enforced by a central authority",
+      "Periodic merkle-root anchoring to Bitcoin for ordering"
     ],
-    "explanation": "Dan Romero (dwr.eth) co-founded Farcaster and previously worked at Coinbase.",
-    "tags": ["farcaster", "founders"]
+    "explanation": "Farcaster adopts CRDTs (Conflict-free Replicated Data Types) to achieve eventual consistency across independently operated Hubs without requiring a traditional consensus mechanism.",
+    "tags": ["farcaster", "consistency", "hard"]
   },
   {
     "id": "fc_003",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "easy",
-    "question": "What is a 'Frame' in Farcaster?",
-    "correct_answer": "An interactive element embedded in casts",
+    "difficulty": "hard",
+    "question": "How do Frames provide interactive third-party functionality without exposing user private keys?",
+    "correct_answer": "Frames render third-party content via Open Graph/HTTPS and use Signer delegation or app-level signing callbacks so the frame never accesses the user's main private key",
     "incorrect_answers": [
-      "A profile picture border",
-      "A type of NFT",
-      "A video format"
+      "Frames require users to enter their private key into the frame UI",
+      "Frames run on-chain logic that signs transactions directly",
+      "Frames replicate the user's key material on third-party servers"
     ],
-    "explanation": "Frames are interactive applications that can be embedded directly in Farcaster casts.",
-    "tags": ["farcaster", "frames"]
+    "explanation": "Frames embed interactive experiences using web standards; actual authorization to post or act on a user's behalf is done via delegated Signers or signed callbacks, keeping private keys secure.",
+    "tags": ["farcaster", "frames", "security", "hard"]
   },
   {
     "id": "fc_004",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "easy",
-    "question": "What blockchain is Farcaster primarily built on?",
-    "correct_answer": "Ethereum",
+    "difficulty": "hard",
+    "question": "Why does Farcaster use L2 solutions like Optimism or Base for certain on-chain interactions?",
+    "correct_answer": "To lower transaction costs and increase throughput for identity and storage-related payments while preserving settlement on Ethereum",
     "incorrect_answers": [
-      "Bitcoin",
-      "Solana",
-      "Cardano"
+      "Because Farcaster only supports Layer 2 networks and not Ethereum",
+      "To move all message storage on-chain permanently",
+      "To replace the need for Hubs entirely"
     ],
-    "explanation": "Farcaster uses Ethereum for identity and key management.",
-    "tags": ["farcaster", "blockchain"]
+    "explanation": "Using L2s reduces gas costs for actions like paying rent for storage, while keeping the trust assumptions connected to Ethereum for final settlement where necessary.",
+    "tags": ["farcaster", "layer2", "hard"]
   },
   {
     "id": "fc_005",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "easy",
-    "question": "What is the main Farcaster client called?",
-    "correct_answer": "Warpcast",
+    "difficulty": "hard",
+    "question": "What role does Warpcast play relative to Farcaster Hubs and the protocol?",
+    "correct_answer": "Warpcast is a primary client that interfaces with Hubs to read and write messages, apply client-side moderation, and provide user-facing features",
     "incorrect_answers": [
-      "Farcaster App",
-      "Castaway",
-      "Farcast"
+      "Warpcast is the only Hub implementation and stores all messages",
+      "Warpcast is an on-chain smart contract that mints FIDs",
+      "Warpcast is a governance token for Farcaster"
     ],
-    "explanation": "Warpcast is the primary client for accessing Farcaster, developed by the core team.",
-    "tags": ["farcaster", "clients"]
+    "explanation": "Warpcast is a client implementation (UI and app logic) that interacts with Hubs; Hubs store and sync data while clients present content and enforce client-level moderation.",
+    "tags": ["farcaster", "clients", "hard"]
   },
   {
     "id": "fc_006",
@@ -236,7 +236,7 @@
       "Gas fees for Ethereum transactions",
       "A tipping mechanism for content"
     ],
-    "explanation": "Users pay rent (in ETH) to store their data on Farcaster Hubs.",
+    "explanation": "Users pay rent (in ETH or via L2) to store their data on Farcaster Hubs.",
     "tags": ["farcaster", "hard", "economics"]
   },
   {
@@ -303,31 +303,31 @@
     "id": "fc_021",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "easy",
-    "question": "What is the symbol used before a username on Farcaster?",
-    "correct_answer": "@",
+    "difficulty": "hard",
+    "question": "How are ENS names resolved to Farcaster FIDs in the protocol?",
+    "correct_answer": "Via mappings registered in the Farcaster Name Registry (FNR) that link ENS/username entries to on-chain FID NFTs",
     "incorrect_answers": [
-      "#",
-      "$",
-      "&"
+      "ENS names are ignored by Farcaster and not supported",
+      "Farcaster uses a separate central database for ENS resolution",
+      "ENS names are resolved off-chain by third-party indexers only"
     ],
-    "explanation": "Farcaster uses @ for mentions, similar to Twitter and other social platforms.",
-    "tags": ["farcaster", "basics"]
+    "explanation": "The FNR allows ENS-like names to be associated with FID NFTs so clients can resolve human-readable names to Farcaster accounts.",
+    "tags": ["farcaster", "identity", "hard"]
   },
   {
     "id": "fc_022",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "easy",
-    "question": "Can you edit a cast after posting it?",
-    "correct_answer": "No, casts are immutable",
+    "difficulty": "hard",
+    "question": "How does Farcaster enforce immutability and what are deletion semantics for casts?",
+    "correct_answer": "Messages are signed and persisted on Hubs; deleting creates a tombstone but cached copies or archived copies may persist outside the Hub",
     "incorrect_answers": [
-      "Yes, within 5 minutes",
-      "Yes, anytime",
-      "Yes, but it shows as edited"
+      "Casts are fully mutable and edits are stored on-chain",
+      "Deletes instantly purge all copies from every archive",
+      "Casts are stored only locally and never propagated"
     ],
-    "explanation": "Like blockchain transactions, casts cannot be edited once posted. You can only delete them.",
-    "tags": ["farcaster", "basics"]
+    "explanation": "Because Hubs and other services may have cached copies, deleting a cast typically marks it as deleted at the protocol level but does not guarantee removal from all external caches or archives.",
+    "tags": ["farcaster", "data-retention", "hard"]
   },
   {
     "id": "fc_023",
@@ -753,31 +753,31 @@
     "id": "fc_051",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "easy",
-    "question": "What is the main purpose of Channels on Farcaster?",
-    "correct_answer": "To organize content by topic",
+    "difficulty": "hard",
+    "question": "How are moderation and access controls typically implemented for Channels?",
+    "correct_answer": "They are implemented at the client or Hub level via allowlists, blocklists, and client-side curation rather than as a protocol-enforced rule",
     "incorrect_answers": [
-      "To create private groups",
-      "To sell NFTs",
-      "To stream videos"
+      "Channels are moderated only by an on-chain DAO vote",
+      "Channels cannot be moderated at all",
+      "Channels are centrally moderated by Warpcast"
     ],
-    "explanation": "Channels help organize Farcaster content around specific topics and communities.",
-    "tags": ["farcaster", "channels"]
+    "explanation": "Farcaster delegates moderation to clients and hub operators, allowing different policies per client/channel for curation and access control.",
+    "tags": ["farcaster", "channels", "moderation", "hard"]
   },
   {
     "id": "fc_052",
     "category": "Farcaster Knowledge",
     "type": "multiple",
-    "difficulty": "easy",
-    "question": "Can you delete a cast after posting?",
-    "correct_answer": "Yes, but it may remain in some caches",
+    "difficulty": "hard",
+    "question": "What factors determine 'rent' and storage pricing on Farcaster Hubs?",
+    "correct_answer": "Bytes stored, retention period, hub operator pricing, and payment network (often an L2 like Optimism or Base)",
     "incorrect_answers": [
-      "No, never",
-      "Yes, completely and permanently",
-      "Only within 1 minute"
+      "A flat subscription set by Warpcast only",
+      "Only the number of casts, independent of size",
+      "Storage is free and unlimited for all accounts"
     ],
-    "explanation": "You can delete casts, but they may persist in some caches or archives.",
-    "tags": ["farcaster", "basics"]
+    "explanation": "Hub operators set pricing based on storage usage and retention; payments are often made via Layer 2 solutions to reduce costs.",
+    "tags": ["farcaster", "storage", "hard"]
   },
   {
     "id": "fc_053",
@@ -998,9 +998,12 @@
     "correct_answer": "EdDSA (Ed25519)",
     "incorrect_answers": [
       "RSA",
-      "ECDSA only",
-      "SHA-256"
+      "ECDSA secp256k1",
+      "Blowfish"
     ],
+    "explanation": "Farcaster uses EdDSA (Ed25519) for its message signatures in many implementations.",
+    "tags": ["farcaster", "hard", "security"]
+  }
     "explanation": "Farcaster uses EdDSA with Ed25519 for efficient and secure message signatures.",
     "tags": ["farcaster", "hard", "cryptography"]
   },
