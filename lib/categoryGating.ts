@@ -58,18 +58,21 @@ export const UNGATED_CATEGORIES = [
   'Christmas',
 ];
 
+// Cache category to points mapping for O(1) lookups
+const CATEGORY_TO_POINTS_MAP = new Map<string, number>();
+for (const tier of GATING_TIERS) {
+  for (const category of tier.categories) {
+    CATEGORY_TO_POINTS_MAP.set(category, tier.minPoints);
+  }
+}
+
 /**
  * Get the minimum T points required for a category
  * @param category Category name
  * @returns Minimum points required, or 0 if ungated
  */
 export function getRequiredPoints(category: string): number {
-  for (const tier of GATING_TIERS) {
-    if (tier.categories.includes(category)) {
-      return tier.minPoints;
-    }
-  }
-  return 0; // Ungated
+  return CATEGORY_TO_POINTS_MAP.get(category) ?? 0;
 }
 
 /**
