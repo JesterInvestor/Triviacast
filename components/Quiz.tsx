@@ -81,7 +81,12 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
       // a brief pause caused by the lifecycle effect cleaning up/creating
       // the audio element during the state transition.
       // Request questions without specifying a difficulty (allow all difficulties)
-      const categoryParam = questionCategory ? `&category=${encodeURIComponent(questionCategory)}` : '';
+      // For local sources like Farcaster/Base/Christmas, we rely on their
+      // internal categories and do not pass the high-level label as a filter.
+      const shouldPassCategory = !['Farcaster', 'Base', 'Christmas'].includes(questionCategory);
+      const categoryParam = questionCategory && shouldPassCategory
+        ? `&category=${encodeURIComponent(questionCategory)}`
+        : '';
       const effectiveSource = questionCategory === 'Farcaster'
         ? 'farcaster'
         : questionCategory === 'Base'
