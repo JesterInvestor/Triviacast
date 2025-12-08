@@ -1,0 +1,49 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cedar/Pine branch for corner decoration -->
+  <!-- Main branch stem -->
+  <path d="M5 75 Q20 60 35 45 Q50 30 65 15" stroke="#2F4F2F" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Pine needles clusters -->
+  <!-- Bottom cluster -->
+  <path d="M8 72 L2 78" stroke="#228B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M8 72 L6 80" stroke="#228B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M8 72 L12 78" stroke="#228B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M8 72 L14 74" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Middle-bottom cluster -->
+  <path d="M18 62 L12 66" stroke="#228B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M18 62 L14 70" stroke="#228B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M18 62 L22 68" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
+  <path d="M18 62 L26 64" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
+  <path d="M18 62 L20 56" stroke="#32CD32" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Middle cluster -->
+  <path d="M32 48 L26 52" stroke="#228B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M32 48 L28 56" stroke="#228B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M32 48 L36 54" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
+  <path d="M32 48 L40 50" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
+  <path d="M32 48 L34 42" stroke="#32CD32" stroke-width="2" stroke-linecap="round"/>
+  <path d="M32 48 L38 44" stroke="#32CD32" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Middle-top cluster -->
+  <path d="M48 32 L42 36" stroke="#228B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M48 32 L44 40" stroke="#228B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M48 32 L52 38" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
+  <path d="M48 32 L56 34" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
+  <path d="M48 32 L50 26" stroke="#32CD32" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Top cluster -->
+  <path d="M62 18 L56 22" stroke="#228B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M62 18 L58 26" stroke="#228B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M62 18 L66 24" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
+  <path d="M62 18 L70 20" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
+  <path d="M62 18 L64 12" stroke="#32CD32" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Red berries for Christmas touch -->
+  <circle cx="10" cy="75" r="2.5" fill="#DC143C"/>
+  <circle cx="22" cy="65" r="2.5" fill="#DC143C"/>
+  <circle cx="35" cy="52" r="2.5" fill="#DC143C"/>
+  <circle cx="50" cy="36" r="2.5" fill="#DC143C"/>
+  <circle cx="38" cy="50" r="2" fill="#B22222"/>
+  <circle cx="55" cy="32" r="2" fill="#B22222"/>
+</svg>

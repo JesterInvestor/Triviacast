@@ -333,7 +333,21 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   if (!isConnected || !accountAddress) {
     return (
       <div className="max-w-2xl mx-auto px-2 sm:px-6">
-        <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 text-center border-4 border-[#F4A6B7]">
+        <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 text-center border-4 border-[#F4A6B7] relative overflow-visible">
+          {/* Christmas Cedar Corner Decorations */}
+          <div className="absolute -top-2 -left-2 w-12 h-12 sm:w-16 sm:h-16 pointer-events-none z-10">
+            <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+          </div>
+          <div className="absolute -top-2 -right-2 w-12 h-12 sm:w-16 sm:h-16 pointer-events-none z-10 transform scale-x-[-1]">
+            <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+          </div>
+          <div className="absolute -bottom-2 -left-2 w-12 h-12 sm:w-16 sm:h-16 pointer-events-none z-10 transform scale-y-[-1]">
+            <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+          </div>
+          <div className="absolute -bottom-2 -right-2 w-12 h-12 sm:w-16 sm:h-16 pointer-events-none z-10 transform scale-[-1]">
+            <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+          </div>
+          
           <div className="mb-4 p-4 bg-[#FFE4EC] border-2 border-[#F4A6B7] text-[#5a3d5c] rounded-lg text-sm sm:text-base">
             🔒 Connect your wallet silly
           </div>
@@ -346,7 +360,21 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   if (!quizState.quizStarted) {
     return (
       <div className="max-w-2xl mx-auto px-2 sm:px-6">
-        <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 text-center border-4 border-[#F4A6B7]">
+        <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 text-center border-4 border-[#F4A6B7] relative overflow-visible">
+          {/* Christmas Cedar Corner Decorations */}
+          <div className="absolute -top-2 -left-2 w-12 h-12 sm:w-16 sm:h-16 pointer-events-none z-10">
+            <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+          </div>
+          <div className="absolute -top-2 -right-2 w-12 h-12 sm:w-16 sm:h-16 pointer-events-none z-10 transform scale-x-[-1]">
+            <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+          </div>
+          <div className="absolute -bottom-2 -left-2 w-12 h-12 sm:w-16 sm:h-16 pointer-events-none z-10 transform scale-y-[-1]">
+            <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+          </div>
+          <div className="absolute -bottom-2 -right-2 w-12 h-12 sm:w-16 sm:h-16 pointer-events-none z-10 transform scale-[-1]">
+            <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+          </div>
+          
           <div className="mb-6 flex justify-center">
             <Image src="/brain-large.svg" alt="Brain" width={96} height={96} className="w-24 h-24 sm:w-32 sm:h-32" priority />
           </div>
