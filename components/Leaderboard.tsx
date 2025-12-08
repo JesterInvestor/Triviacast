@@ -333,7 +333,21 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
 
   return (
     <div className="w-full px-0 sm:px-6">
-      <div className="bg-white rounded-lg shadow-xl p-2 sm:p-6 border-4 border-[#F4A6B7] w-full max-w-full">
+      <div className="bg-white rounded-lg shadow-xl p-2 sm:p-6 border-4 border-[#F4A6B7] w-full max-w-full relative overflow-visible">
+        {/* Christmas Cedar Corner Decorations */}
+        <div className="absolute -top-2 -left-2 w-12 h-12 sm:w-16 sm:h-16 pointer-events-none z-10">
+          <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+        </div>
+        <div className="absolute -top-2 -right-2 w-12 h-12 sm:w-16 sm:h-16 pointer-events-none z-10 transform scale-x-[-1]">
+          <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+        </div>
+        <div className="absolute -bottom-2 -left-2 w-12 h-12 sm:w-16 sm:h-16 pointer-events-none z-10 transform scale-y-[-1]">
+          <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+        </div>
+        <div className="absolute -bottom-2 -right-2 w-12 h-12 sm:w-16 sm:h-16 pointer-events-none z-10 transform scale-[-1]">
+          <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+        </div>
+        
         <div className="flex items-center justify-center gap-3 sm:gap-4 mb-2">
           <Image src="/brain-large.svg" alt="Brain" width={64} height={64} priority />
           <h1 className="text-2xl sm:text-4xl font-bold text-center text-[#2d1b2e]">
