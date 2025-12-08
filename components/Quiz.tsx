@@ -67,7 +67,8 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [userTPoints, setUserTPoints] = useState<number>(0);
 
-  const startQuiz = async () => {
+  // Update startQuiz to accept category param
+  const startQuiz = async (selectedCategory?: string) => {
     setLoading(true);
     setError(null);
 
@@ -78,30 +79,26 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
       return;
     }
 
+    const categoryToUse = selectedCategory ?? questionCategory;
+
     // Check if user has access to the selected category
-    if (questionCategory && !canAccessCategory(questionCategory, userTPoints)) {
-      const requiredPoints = getRequiredPoints(questionCategory);
+    if (categoryToUse && !canAccessCategory(categoryToUse, userTPoints)) {
+      const requiredPoints = getRequiredPoints(categoryToUse);
       setError(`This category requires ${requiredPoints.toLocaleString()} T Points. You have ${userTPoints.toLocaleString()} T Points. Play more quizzes to unlock!`);
       setLoading(false);
       return;
     }
 
     try {
-      // Note: defer starting music until after quiz state flips to avoid
-      // a brief pause caused by the lifecycle effect cleaning up/creating
-      // the audio element during the state transition.
-      // Request questions without specifying a difficulty (allow all difficulties)
-      // For local sources like Farcaster/Base/Christmas, we rely on their
-      // internal categories and do not pass the high-level label as a filter.
-      const shouldPassCategory = !['Farcaster', 'Base', 'Christmas'].includes(questionCategory);
-      const categoryParam = questionCategory && shouldPassCategory
-        ? `&category=${encodeURIComponent(questionCategory)}`
+      const shouldPassCategory = !['Farcaster', 'Base', 'Christmas'].includes(categoryToUse);
+      const categoryParam = categoryToUse && shouldPassCategory
+        ? `&category=${encodeURIComponent(categoryToUse)}`
         : '';
-      const effectiveSource = questionCategory === 'Farcaster'
+      const effectiveSource = categoryToUse === 'Farcaster'
         ? 'farcaster'
-        : questionCategory === 'Base'
+        : categoryToUse === 'Base'
           ? 'base'
-          : questionCategory === 'Christmas'
+          : categoryToUse === 'Christmas'
             ? 'christmas'
             : 'opentdb';
       const response = await fetch(`/api/questions?amount=10&source=${effectiveSource}${categoryParam}`);
@@ -123,8 +120,6 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         tPoints: 0,
       });
 
-      // Start music after quiz state is set so the effect that manages
-      // the audio element doesn't race with an early togglePlay call.
       try {
         await togglePlay(true);
       } catch (_) {
@@ -176,9 +171,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   // Notify parent when quiz completes so callers can show a share/preview flow
   useEffect(() => {
     if (!quizState.quizCompleted) return;
-    // Minimal client-side completion flag for quests gating
     try {
-      // Emit client-side event only; backend relayer disabled.
       window.dispatchEvent(new Event('triviacast:quizCompleted'));
     } catch {}
     try {
@@ -194,8 +187,6 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     } catch (_) {
       // ignore downstream errors from consumer
     }
-    // Only fire when completion state flips to true
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizState.quizCompleted]);
 
   // Background music lifecycle: create/cleanup only on quiz lifecycle
@@ -245,7 +236,6 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
 
   // Centralized audio control used by both the Start button and Play/Pause button
   async function togglePlay(shouldPlay?: boolean) {
-    // ensure audio element exists
     if (!audioRef.current) {
       const a = new Audio('/giggly-bubble-222533.mp3');
       a.loop = true;
@@ -258,8 +248,6 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     const play = typeof shouldPlay === 'undefined' ? audio.paused : !!shouldPlay;
 
     if (play) {
-      // Unmute preference: if the global sound setting is disabled, enable it
-      // when user explicitly requests playback via Start or Play button.
       try {
         if (sound.disabled) {
           try { sound.set(false); } catch {}
@@ -336,7 +324,6 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
       };
     });
 
-    // Move to next question or complete quiz
     setTimeout(() => {
       setQuizState((prev) => {
         const lastIndex = prev.questions.length - 1;
@@ -361,9 +348,8 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
       tPoints: 0,
     });
     setError(null);
+    setQuestionCategory('');
   };
-
-  // question source is derived from selected category at runtime
 
   // Require wallet connection before showing any quiz UI
   if (!isConnected || !accountAddress) {
@@ -428,22 +414,22 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
 
             <div className="mt-3 w-full grid grid-cols-2 sm:grid-cols-4 gap-2">
               {CATEGORIES.map((cat) => {
-                // Strip common prefixes for display only (preserve full value internally)
                 const shortLabel = String(cat).replace(/^(?:Entertainment|Science):\s*/i, '');
                 const isGated = isCategoryGated(cat);
                 const requiredPoints = getRequiredPoints(cat);
                 const hasAccess = canAccessCategory(cat, userTPoints);
                 const isLocked = isGated && !hasAccess;
-                
+
                 return (
                   <button
                     key={cat}
-                    onClick={() => {
-                      if (!isLocked) {
-                        setQuestionCategory(cat === questionCategory ? '' : cat);
+                    onClick={async () => {
+                      if (!isLocked && !loading) {
+                        setQuestionCategory(cat);
+                        await startQuiz(cat);
                       }
                     }}
-                    disabled={isLocked}
+                    disabled={isLocked || loading}
                     className={`px-3 py-2 rounded-lg text-sm text-left transition w-full relative ${
                       questionCategory === cat
                         ? 'bg-[#F4A6B7] text-white shadow-lg scale-105'
@@ -471,8 +457,6 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
             )}
           </div>
 
-          {/* (Question source removed — source is derived from selected category) */}
-
           {/* Gating Info Box */}
           <div className="mb-6 p-3 bg-[#FFE4EC] border-2 border-[#F4A6B7] rounded-lg text-sm">
             <div className="font-semibold text-[#2d1b2e] mb-2">🔓 Unlock More Categories</div>
@@ -495,17 +479,8 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
               {error}
             </div>
           )}
-          <button
-            onClick={startQuiz}
-            disabled={loading}
-            aria-disabled={loading}
-            className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-lg transition disabled:opacity-50 shadow-lg w-full sm:w-auto min-h-[56px]"
-          >
-            {loading ? 'Loading...' : 'Start Quiz'}
-          </button>
+          {/* Start button removed since selection starts quiz */}
         </div>
-
-        {/* source-change confirmation removed */}
       </div>
     );
   }
@@ -519,8 +494,8 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
         questions={quizState.questions}
         answers={quizState.answers}
         tPoints={quizState.tPoints}
-          onRestart={restartQuiz}
-          category={questionCategory}
+        onRestart={restartQuiz}
+        category={questionCategory}
       />
     );
   }
