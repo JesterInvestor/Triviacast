@@ -21,8 +21,9 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   const [questionCategory, setQuestionCategory] = useState<string>('');
   const CATEGORIES = [
     'General Knowledge',
-    'Farcaster Knowledge',
-    'Base Knowledge',
+    'Farcaster',
+    'Base',
+    'Christmas',
     'Entertainment: Books',
     'Entertainment: Film',
     'Entertainment: Music',
@@ -81,11 +82,13 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
       // the audio element during the state transition.
       // Request questions without specifying a difficulty (allow all difficulties)
       const categoryParam = questionCategory ? `&category=${encodeURIComponent(questionCategory)}` : '';
-      const effectiveSource = questionCategory === 'Farcaster Knowledge'
+      const effectiveSource = questionCategory === 'Farcaster'
         ? 'farcaster'
-        : questionCategory === 'Base Knowledge'
+        : questionCategory === 'Base'
           ? 'base'
-          : 'opentdb';
+          : questionCategory === 'Christmas'
+            ? 'christmas'
+            : 'opentdb';
       const response = await fetch(`/api/questions?amount=10&source=${effectiveSource}${categoryParam}`);
       const data = await response.json();
 

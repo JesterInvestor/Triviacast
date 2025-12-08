@@ -1,6 +1,7 @@
 import type { Question } from '@/types/quiz';
 import farcasterQuestions from '@/data/farcaster_questions.json';
 import baseQuestions from '@/data/base_questions.json';
+import christmasQuestions from '@/data/christmas_questions.json';
 
 /**
  * Fetch questions from OpenTDB API
@@ -102,6 +103,13 @@ export function loadLocalBaseQuestions(): Question[] {
 }
 
 /**
+ * Load Christmas questions from local JSON file
+ */
+export function loadLocalChristmasQuestions(): Question[] {
+  return christmasQuestions as Question[];
+}
+
+/**
  * Pick random questions from a pool, optionally filtering by difficulty
  */
 export function pickRandomQuestions(
@@ -131,7 +139,7 @@ export function pickRandomQuestions(
  * Get questions based on source (opentdb or farcaster)
  */
 export async function getQuestions(
-  source: 'opentdb' | 'farcaster' | 'base',
+  source: 'opentdb' | 'farcaster' | 'base' | 'christmas',
   amount: number = 10,
   difficulty?: string,
   category?: string
@@ -144,6 +152,12 @@ export async function getQuestions(
     return pickRandomQuestions(allQuestions, amount, difficulty);
   } else if (source === 'base') {
     let allQuestions = loadLocalBaseQuestions();
+    if (category) {
+      allQuestions = allQuestions.filter((q) => (q.category || '').toLowerCase() === category.toLowerCase());
+    }
+    return pickRandomQuestions(allQuestions, amount, difficulty);
+  } else if (source === 'christmas') {
+    let allQuestions = loadLocalChristmasQuestions();
     if (category) {
       allQuestions = allQuestions.filter((q) => (q.category || '').toLowerCase() === category.toLowerCase());
     }
