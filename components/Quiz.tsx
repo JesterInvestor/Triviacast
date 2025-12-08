@@ -9,8 +9,9 @@ import Timer from './Timer';
 import QuizQuestion from './QuizQuestion';
 import QuizResults from './QuizResults';
 
-import { calculateTPoints } from '@/lib/tpoints';
+import { calculateTPoints, getWalletTotalPoints } from '@/lib/tpoints';
 import type { QuizState } from '@/types/quiz';
+import { canAccessCategory, getRequiredPoints, isCategoryGated } from '@/lib/categoryGating';
 
 const QUIZ_TIME_LIMIT = 60; // 1 minute in seconds
 const TIME_PER_QUESTION = 6; // ~6 seconds per question (informational only)
@@ -64,6 +65,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [userTPoints, setUserTPoints] = useState<number>(0);
 
   const startQuiz = async () => {
     setLoading(true);
@@ -72,6 +74,14 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     // Prevent starting if wallet is not connected (defensive guard in addition to disabled button)
     if (!isConnected || !accountAddress) {
       setError('Connect your wallet silly');
+      setLoading(false);
+      return;
+    }
+
+    // Check if user has access to the selected category
+    if (questionCategory && !canAccessCategory(questionCategory, userTPoints)) {
+      const requiredPoints = getRequiredPoints(questionCategory);
+      setError(`This category requires ${requiredPoints.toLocaleString()} T Points. You have ${userTPoints.toLocaleString()} T Points. Play more quizzes to unlock!`);
       setLoading(false);
       return;
     }
@@ -144,6 +154,24 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
 
     return () => clearInterval(timer);
   }, [quizState.quizStarted, quizState.quizCompleted]);
+
+  // Fetch user's T points when wallet connects
+  useEffect(() => {
+    async function fetchUserPoints() {
+      if (accountAddress && isConnected) {
+        try {
+          const points = await getWalletTotalPoints(accountAddress);
+          setUserTPoints(points);
+        } catch (err) {
+          console.error('Failed to fetch user T points:', err);
+          setUserTPoints(0);
+        }
+      } else {
+        setUserTPoints(0);
+      }
+    }
+    fetchUserPoints();
+  }, [accountAddress, isConnected]);
 
   // Notify parent when quiz completes so callers can show a share/preview flow
   useEffect(() => {
@@ -402,18 +430,33 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
               {CATEGORIES.map((cat) => {
                 // Strip common prefixes for display only (preserve full value internally)
                 const shortLabel = String(cat).replace(/^(?:Entertainment|Science):\s*/i, '');
+                const isGated = isCategoryGated(cat);
+                const requiredPoints = getRequiredPoints(cat);
+                const hasAccess = canAccessCategory(cat, userTPoints);
+                const isLocked = isGated && !hasAccess;
+                
                 return (
                   <button
                     key={cat}
-                    onClick={() => setQuestionCategory(cat === questionCategory ? '' : cat)}
-                    className={`px-3 py-2 rounded-lg text-sm text-left transition w-full ${
+                    onClick={() => {
+                      if (!isLocked) {
+                        setQuestionCategory(cat === questionCategory ? '' : cat);
+                      }
+                    }}
+                    disabled={isLocked}
+                    className={`px-3 py-2 rounded-lg text-sm text-left transition w-full relative ${
                       questionCategory === cat
                         ? 'bg-[#F4A6B7] text-white shadow-lg scale-105'
-                        : 'bg-white text-[#5a3d5c] border-2 border-[#F4A6B7] hover:bg-[#FFE4EC]'
+                        : isLocked
+                          ? 'bg-gray-200 text-gray-400 border-2 border-gray-300 cursor-not-allowed opacity-60'
+                          : 'bg-white text-[#5a3d5c] border-2 border-[#F4A6B7] hover:bg-[#FFE4EC]'
                     }`}
-                    title={cat}
+                    title={isLocked ? `Requires ${requiredPoints.toLocaleString()} T Points (You have ${userTPoints.toLocaleString()})` : cat}
                   >
-                    {shortLabel}
+                    <span className="flex items-center justify-between gap-1">
+                      <span className={isLocked ? 'line-through' : ''}>{shortLabel}</span>
+                      {isLocked && <span className="text-xs">🔒</span>}
+                    </span>
                   </button>
                 );
               })}
@@ -421,9 +464,25 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
             {questionCategory && (
               <div className="mt-2 text-xs text-gray-600">Selected: <strong>{questionCategory}</strong></div>
             )}
+            {userTPoints > 0 && (
+              <div className="mt-2 text-xs text-[#DC8291] font-semibold">
+                Your T Points: {userTPoints.toLocaleString()}
+              </div>
+            )}
           </div>
 
           {/* (Question source removed — source is derived from selected category) */}
+
+          {/* Gating Info Box */}
+          <div className="mb-6 p-3 bg-[#FFE4EC] border-2 border-[#F4A6B7] rounded-lg text-sm">
+            <div className="font-semibold text-[#2d1b2e] mb-2">🔓 Unlock More Categories</div>
+            <div className="text-xs text-[#5a3d5c] space-y-1">
+              <div>🟢 <strong>Always Available:</strong> General Knowledge, Farcaster, Base, Christmas</div>
+              <div>🔒 <strong>20,000 T Points:</strong> Books, Film, Music, Musicals & Theatres</div>
+              <div>🔒 <strong>50,000 T Points:</strong> Television, Video Games, Board Games, Science & Nature, Computers, Mathematics, Mythology, Sports</div>
+              <div>🔒 <strong>100,000 T Points:</strong> Geography, History, Politics, Art, Celebrities, Animals, Vehicles, Comics, Gadgets, Japanese Anime & Manga, Cartoon & Animations</div>
+            </div>
+          </div>
 
           <p className="text-[#5a3d5c] mb-8 text-base sm:text-lg">
             ⏱️ Only 1 minute ⏱️<br />
