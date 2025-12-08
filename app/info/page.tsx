@@ -418,7 +418,34 @@ export default function InfoPage() {
             <li>Hit five in a row for a 1000 bonus</li>
             <li>Perfect ten in a row for a 2000 bonus and eternal bragging rights</li>
             <li>T Points unlock quests, boosts and eligibility for token drops and jackpot events</li>
+            <li className="font-bold text-purple-700 mt-2">T Points unlock premium quiz categories — keep playing to unlock more!</li>
           </ul>
+        </div>
+
+        <div className="mb-6 p-4 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-xl shadow w-full max-w-2xl border-2 border-purple-300">
+          <h2 className="text-xl font-bold mb-2 text-purple-700 flex items-center gap-2">
+            🔓 Unlock Quiz Categories with T Points
+          </h2>
+          <p className="text-gray-700 mb-3">Play more quizzes to earn T Points and unlock premium categories! The more you play, the more categories become available.</p>
+          <div className="space-y-3">
+            <div className="p-3 bg-green-50 border-2 border-green-300 rounded-lg">
+              <div className="font-semibold text-green-700 mb-1">🟢 Always Available (Free)</div>
+              <div className="text-sm text-gray-700">General Knowledge, Farcaster, Base, Christmas</div>
+            </div>
+            <div className="p-3 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+              <div className="font-semibold text-yellow-700 mb-1">🔒 20,000 T Points Required</div>
+              <div className="text-sm text-gray-700">Books, Film, Music, Musicals & Theatres</div>
+            </div>
+            <div className="p-3 bg-orange-50 border-2 border-orange-300 rounded-lg">
+              <div className="font-semibold text-orange-700 mb-1">🔒 50,000 T Points Required</div>
+              <div className="text-sm text-gray-700">Television, Video Games, Board Games, Science & Nature, Computers, Mathematics, Mythology, Sports</div>
+            </div>
+            <div className="p-3 bg-red-50 border-2 border-red-300 rounded-lg">
+              <div className="font-semibold text-red-700 mb-1">🔒 100,000 T Points Required</div>
+              <div className="text-sm text-gray-700">Geography, History, Politics, Art, Celebrities, Animals, Vehicles, Comics, Gadgets, Japanese Anime & Manga, Cartoon & Animations</div>
+            </div>
+          </div>
+          <p className="text-xs text-gray-600 mt-3 italic">💡 Tip: Start with free categories to earn T Points, then unlock premium categories as you improve!</p>
         </div>
 
         <div className="mb-6 p-4 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-xl shadow w-full max-w-2xl">
