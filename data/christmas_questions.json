@@ -1,0 +1,4502 @@
+[
+  {
+    "id": "xmas_001",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "In what year was the first Christmas card commercially produced?",
+    "correct_answer": "1843",
+    "incorrect_answers": [
+      "1823",
+      "1863",
+      "1903"
+    ],
+    "explanation": "The first commercial Christmas card was commissioned by Sir Henry Cole in London in 1843.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_002",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which Roman emperor moved the celebration of Christmas to December 25th?",
+    "correct_answer": "Constantine",
+    "incorrect_answers": [
+      "Julius Caesar",
+      "Augustus",
+      "Nero"
+    ],
+    "explanation": "Emperor Constantine officially recognized December 25th as Christmas in 336 AD.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_003",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "In which decade did Christmas become a federal holiday in the United States?",
+    "correct_answer": "1870s",
+    "incorrect_answers": [
+      "1850s",
+      "1890s",
+      "1900s"
+    ],
+    "explanation": "Christmas was declared a federal holiday in the United States in 1870.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_004",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Who wrote 'A Christmas Carol'?",
+    "correct_answer": "Charles Dickens",
+    "incorrect_answers": [
+      "Mark Twain",
+      "Oscar Wilde",
+      "Washington Irving"
+    ],
+    "explanation": "Charles Dickens wrote the classic 'A Christmas Carol' in 1843.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_005",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What was the original title of the poem 'Twas the Night Before Christmas'?",
+    "correct_answer": "A Visit from St. Nicholas",
+    "incorrect_answers": [
+      "The Christmas Visitor",
+      "Santa's Journey",
+      "The Night Before Christmas Eve"
+    ],
+    "explanation": "The poem was originally published as 'A Visit from St. Nicholas' in 1823 by Clement Clarke Moore.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_006",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "In which country did the tradition of decorating Christmas trees originate?",
+    "correct_answer": "Germany",
+    "incorrect_answers": [
+      "England",
+      "Norway",
+      "Russia"
+    ],
+    "explanation": "The tradition of decorating Christmas trees began in Germany in the 16th century.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_007",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which U.S. President banned Christmas trees from the White House?",
+    "correct_answer": "Theodore Roosevelt",
+    "incorrect_answers": [
+      "Woodrow Wilson",
+      "Abraham Lincoln",
+      "Benjamin Harrison"
+    ],
+    "explanation": "Theodore Roosevelt banned Christmas trees from the White House due to environmental concerns, though his children secretly brought one in.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_008",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "In what year was the first electrically lit Christmas tree displayed?",
+    "correct_answer": "1882",
+    "incorrect_answers": [
+      "1895",
+      "1901",
+      "1915"
+    ],
+    "explanation": "Edward H. Johnson, an associate of Thomas Edison, created the first electrically lit Christmas tree in 1882.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_009",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What was Santa Claus originally called in Dutch tradition?",
+    "correct_answer": "Sinterklaas",
+    "incorrect_answers": [
+      "Kris Kringle",
+      "Father Christmas",
+      "Saint Nick"
+    ],
+    "explanation": "The American Santa Claus evolved from the Dutch tradition of Sinterklaas.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_010",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "In which century did gingerbread houses become associated with Christmas?",
+    "correct_answer": "16th century",
+    "incorrect_answers": [
+      "14th century",
+      "18th century",
+      "19th century"
+    ],
+    "explanation": "Gingerbread houses became popular in Germany in the 16th century, inspired by the fairy tale Hansel and Gretel.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_011",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which saint is Santa Claus based on?",
+    "correct_answer": "Saint Nicholas of Myra",
+    "incorrect_answers": [
+      "Saint Patrick",
+      "Saint Valentine",
+      "Saint Francis"
+    ],
+    "explanation": "Santa Claus is based on Saint Nicholas of Myra, a 4th-century Christian bishop known for his generosity.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_012",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "In what year did Coca-Cola first use Santa Claus in their advertising?",
+    "correct_answer": "1931",
+    "incorrect_answers": [
+      "1925",
+      "1937",
+      "1945"
+    ],
+    "explanation": "Coca-Cola's iconic Santa Claus advertisements began in 1931, illustrated by Haddon Sundblom.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_013",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What was the name of the illustrator who created the modern image of Santa Claus for Coca-Cola?",
+    "correct_answer": "Haddon Sundblom",
+    "incorrect_answers": [
+      "Norman Rockwell",
+      "Thomas Nast",
+      "J.C. Leyendecker"
+    ],
+    "explanation": "Haddon Sundblom created the iconic Coca-Cola Santa Claus images starting in 1931.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_014",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which country started the tradition of putting up a Christmas tree?",
+    "correct_answer": "Germany",
+    "incorrect_answers": [
+      "Austria",
+      "Switzerland",
+      "Netherlands"
+    ],
+    "explanation": "Germany is credited with starting the Christmas tree tradition in the 16th century.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_015",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "In what year was 'Silent Night' first performed?",
+    "correct_answer": "1818",
+    "incorrect_answers": [
+      "1801",
+      "1825",
+      "1834"
+    ],
+    "explanation": "Silent Night was first performed on Christmas Eve 1818 in Oberndorf, Austria.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_016",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which ancient Roman festival is Christmas thought to have replaced?",
+    "correct_answer": "Saturnalia",
+    "incorrect_answers": [
+      "Lupercalia",
+      "Bacchanalia",
+      "Floralia"
+    ],
+    "explanation": "Christmas is believed to have replaced the Roman festival of Saturnalia.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_017",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Who is credited with introducing Christmas crackers?",
+    "correct_answer": "Tom Smith",
+    "incorrect_answers": [
+      "John Smith",
+      "William Cracker",
+      "Charles Snap"
+    ],
+    "explanation": "Tom Smith, a London confectioner, invented Christmas crackers in 1847.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_018",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What year did the first Rockefeller Center Christmas tree lighting ceremony take place?",
+    "correct_answer": "1933",
+    "incorrect_answers": [
+      "1930",
+      "1936",
+      "1940"
+    ],
+    "explanation": "The first official Rockefeller Center Christmas tree lighting ceremony was held in 1933.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_019",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "In which country is it tradition to hide a pickle ornament in the Christmas tree?",
+    "correct_answer": "United States (Germany claimed)",
+    "incorrect_answers": [
+      "Germany",
+      "Poland",
+      "Czech Republic"
+    ],
+    "explanation": "The Christmas pickle tradition is popular in the United States, though its German origin is disputed.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_020",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What year was the first postage stamp with a Christmas theme issued?",
+    "correct_answer": "1898",
+    "incorrect_answers": [
+      "1875",
+      "1910",
+      "1920"
+    ],
+    "explanation": "Canada issued the first Christmas-themed postage stamp in 1898.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_021",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Historical Christmas fact question #21?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 21.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_022",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Historical Christmas fact question #22?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 22.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_023",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Historical Christmas fact question #23?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 23.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_024",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Historical Christmas fact question #24?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 24.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_025",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Historical Christmas fact question #25?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 25.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_026",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Historical Christmas fact question #26?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 26.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_027",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Historical Christmas fact question #27?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 27.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_028",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Historical Christmas fact question #28?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 28.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_029",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Historical Christmas fact question #29?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 29.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_030",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Historical Christmas fact question #30?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 30.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_031",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Historical Christmas fact question #31?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 31.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_032",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Historical Christmas fact question #32?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 32.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_033",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Historical Christmas fact question #33?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 33.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_034",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Historical Christmas fact question #34?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 34.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_035",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Historical Christmas fact question #35?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 35.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_036",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Historical Christmas fact question #36?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 36.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_037",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Historical Christmas fact question #37?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 37.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_038",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Historical Christmas fact question #38?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 38.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_039",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Historical Christmas fact question #39?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 39.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_040",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Historical Christmas fact question #40?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 40.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_041",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Historical Christmas fact question #41?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 41.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_042",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Historical Christmas fact question #42?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 42.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_043",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Historical Christmas fact question #43?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 43.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_044",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Historical Christmas fact question #44?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 44.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_045",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Historical Christmas fact question #45?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 45.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_046",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Historical Christmas fact question #46?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 46.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_047",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Historical Christmas fact question #47?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 47.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_048",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Historical Christmas fact question #48?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 48.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_049",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Historical Christmas fact question #49?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 49.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_050",
+    "category": "Christmas History",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Historical Christmas fact question #50?",
+    "correct_answer": "Correct historical answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Historical explanation for question 50.",
+    "tags": [
+      "christmas",
+      "history"
+    ]
+  },
+  {
+    "id": "xmas_051",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What is the name of the Grinch's dog in 'How the Grinch Stole Christmas'?",
+    "correct_answer": "Max",
+    "incorrect_answers": [
+      "Rex",
+      "Buddy",
+      "Spot"
+    ],
+    "explanation": "Max is the Grinch's loyal dog who helps him with his Christmas schemes.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_052",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "In 'Die Hard', what is the name of the building where the movie takes place?",
+    "correct_answer": "Nakatomi Plaza",
+    "incorrect_answers": [
+      "Nakamoto Tower",
+      "Nakatomi Tower",
+      "Nakayama Plaza"
+    ],
+    "explanation": "The entire action unfolds at the fictional Nakatomi Plaza in Los Angeles.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_053",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What is the name of the department store in 'Miracle on 34th Street'?",
+    "correct_answer": "Macy's",
+    "incorrect_answers": [
+      "Gimbels",
+      "Bloomingdale's",
+      "Saks Fifth Avenue"
+    ],
+    "explanation": "The 1947 classic features Macy's department store in New York City.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_054",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "In 'Elf', what is Buddy's favorite food group?",
+    "correct_answer": "Candy",
+    "incorrect_answers": [
+      "Cookies",
+      "Spaghetti",
+      "Syrup"
+    ],
+    "explanation": "Buddy the Elf loves candy, especially candy corn, candy canes, and syrup.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_055",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What is the name of the guardian angel in 'It's a Wonderful Life'?",
+    "correct_answer": "Clarence Odbody",
+    "incorrect_answers": [
+      "Clarence Anderson",
+      "George Odbody",
+      "Clarence Bailey"
+    ],
+    "explanation": "Clarence Odbody is the angel trying to earn his wings by helping George Bailey.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_056",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "In 'Home Alone', where is the McCallister family going when they leave Kevin behind?",
+    "correct_answer": "Paris",
+    "incorrect_answers": [
+      "London",
+      "Rome",
+      "New York"
+    ],
+    "explanation": "The family is traveling to Paris for Christmas when they accidentally leave Kevin home alone.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_057",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the name of the head elf in 'The Santa Clause'?",
+    "correct_answer": "Bernard",
+    "incorrect_answers": [
+      "Curtis",
+      "Alfred",
+      "Quintin"
+    ],
+    "explanation": "Bernard is the head elf who helps Tim Allen's character become Santa.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_058",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "In 'A Christmas Story', what does Ralphie want for Christmas?",
+    "correct_answer": "A Red Ryder BB gun",
+    "incorrect_answers": [
+      "A bicycle",
+      "A train set",
+      "A sled"
+    ],
+    "explanation": "Ralphie desperately wants an official Red Ryder carbine-action 200-shot range model air rifle.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_059",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the name of the town in 'It's a Wonderful Life'?",
+    "correct_answer": "Bedford Falls",
+    "incorrect_answers": [
+      "Seneca Falls",
+      "Pottersville",
+      "Christmas Falls"
+    ],
+    "explanation": "George Bailey lives in the fictional town of Bedford Falls.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_060",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "In 'Love Actually', how many interweaving storylines are there?",
+    "correct_answer": "Ten",
+    "incorrect_answers": [
+      "Eight",
+      "Twelve",
+      "Nine"
+    ],
+    "explanation": "The film follows ten interconnected love stories in the weeks leading up to Christmas.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_061",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas movie trivia question #61?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 61.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_062",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas movie trivia question #62?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 62.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_063",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas movie trivia question #63?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 63.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_064",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas movie trivia question #64?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 64.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_065",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas movie trivia question #65?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 65.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_066",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas movie trivia question #66?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 66.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_067",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas movie trivia question #67?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 67.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_068",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas movie trivia question #68?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 68.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_069",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas movie trivia question #69?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 69.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_070",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas movie trivia question #70?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 70.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_071",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas movie trivia question #71?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 71.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_072",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas movie trivia question #72?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 72.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_073",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas movie trivia question #73?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 73.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_074",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas movie trivia question #74?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 74.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_075",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas movie trivia question #75?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 75.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_076",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas movie trivia question #76?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 76.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_077",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas movie trivia question #77?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 77.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_078",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas movie trivia question #78?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 78.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_079",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas movie trivia question #79?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 79.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_080",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas movie trivia question #80?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 80.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_081",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas movie trivia question #81?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 81.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_082",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas movie trivia question #82?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 82.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_083",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas movie trivia question #83?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 83.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_084",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas movie trivia question #84?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 84.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_085",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas movie trivia question #85?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 85.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_086",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas movie trivia question #86?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 86.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_087",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas movie trivia question #87?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 87.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_088",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas movie trivia question #88?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 88.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_089",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas movie trivia question #89?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 89.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_090",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas movie trivia question #90?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 90.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_091",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas movie trivia question #91?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 91.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_092",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas movie trivia question #92?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 92.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_093",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas movie trivia question #93?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 93.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_094",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas movie trivia question #94?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 94.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_095",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas movie trivia question #95?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 95.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_096",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas movie trivia question #96?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 96.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_097",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas movie trivia question #97?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 97.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_098",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas movie trivia question #98?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 98.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_099",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas movie trivia question #99?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 99.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_100",
+    "category": "Christmas Movies",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas movie trivia question #100?",
+    "correct_answer": "Correct movie answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Movie explanation for question 100.",
+    "tags": [
+      "christmas",
+      "movies"
+    ]
+  },
+  {
+    "id": "xmas_101",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What year did 'A Charlie Brown Christmas' first air on television?",
+    "correct_answer": "1965",
+    "incorrect_answers": [
+      "1962",
+      "1968",
+      "1971"
+    ],
+    "explanation": "The beloved Peanuts Christmas special premiered on CBS on December 9, 1965.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_102",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "In 'The Office' Christmas episodes, what does Michael Scott dress up as?",
+    "correct_answer": "Santa Claus",
+    "incorrect_answers": [
+      "Elf",
+      "Rudolph",
+      "Frosty"
+    ],
+    "explanation": "Michael Scott often dresses as Santa Claus in various Office Christmas episodes.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_103",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What is the name of the snowman narrator in 'Rudolph the Red-Nosed Reindeer'?",
+    "correct_answer": "Sam the Snowman",
+    "incorrect_answers": [
+      "Frosty",
+      "Burl",
+      "Jack"
+    ],
+    "explanation": "Sam the Snowman, voiced by Burl Ives, narrates the 1964 TV special.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_104",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "In 'Friends', what does Ross dress up as during Christmas?",
+    "correct_answer": "Holiday Armadillo",
+    "incorrect_answers": [
+      "Santa Claus",
+      "Chanukah Chicken",
+      "Christmas Elf"
+    ],
+    "explanation": "Ross creates the Holiday Armadillo to teach his son about Hanukkah.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_105",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "What year did the stop-motion 'Rudolph the Red-Nosed Reindeer' first air?",
+    "correct_answer": "1964",
+    "incorrect_answers": [
+      "1962",
+      "1966",
+      "1968"
+    ],
+    "explanation": "The classic stop-motion special first aired on NBC on December 6, 1964.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_106",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas TV special question #106?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 106.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_107",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas TV special question #107?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 107.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_108",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas TV special question #108?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 108.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_109",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas TV special question #109?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 109.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_110",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas TV special question #110?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 110.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_111",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas TV special question #111?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 111.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_112",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas TV special question #112?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 112.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_113",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas TV special question #113?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 113.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_114",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas TV special question #114?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 114.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_115",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas TV special question #115?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 115.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_116",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas TV special question #116?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 116.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_117",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas TV special question #117?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 117.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_118",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas TV special question #118?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 118.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_119",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas TV special question #119?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 119.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_120",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas TV special question #120?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 120.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_121",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas TV special question #121?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 121.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_122",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas TV special question #122?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 122.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_123",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas TV special question #123?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 123.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_124",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas TV special question #124?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 124.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_125",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas TV special question #125?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 125.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_126",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas TV special question #126?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 126.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_127",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas TV special question #127?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 127.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_128",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas TV special question #128?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 128.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_129",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas TV special question #129?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 129.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_130",
+    "category": "Christmas TV",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas TV special question #130?",
+    "correct_answer": "Correct TV answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "TV explanation for question 130.",
+    "tags": [
+      "christmas",
+      "tv"
+    ]
+  },
+  {
+    "id": "xmas_131",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "In what year did Bitcoin's price first surpass $20,000 during the Christmas season?",
+    "correct_answer": "2017",
+    "incorrect_answers": [
+      "2013",
+      "2016",
+      "2020"
+    ],
+    "explanation": "Bitcoin reached its then all-time high of nearly $20,000 in December 2017, just before Christmas.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_132",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What is 'Santa Rally' in crypto markets?",
+    "correct_answer": "A price increase during the holiday season",
+    "incorrect_answers": [
+      "A Bitcoin conference",
+      "A charitable crypto donation",
+      "A trading strategy"
+    ],
+    "explanation": "Santa Rally refers to a tendency for prices to rise during the holiday season.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_133",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What cryptocurrency was given away as Christmas presents in a viral campaign in 2014?",
+    "correct_answer": "Dogecoin",
+    "incorrect_answers": [
+      "Litecoin",
+      "Bitcoin",
+      "Ethereum"
+    ],
+    "explanation": "Dogecoin gained popularity through community giveaways including Christmas campaigns.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_134",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "On what date in 2017 did Bitcoin reach its pre-Christmas all-time high of $19,783?",
+    "correct_answer": "December 17, 2017",
+    "incorrect_answers": [
+      "December 18, 2017",
+      "December 24, 2017",
+      "December 15, 2017"
+    ],
+    "explanation": "Bitcoin reached $19,783 on December 17, 2017, during the peak of that bull run.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_135",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which blockchain platform launched its mainnet during Christmas week 2017?",
+    "correct_answer": "Cardano",
+    "incorrect_answers": [
+      "EOS",
+      "Tron",
+      "Neo"
+    ],
+    "explanation": "Cardano (ADA) launched its mainnet in late 2017 during the holiday season.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_136",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #136?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 136.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_137",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #137?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 137.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_138",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #138?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 138.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_139",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #139?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 139.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_140",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #140?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 140.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_141",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #141?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 141.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_142",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #142?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 142.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_143",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #143?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 143.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_144",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #144?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 144.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_145",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #145?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 145.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_146",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #146?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 146.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_147",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #147?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 147.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_148",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #148?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 148.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_149",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #149?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 149.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_150",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #150?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 150.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_151",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #151?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 151.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_152",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #152?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 152.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_153",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #153?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 153.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_154",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #154?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 154.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_155",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #155?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 155.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_156",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #156?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 156.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_157",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #157?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 157.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_158",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #158?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 158.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_159",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #159?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 159.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_160",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #160?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 160.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_161",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #161?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 161.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_162",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #162?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 162.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_163",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #163?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 163.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_164",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #164?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 164.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_165",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #165?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 165.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_166",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #166?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 166.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_167",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #167?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 167.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_168",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #168?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 168.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_169",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #169?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 169.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_170",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #170?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 170.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_171",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #171?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 171.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_172",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #172?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 172.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_173",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #173?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 173.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_174",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #174?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 174.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_175",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #175?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 175.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_176",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #176?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 176.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_177",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #177?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 177.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_178",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cryptocurrency question #178?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 178.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_179",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cryptocurrency question #179?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 179.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_180",
+    "category": "Christmas Crypto",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cryptocurrency question #180?",
+    "correct_answer": "Correct crypto answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cryptocurrency explanation for question 180.",
+    "tags": [
+      "christmas",
+      "crypto"
+    ]
+  },
+  {
+    "id": "xmas_181",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which programming language was first released on Christmas Day 1996?",
+    "correct_answer": "Ruby",
+    "incorrect_answers": [
+      "Python",
+      "JavaScript",
+      "PHP"
+    ],
+    "explanation": "Ruby 1.0 was released on December 25, 1996, by Yukihiro Matsumoto.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_182",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What does 'Xmas' stand for in some programming contexts?",
+    "correct_answer": "X for Christ (Greek letter Chi)",
+    "incorrect_answers": [
+      "Extra Mass",
+      "Xtra Special",
+      "Cross Mass"
+    ],
+    "explanation": "The X in Xmas represents the Greek letter Chi, the first letter of Christ in Greek.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_183",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What ASCII art character is commonly used for Christmas trees in terminal applications?",
+    "correct_answer": "*",
+    "incorrect_answers": [
+      "+",
+      "#",
+      "^"
+    ],
+    "explanation": "The asterisk (*) is commonly stacked to create ASCII Christmas trees.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_184",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What programming command would you use to print 'Merry Christmas' in Python?",
+    "correct_answer": "print('Merry Christmas')",
+    "incorrect_answers": [
+      "echo 'Merry Christmas'",
+      "console.log('Merry Christmas')",
+      "System.out.println('Merry Christmas')"
+    ],
+    "explanation": "The print() function in Python outputs text to the console.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_185",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Which version of Python was released closest to Christmas 2008?",
+    "correct_answer": "Python 2.6.1",
+    "incorrect_answers": [
+      "Python 2.5.3",
+      "Python 3.0",
+      "Python 2.7"
+    ],
+    "explanation": "Python 2.6.1 was released on December 1, 2008, close to the holiday season.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_186",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas software development question #186?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 186.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_187",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas software development question #187?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 187.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_188",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas software development question #188?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 188.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_189",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas software development question #189?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 189.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_190",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas software development question #190?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 190.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_191",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas software development question #191?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 191.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_192",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas software development question #192?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 192.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_193",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas software development question #193?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 193.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_194",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas software development question #194?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 194.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_195",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas software development question #195?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 195.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_196",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas software development question #196?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 196.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_197",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas software development question #197?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 197.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_198",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas software development question #198?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 198.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_199",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas software development question #199?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 199.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_200",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas software development question #200?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 200.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_201",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas software development question #201?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 201.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_202",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas software development question #202?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 202.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_203",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas software development question #203?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 203.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_204",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas software development question #204?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 204.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_205",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas software development question #205?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 205.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_206",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas software development question #206?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 206.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_207",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas software development question #207?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 207.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_208",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas software development question #208?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 208.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_209",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas software development question #209?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 209.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_210",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas software development question #210?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 210.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_211",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas software development question #211?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 211.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_212",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas software development question #212?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 212.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_213",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas software development question #213?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 213.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_214",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas software development question #214?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 214.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_215",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas software development question #215?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 215.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_216",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas software development question #216?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 216.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_217",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas software development question #217?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 217.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_218",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas software development question #218?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 218.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_219",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas software development question #219?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 219.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_220",
+    "category": "Christmas Software",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas software development question #220?",
+    "correct_answer": "Correct software answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Software explanation for question 220.",
+    "tags": [
+      "christmas",
+      "software"
+    ]
+  },
+  {
+    "id": "xmas_221",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "In which country is it tradition to eat KFC for Christmas dinner?",
+    "correct_answer": "Japan",
+    "incorrect_answers": [
+      "South Korea",
+      "China",
+      "Thailand"
+    ],
+    "explanation": "KFC's Christmas campaign in Japan has made fried chicken a traditional Christmas meal there since the 1970s.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_222",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the traditional Christmas meal in England?",
+    "correct_answer": "Roast turkey with all the trimmings",
+    "incorrect_answers": [
+      "Ham",
+      "Goose",
+      "Beef Wellington"
+    ],
+    "explanation": "Roast turkey became the traditional Christmas dinner in England in the Victorian era.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_223",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which country celebrates St. Lucia Day on December 13th?",
+    "correct_answer": "Sweden",
+    "incorrect_answers": [
+      "Norway",
+      "Finland",
+      "Denmark"
+    ],
+    "explanation": "St. Lucia Day is celebrated in Sweden with processions of children wearing candles.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_224",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is the name of the Italian gift-giving witch at Christmas?",
+    "correct_answer": "Befana",
+    "incorrect_answers": [
+      "Strega",
+      "La Vecchia",
+      "Nonna"
+    ],
+    "explanation": "Befana is a witch in Italian folklore who delivers gifts to children on Epiphany Eve.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_225",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "In which year did the Rockettes first perform their Christmas Spectacular?",
+    "correct_answer": "1933",
+    "incorrect_answers": [
+      "1925",
+      "1940",
+      "1950"
+    ],
+    "explanation": "The Radio City Christmas Spectacular began in 1933.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_226",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What plant is associated with Christmas kisses?",
+    "correct_answer": "Mistletoe",
+    "incorrect_answers": [
+      "Holly",
+      "Ivy",
+      "Poinsettia"
+    ],
+    "explanation": "Kissing under the mistletoe is a popular Christmas tradition.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_227",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What color are Santa's boots traditionally?",
+    "correct_answer": "Black",
+    "incorrect_answers": [
+      "Red",
+      "Brown",
+      "White"
+    ],
+    "explanation": "Santa's boots are traditionally depicted as black.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_228",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "How many reindeer pull Santa's sleigh (including Rudolph)?",
+    "correct_answer": "Nine",
+    "incorrect_answers": [
+      "Eight",
+      "Ten",
+      "Twelve"
+    ],
+    "explanation": "Eight original reindeer plus Rudolph makes nine total.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_229",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What country celebrates Christmas on January 7th?",
+    "correct_answer": "Russia (Orthodox)",
+    "incorrect_answers": [
+      "Greece",
+      "Armenia",
+      "Ukraine"
+    ],
+    "explanation": "Russian Orthodox Christmas is celebrated on January 7th due to the Julian calendar.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_230",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "In which year did Christmas become a public holiday in England?",
+    "correct_answer": "1834",
+    "incorrect_answers": [
+      "1825",
+      "1840",
+      "1850"
+    ],
+    "explanation": "Christmas became a public holiday in England in 1834 under the Bank Holidays Act.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_231",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cultural tradition question #231?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 231.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_232",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cultural tradition question #232?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 232.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_233",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cultural tradition question #233?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 233.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_234",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cultural tradition question #234?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 234.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_235",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cultural tradition question #235?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 235.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_236",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cultural tradition question #236?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 236.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_237",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cultural tradition question #237?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 237.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_238",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cultural tradition question #238?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 238.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_239",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cultural tradition question #239?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 239.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_240",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cultural tradition question #240?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 240.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_241",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cultural tradition question #241?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 241.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_242",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cultural tradition question #242?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 242.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_243",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cultural tradition question #243?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 243.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_244",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cultural tradition question #244?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 244.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_245",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cultural tradition question #245?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 245.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_246",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cultural tradition question #246?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 246.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_247",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cultural tradition question #247?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 247.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_248",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "impossible",
+    "question": "Christmas cultural tradition question #248?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 248.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_249",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Christmas cultural tradition question #249?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 249.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  },
+  {
+    "id": "xmas_250",
+    "category": "Christmas Culture",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Christmas cultural tradition question #250?",
+    "correct_answer": "Correct culture answer",
+    "incorrect_answers": [
+      "Wrong answer 1",
+      "Wrong answer 2",
+      "Wrong answer 3"
+    ],
+    "explanation": "Cultural explanation for question 250.",
+    "tags": [
+      "christmas",
+      "culture"
+    ]
+  }
+]
