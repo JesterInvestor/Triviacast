@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Question } from '@/types/quiz';
+import Image from 'next/image';
 
 interface QuizQuestionProps {
   question: Question;
@@ -53,7 +54,21 @@ export default function QuizQuestion({ question, onAnswer, answered }: QuizQuest
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-xl p-4 sm:p-6 border-4 border-[#F4A6B7]">
+    <div className="bg-white rounded-lg shadow-xl p-4 sm:p-6 border-4 border-[#F4A6B7] relative overflow-visible">
+      {/* Christmas Cedar Corner Decorations */}
+      <div className="absolute -top-2 -left-2 w-12 h-12 sm:w-14 sm:h-14 pointer-events-none z-10">
+        <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+      </div>
+      <div className="absolute -top-2 -right-2 w-12 h-12 sm:w-14 sm:h-14 pointer-events-none z-10 transform scale-x-[-1]">
+        <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+      </div>
+      <div className="absolute -bottom-2 -left-2 w-12 h-12 sm:w-14 sm:h-14 pointer-events-none z-10 transform scale-y-[-1]">
+        <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+      </div>
+      <div className="absolute -bottom-2 -right-2 w-12 h-12 sm:w-14 sm:h-14 pointer-events-none z-10 transform scale-[-1]">
+        <Image src="/cedar-corner.svg" alt="" width={64} height={64} className="w-full h-full" loading="lazy" />
+      </div>
+      
       <div className="mb-2 text-xs sm:text-sm text-[#8b6b8d] font-semibold uppercase tracking-wide">
         {question.category} - {question.difficulty}
       </div>
