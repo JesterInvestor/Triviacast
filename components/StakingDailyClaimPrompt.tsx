@@ -8,6 +8,8 @@ import { getDailyClaimLabel } from '@/lib/config';
 const DISMISS_KEY = "triviacast:claim_prompt:dismissedAt";
 const DISMISS_TTL_MS = 1000 * 60 * 60 * 24; // 24 hours
 
+const FARCASTER_MINIAPP_URL = "https://farcaster.xyz/miniapps/UmWywlPILouA/triviacast";
+
 export default function StakingDailyClaimPrompt() {
   const { address, status } = useAccount();
   const [open, setOpen] = useState(false);
@@ -87,8 +89,11 @@ export default function StakingDailyClaimPrompt() {
         const mod = await import('@farcaster/miniapp-sdk').catch(() => null as any);
         const maybeSdk: any = (mod as any)?.sdk ?? (mod as any)?.default?.sdk ?? (mod as any)?.default ?? mod;
         if (maybeSdk?.actions?.composeCast) {
+          const claimLabel = DAILY_CLAIM_AMOUNT || 'my daily reward';
+          const text = `I just claimed ${claimLabel} on Triviacast!`;
           await maybeSdk.actions.composeCast({
-            text: "I just claimed 100,000 TRIV and try Triviacast now with https://farcaster.xyz/miniapps/UmWywlPILouA/triviacast",
+            text,
+            embeds: [FARCASTER_MINIAPP_URL],
           });
         }
       } catch {}
