@@ -82,6 +82,17 @@ export default function StakingDailyClaimPrompt() {
         );
       } catch {}
 
+      // Prompt the user to cast about their claim in Farcaster, if SDK is available
+      try {
+        const mod = await import('@farcaster/miniapp-sdk').catch(() => null as any);
+        const maybeSdk: any = (mod as any)?.sdk ?? (mod as any)?.default?.sdk ?? (mod as any)?.default ?? mod;
+        if (maybeSdk?.actions?.composeCast) {
+          await maybeSdk.actions.composeCast({
+            text: "I just claimed 100,000 TRIV and try Triviacast now with triviacast.xyz",
+          });
+        }
+      } catch {}
+
       // Hide for 24 hours on success
       dismiss();
     } catch (err: unknown) {
