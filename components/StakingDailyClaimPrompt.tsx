@@ -88,7 +88,7 @@ export default function StakingDailyClaimPrompt() {
         const maybeSdk: any = (mod as any)?.sdk ?? (mod as any)?.default?.sdk ?? (mod as any)?.default ?? mod;
         if (maybeSdk?.actions?.composeCast) {
           await maybeSdk.actions.composeCast({
-            text: "I just claimed 100,000 TRIV and try Triviacast now with triviacast.xyz",
+            text: "I just claimed 100,000 TRIV and try Triviacast now with https://farcaster.xyz/miniapps/UmWywlPILouA/triviacast",
           });
         }
       } catch {}
