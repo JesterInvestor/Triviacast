@@ -213,7 +213,7 @@ export default function StakingWidget() {
 
   const openMintClubSDK = async (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.preventDefault();
-    const url = "https://mint.club/staking/base/160";
+    const url = "https://mint.club/staking/base/187";
 
     try {
       const ok = await tryOpenMiniApp(url);
