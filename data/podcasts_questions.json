@@ -1,0 +1,2852 @@
+[
+  {
+    "id": "pod_001",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Which comedian hosts the long-running podcast 'The Joe Rogan Experience'?",
+    "correct_answer": "Joe Rogan",
+    "incorrect_answers": [
+      "Marc Maron",
+      "Bill Burr",
+      "Kevin Hart"
+    ],
+    "explanation": "Joe Rogan is the stand-up comedian and UFC commentator behind 'The Joe Rogan Experience'.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "hosts"
+    ]
+  },
+  {
+    "id": "pod_002",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Which podcast features comedian Marc Maron interviewing celebrities in his garage studio?",
+    "correct_answer": "WTF with Marc Maron",
+    "incorrect_answers": [
+      "Comedy Bang! Bang!",
+      "The Dollop",
+      "My Favorite Murder"
+    ],
+    "explanation": "'WTF with Marc Maron' is famous for intimate conversations recorded in Maron's home garage.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "interviews"
+    ]
+  },
+  {
+    "id": "pod_003",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which improv-heavy podcast is hosted by Scott Aukerman and often features recurring fictional characters?",
+    "correct_answer": "Comedy Bang! Bang!",
+    "incorrect_answers": [
+      "The Bugle",
+      "No Such Thing As A Fish",
+      "The Basement Yard"
+    ],
+    "explanation": "Scott Aukerman's 'Comedy Bang! Bang!' blends interviews with surreal improv characters.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "improv"
+    ]
+  },
+  {
+    "id": "pod_004",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which American history–themed comedy podcast is hosted by Dave Anthony and Gareth Reynolds?",
+    "correct_answer": "The Dollop",
+    "incorrect_answers": [
+      "Hardcore History",
+      "Behind the Bastards",
+      "No Such Thing As A Fish"
+    ],
+    "explanation": "Dave Anthony and Gareth Reynolds host 'The Dollop', a comedic look at American history.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "history"
+    ]
+  },
+  {
+    "id": "pod_005",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Which true-crime comedy podcast is hosted by Karen Kilgariff and Georgia Hardstark?",
+    "correct_answer": "My Favorite Murder",
+    "incorrect_answers": [
+      "Last Podcast on the Left",
+      "Crime Junkie",
+      "RedHanded"
+    ],
+    "explanation": "Karen Kilgariff and Georgia Hardstark co-host 'My Favorite Murder', a true-crime comedy show.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "true-crime"
+    ]
+  },
+  {
+    "id": "pod_006",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which British comedy podcast is produced by the team behind the TV show 'QI'?",
+    "correct_answer": "No Such Thing As A Fish",
+    "incorrect_answers": [
+      "Off Menu",
+      "The Bugle",
+      "Athletico Mince"
+    ],
+    "explanation": "QI researchers host 'No Such Thing As A Fish', sharing quirky facts with a comedic spin.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "british"
+    ]
+  },
+  {
+    "id": "pod_007",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which comedy podcast hosted by John Oliver, Andy Zaltzman, and others satirizes world news?",
+    "correct_answer": "The Bugle",
+    "incorrect_answers": [
+      "Chapo Trap House",
+      "Pod Save the World",
+      "Wait Wait... Don’t Tell Me!"
+    ],
+    "explanation": "'The Bugle' began with John Oliver and Andy Zaltzman delivering satirical takes on global news.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "news"
+    ]
+  },
+  {
+    "id": "pod_008",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which comedy podcast co-hosted by Jason Mantzoukas, June Diane Raphael, and Paul Scheer focuses on bad movies?",
+    "correct_answer": "How Did This Get Made?",
+    "incorrect_answers": [
+      "Blank Check",
+      "The Flop House",
+      "Unspooled"
+    ],
+    "explanation": "'How Did This Get Made?' is a cult-favorite podcast that riffs on infamously bad films.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "movies"
+    ]
+  },
+  {
+    "id": "pod_009",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which comedy podcast features comedians riffing on hypothetical 'Would You Rather' scenarios and bizarre questions?",
+    "correct_answer": "If I Were You",
+    "incorrect_answers": [
+      "The Basement Yard",
+      "YMH: Your Mom's House",
+      "2 Bears 1 Cave"
+    ],
+    "explanation": "Jake Hurwitz and Amir Blumenfeld host 'If I Were You', an advice show often filled with absurd hypotheticals.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "advice"
+    ]
+  },
+  {
+    "id": "pod_010",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which married comedy duo hosts 'Your Mom's House', a popular comedy podcast and YouTube show?",
+    "correct_answer": "Tom Segura and Christina Pazsitzky",
+    "incorrect_answers": [
+      "Bert Kreischer and LeeAnn Kreischer",
+      "Nick Kroll and Jenny Slate",
+      "John Mulaney and Annamarie Tendler"
+    ],
+    "explanation": "Tom Segura and Christina P. co-host the raunchy, clip-heavy comedy podcast 'Your Mom's House'.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "hosts"
+    ]
+  },
+  {
+    "id": "pod_011",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political-comedy hybrid podcast features left-wing commentary from hosts Will Menaker, Matt Christman, and others?",
+    "correct_answer": "Chapo Trap House",
+    "incorrect_answers": [
+      "The Majority Report",
+      "Pod Save America",
+      "The Bugle"
+    ],
+    "explanation": "'Chapo Trap House' is a subscription-driven political-comedy podcast from the American left.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_012",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which American public radio game show and podcast quizzes panelists on current events in a humorous way?",
+    "correct_answer": "Wait Wait... Don't Tell Me!",
+    "incorrect_answers": [
+      "Ask Me Another",
+      "This American Life",
+      "The Daily"
+    ],
+    "explanation": "NPR's 'Wait Wait... Don't Tell Me!' is a weekly news quiz show with comedic guests and panelists.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "quiz"
+    ]
+  },
+  {
+    "id": "pod_013",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Roughly how popular is 'The Joe Rogan Experience' compared to other podcasts by total listeners?",
+    "correct_answer": "It is among the most-listened-to podcasts in the world.",
+    "incorrect_answers": [
+      "It has a small niche audience under 10,000 listeners.",
+      "It is mostly unknown outside of one city.",
+      "It only releases a few episodes per year."
+    ],
+    "explanation": "By most estimates, 'The Joe Rogan Experience' ranks among the top global podcasts by audience size.",
+    "tags": [
+      "podcast",
+      "popularity",
+      "comedy"
+    ]
+  },
+  {
+    "id": "pod_014",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What is a common reason fans cite for the popularity of 'My Favorite Murder'?",
+    "correct_answer": "The balance of true crime storytelling and candid, comedic banter.",
+    "incorrect_answers": [
+      "Extremely short 2-minute episodes.",
+      "Heavy use of sound effects instead of narration.",
+      "Focus on only unsolved crimes with no commentary."
+    ],
+    "explanation": "Listeners often praise 'My Favorite Murder' for mixing true-crime stories with personable, funny conversation.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "popularity"
+    ]
+  },
+  {
+    "id": "pod_015",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which of these comedy podcasts is known for having a large live-tour component, selling out theaters with fans?",
+    "correct_answer": "My Favorite Murder",
+    "incorrect_answers": [
+      "Reply All",
+      "99% Invisible",
+      "Planet Money"
+    ],
+    "explanation": "'My Favorite Murder' has run extensive live tours, performing to large crowds of 'Murderinos'.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "live-shows"
+    ]
+  },
+  {
+    "id": "pod_016",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which metric is often used as a rough proxy for a podcast's popularity?",
+    "correct_answer": "Average downloads or streams per episode.",
+    "incorrect_answers": [
+      "Number of studio cameras.",
+      "Age of the host.",
+      "Length of individual episodes."
+    ],
+    "explanation": "Podcast advertisers and platforms frequently look at downloads or streams per episode to gauge reach.",
+    "tags": [
+      "podcast",
+      "metrics",
+      "popularity"
+    ]
+  },
+  {
+    "id": "pod_017",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which comedy podcast about obscure internet stories and oddities is hosted by Griffin and Justin McElroy?",
+    "correct_answer": "Wonderful! (and formerly MBMBaM–adjacent projects)",
+    "incorrect_answers": [
+      "The Adventure Zone",
+      "Reply All",
+      "99% Invisible"
+    ],
+    "explanation": "Griffin and Justin McElroy have hosted 'Wonderful!' and other spinoffs highlighting small joys and oddities.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "hosts"
+    ]
+  },
+  {
+    "id": "pod_018",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which comedy-leaning advice podcast is known for the tagline 'an advice show for the modern era'?",
+    "correct_answer": "My Brother, My Brother and Me",
+    "incorrect_answers": [
+      "If I Were You",
+      "Call Her Daddy",
+      "Armchair Expert"
+    ],
+    "explanation": "The McElroy brothers describe 'My Brother, My Brother and Me' as 'an advice show for the modern era'.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "advice"
+    ]
+  },
+  {
+    "id": "pod_019",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which of these podcast hosts built a large comedy fanbase partly through viral animated clips on YouTube?",
+    "correct_answer": "Joe Rogan",
+    "incorrect_answers": [
+      "Ira Glass",
+      "Rachel Maddow",
+      "Ezra Klein"
+    ],
+    "explanation": "Animated clips from 'The Joe Rogan Experience' helped spread the show's comedic and conversational moments online.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "growth"
+    ]
+  },
+  {
+    "id": "pod_020",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which format has helped many comedy podcasts grow their audience beyond audio-only platforms?",
+    "correct_answer": "Simulcasting episodes on video platforms like YouTube.",
+    "incorrect_answers": [
+      "Replacing episodes with PDFs only.",
+      "Streaming exclusively on AM radio.",
+      "Limiting access to one small country."
+    ],
+    "explanation": "Video versions on platforms like YouTube and Twitch have helped comedy podcasts reach new viewers.",
+    "tags": [
+      "podcast",
+      "video",
+      "growth"
+    ]
+  },
+  {
+    "id": "pod_021",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Which former Obama staffers host the liberal political podcast 'Pod Save America'?",
+    "correct_answer": "Jon Favreau, Jon Lovett, and Tommy Vietor",
+    "incorrect_answers": [
+      "Ben Shapiro, Matt Walsh, and Michael Knowles",
+      "Rachel Maddow, Chris Hayes, and Joy Reid",
+      "Ezra Klein, Matt Yglesias, and Sarah Kliff"
+    ],
+    "explanation": "Ex-Obama aides Jon Favreau, Jon Lovett, and Tommy Vietor are key hosts of 'Pod Save America'.",
+    "tags": [
+      "podcast",
+      "politics",
+      "hosts"
+    ]
+  },
+  {
+    "id": "pod_022",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Which New York Times podcast hosted by Michael Barbaro focuses on a single major news story each weekday?",
+    "correct_answer": "The Daily",
+    "incorrect_answers": [
+      "Up First",
+      "Start Here",
+      "Today, Explained"
+    ],
+    "explanation": "Michael Barbaro hosts 'The Daily', a flagship New York Times news podcast.",
+    "tags": [
+      "podcast",
+      "politics",
+      "news"
+    ]
+  },
+  {
+    "id": "pod_023",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which political podcast hosted by Ezra Klein often features in-depth interviews about policy and ideas?",
+    "correct_answer": "The Ezra Klein Show",
+    "incorrect_answers": [
+      "The Argument",
+      "FiveThirtyEight Politics",
+      "Left, Right & Center"
+    ],
+    "explanation": "Ezra Klein hosts 'The Ezra Klein Show', known for long-form, policy-focused interviews.",
+    "tags": [
+      "podcast",
+      "politics",
+      "interviews"
+    ]
+  },
+  {
+    "id": "pod_024",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which conservative commentator hosts 'The Ben Shapiro Show', a popular right-leaning political podcast?",
+    "correct_answer": "Ben Shapiro",
+    "incorrect_answers": [
+      "Charlie Kirk",
+      "Sean Hannity",
+      "Tucker Carlson"
+    ],
+    "explanation": "Ben Shapiro is the fast-talking host of 'The Ben Shapiro Show'.",
+    "tags": [
+      "podcast",
+      "politics",
+      "conservative"
+    ]
+  },
+  {
+    "id": "pod_025",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which public radio podcast from NPR provides a concise daily political news briefing each morning?",
+    "correct_answer": "Up First",
+    "incorrect_answers": [
+      "All Things Considered",
+      "Politics Podcast",
+      "Morning Edition"
+    ],
+    "explanation": "NPR's 'Up First' offers a brief morning rundown of top stories, often including politics.",
+    "tags": [
+      "podcast",
+      "politics",
+      "news"
+    ]
+  },
+  {
+    "id": "pod_026",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which political podcast, associated with FiveThirtyEight, focuses on data and polling analysis?",
+    "correct_answer": "FiveThirtyEight Politics",
+    "incorrect_answers": [
+      "The Weeds",
+      "Left, Right & Center",
+      "The Argument"
+    ],
+    "explanation": "The 'FiveThirtyEight Politics' podcast dives into polling data and electoral analysis.",
+    "tags": [
+      "podcast",
+      "politics",
+      "data"
+    ]
+  },
+  {
+    "id": "pod_027",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which Vox Media podcast hosted by Matt Yglesias and others has focused heavily on policy details and wonky debates?",
+    "correct_answer": "The Weeds",
+    "incorrect_answers": [
+      "Today, Explained",
+      "The Ezra Klein Show",
+      "Pod Save the People"
+    ],
+    "explanation": "'The Weeds' digs into policy minutiae and political trade-offs.",
+    "tags": [
+      "podcast",
+      "politics",
+      "policy"
+    ]
+  },
+  {
+    "id": "pod_028",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which Crooked Media podcast specifically focuses on foreign policy and international issues?",
+    "correct_answer": "Pod Save the World",
+    "incorrect_answers": [
+      "Love It or Leave It",
+      "Pod Save America",
+      "What A Day"
+    ],
+    "explanation": "'Pod Save the World', hosted by Tommy Vietor and Ben Rhodes, covers foreign policy.",
+    "tags": [
+      "podcast",
+      "politics",
+      "foreign-policy"
+    ]
+  },
+  {
+    "id": "pod_029",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which podcast from The New York Times presents debates between columnists on current political topics?",
+    "correct_answer": "The Argument",
+    "incorrect_answers": [
+      "The Daily",
+      "Still Processing",
+      "Modern Love"
+    ],
+    "explanation": "NYT's 'The Argument' brings together opinion writers to debate politics and policy.",
+    "tags": [
+      "podcast",
+      "politics",
+      "debate"
+    ]
+  },
+  {
+    "id": "pod_030",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Compared to niche podcasts, how popular are shows like 'The Daily' and 'Pod Save America' in terms of audience size?",
+    "correct_answer": "They regularly rank near the top of podcast charts in news and politics.",
+    "incorrect_answers": [
+      "They are only downloaded a few hundred times per year.",
+      "They are limited to internal company employees only.",
+      "They are released without any promotion or listeners."
+    ],
+    "explanation": "Large news and politics shows like 'The Daily' and 'Pod Save America' frequently chart near the top in their categories.",
+    "tags": [
+      "podcast",
+      "politics",
+      "popularity"
+    ]
+  },
+  {
+    "id": "pod_031",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which approximate audience range is typical for top-tier political podcasts at their peak?",
+    "correct_answer": "Hundreds of thousands to millions of downloads per episode.",
+    "incorrect_answers": [
+      "Single-digit listeners per year.",
+      "Exactly 42 total lifetime downloads.",
+      "No more than 25 downloads per episode."
+    ],
+    "explanation": "Widely reported figures suggest leading political podcasts can reach hundreds of thousands or more per episode.",
+    "tags": [
+      "podcast",
+      "politics",
+      "metrics"
+    ]
+  },
+  {
+    "id": "pod_032",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which factor has significantly boosted global reach for political podcasts in recent years?",
+    "correct_answer": "Distribution through major platforms and recommendation algorithms.",
+    "incorrect_answers": [
+      "Exclusive broadcast over fax machines.",
+      "Mandatory listening laws.",
+      "Removal from all mobile apps."
+    ],
+    "explanation": "Platforms like Spotify, Apple Podcasts, and recommendation feeds have expanded the reach of political shows.",
+    "tags": [
+      "podcast",
+      "politics",
+      "distribution"
+    ]
+  },
+  {
+    "id": "pod_033",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which political podcast is known for a comedic, panel-style live show format called 'Love It or Leave It'?",
+    "correct_answer": "Love It or Leave It (Crooked Media)",
+    "incorrect_answers": [
+      "Left, Right & Center",
+      "FiveThirtyEight Politics",
+      "Pod Save the World"
+    ],
+    "explanation": "Jon Lovett hosts 'Love It or Leave It', a political-comedy live panel show.",
+    "tags": [
+      "podcast",
+      "politics",
+      "comedy"
+    ]
+  },
+  {
+    "id": "pod_034",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which long-running public radio program and podcast hosted by Terry Gross focuses on interviews with newsmakers and artists?",
+    "correct_answer": "Fresh Air",
+    "incorrect_answers": [
+      "All Things Considered",
+      "The World",
+      "Here & Now"
+    ],
+    "explanation": "Terry Gross has hosted 'Fresh Air', interviewing figures from politics, arts, and culture.",
+    "tags": [
+      "podcast",
+      "politics",
+      "interviews"
+    ]
+  },
+  {
+    "id": "pod_035",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political podcast frequently invites pollsters and data journalists like Nate Silver to dissect election forecasts?",
+    "correct_answer": "FiveThirtyEight Politics",
+    "incorrect_answers": [
+      "The Weeds",
+      "The Daily",
+      "Pod Save America"
+    ],
+    "explanation": "'FiveThirtyEight Politics' often features Nate Silver and team dissecting polls and forecasts.",
+    "tags": [
+      "podcast",
+      "politics",
+      "polling"
+    ]
+  },
+  {
+    "id": "pod_036",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which trend has helped political podcasts grow influence around major elections?",
+    "correct_answer": "Daily or near-daily episodes during campaign seasons.",
+    "incorrect_answers": [
+      "Releasing only one episode per decade.",
+      "Avoiding any mention of elections.",
+      "Deleting episodes after 24 hours."
+    ],
+    "explanation": "Many political podcasts ramp up frequency around elections, keeping audiences engaged in fast-moving news.",
+    "tags": [
+      "podcast",
+      "politics",
+      "elections"
+    ]
+  },
+  {
+    "id": "pod_037",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political podcast hosted by Dan Carlin is known for deeply researched, long-form episodes, sometimes touching on geopolitics?",
+    "correct_answer": "Common Sense with Dan Carlin",
+    "incorrect_answers": [
+      "Hardcore History",
+      "The Daily",
+      "Pod Save the World"
+    ],
+    "explanation": "Dan Carlin's 'Common Sense' covers politics and current affairs with long, analytical monologues.",
+    "tags": [
+      "podcast",
+      "politics",
+      "analysis"
+    ]
+  },
+  {
+    "id": "pod_038",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which of these is a typical way podcast platforms signal political podcast popularity to users?",
+    "correct_answer": "Featuring shows in 'Top Charts' and curated political collections.",
+    "incorrect_answers": [
+      "Hiding all political podcasts from search results.",
+      "Replacing political shows with blank feeds.",
+      "Requiring a password just to see show artwork."
+    ],
+    "explanation": "Platforms often highlight popular political podcasts through charts, carousels, and editorial picks.",
+    "tags": [
+      "podcast",
+      "politics",
+      "platforms"
+    ]
+  },
+  {
+    "id": "pod_039",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast often blends U.S. political commentary with labor and economic issues, hosted by Sam Seder?",
+    "correct_answer": "The Majority Report",
+    "incorrect_answers": [
+      "The Michael Knowles Show",
+      "Lovett or Leave It",
+      "The Argument"
+    ],
+    "explanation": "Sam Seder hosts 'The Majority Report', a left-wing politics and labor-focused show.",
+    "tags": [
+      "podcast",
+      "politics",
+      "left"
+    ]
+  },
+  {
+    "id": "pod_040",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Why do many political podcasts experience spikes in downloads around major news events?",
+    "correct_answer": "Listeners seek rapid analysis and context when big stories break.",
+    "incorrect_answers": [
+      "Platforms randomly auto-play them.",
+      "Episodes become shorter and silent.",
+      "Hosts stop discussing politics."
+    ],
+    "explanation": "Breaking news drives listeners to political podcasts for explanation and commentary.",
+    "tags": [
+      "podcast",
+      "politics",
+      "news-events"
+    ]
+  },
+  {
+    "id": "pod_041",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which metric do advertisers most commonly use to buy ads on comedy and political podcasts?",
+    "correct_answer": "Cost per thousand downloads (CPM).",
+    "incorrect_answers": [
+      "Cost per minute of silence.",
+      "Cost per unplayed episode.",
+      "Cost per number of episode titles."
+    ],
+    "explanation": "Podcast ad pricing often uses CPM, based on measured downloads or impressions.",
+    "tags": [
+      "podcast",
+      "advertising",
+      "metrics"
+    ]
+  },
+  {
+    "id": "pod_042",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which of these is a common way podcasts in comedy and politics monetize their popularity beyond ads?",
+    "correct_answer": "Paid subscriptions or bonus episodes on platforms like Patreon.",
+    "incorrect_answers": [
+      "Charging per minute of laughter.",
+      "Selling government-issued podcast licenses.",
+      "Charging a tax on every download."
+    ],
+    "explanation": "Many shows use Patreon, Apple/Spotify subscriptions, or private feeds for extra revenue.",
+    "tags": [
+      "podcast",
+      "business",
+      "monetization"
+    ]
+  },
+  {
+    "id": "pod_043",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which factor often gives political podcasts an engagement advantage over traditional TV news?",
+    "correct_answer": "Long-form, conversational format that builds parasocial relationships.",
+    "incorrect_answers": [
+      "Being limited to 30-second clips only.",
+      "Never having recurring hosts.",
+      "Removal of all listener feedback channels."
+    ],
+    "explanation": "Listeners often feel a closer bond with recurring podcast hosts over long-form discussions.",
+    "tags": [
+      "podcast",
+      "engagement",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_044",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which type of analytics can help show which segments of a political or comedy podcast keep listeners engaged?",
+    "correct_answer": "Completion rates and listener drop-off charts.",
+    "incorrect_answers": [
+      "Number of unused RSS feeds.",
+      "Host shoe size statistics.",
+      "Random color of cover art."
+    ],
+    "explanation": "Completion and drop-off data show where listeners stay tuned or exit episodes.",
+    "tags": [
+      "podcast",
+      "analytics",
+      "engagement"
+    ]
+  },
+  {
+    "id": "pod_045",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is one reason comedy podcasts often over-index in total listening hours compared to short-form content?",
+    "correct_answer": "Episodes are frequently long-form conversations lasting an hour or more.",
+    "incorrect_answers": [
+      "They are required to be exactly 60 seconds.",
+      "They can only be released once per year.",
+      "They are banned from using humor."
+    ],
+    "explanation": "Long episodes and loyal audiences mean more total hours spent on comedy shows.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "engagement"
+    ]
+  },
+  {
+    "id": "pod_046",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which common discovery mechanism often boosts listener counts for both comedy and political podcasts?",
+    "correct_answer": "Cross-guesting and host appearances on other popular shows.",
+    "incorrect_answers": [
+      "Deleting entire back catalogs.",
+      "Blocking all social media promotion.",
+      "Only whispering titles offline."
+    ],
+    "explanation": "Guest spots and crossovers help podcasts tap into each other's audiences.",
+    "tags": [
+      "podcast",
+      "growth",
+      "crossovers"
+    ]
+  },
+  {
+    "id": "pod_047",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which platform feature can significantly increase exposure for a podcast by highlighting it to new users?",
+    "correct_answer": "Being featured on the front page or in editorial 'featured' rows.",
+    "incorrect_answers": [
+      "Being hidden in developer settings only.",
+      "Being mislabeled as an audiobook.",
+      "Being released with no title or image."
+    ],
+    "explanation": "Editorial placement on major apps often drives big discovery spikes.",
+    "tags": [
+      "podcast",
+      "platforms",
+      "discovery"
+    ]
+  },
+  {
+    "id": "pod_048",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which listener behavior is a strong indicator of a podcast's loyal fanbase?",
+    "correct_answer": "Subscribing or following and listening to most new episodes.",
+    "incorrect_answers": [
+      "Never pressing play.",
+      "Only reading episode descriptions.",
+      "Muting all audio output."
+    ],
+    "explanation": "Frequent listening from subscribers indicates strong loyalty and retention.",
+    "tags": [
+      "podcast",
+      "loyalty",
+      "listeners"
+    ]
+  },
+  {
+    "id": "pod_049",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "What is a realistic reason podcast download numbers might differ from true listener counts?",
+    "correct_answer": "Auto-downloads and multiple devices can inflate raw download metrics.",
+    "incorrect_answers": [
+      "Downloads are legally capped at 10 per episode.",
+      "Apps are not allowed to count streams.",
+      "Listeners are forced to share accounts."
+    ],
+    "explanation": "One listener may generate multiple downloads across devices or apps.",
+    "tags": [
+      "podcast",
+      "metrics",
+      "statistics"
+    ]
+  },
+  {
+    "id": "pod_050",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Why might a political or comedy podcast start releasing shorter 'highlight' episodes in addition to full shows?",
+    "correct_answer": "To attract casual listeners who prefer bite-sized content.",
+    "incorrect_answers": [
+      "To erase their main feed history.",
+      "To comply with a 5-minute legal limit.",
+      "To hide their most popular segments."
+    ],
+    "explanation": "Highlight clips can act as an entry point for new or time-constrained listeners.",
+    "tags": [
+      "podcast",
+      "strategy",
+      "growth"
+    ]
+  },
+  {
+    "id": "pod_051",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which of these podcasts is best described as a comedic take on U.S. politics from a left-wing perspective?",
+    "correct_answer": "Chapo Trap House",
+    "incorrect_answers": [
+      "The Daily",
+      "Planet Money",
+      "Radiolab"
+    ],
+    "explanation": "'Chapo Trap House' mixes political analysis with irreverent comedy.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_052",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast, often listed among top global comedy shows, regularly hosts politicians and public figures as guests?",
+    "correct_answer": "The Joe Rogan Experience",
+    "incorrect_answers": [
+      "No Such Thing As A Fish",
+      "The Dollop",
+      "My Favorite Murder"
+    ],
+    "explanation": "While classified as comedy/conversation, Rogan's show frequently features political guests.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "guests"
+    ]
+  },
+  {
+    "id": "pod_053",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which podcast host moved from hosting a satirical news show on TV to leading a high-profile political-comedy podcast?",
+    "correct_answer": "Jon Lovett of 'Pod Save America' and 'Love It or Leave It'",
+    "incorrect_answers": [
+      "Michael Barbaro of 'The Daily'",
+      "Ira Glass of 'This American Life'",
+      "Sarah Koenig of 'Serial'"
+    ],
+    "explanation": "Jon Lovett worked in TV comedy and politics before co-founding Crooked Media podcasts.",
+    "tags": [
+      "podcast",
+      "hosts",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_054",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which of the following best explains why comedy and political podcasts often share large overlapping audiences?",
+    "correct_answer": "Many listeners enjoy humorous framing of serious current events.",
+    "incorrect_answers": [
+      "Comedy podcasts legally must avoid current events.",
+      "Political podcasts may not include jokes.",
+      "Platforms block listeners from subscribing to both."
+    ],
+    "explanation": "Humor helps make complex or heavy topics more approachable for many news-focused listeners.",
+    "tags": [
+      "podcast",
+      "audience",
+      "behavior"
+    ]
+  },
+  {
+    "id": "pod_055",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which type of episode is especially likely to spike view and download counts for comedy and political podcasts alike?",
+    "correct_answer": "Episodes reacting to breaking or controversial news.",
+    "incorrect_answers": [
+      "Episodes consisting only of silence.",
+      "Episodes released without titles.",
+      "Episodes never made available to the public."
+    ],
+    "explanation": "Timely reaction episodes often capture search interest around big news events.",
+    "tags": [
+      "podcast",
+      "spikes",
+      "news"
+    ]
+  },
+  {
+    "id": "pod_056",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast category label is most frequently used for shows like 'The Daily', 'Pod Save America', and 'The Ben Shapiro Show' on platforms?",
+    "correct_answer": "News & Politics",
+    "incorrect_answers": [
+      "Kids & Family",
+      "Science Fiction",
+      "Cooking"
+    ],
+    "explanation": "Most platforms group these shows under News or News & Politics.",
+    "tags": [
+      "podcast",
+      "categories",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_057",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which of the following is a realistic sign that a comedy or political podcast has a highly engaged community?",
+    "correct_answer": "Active fan subreddits, Discords, or comment sections discussing each episode.",
+    "incorrect_answers": [
+      "Zero mentions across all social platforms.",
+      "Only one listener in total.",
+      "Episodes with no titles or descriptions."
+    ],
+    "explanation": "Engaged podcasts inspire ongoing conversation and meme culture around their content.",
+    "tags": [
+      "podcast",
+      "community",
+      "engagement"
+    ]
+  },
+  {
+    "id": "pod_058",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which approximate pattern best describes listener behavior for top weekly comedy and political podcasts?",
+    "correct_answer": "A large core audience listens to most episodes soon after release, with a long tail of casual listeners.",
+    "incorrect_answers": [
+      "Only a single listener ever hears an episode.",
+      "Episodes vanish after one hour and never return.",
+      "Listeners can only access the very first episode."
+    ],
+    "explanation": "Core fans drive early spikes; long tails come from back-catalog discovery.",
+    "tags": [
+      "podcast",
+      "behavior",
+      "audience"
+    ]
+  },
+  {
+    "id": "pod_059",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which show is best known as a data-driven political analysis podcast rather than pure comedy?",
+    "correct_answer": "FiveThirtyEight Politics",
+    "incorrect_answers": [
+      "Comedy Bang! Bang!",
+      "The Dollop",
+      "No Such Thing As A Fish"
+    ],
+    "explanation": "FiveThirtyEight's podcast focuses primarily on polling and wonky analysis.",
+    "tags": [
+      "podcast",
+      "politics",
+      "data"
+    ]
+  },
+  {
+    "id": "pod_060",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which of these podcasts is especially known for mixing cultural, political, and social topics with a comedic tone, hosted by two brothers?",
+    "correct_answer": "My Brother, My Brother and Me",
+    "incorrect_answers": [
+      "The Daily",
+      "Pod Save the World",
+      "The Ezara Report"
+    ],
+    "explanation": "MBMBaM weaves cultural references and light political commentary into comedic advice.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "culture"
+    ]
+  },
+  {
+    "id": "pod_061",
+    "category": "Hosts & Formats",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "What is the most common format for top comedy and political podcasts?",
+    "correct_answer": "Conversational talk shows with recurring hosts and guests.",
+    "incorrect_answers": [
+      "Silent meditation with no speaking.",
+      "Only instrumentals with no hosts.",
+      "Static images with no audio."
+    ],
+    "explanation": "Most leading shows follow a talk-show format with regular hosts and guests.",
+    "tags": [
+      "podcast",
+      "format",
+      "hosts"
+    ]
+  },
+  {
+    "id": "pod_062",
+    "category": "Hosts & Formats",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which of the following is a key skill for hosts of political podcasts that helps retain listeners?",
+    "correct_answer": "Explaining complex issues clearly and engagingly.",
+    "incorrect_answers": [
+      "Whispering so quietly no one hears.",
+      "Avoiding any research before episodes.",
+      "Changing the show name every week."
+    ],
+    "explanation": "Clarity and engaging explanations are critical for retaining politically curious audiences.",
+    "tags": [
+      "podcast",
+      "skills",
+      "hosts"
+    ]
+  },
+  {
+    "id": "pod_063",
+    "category": "Hosts & Formats",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Why do many comedy podcast hosts maintain consistent recurring bits or segments?",
+    "correct_answer": "Recurring bits create familiar structure and in-jokes that bond listeners.",
+    "incorrect_answers": [
+      "Platforms require identical scripts each time.",
+      "They are legally barred from improvising.",
+      "Listeners dislike any predictable structure."
+    ],
+    "explanation": "Running gags and segments help foster shared language in a show's fanbase.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "structure"
+    ]
+  },
+  {
+    "id": "pod_064",
+    "category": "Hosts & Formats",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which factor can cause a noticeable drop in listener counts for a popular podcast?",
+    "correct_answer": "Long, unannounced hiatuses with no new episodes.",
+    "incorrect_answers": [
+      "Announcing a clear publishing schedule.",
+      "Releasing consistent episodes weekly.",
+      "Communicating changes openly to listeners."
+    ],
+    "explanation": "Unexpected gaps often lead to listener drop-off or lost subscribers.",
+    "tags": [
+      "podcast",
+      "consistency",
+      "listeners"
+    ]
+  },
+  {
+    "id": "pod_065",
+    "category": "Hosts & Formats",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which hosting style tends to perform better for complex political topics?",
+    "correct_answer": "A mix of expert interviews and host analysis.",
+    "incorrect_answers": [
+      "Random topic changes mid-sentence.",
+      "Reading headlines with no commentary.",
+      "Playing only background music."
+    ],
+    "explanation": "Combining interviews with analysis helps tackle nuance and context.",
+    "tags": [
+      "podcast",
+      "politics",
+      "style"
+    ]
+  },
+  {
+    "id": "pod_066",
+    "category": "Hosts & Formats",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Why might a comedy podcast bring recurring 'character' guests with fictional backstories?",
+    "correct_answer": "To create a comedic universe that rewards longtime listeners.",
+    "incorrect_answers": [
+      "To hide all real hosts from the audience.",
+      "Because platforms forbid real names.",
+      "To avoid recording any actual dialogue."
+    ],
+    "explanation": "Recurring characters deepen the lore and humor for dedicated fans.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "characters"
+    ]
+  },
+  {
+    "id": "pod_067",
+    "category": "Hosts & Formats",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which aspect of host performance most directly affects completion rates in comedy and political podcasts?",
+    "correct_answer": "Pacing, tone, and how quickly they get into core topics.",
+    "incorrect_answers": [
+      "The number of microphones unused.",
+      "The exact RGB value of cover art.",
+      "The size of the recording studio chairs."
+    ],
+    "explanation": "Audience analytics often show that pacing and early engagement affect whether listeners finish episodes.",
+    "tags": [
+      "podcast",
+      "hosts",
+      "performance"
+    ]
+  },
+  {
+    "id": "pod_068",
+    "category": "Hosts & Formats",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which reason is often cited for why multi-host podcasts feel more engaging than solo monologues?",
+    "correct_answer": "Natural back-and-forth banter creates dynamic energy.",
+    "incorrect_answers": [
+      "Editing becomes impossible with two people.",
+      "Listeners cannot follow more than one voice.",
+      "Multiple hosts prevent any jokes."
+    ],
+    "explanation": "Conversation and chemistry between hosts help keep episodes lively.",
+    "tags": [
+      "podcast",
+      "format",
+      "chemistry"
+    ]
+  },
+  {
+    "id": "pod_069",
+    "category": "Hosts & Formats",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Why do some political podcasts release 'explainer' mini-series separate from their main feed?",
+    "correct_answer": "To give new listeners a structured entry point into complex topics.",
+    "incorrect_answers": [
+      "To delete their most popular episodes.",
+      "To hide all archived content.",
+      "To comply with monthly reset laws."
+    ],
+    "explanation": "Mini-series can provide evergreen overviews that help onboard new audiences.",
+    "tags": [
+      "podcast",
+      "politics",
+      "onboarding"
+    ]
+  },
+  {
+    "id": "pod_070",
+    "category": "Hosts & Formats",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which of the following is a realistic reason some shows switch from audio-only to audio-plus-video?",
+    "correct_answer": "To reach additional viewers on platforms like YouTube and TikTok.",
+    "incorrect_answers": [
+      "Because audio is banned online.",
+      "Because video uses less data.",
+      "Because hosts dislike being heard."
+    ],
+    "explanation": "Video clips help discovery and bring in viewers who prefer visual content.",
+    "tags": [
+      "podcast",
+      "video",
+      "strategy"
+    ]
+  },
+  {
+    "id": "pod_071",
+    "category": "View Counts & Popularity",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which of these is a common public signal of a podcast's popularity besides charts and rankings?",
+    "correct_answer": "Selling out live shows or tours.",
+    "incorrect_answers": [
+      "Having no social media presence.",
+      "Removing all back episodes.",
+      "Blocking new subscribers."
+    ],
+    "explanation": "Live show demand often mirrors the size and enthusiasm of a show's audience.",
+    "tags": [
+      "podcast",
+      "popularity",
+      "live"
+    ]
+  },
+  {
+    "id": "pod_072",
+    "category": "View Counts & Popularity",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Why can YouTube view counts differ dramatically from RSS download numbers for the same podcast episode?",
+    "correct_answer": "They measure different platforms and may be influenced by different recommendation systems.",
+    "incorrect_answers": [
+      "They are required to match exactly by law.",
+      "YouTube refuses to count any podcast views.",
+      "RSS feeds are limited to one download total."
+    ],
+    "explanation": "YouTube and RSS represent separate ecosystems with different discovery dynamics.",
+    "tags": [
+      "podcast",
+      "view-counts",
+      "platforms"
+    ]
+  },
+  {
+    "id": "pod_073",
+    "category": "View Counts & Popularity",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which factor can artificially inflate view or download counts in analytics if not accounted for?",
+    "correct_answer": "Auto-play or auto-download features across devices.",
+    "incorrect_answers": [
+      "Listeners deleting episodes.",
+      "Hosts speaking too clearly.",
+      "Cover art with fewer colors."
+    ],
+    "explanation": "Automatic behaviors can create extra downloads that don't map 1:1 to humans.",
+    "tags": [
+      "podcast",
+      "analytics",
+      "metrics"
+    ]
+  },
+  {
+    "id": "pod_074",
+    "category": "View Counts & Popularity",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Why might a niche political podcast have lower raw viewer counts but higher engagement per listener?",
+    "correct_answer": "A smaller, highly invested audience may listen to every episode and support financially.",
+    "incorrect_answers": [
+      "Niche shows cannot accept any listeners.",
+      "Engagement is always lower for political shows.",
+      "Small audiences are banned from supporting shows."
+    ],
+    "explanation": "Niche podcasts can build very loyal communities with high per-listener engagement.",
+    "tags": [
+      "podcast",
+      "niche",
+      "engagement"
+    ]
+  },
+  {
+    "id": "pod_075",
+    "category": "View Counts & Popularity",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which of these is a realistic conversion pattern from casual podcast viewers to core fans?",
+    "correct_answer": "Discover via a popular clip, then subscribe and start exploring the back catalog.",
+    "incorrect_answers": [
+      "Discover via silence, then never press play.",
+      "Subscribe without ever listening.",
+      "Delete the app immediately."
+    ],
+    "explanation": "Viral clips often funnel people into deeper listening and subscriptions.",
+    "tags": [
+      "podcast",
+      "funnel",
+      "growth"
+    ]
+  },
+  {
+    "id": "pod_076",
+    "category": "View Counts & Popularity",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which kind of episode title generally performs better for new-listener discovery?",
+    "correct_answer": "Clear titles that reference recognizable topics, guests, or events.",
+    "incorrect_answers": [
+      "Completely opaque inside jokes only fans know.",
+      "Leaving titles blank.",
+      "Using only episode numbers with no description."
+    ],
+    "explanation": "Descriptive titles help search and recommendation systems connect content to audience interest.",
+    "tags": [
+      "podcast",
+      "titles",
+      "discovery"
+    ]
+  },
+  {
+    "id": "pod_077",
+    "category": "View Counts & Popularity",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Why might a comedy podcast spike in popularity after a high-profile guest appearance?",
+    "correct_answer": "The guest's existing fanbase checks out the episode and may subscribe.",
+    "incorrect_answers": [
+      "Platforms hide episodes with guests.",
+      "Guests replace the hosts permanently.",
+      "Guest episodes are never promoted."
+    ],
+    "explanation": "Guest cross-promotion is a classic way to grow listener counts.",
+    "tags": [
+      "podcast",
+      "guests",
+      "growth"
+    ]
+  },
+  {
+    "id": "pod_078",
+    "category": "View Counts & Popularity",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which approximate pattern is common among long-running political podcasts' audience metrics?",
+    "correct_answer": "Gradual growth over years, punctuated by spikes during major political cycles.",
+    "incorrect_answers": [
+      "Instant total loss of all listeners after one episode.",
+      "Guaranteed linear decline from launch.",
+      "Legally fixed audience size with no variation."
+    ],
+    "explanation": "Elections and crises tend to create wave-like patterns in political podcast growth.",
+    "tags": [
+      "podcast",
+      "politics",
+      "trends"
+    ]
+  },
+  {
+    "id": "pod_079",
+    "category": "View Counts & Popularity",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which of these would most likely cause an algorithm to recommend a comedy-political podcast to more users?",
+    "correct_answer": "High watch-time or listen-time and strong retention on recent episodes.",
+    "incorrect_answers": [
+      "Episodes played only for three seconds.",
+      "Listeners quitting during the intro every time.",
+      "Every user immediately skipping the show."
+    ],
+    "explanation": "Algorithms reward content that keeps people engaged for longer sessions.",
+    "tags": [
+      "podcast",
+      "algorithms",
+      "engagement"
+    ]
+  },
+  {
+    "id": "pod_080",
+    "category": "View Counts & Popularity",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which of the following is a realistic sign that a podcast has 'broken out' beyond its original niche?",
+    "correct_answer": "Mainstream press coverage and frequent appearance on cross-genre charts.",
+    "incorrect_answers": [
+      "Complete removal from all directories.",
+      "No one is allowed to mention it.",
+      "Only hosts are permitted to listen."
+    ],
+    "explanation": "Coverage in mainstream media usually indicates broader cultural relevance.",
+    "tags": [
+      "podcast",
+      "popularity",
+      "mainstream"
+    ]
+  },
+  {
+    "id": "pod_081",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast network is closely associated with 'Pod Save America' and other progressive shows?",
+    "correct_answer": "Crooked Media",
+    "incorrect_answers": [
+      "Gimlet Media",
+      "Wondery",
+      "Parcast"
+    ],
+    "explanation": "Crooked Media was founded by former Obama staffers and produces several political podcasts.",
+    "tags": [
+      "podcast",
+      "networks",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_082",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which British podcast network and company produces 'No Such Thing As A Fish'?",
+    "correct_answer": "QI's production arm (Quite Interesting Limited)",
+    "incorrect_answers": [
+      "BBC Sounds",
+      "Crooked Media",
+      "Radiotopia"
+    ],
+    "explanation": "The QI team under Quite Interesting Limited produces 'No Such Thing As A Fish'.",
+    "tags": [
+      "podcast",
+      "networks",
+      "british"
+    ]
+  },
+  {
+    "id": "pod_083",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which innovation helped podcasts like 'The Daily' popularize the modern news-podcast format?",
+    "correct_answer": "Focusing one episode on a single, deeply reported story.",
+    "incorrect_answers": [
+      "Releasing episodes only once per year.",
+      "Avoiding any narrative or structure.",
+      "Using only raw, unedited press conferences."
+    ],
+    "explanation": "'The Daily' pioneered a narrative style of one in-depth story per weekday.",
+    "tags": [
+      "podcast",
+      "format",
+      "news"
+    ]
+  },
+  {
+    "id": "pod_084",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which of these shows is best known for combining investigative journalism with comedic storytelling?",
+    "correct_answer": "Reply All (some episodes)",
+    "incorrect_answers": [
+      "99% Invisible",
+      "The Daily",
+      "Serial"
+    ],
+    "explanation": "Reply All episodes often mix investigation with humorous narrative and banter.",
+    "tags": [
+      "podcast",
+      "investigation",
+      "comedy"
+    ]
+  },
+  {
+    "id": "pod_085",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which scheduling pattern is used by many top political podcasts to keep up with fast news cycles?",
+    "correct_answer": "Multiple episodes per week, often timed after major news events.",
+    "incorrect_answers": [
+      "Only one episode every five years.",
+      "Random episodes at 3 a.m. with no news tie-in.",
+      "Only episodes released when no news occurs."
+    ],
+    "explanation": "Frequent releases allow shows to respond quickly to political developments.",
+    "tags": [
+      "podcast",
+      "schedule",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_086",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which type of ad format is especially common in comedy and political podcasts due to host trust?",
+    "correct_answer": "Host-read native ads integrated into the conversation.",
+    "incorrect_answers": [
+      "Only silent video ads.",
+      "Mandatory 30-minute ad blocks with no hosts.",
+      "Ads read exclusively by computer voices."
+    ],
+    "explanation": "Host-read placements leverage the host–listener relationship for better ad recall.",
+    "tags": [
+      "podcast",
+      "ads",
+      "hosts"
+    ]
+  },
+  {
+    "id": "pod_087",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Why do download numbers for older episodes of evergreen comedy podcasts often stay strong over time?",
+    "correct_answer": "New listeners binge back catalogs once they discover the show.",
+    "incorrect_answers": [
+      "Old episodes are forcibly removed.",
+      "Apps automatically delete evergreen content.",
+      "Only the latest episode is allowed to be streamed."
+    ],
+    "explanation": "Evergreen humor encourages new fans to explore years of archived episodes.",
+    "tags": [
+      "podcast",
+      "evergreen",
+      "back-catalog"
+    ]
+  },
+  {
+    "id": "pod_088",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which of these is a realistic risk of relying solely on platform algorithms for podcast growth?",
+    "correct_answer": "Sudden changes in recommendation systems can reduce visibility overnight.",
+    "incorrect_answers": [
+      "Algorithms guarantee permanent top placement.",
+      "Platforms must promote all shows equally.",
+      "Algorithms never change once launched."
+    ],
+    "explanation": "Algorithm updates can affect visibility, so many shows diversify promotion.",
+    "tags": [
+      "podcast",
+      "algorithms",
+      "risk"
+    ]
+  },
+  {
+    "id": "pod_089",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What is a common reason comedy-political podcasts encourage ratings and reviews from listeners?",
+    "correct_answer": "Positive ratings can improve chart rankings and discovery.",
+    "incorrect_answers": [
+      "Platforms delete shows with reviews.",
+      "Reviews turn episodes into video.",
+      "Ratings remove ads automatically."
+    ],
+    "explanation": "Ratings and reviews can influence algorithmic recommendations and social proof.",
+    "tags": [
+      "podcast",
+      "ratings",
+      "growth"
+    ]
+  },
+  {
+    "id": "pod_090",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Why might a political podcast occasionally bring in comedians as guests?",
+    "correct_answer": "To add levity and broaden appeal while discussing serious issues.",
+    "incorrect_answers": [
+      "Because comedians are required to host the news.",
+      "Because experts are banned from podcasts.",
+      "Because humor is illegal on TV."
+    ],
+    "explanation": "Comedians can make complex or heavy topics more approachable.",
+    "tags": [
+      "podcast",
+      "guests",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_091",
+    "category": "Meta Podcast Trivia",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which of these is a realistic strategy to test new formats on an established comedy podcast?",
+    "correct_answer": "Trying experimental segments in bonus or special episodes first.",
+    "incorrect_answers": [
+      "Erasing all previous episodes overnight.",
+      "Changing the RSS feed URL every day.",
+      "Hiding the show from existing subscribers."
+    ],
+    "explanation": "Bonus feeds let shows experiment without confusing the main audience.",
+    "tags": [
+      "podcast",
+      "strategy",
+      "experiments"
+    ]
+  },
+  {
+    "id": "pod_092",
+    "category": "Meta Podcast Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which reason best explains why some political podcasters release detailed show notes and links?",
+    "correct_answer": "To provide sources and further reading that back up claims.",
+    "incorrect_answers": [
+      "To hide the topics they covered.",
+      "To prevent listeners from fact-checking.",
+      "Because apps require empty descriptions."
+    ],
+    "explanation": "Show notes add transparency and value for politically engaged listeners.",
+    "tags": [
+      "podcast",
+      "notes",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_093",
+    "category": "Meta Podcast Trivia",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which of these is a realistic listener pattern for a highly popular weekly comedy podcast?",
+    "correct_answer": "Many listeners treat new episodes as part of their weekly routine.",
+    "incorrect_answers": [
+      "Listeners are forbidden to subscribe.",
+      "Shows play only once globally.",
+      "Episodes self-destruct after five minutes."
+    ],
+    "explanation": "Routine listening is common; fans build episodes into regular habits.",
+    "tags": [
+      "podcast",
+      "habits",
+      "comedy"
+    ]
+  },
+  {
+    "id": "pod_094",
+    "category": "Meta Podcast Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Why might a podcast's average viewer or listener counts drop slightly after an initial viral spike?",
+    "correct_answer": "Some curious visitors leave, while a core audience remains and stabilizes.",
+    "incorrect_answers": [
+      "All platforms delete popular shows.",
+      "Hosts lose the ability to upload audio.",
+      "Listeners are legally capped at ten."
+    ],
+    "explanation": "It's normal for numbers to settle after viral bursts as core fans stick around.",
+    "tags": [
+      "podcast",
+      "trends",
+      "audience"
+    ]
+  },
+  {
+    "id": "pod_095",
+    "category": "Meta Podcast Trivia",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which of these is a realistic reason a comedy show might start adding more political content over time?",
+    "correct_answer": "Audience interest in current events increases, and hosts want to respond.",
+    "incorrect_answers": [
+      "They are banned from making jokes.",
+      "Comedy content becomes illegal.",
+      "Platforms remove all non-political shows."
+    ],
+    "explanation": "Many comedy shows naturally evolve as hosts respond to political climates.",
+    "tags": [
+      "podcast",
+      "evolution",
+      "content"
+    ]
+  },
+  {
+    "id": "pod_096",
+    "category": "Meta Podcast Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which of these common listener actions best signals that a podcast is considered highly binge-worthy?",
+    "correct_answer": "Starting the show recently and then listening through dozens of back episodes quickly.",
+    "incorrect_answers": [
+      "Subscribing but never downloading.",
+      "Deleting the app upon hearing about the show.",
+      "Only reading summaries and never pressing play."
+    ],
+    "explanation": "Back-catalog binging is a key sign of high content appeal.",
+    "tags": [
+      "podcast",
+      "binge",
+      "behavior"
+    ]
+  },
+  {
+    "id": "pod_097",
+    "category": "Meta Podcast Trivia",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Why might a political podcast publish listener surveys about show topics and formats?",
+    "correct_answer": "To gather feedback that can improve content and retention.",
+    "incorrect_answers": [
+      "To ban listeners from answering questions.",
+      "To prevent anyone from sharing opinions.",
+      "Because surveys replace all episodes."
+    ],
+    "explanation": "Surveys help creators align topics and formats with audience interests.",
+    "tags": [
+      "podcast",
+      "feedback",
+      "strategy"
+    ]
+  },
+  {
+    "id": "pod_098",
+    "category": "Meta Podcast Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which of the following is a realistic challenge in comparing viewer counts across different podcast platforms?",
+    "correct_answer": "Platforms count plays and downloads differently and may not share full data.",
+    "incorrect_answers": [
+      "All platforms must use identical, public metrics.",
+      "Podcast plays are never counted anywhere.",
+      "Each platform has exactly the same user base."
+    ],
+    "explanation": "Fragmented analytics make cross-platform comparisons imperfect.",
+    "tags": [
+      "podcast",
+      "metrics",
+      "comparison"
+    ]
+  },
+  {
+    "id": "pod_099",
+    "category": "Meta Podcast Trivia",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which monetization pattern is common for very large comedy and political podcasts compared to smaller ones?",
+    "correct_answer": "A mix of high-CPM ads, live shows, and premium subscription content.",
+    "incorrect_answers": [
+      "Relying solely on one $1 donation forever.",
+      "Refusing any form of revenue.",
+      "Charging listeners per second of silence."
+    ],
+    "explanation": "Big shows diversify income across ads, tours, and premium feeds.",
+    "tags": [
+      "podcast",
+      "monetization",
+      "large-shows"
+    ]
+  },
+  {
+    "id": "pod_100",
+    "category": "Meta Podcast Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which realistic factor often limits the maximum size of a political podcast's audience compared to a broad comedy show?",
+    "correct_answer": "Political shows appeal strongly to specific ideologies rather than a full mainstream spectrum.",
+    "incorrect_answers": [
+      "Platforms block politics globally.",
+      "Politics cannot be discussed in audio.",
+      "Comedy is banned from big platforms."
+    ],
+    "explanation": "Ideological focus can cap total addressable audience compared with broad humor.",
+    "tags": [
+      "podcast",
+      "politics",
+      "audience-size"
+    ]
+  },
+  {
+    "id": "pod_101",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which comedy podcast, hosted by Dan Soder and Big Jay Oakerson, features comedians telling stories from their lives in a confessional style?",
+    "correct_answer": "The Bonfire",
+    "incorrect_answers": [
+      "Comedy Central Roast",
+      "The Joe Rogan Experience",
+      "WTF with Marc Maron"
+    ],
+    "explanation": "'The Bonfire' is known for its intimate, story-driven format where comedians share personal anecdotes.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "storytelling"
+    ]
+  },
+  {
+    "id": "pod_102",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which obscure comedy podcast from the 2010s featured hosts discussing conspiracy theories with a humorous twist, hosted by Brian Atlas and Mark Normand?",
+    "correct_answer": "Guys We F****d",
+    "incorrect_answers": [
+      "The Dollop",
+      "How Did This Get Made?",
+      "Comedy Bang! Bang!"
+    ],
+    "explanation": "'Guys We F****d' blends comedy with bizarre conspiracy discussions, gaining a cult following.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "conspiracy"
+    ]
+  },
+  {
+    "id": "pod_103",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which comedy podcast, hosted by Pete Holmes, explores spirituality and comedy through interviews with comedians and thinkers?",
+    "correct_answer": "You Made It Weird",
+    "incorrect_answers": [
+      "The Joe Rogan Experience",
+      "WTF with Marc Maron",
+      "Armchair Expert"
+    ],
+    "explanation": "Pete Holmes' 'You Made It Weird' delves into personal growth and spirituality in comedy interviews.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "spirituality"
+    ]
+  },
+  {
+    "id": "pod_104",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which British comedy podcast, hosted by James Acaster, involves comedians telling true stories with a twist of absurdity?",
+    "correct_answer": "Off Menu",
+    "incorrect_answers": [
+      "No Such Thing As A Fish",
+      "The Guilty Feminist",
+      "Shagged Married Annoyed"
+    ],
+    "explanation": "'Off Menu' features comedians discussing food in exaggerated, comedic ways.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "british"
+    ]
+  },
+  {
+    "id": "pod_105",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which comedy podcast, hosted by Tig Notaro and Claudia Kheel, focuses on feminist comedy and discussions?",
+    "correct_answer": "The Guilty Feminist",
+    "incorrect_answers": [
+      "My Favorite Murder",
+      "Queer Talk",
+      "Nobody Panic"
+    ],
+    "explanation": "'The Guilty Feminist' explores feminism through comedy and personal stories.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "feminism"
+    ]
+  },
+  {
+    "id": "pod_106",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which comedy podcast, hosted by Chris Sweeney and Stephen Buchanan, features comedians discussing their worst gigs?",
+    "correct_answer": "Scummy Mummies",
+    "incorrect_answers": [
+      "The Dollop",
+      "Comedy Bang! Bang!",
+      "Nobody Panic"
+    ],
+    "explanation": "'Scummy Mummies' is a British podcast where comedians share embarrassing performance stories.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "stand-up"
+    ]
+  },
+  {
+    "id": "pod_107",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which comedy podcast, hosted by Helen Bauer and Catherine Bohart, discusses sex and relationships with humor?",
+    "correct_answer": "Shagged Married Annoyed",
+    "incorrect_answers": [
+      "The Guilty Feminist",
+      "Queer Talk",
+      "Nobody Panic"
+    ],
+    "explanation": "'Shagged Married Annoyed' tackles relationship topics with comedic insight.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "relationships"
+    ]
+  },
+  {
+    "id": "pod_108",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which comedy podcast, hosted by Rosie Jones, features comedians discussing their fears and anxieties?",
+    "correct_answer": "Nobody Panic",
+    "incorrect_answers": [
+      "The Guilty Feminist",
+      "Shagged Married Annoyed",
+      "Queer Talk"
+    ],
+    "explanation": "'Nobody Panic' explores mental health and comedy through personal stories.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "mental-health"
+    ]
+  },
+  {
+    "id": "pod_109",
+    "category": "Comedy Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which comedy podcast, hosted by Jordan North and William Hanson, satirizes modern life and social media?",
+    "correct_answer": "Private Education",
+    "incorrect_answers": [
+      "Off Menu",
+      "Scummy Mummies",
+      "Nobody Panic"
+    ],
+    "explanation": "'Private Education' mocks upper-class culture and social norms with sharp wit.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "satire"
+    ]
+  },
+  {
+    "id": "pod_110",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political podcast, hosted by Glenn Greenwald and others, focuses on investigative journalism and government overreach?",
+    "correct_answer": "System Update",
+    "incorrect_answers": [
+      "The Daily",
+      "Pod Save America",
+      "The Ezra Klein Show"
+    ],
+    "explanation": "'System Update' delves into deep investigative pieces on politics and power.",
+    "tags": [
+      "podcast",
+      "politics",
+      "investigative"
+    ]
+  },
+  {
+    "id": "pod_111",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political podcast, hosted by Krystal Ball and Saagar Enjeti, critiques mainstream media and politics from a progressive viewpoint?",
+    "correct_answer": "Breaking Points",
+    "incorrect_answers": [
+      "The Majority Report",
+      "Chapo Trap House",
+      "Pod Save the World"
+    ],
+    "explanation": "'Breaking Points' analyzes media bias and political events with sharp commentary.",
+    "tags": [
+      "podcast",
+      "politics",
+      "media-critique"
+    ]
+  },
+  {
+    "id": "pod_112",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political podcast, hosted by David Pakman, focuses on progressive politics and debunking right-wing talking points?",
+    "correct_answer": "The David Pakman Show",
+    "incorrect_answers": [
+      "The Ben Shapiro Show",
+      "FiveThirtyEight Politics",
+      "The Argument"
+    ],
+    "explanation": "'The David Pakman Show' provides in-depth political analysis from a left-leaning perspective.",
+    "tags": [
+      "podcast",
+      "politics",
+      "progressive"
+    ]
+  },
+  {
+    "id": "pod_113",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political podcast, hosted by Michael Knowles, represents conservative viewpoints and cultural commentary?",
+    "correct_answer": "The Michael Knowles Show",
+    "incorrect_answers": [
+      "Pod Save America",
+      "The Ezra Klein Show",
+      "FiveThirtyEight Politics"
+    ],
+    "explanation": "'The Michael Knowles Show' discusses politics, culture, and conservatism.",
+    "tags": [
+      "podcast",
+      "politics",
+      "conservative"
+    ]
+  },
+  {
+    "id": "pod_114",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political podcast, hosted by Katie Halper and Matt Taibbi, critiques media and politics with a focus on journalism?",
+    "correct_answer": "Useful Idiots",
+    "incorrect_answers": [
+      "Breaking Points",
+      "System Update",
+      "The Majority Report"
+    ],
+    "explanation": "'Useful Idiots' examines media narratives and political events critically.",
+    "tags": [
+      "podcast",
+      "politics",
+      "journalism"
+    ]
+  },
+  {
+    "id": "pod_115",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political podcast, hosted by Briahna Joy Gray and Virgil Texas, discusses politics from a socialist perspective?",
+    "correct_answer": "Bad Dates",
+    "incorrect_answers": [
+      "Chapo Trap House",
+      "The Majority Report",
+      "Pod Save America"
+    ],
+    "explanation": "'Bad Dates' explores politics, culture, and socialism through interviews and discussions.",
+    "tags": [
+      "podcast",
+      "politics",
+      "socialist"
+    ]
+  },
+  {
+    "id": "pod_116",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political podcast, hosted by Ryan Grim and others, focuses on labor rights and progressive politics?",
+    "correct_answer": "The Intercept's Deconstructed",
+    "incorrect_answers": [
+      "FiveThirtyEight Politics",
+      "The Argument",
+      "Up First"
+    ],
+    "explanation": "'Deconstructed' investigates labor issues and political scandals.",
+    "tags": [
+      "podcast",
+      "politics",
+      "labor"
+    ]
+  },
+  {
+    "id": "pod_117",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political podcast, hosted by Al Franken and others, satirizes politics and media?",
+    "correct_answer": "The Al Franken Show",
+    "incorrect_answers": [
+      "Wait Wait... Don't Tell Me!",
+      "The Bugle",
+      "Chapo Trap House"
+    ],
+    "explanation": "'The Al Franken Show' blends humor with political commentary.",
+    "tags": [
+      "podcast",
+      "politics",
+      "satire"
+    ]
+  },
+  {
+    "id": "pod_118",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political podcast, hosted by Mehdi Hasan, focuses on global politics and interviews with world leaders?",
+    "correct_answer": "The Mehdi Hasan Show",
+    "incorrect_answers": [
+      "The Ezra Klein Show",
+      "Pod Save the World",
+      "Fresh Air"
+    ],
+    "explanation": "'The Mehdi Hasan Show' discusses international affairs and policy.",
+    "tags": [
+      "podcast",
+      "politics",
+      "global"
+    ]
+  },
+  {
+    "id": "pod_119",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political podcast, hosted by Joy Reid, covers news and politics with a focus on social justice?",
+    "correct_answer": "Revolt TV's The ReidOut",
+    "incorrect_answers": [
+      "The Daily",
+      "Up First",
+      "The Argument"
+    ],
+    "explanation": "'The ReidOut' analyzes current events through a progressive lens.",
+    "tags": [
+      "podcast",
+      "politics",
+      "social-justice"
+    ]
+  },
+  {
+    "id": "pod_120",
+    "category": "Political Podcasts",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political podcast, hosted by Cornel West and others, discusses philosophy, politics, and activism?",
+    "correct_answer": "The Tight Rope",
+    "incorrect_answers": [
+      "Common Sense with Dan Carlin",
+      "The Weeds",
+      "FiveThirtyEight Politics"
+    ],
+    "explanation": "'The Tight Rope' explores political philosophy and social issues.",
+    "tags": [
+      "podcast",
+      "politics",
+      "philosophy"
+    ]
+  },
+  {
+    "id": "pod_121",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast platform pioneered the use of dynamic ad insertion for personalized advertising?",
+    "correct_answer": "Spotify",
+    "incorrect_answers": [
+      "Apple Podcasts",
+      "Google Podcasts",
+      "Stitcher"
+    ],
+    "explanation": "Spotify introduced dynamic ad insertion to tailor ads to listeners.",
+    "tags": [
+      "podcast",
+      "industry",
+      "advertising"
+    ]
+  },
+  {
+    "id": "pod_122",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which metric is used by podcast analytics to measure listener loyalty beyond downloads?",
+    "correct_answer": "Completion rate",
+    "incorrect_answers": [
+      "File size",
+      "Host age",
+      "Episode length"
+    ],
+    "explanation": "Completion rate indicates how many listeners finish an episode.",
+    "tags": [
+      "podcast",
+      "industry",
+      "analytics"
+    ]
+  },
+  {
+    "id": "pod_123",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast hosting service is known for its focus on creator-owned platforms and decentralized distribution?",
+    "correct_answer": "Anchor (by Spotify)",
+    "incorrect_answers": [
+      "Libsyn",
+      "Megaphone",
+      "Buzzsprout"
+    ],
+    "explanation": "Anchor emphasizes creator control and easy distribution.",
+    "tags": [
+      "podcast",
+      "industry",
+      "hosting"
+    ]
+  },
+  {
+    "id": "pod_124",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast format involves listeners submitting questions or stories for hosts to discuss?",
+    "correct_answer": "Q&A or listener mail",
+    "incorrect_answers": [
+      "Silent episodes",
+      "Solo monologues",
+      "Instrumental music"
+    ],
+    "explanation": "Listener mail formats engage audiences directly.",
+    "tags": [
+      "podcast",
+      "industry",
+      "format"
+    ]
+  },
+  {
+    "id": "pod_125",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which company acquired Gimlet Media, influencing the podcast industry's growth?",
+    "correct_answer": "Spotify",
+    "incorrect_answers": [
+      "Apple",
+      "Google",
+      "Amazon"
+    ],
+    "explanation": "Spotify's acquisition of Gimlet boosted podcast production.",
+    "tags": [
+      "podcast",
+      "industry",
+      "acquisition"
+    ]
+  },
+  {
+    "id": "pod_126",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast monetization strategy involves fans paying a fixed amount per episode?",
+    "correct_answer": "Pay-per-episode",
+    "incorrect_answers": [
+      "Free downloads",
+      "Ad-supported",
+      "Sponsorship only"
+    ],
+    "explanation": "Pay-per-episode allows direct fan support for exclusive content.",
+    "tags": [
+      "podcast",
+      "industry",
+      "monetization"
+    ]
+  },
+  {
+    "id": "pod_127",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast analytics tool provides detailed listener demographics and behavior?",
+    "correct_answer": "Chartable",
+    "incorrect_answers": [
+      "Google Analytics",
+      "Facebook Insights",
+      "Twitter Analytics"
+    ],
+    "explanation": "Chartable offers podcast-specific analytics.",
+    "tags": [
+      "podcast",
+      "industry",
+      "analytics"
+    ]
+  },
+  {
+    "id": "pod_128",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast trend involves creating video versions of audio episodes for YouTube?",
+    "correct_answer": "Video podcasting",
+    "incorrect_answers": [
+      "Silent podcasts",
+      "Text-only episodes",
+      "Image galleries"
+    ],
+    "explanation": "Video podcasting expands reach to visual platforms.",
+    "tags": [
+      "podcast",
+      "industry",
+      "trend"
+    ]
+  },
+  {
+    "id": "pod_129",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast distribution protocol allows creators to own their content fully?",
+    "correct_answer": "RSS",
+    "incorrect_answers": [
+      "HTTP",
+      "FTP",
+      "SMTP"
+    ],
+    "explanation": "RSS enables decentralized podcast distribution.",
+    "tags": [
+      "podcast",
+      "industry",
+      "distribution"
+    ]
+  },
+  {
+    "id": "pod_130",
+    "category": "Podcast Industry",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast category often sees higher engagement due to niche audiences?",
+    "correct_answer": "True crime",
+    "incorrect_answers": [
+      "Weather reports",
+      "Traffic updates",
+      "Cooking recipes"
+    ],
+    "explanation": "True crime podcasts build dedicated fanbases.",
+    "tags": [
+      "podcast",
+      "industry",
+      "engagement"
+    ]
+  },
+  {
+    "id": "pod_131",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which comedy-political podcast, hosted by Al Madrigal, satirizes news with absurd humor?",
+    "correct_answer": "The Half Hour News Hour",
+    "incorrect_answers": [
+      "The Bugle",
+      "Chapo Trap House",
+      "Wait Wait... Don't Tell Me!"
+    ],
+    "explanation": "'The Half Hour News Hour' parodies news with comedic sketches.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_132",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast blends comedy with political commentary, hosted by Hasan Piker and others?",
+    "correct_answer": "The Hasan Piker Show",
+    "incorrect_answers": [
+      "The Joe Rogan Experience",
+      "Armchair Expert",
+      "The Daily Show"
+    ],
+    "explanation": "'The Hasan Piker Show' discusses politics with humor and guests.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_133",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which comedy podcast occasionally dives into politics, hosted by John Mulaney and others?",
+    "correct_answer": "John Mulaney & the Sack Lunch Bunch",
+    "incorrect_answers": [
+      "My Brother, My Brother and Me",
+      "The Dollop",
+      "Comedy Bang! Bang!"
+    ],
+    "explanation": "'John Mulaney & the Sack Lunch Bunch' mixes comedy with light political banter.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_134",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political-comedy podcast, hosted by Dan Crenshaw and others, offers conservative humor?",
+    "correct_answer": "The Buck Sexton Show",
+    "incorrect_answers": [
+      "Chapo Trap House",
+      "Pod Save America",
+      "The Majority Report"
+    ],
+    "explanation": "'The Buck Sexton Show' combines politics with comedic commentary.",
+    "tags": [
+      "podcast",
+      "politics",
+      "comedy"
+    ]
+  },
+  {
+    "id": "pod_135",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which comedy podcast, hosted by Sarah Sherman and others, satirizes internet culture and politics?",
+    "correct_answer": "Three Busy Debras",
+    "incorrect_answers": [
+      "Nobody Panic",
+      "The Guilty Feminist",
+      "Shagged Married Annoyed"
+    ],
+    "explanation": "'Three Busy Debras' uses absurdity to comment on social issues.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "satire"
+    ]
+  },
+  {
+    "id": "pod_136",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast, hosted by Tim Dillon, blends stand-up comedy with political rants?",
+    "correct_answer": "Tim Dillon Show",
+    "incorrect_answers": [
+      "The Joe Rogan Experience",
+      "WTF with Marc Maron",
+      "Armchair Expert"
+    ],
+    "explanation": "'Tim Dillon Show' discusses politics through comedic lenses.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_137",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which comedy-political podcast, hosted by Charlamagne Tha God, covers hip-hop and politics?",
+    "correct_answer": "The Breakfast Club",
+    "incorrect_answers": [
+      "Chapo Trap House",
+      "Pod Save America",
+      "The Majority Report"
+    ],
+    "explanation": "'The Breakfast Club' mixes entertainment with political discussions.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_138",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast, hosted by Joe Rogan, often features political guests with comedic banter?",
+    "correct_answer": "The Joe Rogan Experience",
+    "incorrect_answers": [
+      "The Daily",
+      "Pod Save America",
+      "The Ezra Klein Show"
+    ],
+    "explanation": "Rogan's show blends comedy with deep political conversations.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_139",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which comedy podcast, hosted by Sasheer Zamata, discusses race, politics, and culture?",
+    "correct_answer": "Chicks in the Office",
+    "incorrect_answers": [
+      "The Guilty Feminist",
+      "Nobody Panic",
+      "Shagged Married Annoyed"
+    ],
+    "explanation": "'Chicks in the Office' explores social issues with humor.",
+    "tags": [
+      "podcast",
+      "comedy",
+      "politics"
+    ]
+  },
+  {
+    "id": "pod_140",
+    "category": "Comedy & Politics",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which political-comedy podcast, hosted by Jon Harris, satirizes British politics?",
+    "correct_answer": "The Jon Harris Show",
+    "incorrect_answers": [
+      "The Bugle",
+      "Off Menu",
+      "Scummy Mummies"
+    ],
+    "explanation": "'The Jon Harris Show' uses comedy to critique UK politics.",
+    "tags": [
+      "podcast",
+      "politics",
+      "comedy"
+    ]
+  },
+  {
+    "id": "pod_141",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast, hosted by Ira Glass, pioneered narrative storytelling in radio and podcasts?",
+    "correct_answer": "This American Life",
+    "incorrect_answers": [
+      "Serial",
+      "The Daily",
+      "Radiolab"
+    ],
+    "explanation": "'This American Life' revolutionized storytelling in audio media.",
+    "tags": [
+      "podcast",
+      "narrative",
+      "storytelling"
+    ]
+  },
+  {
+    "id": "pod_142",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast network, founded by Alex Blumberg, focuses on independent creators?",
+    "correct_answer": "Gimlet Media",
+    "incorrect_answers": [
+      "Crooked Media",
+      "Radiotopia",
+      "Pineapple Street Media"
+    ],
+    "explanation": "Gimlet Media supports innovative podcast production.",
+    "tags": [
+      "podcast",
+      "network",
+      "independent"
+    ]
+  },
+  {
+    "id": "pod_143",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast, hosted by Jad Abumrad and Robert Krulwich, explores science through stories?",
+    "correct_answer": "Radiolab",
+    "incorrect_answers": [
+      "Stuff You Should Know",
+      "The Daily",
+      "Serial"
+    ],
+    "explanation": "'Radiolab' makes science accessible through narrative.",
+    "tags": [
+      "podcast",
+      "science",
+      "storytelling"
+    ]
+  },
+  {
+    "id": "pod_144",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast, hosted by Sarah Koenig, investigates true crime with deep reporting?",
+    "correct_answer": "Serial",
+    "incorrect_answers": [
+      "My Favorite Murder",
+      "Crime Junkie",
+      "The Daily"
+    ],
+    "explanation": "'Serial' set the standard for investigative podcasting.",
+    "tags": [
+      "podcast",
+      "true-crime",
+      "investigative"
+    ]
+  },
+  {
+    "id": "pod_145",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast network, co-founded by Roman Mars, supports creative audio?",
+    "correct_answer": "Radiotopia",
+    "incorrect_answers": [
+      "Gimlet Media",
+      "Crooked Media",
+      "Pineapple Street Media"
+    ],
+    "explanation": "Radiotopia fosters diverse and experimental podcasts.",
+    "tags": [
+      "podcast",
+      "network",
+      "creative"
+    ]
+  },
+  {
+    "id": "pod_146",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast, hosted by Josh and Chuck, explores obscure facts and myths?",
+    "correct_answer": "Stuff You Should Know",
+    "incorrect_answers": [
+      "No Such Thing As A Fish",
+      "The Dollop",
+      "Radiolab"
+    ],
+    "explanation": "'Stuff You Should Know' educates through entertaining explanations.",
+    "tags": [
+      "podcast",
+      "facts",
+      "education"
+    ]
+  },
+  {
+    "id": "pod_147",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast, hosted by Malcolm Gladwell, explores social science and psychology?",
+    "correct_answer": "Revisionist History",
+    "incorrect_answers": [
+      "The Ezra Klein Show",
+      "The Weeds",
+      "FiveThirtyEight Politics"
+    ],
+    "explanation": "'Revisionist History' re-examines historical events through new lenses.",
+    "tags": [
+      "podcast",
+      "social-science",
+      "history"
+    ]
+  },
+  {
+    "id": "pod_148",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast, hosted by Tim Ferriss, interviews high achievers on productivity?",
+    "correct_answer": "The Tim Ferriss Show",
+    "incorrect_answers": [
+      "Armchair Expert",
+      "The Joe Rogan Experience",
+      "WTF with Marc Maron"
+    ],
+    "explanation": "'The Tim Ferriss Show' focuses on tools for personal optimization.",
+    "tags": [
+      "podcast",
+      "productivity",
+      "interviews"
+    ]
+  },
+  {
+    "id": "pod_149",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast, hosted by Brené Brown, discusses vulnerability and leadership?",
+    "correct_answer": "Unlocking Us",
+    "incorrect_answers": [
+      "The Ezra Klein Show",
+      "Armchair Expert",
+      "The Daily"
+    ],
+    "explanation": "'Unlocking Us' explores emotional intelligence and courage.",
+    "tags": [
+      "podcast",
+      "vulnerability",
+      "leadership"
+    ]
+  },
+  {
+    "id": "pod_150",
+    "category": "Advanced Trivia",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which podcast, hosted by Sam Harris, debates philosophy, science, and politics?",
+    "correct_answer": "Making Sense",
+    "incorrect_answers": [
+      "The Joe Rogan Experience",
+      "The Ezra Klein Show",
+      "Common Sense with Dan Carlin"
+    ],
+    "explanation": "'Making Sense' features long-form discussions on complex topics.",
+    "tags": [
+      "podcast",
+      "philosophy",
+      "debate"
+    ]
+  }
+]
