@@ -1,5 +1,5 @@
 <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Original Brain -->
+  <!-- Brain icon -->
   <path d="M100 25C75 25 56 44 56 69C44 69 31 81 31 94C31 100 34 106 38 109C31 113 25 119 25 131C25 144 34 153 47 153C47 166 56 175 69 175C69 188 81 200 100 200C119 200 131 188 131 175C144 175 153 166 153 153C166 153 175 144 175 131C175 119 169 113 163 109C166 106 169 100 169 94C169 81 156 69 144 69C144 44 125 25 100 25Z" fill="#F4A6B7"/>
   <ellipse cx="75" cy="81" rx="9" ry="9" fill="#E8949C"/>
   <ellipse cx="125" cy="81" rx="9" ry="9" fill="#E8949C"/>
@@ -13,17 +13,4 @@
   <circle cx="100" cy="56" r="8" fill="#FFC4D1" opacity="0.5"/>
   <path d="M50 75C50 75 44 81 44 88" stroke="#E8949C" stroke-width="4" stroke-linecap="round"/>
   <path d="M150 75C150 75 156 81 156 88" stroke="#E8949C" stroke-width="4" stroke-linecap="round"/>
-  
-  <!-- Christmas Hat -->
-  <!-- Hat base (red part) -->
-  <path d="M70 30 L130 30 L135 45 L65 45 Z" fill="#DC143C"/>
-  <!-- Hat white trim at base -->
-  <ellipse cx="100" cy="45" rx="37" ry="6" fill="white"/>
-  <!-- Hat cone -->
-  <path d="M65 45 L100 5 L135 45 Z" fill="#DC143C"/>
-  <!-- Hat white pom-pom -->
-  <circle cx="100" cy="5" r="8" fill="white"/>
-  <!-- Hat shading/fold lines -->
-  <path d="M75 45 L95 15" stroke="#B01030" stroke-width="2" opacity="0.3" stroke-linecap="round"/>
-  <path d="M105 15 L125 45" stroke="#B01030" stroke-width="2" opacity="0.3" stroke-linecap="round"/>
 </svg>
