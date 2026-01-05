@@ -47,7 +47,7 @@ export async function GET(request: Request) {
 
   try {
     const questions = await getQuestions(
-      source as 'opentdb' | 'farcaster' | 'base' | 'christmas',
+      source as 'opentdb' | 'farcaster' | 'base' | 'christmas' | 'podcasts',
       amount,
       difficulty,
       category || undefined

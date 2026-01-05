@@ -15,6 +15,7 @@ describe('Category Gating', () => {
       expect(getRequiredPoints('Farcaster')).toBe(0);
       expect(getRequiredPoints('Base')).toBe(0);
       expect(getRequiredPoints('Christmas')).toBe(0);
+      expect(getRequiredPoints('Podcasts')).toBe(0);
     });
 
     it('should return 20000 for tier 1 categories', () => {
@@ -60,6 +61,7 @@ describe('Category Gating', () => {
       expect(canAccessCategory('Farcaster', 0)).toBe(true);
       expect(canAccessCategory('Base', 100)).toBe(true);
       expect(canAccessCategory('Christmas', 5000)).toBe(true);
+      expect(canAccessCategory('Podcasts', 0)).toBe(true);
     });
 
     it('should deny access to tier 1 categories with insufficient points', () => {
@@ -105,6 +107,7 @@ describe('Category Gating', () => {
       expect(isCategoryGated('Farcaster')).toBe(false);
       expect(isCategoryGated('Base')).toBe(false);
       expect(isCategoryGated('Christmas')).toBe(false);
+       expect(isCategoryGated('Podcasts')).toBe(false);
     });
 
     it('should return true for gated categories', () => {
@@ -120,6 +123,7 @@ describe('Category Gating', () => {
       'Farcaster',
       'Base',
       'Christmas',
+      'Podcasts',
       'Entertainment: Books',
       'Entertainment: Film',
       'Entertainment: Television',
@@ -134,6 +138,7 @@ describe('Category Gating', () => {
         'Farcaster',
         'Base',
         'Christmas',
+        'Podcasts',
       ]);
     });
 
@@ -190,7 +195,7 @@ describe('Category Gating', () => {
 
   describe('UNGATED_CATEGORIES', () => {
     it('should contain exactly 4 categories', () => {
-      expect(UNGATED_CATEGORIES.length).toBe(4);
+      expect(UNGATED_CATEGORIES.length).toBe(5);
     });
 
     it('should contain the expected categories', () => {
@@ -198,6 +203,7 @@ describe('Category Gating', () => {
       expect(UNGATED_CATEGORIES).toContain('Farcaster');
       expect(UNGATED_CATEGORIES).toContain('Base');
       expect(UNGATED_CATEGORIES).toContain('Christmas');
+      expect(UNGATED_CATEGORIES).toContain('Podcasts');
     });
   });
 });

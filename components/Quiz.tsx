@@ -25,6 +25,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     'Farcaster',
     'Base',
     'Christmas',
+    'Podcasts',
     'Entertainment: Books',
     'Entertainment: Film',
     'Entertainment: Music',
@@ -90,7 +91,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     }
 
     try {
-      const shouldPassCategory = !['Farcaster', 'Base', 'Christmas'].includes(categoryToUse);
+      const shouldPassCategory = !['Farcaster', 'Base', 'Christmas', 'Podcasts'].includes(categoryToUse);
       const categoryParam = categoryToUse && shouldPassCategory
         ? `&category=${encodeURIComponent(categoryToUse)}`
         : '';
@@ -100,7 +101,9 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
           ? 'base'
           : categoryToUse === 'Christmas'
             ? 'christmas'
-            : 'opentdb';
+            : categoryToUse === 'Podcasts'
+              ? 'podcasts'
+              : 'opentdb';
       const response = await fetch(`/api/questions?amount=10&source=${effectiveSource}${categoryParam}`);
       const data = await response.json();
 

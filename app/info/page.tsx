@@ -430,7 +430,7 @@ export default function InfoPage() {
           <div className="space-y-3">
             <div className="p-3 bg-green-50 border-2 border-green-300 rounded-lg">
               <div className="font-semibold text-green-700 mb-1">🟢 Always Available (Free)</div>
-              <div className="text-sm text-gray-700">General Knowledge, Farcaster, Base, Christmas</div>
+              <div className="text-sm text-gray-700">General Knowledge, Farcaster, Base, Christmas, Podcasts</div>
             </div>
             <div className="p-3 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
               <div className="font-semibold text-yellow-700 mb-1">🔒 20,000 T Points Required</div>
