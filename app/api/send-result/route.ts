@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Basic in-memory rate limiter stub. In production replace with a
-// persistent store (Redis) and a robust library.
+// In-memory rate limiter
 const rateMap = new Map<string, { count: number; firstTs: number }>();
 const RATE_LIMIT_WINDOW = 60_000; // 1 minute
 const RATE_LIMIT_MAX = 5; // max requests per window per user/ip
