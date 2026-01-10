@@ -110,6 +110,8 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
         showToast("Please wait before spinning again", "error");
       } else if (error.message?.includes("no T points")) {
         showToast("You need T Points to spin", "error", "Complete quizzes to earn T Points");
+      } else if (error.message?.includes("does not match the target chain") || error.message?.includes("ChainMismatchError")) {
+        showToast("Wrong Network", "error", "Please switch your wallet to Base mainnet to spin");
       } else {
         showToast("Spin failed", "error", error.message || "Please try again");
       }
