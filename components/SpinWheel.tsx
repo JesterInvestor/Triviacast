@@ -380,49 +380,38 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
 
       {/* Spin Button */}
       <div className="mb-4">
-        {status?.canSpin ? (
-          <button
-            onClick={handleSpin}
-            disabled={isSpinning || tPoints < REQUIRED_T_POINTS}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-bold py-4 px-6 rounded-lg transition-all transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
-          >
-            {isSpinning ? (
-              <span className="flex items-center justify-center">
-                <svg
-                  className="animate-spin h-5 w-5 mr-3"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="none"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                Spinning...
-              </span>
-            ) : (
-              "🎰 SPIN THE WHEEL"
-            )}
-          </button>
-        ) : (
-          <div className="text-center">
-            <div className="bg-muted rounded-lg py-4 px-6">
-              <div className="text-muted-foreground mb-1">Next spin in</div>
-              <div className="text-2xl font-bold">
-                {status && formatTimeUntilSpin(status.timeUntilNext)}
-              </div>
-            </div>
-          </div>
-        )}
+        <button
+          onClick={handleSpin}
+          disabled={isSpinning || tPoints < REQUIRED_T_POINTS}
+          className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-bold py-4 px-6 rounded-lg transition-all transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
+        >
+          {isSpinning ? (
+            <span className="flex items-center justify-center">
+              <svg
+                className="animate-spin h-5 w-5 mr-3"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              Spinning...
+            </span>
+          ) : (
+            "🎰 SPIN THE WHEEL"
+          )}
+        </button>
       </div>
 
       {/* Info */}
@@ -430,7 +419,7 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
         <p>• 50% chance: {prizeInfo && formatPrize(prizeInfo.smallPrize)} $TRIV</p>
         <p>• 5% chance: {prizeInfo && formatPrize(prizeInfo.bigPrize)} $TRIV</p>
         <p>• 45% chance: No prize</p>
-        <p className="pt-2 font-semibold">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points • Once per day</p>
+        <p className="pt-2 font-semibold">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points • Testing (cooldown disabled)</p>
         {tPoints < REQUIRED_T_POINTS && (
           <p className="pt-1 text-red-500 font-semibold">You have {tPoints.toLocaleString()} T Points (need {(REQUIRED_T_POINTS - tPoints).toLocaleString()} more)</p>
         )}
