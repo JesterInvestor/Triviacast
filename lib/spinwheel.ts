@@ -144,24 +144,28 @@ export async function getPrizeInfo(): Promise<PrizeInfo> {
         address: SPINWHEEL_ADDRESS as `0x${string}`,
         abi: SPINWHEEL_ABI_WITH_ERRORS as any,
         functionName: 'smallPrize',
+        args: [],
         chainId: activeChain.id,
       }),
       readContract(wagmiConfig, {
         address: SPINWHEEL_ADDRESS as `0x${string}`,
         abi: SPINWHEEL_ABI_WITH_ERRORS as any,
         functionName: 'bigPrize',
+        args: [],
         chainId: activeChain.id,
       }),
       readContract(wagmiConfig, {
         address: SPINWHEEL_ADDRESS as `0x${string}`,
         abi: SPINWHEEL_ABI_WITH_ERRORS as any,
         functionName: 'getExpectedValue',
+        args: [],
         chainId: activeChain.id,
       }),
       readContract(wagmiConfig, {
         address: SPINWHEEL_ADDRESS as `0x${string}`,
         abi: SPINWHEEL_ABI_WITH_ERRORS as any,
         functionName: 'spinCooldown',
+        args: [],
         chainId: activeChain.id,
       }),
     ]);
