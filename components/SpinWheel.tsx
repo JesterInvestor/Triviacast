@@ -43,9 +43,6 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
   const [tPoints, setTPoints] = useState<number>(0);
   const [lastSpinResult, setLastSpinResult] = useState<SpinResult | null>(null);
   const [showResult, setShowResult] = useState(false);
-  const [showClaimModal, setShowClaimModal] = useState(false);
-  const [isClaiming, setIsClaiming] = useState(false);
-  const [hasClaimed, setHasClaimed] = useState(false);
 
   // Load initial data
   useEffect(() => {
@@ -91,33 +88,10 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
     }
   }
 
-  async function handleClaim() {
-    if (!lastSpinResult || lastSpinResult.type === PrizeType.NO_PRIZE) return;
-    
-    setIsClaiming(true);
-    try {
-      // Show signing prompt
-      showToast("Sign the claim transaction in your wallet", "info");
-      
-      // Simulate claim process (in real implementation, this would be a contract call)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setHasClaimed(true);
-      showToast("Prize Claimed!", "success", `Your ${formatPrize(lastSpinResult.amount)} $TRIV has been claimed`);
-      setShowClaimModal(false);
-      
-      // Refresh data
-      setTimeout(() => loadData(), 1000);
-    } catch (error: any) {
-      console.error("Claim failed:", error);
-      showToast("Claim failed", "error", error.message || "Please try again");
-    } finally {
-      setIsClaiming(false);
-    }
-  }
-
   async function handleSpin() {
     if (!address || isSpinning) return;
+
+    console.log("Spin started - address:", address, "T Points:", tPoints, "Required:", REQUIRED_T_POINTS);
 
     // Check T points requirement
     if (tPoints < REQUIRED_T_POINTS) {
@@ -130,10 +104,13 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
     setIsSpinning(true);
     setShowResult(false);
     try {
+      console.log("Calling spin() contract function...");
       const hash = await spin();
+      console.log("Spin tx submitted, hash:", hash);
       
       // Simulate spin animation (3-5 seconds)
       await new Promise(resolve => setTimeout(resolve, 4000));
+      console.log("Animation complete, generating result...");
       
       // Determine result based on random chance
       const randomRoll = Math.random() * 100;
@@ -155,8 +132,7 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
       
       setLastSpinResult(result);
       setShowResult(true);
-      setHasClaimed(false);
-      setShowClaimModal(result.type !== PrizeType.NO_PRIZE); // Auto-open claim modal for winners
+      console.log("Result set:", result, "showResult should be true now");
       onSpinComplete?.(result.type, result.amount);
 
       // Refresh status after spinning
@@ -284,20 +260,6 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
               <div className="text-2xl font-bold text-yellow-500">
                 {formatPrize(lastSpinResult.amount)} $TRIV
               </div>
-              {!hasClaimed && (
-                <button
-                  onClick={() => setShowClaimModal(true)}
-                  disabled={isClaiming}
-                  className="mt-3 px-6 py-2 bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-400 text-white font-bold rounded-lg transition-colors disabled:cursor-not-allowed"
-                >
-                  ✨ Claim Prize
-                </button>
-              )}
-              {hasClaimed && (
-                <div className="mt-3 px-4 py-2 bg-green-100 border border-green-400 rounded text-green-700 font-semibold">
-                  ✅ Prize Claimed!
-                </div>
-              )}
             </div>
           ) : (
             <div>
@@ -306,75 +268,8 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
               <div className="text-xl font-bold text-blue-500">
                 {formatPrize(lastSpinResult.amount)} $TRIV
               </div>
-              {!hasClaimed && (
-                <button
-                  onClick={() => setShowClaimModal(true)}
-                  disabled={isClaiming}
-                  className="mt-3 px-6 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-bold rounded-lg transition-colors disabled:cursor-not-allowed"
-                >
-                  ✨ Claim Prize
-                </button>
-              )}
-              {hasClaimed && (
-                <div className="mt-3 px-4 py-2 bg-green-100 border border-green-400 rounded text-green-700 font-semibold">
-                  ✅ Prize Claimed!
-                </div>
-              )}
             </div>
           )}
-        </div>
-      )}
-
-      {/* Claim Modal */}
-      {showClaimModal && lastSpinResult && lastSpinResult.type !== PrizeType.NO_PRIZE && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="text-center mb-6">
-              <div className="text-4xl mb-3">
-                {lastSpinResult.type === PrizeType.BIG_PRIZE ? "🤑🎉" : "🎉"}
-              </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                Claim Your Prize!
-              </h2>
-              <div className="text-3xl font-bold text-purple-600">
-                {formatPrize(lastSpinResult.amount)} $TRIV
-              </div>
-            </div>
-            
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-sm text-blue-800">
-              <p className="font-semibold mb-2">🔐 Sign to Claim</p>
-              <p>Click the button below to sign the claim transaction in your wallet.</p>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowClaimModal(false)}
-                disabled={isClaiming}
-                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleClaim}
-                disabled={isClaiming}
-                className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-bold rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {isClaiming ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    Signing...
-                  </>
-                ) : (
-                  <>
-                    ✍️ Sign & Claim
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
