@@ -13,7 +13,17 @@ import {
   type SpinStatus,
   type PrizeInfo,
 } from "@/lib/spinwheel";
-import { toast } from "sonner";
+import { getWalletTotalPoints } from "@/lib/tpoints";
+
+const REQUIRED_T_POINTS = 500000;
+
+// Custom toast helper using the existing Triviacast toast system
+function showToast(message: string, type: 'success' | 'error' | 'info' = 'info', description?: string) {
+  const fullMessage = description ? `${message}: ${description}` : message;
+  window.dispatchEvent(new CustomEvent('triviacast:toast', {
+    detail: { type, message: fullMessage }
+  }));
+}
 
 interface SpinWheelProps {
   onSpinComplete?: (prizeType: PrizeType, amount: bigint) => void;
@@ -25,6 +35,7 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
   const [prizeInfo, setPrizeInfo] = useState<PrizeInfo | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [tPoints, setTPoints] = useState<number>(0);
 
   // Load initial data
   useEffect(() => {
@@ -54,15 +65,17 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
 
     try {
       setIsLoading(true);
-      const [statusData, prizeData] = await Promise.all([
+      const [statusData, prizeData, points] = await Promise.all([
         canUserSpin(address),
         getPrizeInfo(),
+        getWalletTotalPoints(address),
       ]);
       setStatus(statusData);
       setPrizeInfo(prizeData);
+      setTPoints(points);
     } catch (error) {
       console.error("Failed to load spin wheel data:", error);
-      toast.error("Failed to load spin wheel");
+      showToast("Failed to load spin wheel", "error");
     } finally {
       setIsLoading(false);
     }
@@ -71,12 +84,20 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
   async function handleSpin() {
     if (!address || isSpinning) return;
 
+    // Check T points requirement
+    if (tPoints < REQUIRED_T_POINTS) {
+      showToast("Insufficient T Points", "error", 
+        `You need ${REQUIRED_T_POINTS.toLocaleString()} T Points to spin. You have ${tPoints.toLocaleString()}.`
+      );
+      return;
+    }
+
     setIsSpinning(true);
     try {
       const hash = await spin();
-      toast.success("Spin initiated! Waiting for result...", {
-        description: "The wheel is spinning. Results will appear shortly.",
-      });
+      showToast("Spin initiated! Waiting for result...", "success", 
+        "The wheel is spinning. Results will appear shortly."
+      );
 
       // Refresh status after spinning
       setTimeout(() => {
@@ -86,15 +107,11 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
       console.error("Spin failed:", error);
       
       if (error.message?.includes("cooldown")) {
-        toast.error("Please wait before spinning again");
+        showToast("Please wait before spinning again", "error");
       } else if (error.message?.includes("no T points")) {
-        toast.error("You need T Points to spin", {
-          description: "Complete quizzes to earn T Points",
-        });
+        showToast("You need T Points to spin", "error", "Complete quizzes to earn T Points");
       } else {
-        toast.error("Spin failed", {
-          description: error.message || "Please try again",
-        });
+        showToast("Spin failed", "error", error.message || "Please try again");
       }
     } finally {
       setIsSpinning(false);
@@ -154,7 +171,7 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
         {status?.canSpin ? (
           <button
             onClick={handleSpin}
-            disabled={isSpinning}
+            disabled={isSpinning || tPoints < REQUIRED_T_POINTS}
             className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-bold py-4 px-6 rounded-lg transition-all transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
           >
             {isSpinning ? (
@@ -201,7 +218,10 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
         <p>• 50% chance: {prizeInfo && formatPrize(prizeInfo.smallPrize)} $TRIV</p>
         <p>• 5% chance: {prizeInfo && formatPrize(prizeInfo.bigPrize)} $TRIV</p>
         <p>• 45% chance: No prize</p>
-        <p className="pt-2">Requires T Points • Once per day</p>
+        <p className="pt-2 font-semibold">Requires {REQUIRED_T_POINTS.toLocaleString()} T Points • Once per day</p>
+        {tPoints < REQUIRED_T_POINTS && (
+          <p className="pt-1 text-red-500 font-semibold">You have {tPoints.toLocaleString()} T Points (need {(REQUIRED_T_POINTS - tPoints).toLocaleString()} more)</p>
+        )}
       </div>
     </div>
   );
