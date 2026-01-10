@@ -15,7 +15,7 @@ import {
 } from "@/lib/spinwheel";
 import { getWalletTotalPoints } from "@/lib/tpoints";
 
-const REQUIRED_T_POINTS = 500000;
+const REQUIRED_T_POINTS = 10000;
 
 // Custom toast helper using the existing Triviacast toast system
 function showToast(message: string, type: 'success' | 'error' | 'info' = 'info', description?: string) {
