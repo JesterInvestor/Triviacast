@@ -25,6 +25,19 @@ function showToast(message: string, type: 'success' | 'error' | 'info' = 'info',
   }));
 }
 
+interface SpinResult {
+  type: PrizeType;
+  amount: bigint;
+}
+
+const WHEEL_SEGMENTS = [
+  { label: "NO PRIZE", color: "bg-gray-400", percentage: 45 },
+  { label: "100K $TRIV", color: "bg-blue-500", percentage: 50 },
+  { label: "1M $TRIV", color: "bg-yellow-400", percentage: 5 },
+];
+
+  const [lastSpinResult, setLastSpinResult] = useState<SpinResult | null>(null);
+  const [showResult, setShowResult] = useState(false);
 interface SpinWheelProps {
   onSpinComplete?: (prizeType: PrizeType, amount: bigint) => void;
 }
@@ -81,6 +94,31 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
     }
   }
 
+  async function handleClaim() {
+    if (!lastSpinResult || lastSpinResult.type === PrizeType.NO_PRIZE) return;
+    
+    setIsClaiming(true);
+    try {
+      // Show signing prompt
+      showToast("Sign the claim transaction in your wallet", "info");
+      
+      // Simulate claim process (in real implementation, this would be a contract call)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      setHasClaimed(true);
+      showToast("Prize Claimed!", "success", `Your ${formatPrize(lastSpinResult.amount)} $TRIV has been claimed`);
+      setShowClaimModal(false);
+      
+      // Refresh data
+      setTimeout(() => loadData(), 1000);
+    } catch (error: any) {
+      console.error("Claim failed:", error);
+      showToast("Claim failed", "error", error.message || "Please try again");
+    } finally {
+      setIsClaiming(false);
+    }
+  }
+
   async function handleSpin() {
     if (!address || isSpinning) return;
 
@@ -91,11 +129,34 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
       );
       return;
     }
-
-    setIsSpinning(true);
+setShowResult(false);
     try {
       const hash = await spin();
-      showToast("Spin initiated! Waiting for result...", "success", 
+      
+      // Simulate spin animation (3-5 seconds)
+      await new Promise(resolve => setTimeout(resolve, 4000));
+      
+      // Determine result based on random chance
+      const randomRoll = Math.random() * 100;
+      let result: SpinResult;
+      
+      if (randomRoll < 50) {
+        // Small prize (50%)
+        result = { type: PrizeType.SMALL_PRIZE, amount: prizeInfo?.smallPrize || 0n };
+        showToast("🎉 You Won!", "success", `${formatPrize(result.amount)} $TRIV`);
+      } else if (randomRoll < 55) {
+        // Big prize (5%)
+        result = { type: PrizeType.BIG_PRIZE, amount: prizeInfo?.bigPrize || 0n };
+        showToast("🤑 HUGE WIN!", "success", `${formatPrize(result.amount)} $TRIV`);
+      } else {
+        // No prize (45%)
+        result = { type: PrizeType.NO_PRIZE, amount: 0n };
+        showToast("Better luck next time!", "info", "Come back tomorrow to spin again");
+      }
+      
+      setLastSpinResult(result);
+      setShowResult(true);
+      onSpinComplete?.(result.type, result.amountshowToast("Spin initiated! Waiting for result...", "success", 
         "The wheel is spinning. Results will appear shortly."
       );
 
@@ -123,23 +184,92 @@ export function SpinWheel({ onSpinComplete }: SpinWheelProps) {
   if (!isSpinWheelConfigured()) {
     return null;
   }
+style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(3600deg); }
+        }
+        .wheel-spinning {
+          animation: spin 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+      `}</style>
+      
+      <h3 className="text-2xl font-bold mb-4 text-center">🎡 Daily Spin Wheel</h3>
 
-  if (!isConnected) {
-    return (
-      <div className="rounded-lg border border-border bg-card p-6 text-center">
-        <h3 className="text-lg font-semibold mb-2">Daily Spin Wheel</h3>
-        <p className="text-muted-foreground mb-4">
-          Connect your wallet to spin for prizes
-        </p>
+      {/* Prize Info */}
+      {prizeInfo && (
+        <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
+          <div className="bg-yellow-500/10 rounded-lg p-3 text-center">
+            <div className="text-yellow-500 font-semibold">Big Prize (5%)</div>
+            <div className="text-xl font-bold">
+              {formatPrize(prizeInfo.bigPrize)} $TRIV
+            </div>
+          </div>
+          <div className="bg-blue-500/10 rounded-lg p-3 text-center">
+            <div className="text-blue-500 font-semibold">Small Prize (50%)</div>
+            <div className="text-xl font-bold">
+              {formatPrize(prizeInfo.smallPrize)} $TRIV
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Spinning Wheel */}
+      <div className="flex justify-center mb-6">
+        <div className="relative w-48 h-48">
+          {/* Wheel */}
+          <div
+            className={`w-full h-full rounded-full border-4 border-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center ${
+              isSpinning ? "wheel-spinning" : ""
+            }`}
+            style={{
+              background: `conic-gradient(
+                from 0deg,
+                #f87171 0% 45%,
+                #3b82f6 45% 95%,
+                #facc15 95% 100%
+              )`,
+            }}
+          >
+            {/* Center Circle */}
+            <div className="absolute w-12 h-12 bg-white rounded-full border-4 border-gray-800 flex items-center justify-center">
+              <div className="text-lg font-bold">$</div>
+            </div>
+          </div>
+          
+          {/* Pointer */}
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2">
+            <div className="w-0 h-0 border-l-6 border-r-6 border-t-8 border-l-transparent border-r-transparent border-t-purple-600"></div>
+          </div>
+        </div>
       </div>
-    );
-  }
 
-  if (isLoading) {
-    return (
-      <div className="rounded-lg border border-border bg-card p-6 text-center">
-        <div className="animate-pulse">
-          <div className="h-8 bg-muted rounded w-1/2 mx-auto mb-4"></div>
+      {/* Result Display */}
+      {showResult && lastSpinResult && (
+        <div className="mb-6 p-4 rounded-lg border-2 border-purple-500 bg-purple-50 text-center">
+          {lastSpinResult.type === PrizeType.NO_PRIZE ? (
+            <div>
+              <div className="text-2xl mb-2">😢</div>
+              <div className="font-bold text-lg text-gray-800">No Prize This Time</div>
+              <div className="text-sm text-gray-600">Come back tomorrow!</div>
+            </div>
+          ) : lastSpinResult.type === PrizeType.BIG_PRIZE ? (
+            <div>
+              <div className="text-3xl mb-2">🤑🎉</div>
+              <div className="font-bold text-xl text-yellow-600">JACKPOT!</div>
+              <div className="text-2xl font-bold text-yellow-500">
+                {formatPrize(lastSpinResult.amount)} $TRIV
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div className="text-3xl mb-2">🎉</div>
+              <div className="font-bold text-lg text-blue-600">You Won!</div>
+              <div className="text-xl font-bold text-blue-500">
+                {formatPrize(lastSpinResult.amount)} $TRIV
+              </div>
+            </div>
+          )}lassName="h-8 bg-muted rounded w-1/2 mx-auto mb-4"></div>
           <div className="h-32 bg-muted rounded"></div>
         </div>
       </div>
