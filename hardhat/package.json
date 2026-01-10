@@ -11,6 +11,8 @@
     "verify:base": "hardhat verify --network base",
     "deploy:dist:base": "hardhat run scripts/deploy_distributor.ts --network base",
     "deploy:dist:sepolia": "hardhat run scripts/deploy_distributor.ts --network baseSepolia",
+    "deploy:spinwheel:base": "hardhat run scripts/deploy_spinwheel.ts --network base",
+    "deploy:spinwheel:sepolia": "hardhat run scripts/deploy_spinwheel.ts --network baseSepolia",
     "airdrop:top5:base": "hardhat run scripts/airdrop_top5.ts --network base",
     "airdrop:top5:sepolia": "hardhat run scripts/airdrop_top5.ts --network baseSepolia"
   },
@@ -23,7 +25,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@chainlink/contracts": "^1.2.0",
+    "@chainlink/contracts": "^1.5.0",
     "@openzeppelin/contracts": "^5.4.0"
   }
 }

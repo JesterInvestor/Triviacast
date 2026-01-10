@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import StakingWidget from "../../components/StakingWidget";
 import WagmiWalletConnect from "../../components/WagmiWalletConnect";
+import { SpinWheel } from "../../components/SpinWheel";
 import { useConnect, useAccount } from "wagmi";
 import {
   Jackpot as MegapotJackpot,
@@ -100,6 +101,11 @@ export default function JackpotPage() {
               )}
             </div>
           </MegapotWrapper>
+        </div>
+
+        {/* Spin Wheel */}
+        <div className="w-full mt-8">
+          <SpinWheel />
         </div>
 
         {/* Staking widget inserted below the megapot UI */}

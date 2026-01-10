@@ -13,3 +13,11 @@ export function getDailyClaimLabel(): string {
   // Default fallback
   return '50,000 $TRIV';
 }
+
+export function getSpinWheelAddress(): string | undefined {
+  return process.env.NEXT_PUBLIC_SPINWHEEL_ADDRESS;
+}
+
+export function isSpinWheelEnabled(): boolean {
+  return !!process.env.NEXT_PUBLIC_SPINWHEEL_ADDRESS;
+}
