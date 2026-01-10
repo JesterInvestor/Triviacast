@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAccount } from 'wagmi';
 import { callDailyClaim, isDistributorConfigured } from '@/lib/distributor';
 import { getDailyClaimLabel } from '@/lib/config';
+import { getWalletTotalPoints } from '@/lib/tpoints';
 
 const DISMISS_KEY = "triviacast:claim_prompt:dismissedAt";
 const DISMISS_TTL_MS = 1000 * 60 * 60 * 24; // 24 hours
@@ -49,6 +50,18 @@ export default function StakingDailyClaimPrompt() {
       }
 
       if (!isDistributorConfigured()) return; // no distributor configured
+
+      // Check if user has T points before showing the prompt
+      try {
+        const tPoints = await getWalletTotalPoints(address);
+        if (tPoints <= 0) {
+          // User has no T points, don't show the prompt
+          return;
+        }
+      } catch (err) {
+        // If we can't fetch points, don't show the prompt to be safe
+        return;
+      }
 
       // small delay so it doesn't clash with other prompts
       setTimeout(() => {

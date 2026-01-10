@@ -7,12 +7,10 @@ import Image from 'next/image';
 const DISMISS_KEY = "triviacast:add_prompt:dismissedAt";
 const DISMISS_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
 
+// Key to track if user has successfully added the miniapp
+const ADDED_KEY = "triviacast:miniapp:added";
+
 export default function AddMiniAppPrompt() {
-  // The Neynar SDK is optional at build time. Dynamically load it at runtime
-  // so that builds don't fail in environments where the package isn't installed.
-  const [isSDKLoaded, setIsSDKLoaded] = useState(false);
-  type AddMiniAppResult = { added?: boolean; reason?: string };
-  const [addMiniAppFn, setAddMiniAppFn] = useState<(() => Promise<AddMiniAppResult>) | null>(null);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,45 +18,18 @@ export default function AddMiniAppPrompt() {
   useEffect(() => {
     let cancelled = false;
 
-    // Try to dynamically import the Neynar React helper. If it's not present,
-    // we keep `isSDKLoaded` false and avoid showing the prompt.
-    (async () => {
+    const hasAdded = () => {
       try {
-  // Use an eval-backed dynamic import so bundlers don't attempt to resolve
-  // the optional package at build-time (some hosts don't install it).
-  const mod = await (eval('import("@neynar/react")') as Promise<unknown>);
-    if (mod && typeof (mod as any).useMiniApp === 'function') {
-          // We don't call the hook directly (can't call hooks conditionally). Instead
-          // we create a thin runtime wrapper that proxies to the module's functions.
-          setIsSDKLoaded(true);
-          setAddMiniAppFn(() => async () => {
-            // Re-import inside function to ensure fresh access to the hook implementation
-            // Use eval import to avoid static bundler resolution
-            const m = await (eval('import("@neynar/react")') as Promise<unknown>);
-            try {
-              const mAny = m as any;
-              // Some implementations export an `addMiniApp` helper. Use it if present.
-              if (mAny && typeof mAny.addMiniApp === 'function') {
-                return await mAny.addMiniApp();
-              }
-            } catch (e) {
-              // ignore and fallback
-            }
-            // Fallback to a global Neynar helper if host exposes it
-            const globalAny = (window as unknown) as Record<string, any>;
-            if (globalAny?.neynar?.addMiniApp) {
-              return await globalAny.neynar.addMiniApp();
-            }
-            // If we can't locate an add function, throw so callers show a friendly error.
-            throw new Error('addMiniApp not available');
-          });
-        }
+        return localStorage.getItem(ADDED_KEY) === "true";
       } catch {
-        // Not available — keep defaults
+        return false;
       }
-    })();
+    };
 
     const shouldShow = () => {
+      // Don't show if already added
+      if (hasAdded()) return false;
+      
       try {
         const raw = localStorage.getItem(DISMISS_KEY);
         if (!raw) return true;
@@ -69,16 +40,24 @@ export default function AddMiniAppPrompt() {
       }
     };
 
-    // Wait for Neynar SDK to load and only show prompt if loaded and allowed
     const setup = async () => {
       try {
-        if (!isSDKLoaded) return;
-        // Small delay to avoid racing with splash dismiss and first paint
-        setTimeout(() => {
-          if (!cancelled && shouldShow()) setOpen(true);
-        }, 1200);
+        // Check if we're in a Farcaster context
+        try {
+          const { sdk } = await import('@farcaster/miniapp-sdk');
+          const context = await sdk.context;
+          // If we have context, we're in Farcaster - show prompt if conditions met
+          if (context && !cancelled && shouldShow()) {
+            // Small delay to avoid racing with other prompts
+            setTimeout(() => {
+              if (!cancelled) setOpen(true);
+            }, 1500);
+          }
+        } catch {
+          // Not in Farcaster context, don't show
+        }
       } catch {
-        // ignore — non-host environments
+        // ignore errors
       }
     };
 
@@ -86,7 +65,7 @@ export default function AddMiniAppPrompt() {
     return () => {
       cancelled = true;
     };
-  }, [isSDKLoaded]);
+  }, []);
 
   const dismiss = () => {
     try {
@@ -99,21 +78,52 @@ export default function AddMiniAppPrompt() {
     setBusy(true);
     setError(null);
     try {
-      if (!addMiniAppFn) throw new Error('Add action not available');
-      const result = await addMiniAppFn();
-      if (result.added) {
-        // Success: don’t nag again
-        dismiss();
-      } else {
-        if (result.reason === 'invalid_domain_manifest') {
-          setError('This site cannot be added from this domain.');
-        } else if (result.reason === 'rejected_by_user') {
-          setError('You rejected the add prompt.');
-        } else {
-          setError('Unable to add app.');
+      // Try to use the Farcaster SDK addMiniApp action if available
+      try {
+        const { sdk } = await import('@farcaster/miniapp-sdk');
+        if (sdk?.actions?.addMiniApp) {
+          const result = await sdk.actions.addMiniApp();
+          if (result) {
+            // Mark as successfully added
+            try {
+              localStorage.setItem(ADDED_KEY, "true");
+            } catch {}
+            dismiss();
+            return;
+          }
         }
-        setBusy(false);
+      } catch (sdkErr) {
+        console.error('SDK addMiniApp error:', sdkErr);
       }
+
+      // Fallback: Try Neynar helper
+      try {
+        const mod = await import('@neynar/react');
+        const neynarAny = mod as any;
+        if (neynarAny?.addMiniApp) {
+          const result = await neynarAny.addMiniApp();
+          if (result?.added) {
+            // Mark as successfully added
+            try {
+              localStorage.setItem(ADDED_KEY, "true");
+            } catch {}
+            dismiss();
+            return;
+          } else if (result?.reason === 'invalid_domain_manifest') {
+            setError('This site cannot be added from this domain.');
+          } else if (result?.reason === 'rejected_by_user') {
+            setError('You rejected the add prompt.');
+          } else {
+            setError('Unable to add app.');
+          }
+        }
+      } catch (neynarErr) {
+        console.error('Neynar addMiniApp error:', neynarErr);
+      }
+
+      // If we got here, nothing worked
+      setError('Add to Mini Apps is not available. Make sure you are using Warpcast or another compatible Farcaster client.');
+      setBusy(false);
     } catch (err: unknown) {
       const e = err as { message?: string } | null;
       const msg = e?.message || "Unable to add app. Try again later.";
