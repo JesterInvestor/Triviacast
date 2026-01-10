@@ -41,7 +41,7 @@ export default function JackpotPage() {
     return () => { mounted = false };
   }, [address]);
 
-  const hasAccess = (tPoints ?? 0) >= 100000 && (iqPoints ?? 0n) >= 60n;
+  const hasAccess = (tPoints ?? 0) >= 10000 && (iqPoints ?? 0n) >= 60n;
 
   return (
     <>
@@ -63,7 +63,7 @@ export default function JackpotPage() {
           <ConnectControls />
         </div>
         <p className="text-lg sm:text-xl text-[#5a3d5c] mb-6">
-          Only 1 USDC per ticket. Only for players with 100,000 T points and 60
+          Only 1 USDC per ticket. Only for players with 10,000 T points and 60
           iQ soon. Get T points and iQ!!!
         </p>
 
@@ -92,7 +92,7 @@ export default function JackpotPage() {
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="bg-white/90 px-4 py-3 rounded-lg border border-[#F4A6B7] text-center pointer-events-auto">
                         <div className="text-sm text-[#5a3d5c] font-semibold mb-1">Access restricted</div>
-                        <div className="text-xs text-[#7a516d]">Requires 100,000 T points and 60 iQ to interact with the Jackpot.</div>
+                        <div className="text-xs text-[#7a516d]">Requires 10,000 T points and 60 iQ to interact with the Jackpot.</div>
                         <div className="text-xs text-[#5a3d5c] mt-2">You have: <strong>{(tPoints ?? 0).toLocaleString()}</strong> T and <strong>{Number(iqPoints ?? 0n)}</strong> iQ</div>
                       </div>
                     </div>

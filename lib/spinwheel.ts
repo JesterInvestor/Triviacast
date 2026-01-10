@@ -120,11 +120,11 @@ export async function canUserSpin(userAddress: string): Promise<SpinStatus> {
       functionName: 'canUserSpin',
       args: [userAddress as `0x${string}`],
       chainId: activeChain.id,
-    });
+    }) as [boolean, bigint];
     
     return {
-      canSpin: result[0] as boolean,
-      timeUntilNext: result[1] as bigint,
+      canSpin: result[0],
+      timeUntilNext: result[1],
     };
   } catch (e) {
     log.error(e, { context: 'canUserSpin', userAddress });
