@@ -185,11 +185,11 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             setProfileErrors({});
           } else {
             const data = await response.text();
-          if (!data) {
-            setProfiles(prev => ({ ...prev }));
-            setProfileErrors({});
-          } else {
-            const parsed = JSON.parse(data);
+            if (!data) {
+              setProfiles(prev => ({ ...prev }));
+              setProfileErrors({});
+            } else {
+              const parsed = JSON.parse(data);
             // Client-side normalize avatar URLs as a safety net in case server didn't resolve them.
             try {
               if (parsed && parsed.result && typeof parsed.result === 'object') {
@@ -227,6 +227,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             }
             setProfiles(prev => ({ ...prev, ...parsed.result }));
             setProfileErrors(parsed.errors || {});
+            }
           }
         } catch (err) {
           console.warn('[Leaderboard] Failed to fetch Neynar profiles:', err);
