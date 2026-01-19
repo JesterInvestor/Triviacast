@@ -21,8 +21,8 @@ const OnchainKit: {
 } = { Avatar: null, Name: null };
 async function ensureOnchainKit() {
   try {
-    // Use eval import to prevent bundlers from resolving this optional package at build time
-    const mod = await (eval('import("@coinbase/onchainkit/identity")') as Promise<unknown>);
+    // Dynamically import optional package
+    const mod = await import('@coinbase/onchainkit/identity');
     const modAny = mod as any;
     OnchainKit.Avatar = modAny?.Avatar ?? null;
     OnchainKit.Name = modAny?.Name ?? null;
@@ -407,15 +407,24 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                     const fid = profile?.fid ?? '';
                     const custody = (profile?.custody_address || '').toLowerCase();
                     const verifiedEth: string[] = (profile?.verified_addresses?.eth_addresses || []).map((x: string) => x.toLowerCase());
+                    
+                    // Escape CSV values to prevent injection attacks
+                    const escapeCSV = (val: string) => {
+                      if (val.includes(',') || val.includes('"') || val.includes('\n')) {
+                        return `"${val.replace(/"/g, '""')}"`;
+                      }
+                      return val;
+                    };
+                    
                     const csvRow = [
                       String(idx + 1),
                       addr,
                       String(entry[pointsKey] || 0),
-                      username,
-                      displayName,
+                      escapeCSV(username),
+                      escapeCSV(displayName),
                       String(fid),
-                      custody,
-                      `"${verifiedEth.join(' ')}"`,
+                      escapeCSV(custody),
+                      escapeCSV(verifiedEth.join(' '))
                     ];
                     rows.push(csvRow.join(','));
                   });
