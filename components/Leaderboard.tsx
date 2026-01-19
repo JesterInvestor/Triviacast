@@ -179,8 +179,12 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ addresses }),
           });
-          if (!response.ok) throw new Error('Failed to fetch profiles');
-          const data = await response.text();
+          if (!response.ok) {
+            console.warn(`[Leaderboard] Neynar API returned ${response.status}, continuing without profiles`);
+            setProfiles(prev => ({ ...prev }));
+            setProfileErrors({});
+          } else {
+            const data = await response.text();
           if (!data) {
             setProfiles(prev => ({ ...prev }));
             setProfileErrors({});
@@ -225,6 +229,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             setProfileErrors(parsed.errors || {});
           }
         } catch (err) {
+          console.warn('[Leaderboard] Failed to fetch Neynar profiles:', err);
           setProfiles(prev => ({ ...prev }));
           setProfileErrors({ api: String(err) });
         }
