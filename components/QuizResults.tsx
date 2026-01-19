@@ -101,6 +101,13 @@ export default function QuizResults({
 
         setPointsSaved(true);
 
+        // Trigger leaderboard refresh if available
+        setTimeout(() => {
+          if (typeof (window as any).__refreshLeaderboard === 'function') {
+            (window as any).__refreshLeaderboard();
+          }
+        }, 500);
+
         // Record event server-side (fire-and-forget)
         (async () => {
           try {

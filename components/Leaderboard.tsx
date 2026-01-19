@@ -98,6 +98,17 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const lastScrollCheckRef = useRef<number>(0);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Expose refresh function globally for QuizResults to call
+  useEffect(() => {
+    (window as any).__refreshLeaderboard = () => {
+      setRefreshTrigger(prev => prev + 1);
+    };
+    return () => {
+      delete (window as any).__refreshLeaderboard;
+    };
+  }, []);
 
   const totalTPoints = useMemo(() => {
     return leaderboard.reduce((sum, entry) => sum + (entry?.tPoints || 0), 0);
@@ -224,7 +235,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
       }
     }
     fetchData();
-  }, [address, view]);
+  }, [address, view, refreshTrigger]);
 
   // loadMore callback used by both IntersectionObserver and scroll fallback
   const loadMore = useCallback(() => {
