@@ -2,15 +2,10 @@
 
 import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
-import { LeaderboardEntry } from '@/types/quiz';
-import { getLeaderboard, getWalletTotalPoints } from '@/lib/tpoints';
-import { getIQPoints } from '@/lib/iq';
 import Link from 'next/link';
-import { useAccount } from 'wagmi';
+import { getLeaderboard } from '@/lib/tpoints';
+import { getIQPoints } from '@/lib/iq';
 import { ProfileCard } from '@/components/ProfileCard';
-
-// shareLeaderboardUrl/openShareUrl removed — wallet badge removed from leaderboard
-import { base } from 'viem/chains';
 // Avatar/Name from @coinbase/onchainkit/identity are optional at build time.
 // We'll load them dynamically at runtime and provide fallbacks.
 type AvatarProps = { address?: string; className?: string; chain?: unknown };
@@ -66,33 +61,15 @@ function resolveAvatarUrl(raw?: string | null): string | null {
   return s;
 }
 
-function ProfileDisplay({ profile, fallbackAddress }: { profile?: { displayName?: string; username?: string; avatarImgUrl?: string; pfpUrl?: string; pfp_url?: string; avatar?: string; fid?: number; bio?: string; followers?: number; following?: number; custody_address?: string; verified_addresses?: any; raw?: any }, fallbackAddress?: string }) {
-  const candidate = profile?.avatarImgUrl || profile?.pfpUrl || profile?.pfp_url || profile?.avatar || profile?.raw?.pfp_url || profile?.raw?.pfpUrl || null;
-  const avatarUrl = resolveAvatarUrl(candidate) || (fallbackAddress ? `https://cdn.stamp.fyi/avatar/${fallbackAddress}?s=32` : undefined);
-  const display = profile?.username || profile?.displayName || "Get on Facaster bro";
-  return (
-    <div className="flex items-center gap-2">
-      {avatarUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={avatarUrl} alt="avatar" className="rounded-full w-8 h-8" />
-      )}
-      <span className="font-bold text-[#2d1b2e] text-base sm:text-lg">{display}</span>
-      {profile?.fid && (
-        <span className="ml-2 text-xs text-gray-400">FID: {profile.fid}</span>
-      )}
-    </div>
-  );
-}
-// Farcaster profile display logic
-
 export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | 'iq' }) {
   const ITEMS_PER_PAGE = 20;
 
-  const [leaderboard, setLeaderboard] = useState<Array<any>>([]);
+  type Entry = { walletAddress: string; tPoints: number; iqPoints?: number };
+
+  const [leaderboard, setLeaderboard] = useState<Array<Entry>>([]);
   const [profiles, setProfiles] = useState<Record<string, any>>({});
   const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
-  const { address } = useAccount();
 
   const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -105,143 +82,125 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
     (window as any).__refreshLeaderboard = () => {
       setRefreshTrigger(prev => prev + 1);
     };
-    return () => {
-      delete (window as any).__refreshLeaderboard;
-    };
-  }, []);
+    let cancelled = false;
 
-  const totalTPoints = useMemo(() => {
-    return leaderboard.reduce((sum, entry) => sum + (entry?.tPoints || 0), 0);
-  }, [leaderboard]);
-  
-
-  // Sorted leaderboard memoized so we can paginate the sorted list consistently
-  const sortedLeaderboard = useMemo(() => {
-    return leaderboard
-      .slice()
-      .sort((a, b) => {
-        const aPoints = view === 'iq' ? (a.iqPoints || 0) : (a.tPoints || 0);
-        const bPoints = view === 'iq' ? (b.iqPoints || 0) : (b.tPoints || 0);
-        return bPoints - aPoints;
-      });
-  }, [leaderboard, view]);
-
-  // Limit to top 50 entries only (user request)
-  const MAX_DISPLAY = 50;
-  const limitedLeaderboard = useMemo(() => sortedLeaderboard.slice(0, MAX_DISPLAY), [sortedLeaderboard]);
-
-  // Reset displayCount when leaderboard or view change
-  useEffect(() => {
-    setDisplayCount(ITEMS_PER_PAGE);
-  }, [limitedLeaderboard, view]);
-
-  useEffect(() => {
     async function fetchData() {
       setLoading(true);
       try {
-        const board = await getLeaderboard();
-        // board contains walletAddress and tPoints; for IQ view we'll augment with iqPoints
-        let finalList: any[] = board;
-        if (view === 'iq') {
-          // Fetch IQ points for each address in parallel (best-effort)
-          const entries = await Promise.all(
-            board.map(async (b: any) => {
-              const addr = (b.walletAddress || '').toLowerCase();
+        // 1) Fetch T Points leaderboard from chain
+        const rawEntries = await getLeaderboard();
+        const normalized = rawEntries
+          .map((entry: any) => ({
+            walletAddress: (entry.walletAddress || entry.wallet || entry.address || '').toLowerCase(),
+            tPoints: Number(entry.tPoints || 0),
+          }))
+          .filter((e) => !!e.walletAddress);
+
+        // 2) Fetch iQ points only if needed
+        let entries: Entry[] = normalized;
+        if (view === 'iq' && normalized.length > 0) {
+          const iqValues = await Promise.all(
+            normalized.map(async (e) => {
               try {
-                const v = await getIQPoints(addr as `0x${string}`);
-                return { walletAddress: addr, iqPoints: Number(v) };
+                const v = await getIQPoints(e.walletAddress as `0x${string}`);
+                return Number(v);
               } catch (err) {
-                return { walletAddress: addr, iqPoints: 0 };
+                console.warn('[Leaderboard] getIQPoints failed', e.walletAddress, err);
+                return 0;
               }
             })
           );
-          setLeaderboard(entries);
-          finalList = entries;
-        } else {
-          setLeaderboard(board);
-          finalList = board;
+          entries = normalized.map((e, idx) => ({ ...e, iqPoints: iqValues[idx] || 0 }));
         }
 
-        // Batch fetch Farcaster profiles for the TOP N leaderboard addresses only
-        const addresses = finalList
+        if (cancelled) return;
+        setLeaderboard(entries);
+
+        // 3) Fetch Farcaster profiles for the top slice (best effort)
+        const pointsKey = view === 'iq' ? 'iqPoints' : 'tPoints';
+        const topAddresses = entries
           .slice()
-          .sort((a: any, b: any) => {
-            const aPoints = view === 'iq' ? (a.iqPoints || 0) : (a.tPoints || 0);
-            const bPoints = view === 'iq' ? (b.iqPoints || 0) : (b.tPoints || 0);
-            return bPoints - aPoints;
-          })
-          .slice(0, MAX_DISPLAY)
-          .map((b: any) => (b.walletAddress || b.wallet || b.address || '').toLowerCase())
+          .sort((a: any, b: any) => (b?.[pointsKey] || 0) - (a?.[pointsKey] || 0))
+          .slice(0, 120)
+          .map((e) => e.walletAddress)
           .filter(Boolean);
-        try {
-          const response = await fetch('/api/neynar/user', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ addresses }),
-          });
-          if (!response.ok) {
-            console.warn(`[Leaderboard] Neynar API returned ${response.status}, continuing without profiles`);
-            setProfiles(prev => ({ ...prev }));
-            setProfileErrors({});
-          } else {
-            const data = await response.text();
-            if (!data) {
-              setProfiles(prev => ({ ...prev }));
+
+        if (topAddresses.length > 0) {
+          try {
+            const resp = await fetch('/api/neynar/user', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ addresses: topAddresses }),
+            });
+
+            if (!resp.ok) {
+              throw new Error(`Neynar returned ${resp.status}`);
+            }
+
+            const text = await resp.text();
+            if (cancelled) return;
+            if (!text) {
               setProfileErrors({});
-            } else {
-              const parsed = JSON.parse(data);
-            // Client-side normalize avatar URLs as a safety net in case server didn't resolve them.
+              return;
+            }
+
+            const parsed = JSON.parse(text);
+
             try {
               if (parsed && parsed.result && typeof parsed.result === 'object') {
-                for (const [addr, p] of Object.entries(parsed.result)) {
+                for (const [, p] of Object.entries(parsed.result)) {
                   try {
                     const src = (p as any).pfpUrl || (p as any).avatarImgUrl || (p as any).pfp_url || (p as any).avatar || (p as any).raw?.pfpUrl || (p as any).raw?.pfp_url || null;
                     (p as any).pfpUrl = resolveAvatarUrl(src) || null;
                     (p as any).avatarImgUrl = (p as any).pfpUrl || (p as any).avatarImgUrl || null;
-                  } catch (e) {
-                    // ignore per-profile errors
-                  }
+                  } catch (_e) {}
                 }
               }
             } catch (e) {
               console.debug('[Leaderboard] avatar normalization failed', String(e));
             }
-            // Debug: log the raw parsed response so we can inspect pfp field names
-            try {
-              console.debug('[Leaderboard] Neynar parsed response', parsed);
-              if (parsed && parsed.result) {
-                Object.entries(parsed.result).forEach(([k, v]) => {
-                  try {
-                    const p = v as any;
-                    console.debug('[Leaderboard] profile', k, {
-                      username: p?.username,
-                      fid: p?.fid,
-                      pfpUrl: p?.pfpUrl ?? p?.pfp_url ?? p?.avatar ?? p?.raw?.pfpUrl ?? p?.raw?.pfp_url,
-                      raw: p?.raw ?? null,
-                    });
-                  } catch (e) {}
-                });
-              }
-            } catch (e) {
-              console.debug('[Leaderboard] error logging parsed response', String(e));
-            }
-            setProfiles(prev => ({ ...prev, ...parsed.result }));
+
+            setProfiles((prev) => ({ ...prev, ...(parsed.result || {}) }));
             setProfileErrors(parsed.errors || {});
-            }
+          } catch (err) {
+            console.warn('[Leaderboard] Failed to fetch Neynar profiles:', err);
+            setProfileErrors({ api: String(err) });
           }
-        } catch (err) {
-          console.warn('[Leaderboard] Failed to fetch Neynar profiles:', err);
-          setProfiles(prev => ({ ...prev }));
+        } else {
+          setProfileErrors({});
+        }
+      } catch (err) {
+        console.warn('[Leaderboard] Failed to fetch leaderboard:', err);
+        if (!cancelled) {
+          setLeaderboard([]);
           setProfileErrors({ api: String(err) });
         }
-
-        // walletTotal badge removed — no per-wallet fetch here
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
+
     fetchData();
+    return () => {
+      cancelled = true;
+    };
   }, [address, view, refreshTrigger]);
+
+  // Reset pagination when the dataset or view changes
+  useEffect(() => {
+    setDisplayCount(ITEMS_PER_PAGE);
+  }, [view, leaderboard.length]);
+
+  const sortedLeaderboard = useMemo(() => {
+    const pointsKey = view === 'iq' ? 'iqPoints' : 'tPoints';
+    return leaderboard
+      .slice()
+      .sort((a: any, b: any) => (b?.[pointsKey] || 0) - (a?.[pointsKey] || 0));
+  }, [leaderboard, view]);
+
+  const limitedLeaderboard = useMemo(() => sortedLeaderboard.slice(0, 500), [sortedLeaderboard]);
+
+  const totalTPoints = useMemo(() => leaderboard.reduce((sum, e) => sum + (e.tPoints || 0), 0), [leaderboard]);
 
   // loadMore callback used by both IntersectionObserver and scroll fallback
   const loadMore = useCallback(() => {
