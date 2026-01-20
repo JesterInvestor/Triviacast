@@ -67,6 +67,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
   type Entry = { walletAddress: string; tPoints: number; iqPoints?: number };
 
   const [leaderboard, setLeaderboard] = useState<Array<Entry>>([]);
+  const [chainError, setChainError] = useState<string | null>(null);
   const [profiles, setProfiles] = useState<Record<string, any>>({});
   const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -86,9 +87,13 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
 
     async function fetchData() {
       setLoading(true);
+      setChainError(null);
       try {
         // 1) Fetch T Points leaderboard from chain
-        const rawEntries = await getLeaderboard();
+        const rawEntries = await getLeaderboard().catch((err) => {
+          console.warn('[Leaderboard] getLeaderboard failed', err);
+          throw err;
+        });
         const normalized = rawEntries
           .map((entry: any) => ({
             walletAddress: (entry.walletAddress || entry.wallet || entry.address || '').toLowerCase(),
@@ -173,6 +178,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
         console.warn('[Leaderboard] Failed to fetch leaderboard:', err);
         if (!cancelled) {
           setLeaderboard([]);
+          setChainError('Leaderboard is temporarily unavailable.');
           setProfileErrors({ api: String(err) });
         }
       } finally {
@@ -423,6 +429,19 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
             <p className="text-[#5a3d5c] text-base sm:text-lg">
               Loading leaderboard...
             </p>
+          </div>
+        ) : chainError ? (
+          <div className="text-center py-8 sm:py-12">
+            <Image src="/brain-large.svg" alt="Brain" width={80} height={80} className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 opacity-50" priority />
+            <p className="text-[#5a3d5c] text-base sm:text-lg mb-4">
+              {chainError}
+            </p>
+            <Link
+              href="/"
+              className="bg-[#F4A6B7] hover:bg-[#E8949C] active:bg-[#DC8291] text-white font-bold py-4 px-8 rounded-lg text-base sm:text-lg transition inline-block shadow-lg min-h-[52px] mx-auto"
+            >
+              Start Quiz
+            </Link>
           </div>
         ) : sortedLeaderboard.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
