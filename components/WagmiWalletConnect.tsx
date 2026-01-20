@@ -16,13 +16,17 @@ export default function WagmiWalletConnect() {
     }
     (async () => {
       try {
-        const res = await fetch(`/api/neynar/user?address=${address}`);
+        const res = await fetch('/api/neynar/user', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ addresses: [address] }),
+        });
         if (!mounted) return;
         if (res.status === 204) {
           setProfile(null);
           return;
         }
-        const json = await res.json();
+        const json = await res.json().catch(() => ({}));
         // Debug: log fetched profile response
         try { console.debug('[WagmiWalletConnect] fetched neynar profile', { address, json }); } catch (e) {}
         setProfile(json?.result ?? null);
