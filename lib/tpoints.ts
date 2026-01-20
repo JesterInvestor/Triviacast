@@ -43,8 +43,8 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
     const totalWallets = await getTotalWalletsFromChain();
     log.info('[Triviacast] getLeaderboard totalWallets', { totalWallets });
     
-    // Use a conservative limit; some RPCs/contract versions revert on larger values
-    const limit = Math.max(1, Math.min(25, totalWallets || 25));
+    // Use a more conservative limit; some RPCs/contract versions revert on larger values
+    const limit = Math.max(1, Math.min(10, totalWallets || 10));
     log.info('[Triviacast] getLeaderboard using limit', { limit });
     const chainLeaderboard = await getLeaderboardFromChain(limit);
     
