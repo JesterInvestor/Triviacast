@@ -71,7 +71,8 @@ export function extendAbiWithErrors<T extends readonly any[]>(abi: T) {
 }
 
 // Get contract address from environment
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+// Use new TriviaPointsV2 address, fallback to legacy CONTRACT_ADDRESS
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TRIVIAPOINTS_ADDRESS || process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "84532");
 const activeChain = CHAIN_ID === 8453 ? base : baseSepolia;
 
