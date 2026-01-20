@@ -184,7 +184,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
     return () => {
       cancelled = true;
     };
-  }, [address, view, refreshTrigger]);
+  }, [view, refreshTrigger]);
 
   // Reset pagination when the dataset or view changes
   useEffect(() => {
