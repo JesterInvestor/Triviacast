@@ -6,6 +6,8 @@ import {
 } from './contract';
 import * as log from './logger';
 
+const LEADERBOARD_FETCH_LIMIT = 50;
+
 export function calculateTPoints(
   consecutiveCorrect: number,
   isCorrect: boolean,
@@ -29,7 +31,7 @@ export function calculateTPoints(
 
 /**
  * Get leaderboard from blockchain
- * @returns Array of leaderboard entries sorted by T points (descending)
+ * @returns Array of top leaderboard entries sorted by T points (descending)
  */
 export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
   if (!isContractConfigured()) {
@@ -38,20 +40,33 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
   }
 
   try {
-    // Get total number of wallets to fetch all entries
-    const { getTotalWalletsFromChain } = await import('./contract');
-    const totalWallets = await getTotalWalletsFromChain();
-    log.info('[Triviacast] getLeaderboard totalWallets', { totalWallets });
-    
-    // TriviaPointsV2 uses quicksort, can handle much larger limits efficiently
-    const limit = Math.max(1, totalWallets || 1);
-    log.info('[Triviacast] getLeaderboard using limit', { limit });
-    const chainLeaderboard = await getLeaderboardFromChain(limit);
-    
+    log.info('[Triviacast] getLeaderboard using limit', { limit: LEADERBOARD_FETCH_LIMIT });
+    const chainLeaderboard = await getLeaderboardFromChain(LEADERBOARD_FETCH_LIMIT);
     return chainLeaderboard;
   } catch (error) {
     log.error(error, { context: 'getLeaderboard' });
     return [];
+  }
+}
+
+/**
+ * Get total number of players who have earned T points
+ * @returns Total wallet count from the blockchain
+ */
+export async function getTotalPlayerCount(): Promise<number> {
+  if (!isContractConfigured()) {
+    log.warn('Contract not configured - cannot fetch total player count');
+    return 0;
+  }
+
+  try {
+    const { getTotalWalletsFromChain } = await import('./contract');
+    const total = await getTotalWalletsFromChain();
+    log.info('[Triviacast] getTotalPlayerCount', { total });
+    return total;
+  } catch (error) {
+    log.error(error, { context: 'getTotalPlayerCount' });
+    return 0;
   }
 }
 
