@@ -1,0 +1,152 @@
+[
+  {
+    "id": "ush_001",
+    "category": "US History",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "In what year was the Declaration of Independence adopted?",
+    "correct_answer": "1776",
+    "incorrect_answers": [
+      "1775",
+      "1781",
+      "1789"
+    ],
+    "explanation": "The Continental Congress adopted the Declaration of Independence on July 4, 1776.",
+    "tags": ["us-history", "founding", "easy"]
+  },
+  {
+    "id": "ush_002",
+    "category": "US History",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Who was the first President of the United States?",
+    "correct_answer": "George Washington",
+    "incorrect_answers": [
+      "John Adams",
+      "Thomas Jefferson",
+      "James Madison"
+    ],
+    "explanation": "George Washington served as the first U.S. president from 1789 to 1797.",
+    "tags": ["us-history", "presidents", "easy"]
+  },
+  {
+    "id": "ush_003",
+    "category": "US History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which purchase in 1803 nearly doubled the size of the United States?",
+    "correct_answer": "The Louisiana Purchase",
+    "incorrect_answers": [
+      "The Alaska Purchase",
+      "The Gadsden Purchase",
+      "The Oregon Treaty"
+    ],
+    "explanation": "The Louisiana Purchase from France in 1803 added vast territory west of the Mississippi River.",
+    "tags": ["us-history", "expansion", "medium"]
+  },
+  {
+    "id": "ush_004",
+    "category": "US History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which war was primarily fought between the Union and the Confederacy?",
+    "correct_answer": "The American Civil War",
+    "incorrect_answers": [
+      "The War of 1812",
+      "The Mexican-American War",
+      "The Spanish-American War"
+    ],
+    "explanation": "The American Civil War (1861–1865) was fought between Northern and Southern states over slavery and union.",
+    "tags": ["us-history", "civil-war", "medium"]
+  },
+  {
+    "id": "ush_005",
+    "category": "US History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What amendment to the U.S. Constitution abolished slavery?",
+    "correct_answer": "13th Amendment",
+    "incorrect_answers": [
+      "12th Amendment",
+      "14th Amendment",
+      "15th Amendment"
+    ],
+    "explanation": "The 13th Amendment, ratified in 1865, abolished slavery in the United States.",
+    "tags": ["us-history", "constitution", "medium"]
+  },
+  {
+    "id": "ush_006",
+    "category": "US History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which event is commonly considered the start of the Great Depression?",
+    "correct_answer": "The 1929 stock market crash",
+    "incorrect_answers": [
+      "The Dust Bowl",
+      "The New Deal",
+      "The passage of the Smoot-Hawley Tariff"
+    ],
+    "explanation": "The stock market crash in October 1929 is widely seen as the beginning of the Great Depression.",
+    "tags": ["us-history", "economy", "hard"]
+  },
+  {
+    "id": "ush_007",
+    "category": "US History",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Which U.S. document begins with the words \"We the People\"?",
+    "correct_answer": "The U.S. Constitution",
+    "incorrect_answers": [
+      "The Declaration of Independence",
+      "The Bill of Rights",
+      "The Articles of Confederation"
+    ],
+    "explanation": "The Preamble to the U.S. Constitution starts with \"We the People of the United States...\".",
+    "tags": ["us-history", "constitution", "easy"]
+  },
+  {
+    "id": "ush_008",
+    "category": "US History",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which 1964 law outlawed discrimination in public accommodations and employment?",
+    "correct_answer": "The Civil Rights Act of 1964",
+    "incorrect_answers": [
+      "The Voting Rights Act of 1965",
+      "The Fair Housing Act of 1968",
+      "The Civil Rights Act of 1875"
+    ],
+    "explanation": "The Civil Rights Act of 1964 was a landmark law that prohibited segregation and many forms of discrimination.",
+    "tags": ["us-history", "civil-rights", "hard"]
+  },
+  {
+    "id": "ush_009",
+    "category": "US History",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Who issued the Emancipation Proclamation?",
+    "correct_answer": "Abraham Lincoln",
+    "incorrect_answers": [
+      "Ulysses S. Grant",
+      "Andrew Johnson",
+      "Frederick Douglass"
+    ],
+    "explanation": "President Abraham Lincoln issued the Emancipation Proclamation in 1863 during the Civil War.",
+    "tags": ["us-history", "civil-war", "medium"]
+  },
+  {
+    "id": "ush_010",
+    "category": "US History",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Which holiday commemorates the end of slavery in the United States?",
+    "correct_answer": "Juneteenth",
+    "incorrect_answers": [
+      "Presidents Day",
+      "Labor Day",
+      "Veterans Day"
+    ],
+    "explanation": "Juneteenth commemorates June 19, 1865, when the last enslaved people in Confederate Texas were informed of their freedom.",
+    "tags": ["us-history", "juneteenth", "easy"]
+  }
+]

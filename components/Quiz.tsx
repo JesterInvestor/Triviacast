@@ -26,6 +26,8 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     'Base',
     'Christmas',
     'Podcasts',
+    'US History',
+    'Juneteenth',
     'Entertainment: Books',
     'Entertainment: Film',
     'Entertainment: Music',
@@ -91,7 +93,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
     }
 
     try {
-      const shouldPassCategory = !['Farcaster', 'Base', 'Christmas', 'Podcasts'].includes(categoryToUse);
+      const shouldPassCategory = !['Farcaster', 'Base', 'Christmas', 'Podcasts', 'US History', 'Juneteenth'].includes(categoryToUse);
       const categoryParam = categoryToUse && shouldPassCategory
         ? `&category=${encodeURIComponent(categoryToUse)}`
         : '';
@@ -103,6 +105,10 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
             ? 'christmas'
             : categoryToUse === 'Podcasts'
               ? 'podcasts'
+              : categoryToUse === 'US History'
+                ? 'us-history'
+                : categoryToUse === 'Juneteenth'
+                  ? 'juneteenth'
               : 'opentdb';
       const response = await fetch(`/api/questions?amount=10&source=${effectiveSource}${categoryParam}`);
       const data = await response.json();
@@ -436,7 +442,7 @@ export default function Quiz({ onComplete }: { onComplete?: (result: { quizId: s
           <div className="mb-6 p-3 bg-[#FFE4EC] border-2 border-[#F4A6B7] rounded-lg text-sm">
             <div className="font-semibold text-[#2d1b2e] mb-2">🔓 Unlock More Categories</div>
             <div className="text-xs text-[#5a3d5c] space-y-1">
-              <div>🟢 <strong>Always Available:</strong> General Knowledge, Farcaster, Base, Christmas</div>
+              <div>🟢 <strong>Always Available:</strong> General Knowledge, Farcaster, Base, Christmas, Podcasts, US History, Juneteenth</div>
               <div>🔒 <strong>20,000 T Points:</strong> Books, Film, Music, Musicals & Theatres</div>
               <div>🔒 <strong>50,000 T Points:</strong> Television, Video Games, Board Games, Science & Nature, Computers, Mathematics, Mythology, Sports</div>
               <div>🔒 <strong>100,000 T Points:</strong> Geography, History, Politics, Art, Celebrities, Animals, Vehicles, Comics, Gadgets, Japanese Anime & Manga, Cartoon & Animations</div>

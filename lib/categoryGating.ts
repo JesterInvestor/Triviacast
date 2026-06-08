@@ -57,6 +57,8 @@ export const UNGATED_CATEGORIES = [
   'Base',
   'Christmas',
   'Podcasts',
+  'US History',
+  'Juneteenth',
 ];
 
 // Cache category to points mapping for O(1) lookups
