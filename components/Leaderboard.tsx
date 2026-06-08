@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getLeaderboard } from '@/lib/tpoints';
+import { getLeaderboard, getTotalPlayerCount } from '@/lib/tpoints';
 import { getIQPoints } from '@/lib/iq';
 import { ProfileCard } from '@/components/ProfileCard';
 // Avatar/Name from @coinbase/onchainkit/identity are optional at build time.
@@ -71,6 +71,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
   const [profiles, setProfiles] = useState<Record<string, any>>({});
   const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [totalPlayerCount, setTotalPlayerCount] = useState<number | null>(null);
 
   const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -121,7 +122,12 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
         if (cancelled) return;
         setLeaderboard(entries);
 
-        // 3) Fetch Farcaster profiles for the top slice (best effort)
+        // 3) Fetch real total player count (independent of leaderboard page size)
+        getTotalPlayerCount().then((count) => {
+          if (!cancelled && count > 0) setTotalPlayerCount(count);
+        }).catch((err) => { console.warn('[Leaderboard] getTotalPlayerCount failed', err); });
+
+        // 4) Fetch Farcaster profiles for the top slice (best effort)
         const pointsKey = view === 'iq' ? 'iqPoints' : 'tPoints';
         const topAddresses = entries
           .slice()
@@ -327,7 +333,7 @@ export default function Leaderboard({ view = 'tpoints' }: { view?: 'tpoints' | '
                 Total Players
               </div>
               <div className="mt-1 text-lg sm:text-xl font-extrabold text-[#DC8291] drop-shadow-sm">
-                {leaderboard.length.toLocaleString()}
+                {(totalPlayerCount ?? leaderboard.length).toLocaleString()}
               </div>
             </div>
           )}
