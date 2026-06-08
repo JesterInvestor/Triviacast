@@ -3,6 +3,8 @@ import farcasterQuestions from '@/data/farcaster_questions.json';
 import baseQuestions from '@/data/base_questions.json';
 import christmasQuestions from '@/data/christmas_questions.json';
 import podcastsQuestions from '@/data/podcasts_questions.json';
+import usHistoryQuestions from '@/data/us_history_questions.json';
+import juneteenthQuestions from '@/data/juneteenth_questions.json';
 
 /**
  * Fetch questions from OpenTDB API
@@ -118,6 +120,20 @@ export function loadLocalPodcastsQuestions(): Question[] {
 }
 
 /**
+ * Load US History questions from local JSON file
+ */
+export function loadLocalUSHistoryQuestions(): Question[] {
+  return usHistoryQuestions as Question[];
+}
+
+/**
+ * Load Juneteenth questions from local JSON file
+ */
+export function loadLocalJuneteenthQuestions(): Question[] {
+  return juneteenthQuestions as Question[];
+}
+
+/**
  * Pick random questions from a pool, optionally filtering by difficulty
  */
 export function pickRandomQuestions(
@@ -147,7 +163,7 @@ export function pickRandomQuestions(
  * Get questions based on source (opentdb or farcaster)
  */
 export async function getQuestions(
-  source: 'opentdb' | 'farcaster' | 'base' | 'christmas' | 'podcasts',
+  source: 'opentdb' | 'farcaster' | 'base' | 'christmas' | 'podcasts' | 'us-history' | 'juneteenth',
   amount: number = 10,
   difficulty?: string,
   category?: string
@@ -172,6 +188,18 @@ export async function getQuestions(
     return pickRandomQuestions(allQuestions, amount, difficulty);
   } else if (source === 'podcasts') {
     let allQuestions = loadLocalPodcastsQuestions();
+    if (category) {
+      allQuestions = allQuestions.filter((q) => (q.category || '').toLowerCase() === category.toLowerCase());
+    }
+    return pickRandomQuestions(allQuestions, amount, difficulty);
+  } else if (source === 'us-history') {
+    let allQuestions = loadLocalUSHistoryQuestions();
+    if (category) {
+      allQuestions = allQuestions.filter((q) => (q.category || '').toLowerCase() === category.toLowerCase());
+    }
+    return pickRandomQuestions(allQuestions, amount, difficulty);
+  } else if (source === 'juneteenth') {
+    let allQuestions = loadLocalJuneteenthQuestions();
     if (category) {
       allQuestions = allQuestions.filter((q) => (q.category || '').toLowerCase() === category.toLowerCase());
     }

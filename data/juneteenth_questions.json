@@ -1,0 +1,152 @@
+[
+  {
+    "id": "jtn_001",
+    "category": "Juneteenth",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "On what date is Juneteenth celebrated each year?",
+    "correct_answer": "June 19",
+    "incorrect_answers": [
+      "June 9",
+      "July 4",
+      "May 19"
+    ],
+    "explanation": "Juneteenth is observed on June 19 each year.",
+    "tags": ["juneteenth", "dates", "easy"]
+  },
+  {
+    "id": "jtn_002",
+    "category": "Juneteenth",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "In which Texas city was General Order No. 3 announced on June 19, 1865?",
+    "correct_answer": "Galveston",
+    "incorrect_answers": [
+      "Houston",
+      "Austin",
+      "Dallas"
+    ],
+    "explanation": "Union General Gordon Granger announced General Order No. 3 in Galveston, Texas.",
+    "tags": ["juneteenth", "texas", "medium"]
+  },
+  {
+    "id": "jtn_003",
+    "category": "Juneteenth",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Juneteenth commemorates the enforcement of freedom for enslaved people in which state?",
+    "correct_answer": "Texas",
+    "incorrect_answers": [
+      "Louisiana",
+      "Mississippi",
+      "Georgia"
+    ],
+    "explanation": "Juneteenth marks when emancipation was enforced in Texas, the westernmost Confederate state with enslaved labor.",
+    "tags": ["juneteenth", "history", "easy"]
+  },
+  {
+    "id": "jtn_004",
+    "category": "Juneteenth",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Which Union general delivered the order that informed enslaved Texans they were free?",
+    "correct_answer": "Gordon Granger",
+    "incorrect_answers": [
+      "William T. Sherman",
+      "Ulysses S. Grant",
+      "George G. Meade"
+    ],
+    "explanation": "Major General Gordon Granger arrived in Galveston and issued General Order No. 3.",
+    "tags": ["juneteenth", "civil-war", "hard"]
+  },
+  {
+    "id": "jtn_005",
+    "category": "Juneteenth",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which U.S. constitutional amendment permanently abolished slavery?",
+    "correct_answer": "13th Amendment",
+    "incorrect_answers": [
+      "14th Amendment",
+      "15th Amendment",
+      "10th Amendment"
+    ],
+    "explanation": "The 13th Amendment was ratified in 1865 and abolished slavery in the United States.",
+    "tags": ["juneteenth", "constitution", "medium"]
+  },
+  {
+    "id": "jtn_006",
+    "category": "Juneteenth",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "What color is prominently associated with the Juneteenth flag as a symbol of freedom and new beginnings?",
+    "correct_answer": "Red, white, and blue",
+    "incorrect_answers": [
+      "Green, black, and red",
+      "Purple and gold",
+      "Black and white"
+    ],
+    "explanation": "The Juneteenth flag uses red, white, and blue to emphasize that formerly enslaved people and their descendants are Americans.",
+    "tags": ["juneteenth", "symbols", "easy"]
+  },
+  {
+    "id": "jtn_007",
+    "category": "Juneteenth",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "What was one common historical name for early Juneteenth celebrations?",
+    "correct_answer": "Jubilee Day",
+    "incorrect_answers": [
+      "Freedom Monday",
+      "Liberation Eve",
+      "Emancipation Sunday"
+    ],
+    "explanation": "Many early commemorations referred to Juneteenth festivities as Jubilee Day or Emancipation Day celebrations.",
+    "tags": ["juneteenth", "culture", "medium"]
+  },
+  {
+    "id": "jtn_008",
+    "category": "Juneteenth",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "In what year did Juneteenth become a U.S. federal holiday?",
+    "correct_answer": "2021",
+    "incorrect_answers": [
+      "2016",
+      "2019",
+      "2022"
+    ],
+    "explanation": "Juneteenth National Independence Day became a federal holiday in 2021.",
+    "tags": ["juneteenth", "federal-holiday", "hard"]
+  },
+  {
+    "id": "jtn_009",
+    "category": "Juneteenth",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Which food became a notable tradition in many Juneteenth celebrations due to its red color?",
+    "correct_answer": "Red soda and red foods",
+    "incorrect_answers": [
+      "Blueberry pie",
+      "White rice dishes",
+      "Green salads"
+    ],
+    "explanation": "Red foods and drinks are common at Juneteenth events, symbolizing resilience and remembrance.",
+    "tags": ["juneteenth", "traditions", "medium"]
+  },
+  {
+    "id": "jtn_010",
+    "category": "Juneteenth",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Juneteenth is often called by what formal federal holiday name?",
+    "correct_answer": "Juneteenth National Independence Day",
+    "incorrect_answers": [
+      "National Emancipation Day",
+      "Freedom Proclamation Day",
+      "Abolition Memorial Day"
+    ],
+    "explanation": "The official federal holiday name is Juneteenth National Independence Day.",
+    "tags": ["juneteenth", "federal-holiday", "easy"]
+  }
+]

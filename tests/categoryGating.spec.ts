@@ -194,8 +194,8 @@ describe('Category Gating', () => {
   });
 
   describe('UNGATED_CATEGORIES', () => {
-    it('should contain exactly 4 categories', () => {
-      expect(UNGATED_CATEGORIES.length).toBe(5);
+    it('should contain exactly 7 categories', () => {
+      expect(UNGATED_CATEGORIES.length).toBe(7);
     });
 
     it('should contain the expected categories', () => {
@@ -204,6 +204,8 @@ describe('Category Gating', () => {
       expect(UNGATED_CATEGORIES).toContain('Base');
       expect(UNGATED_CATEGORIES).toContain('Christmas');
       expect(UNGATED_CATEGORIES).toContain('Podcasts');
+      expect(UNGATED_CATEGORIES).toContain('US History');
+      expect(UNGATED_CATEGORIES).toContain('Juneteenth');
     });
   });
 });
